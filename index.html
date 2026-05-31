@@ -1,1 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#020713" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>OSTÉO RA — Mobile V3 GitHub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="phone-shell">
+
+    <section id="home" class="screen active">
+      <div class="top">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <p class="eyebrow">Ostéo RA</p>
+            <h1>Accueil</h1>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="toast('Notifications bientôt disponibles')">⌁</button>
+      </div>
+
+      <div class="scroll">
+        <article class="hero-card glass image-card" style="--bg-img:url('assets/images/hero-bg.webp')">
+          <div class="image-tint"></div>
+          <div class="hero-content">
+            <span class="status">Dernière vidéo</span>
+            <h2>Reprendre la pratique</h2>
+            <p>Biomécanique du rachis lombaire. Reprise à la dernière position, suivi des vues, progression et quiz.</p>
+
+            <div class="actions">
+              <button class="primary" onclick="openVideo(1)">Reprendre à 02:35</button>
+              <button class="secondary" onclick="showScreen('catalog')">Catalogue</button>
+            </div>
+
+            <div class="progress-wrap">
+              <div class="progress-label"><span>Progression vidéo</span><strong>47 %</strong></div>
+              <div class="bar"><span style="width:47%"></span></div>
+            </div>
+          </div>
+        </article>
+
+        <div class="stats-grid">
+          <div class="stat soft"><strong>48</strong><span>vues</span></div>
+          <div class="stat soft"><strong>150</strong><span>vidéos</span></div>
+          <div class="stat soft"><strong>32</strong><span>quiz</span></div>
+          <div class="stat soft"><strong>72%</strong><span>global</span></div>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Explorer</p>
+            <h3>Les 3 parties</h3>
+          </div>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card glass image-card compact" style="--bg-img:url('assets/images/module-rachis.webp')" onclick="filterCategory('Rachis')">
+            <div class="image-tint"></div>
+            <div class="module-content">
+              <span class="module-number">01</span>
+              <h4>Rachis</h4>
+              <p>Cervicales, dorsales, lombaires, côtes et bassin.</p>
+              <div class="progress-wrap">
+                <div class="progress-label"><span>52 vidéos</span><strong>68%</strong></div>
+                <div class="bar"><span style="width:68%"></span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="module-card glass image-card compact" style="--bg-img:url('assets/images/module-membres-superieurs.webp')" onclick="filterCategory('Membres supérieurs')">
+            <div class="image-tint"></div>
+            <div class="module-content">
+              <span class="module-number">02</span>
+              <h4>Membres supérieurs</h4>
+              <p>Épaule, coude, poignet, main.</p>
+              <div class="progress-wrap">
+                <div class="progress-label"><span>48 vidéos</span><strong>54%</strong></div>
+                <div class="bar"><span style="width:54%"></span></div>
+              </div>
+            </div>
+          </article>
+
+          <article class="module-card glass image-card compact" style="--bg-img:url('assets/images/module-membres-inferieurs.webp')" onclick="filterCategory('Membres inférieurs')">
+            <div class="image-tint"></div>
+            <div class="module-content">
+              <span class="module-number">03</span>
+              <h4>Membres inférieurs</h4>
+              <p>Hanche, genou, cheville, pied.</p>
+              <div class="progress-wrap">
+                <div class="progress-label"><span>50 vidéos</span><strong>60%</strong></div>
+                <div class="bar"><span style="width:60%"></span></div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="catalog" class="screen">
+      <div class="top">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <p class="eyebrow">Bibliothèque</p>
+            <h1>Vidéos</h1>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="toast('Filtres avancés ensuite')">☷</button>
+      </div>
+
+      <div class="search-box">
+        <input id="search" placeholder="Rechercher une technique..." />
+      </div>
+
+      <div class="chips">
+        <button class="chip active" data-filter="Tous">Toutes</button>
+        <button class="chip" data-filter="Rachis">Rachis</button>
+        <button class="chip" data-filter="Membres supérieurs">Membres supérieurs</button>
+        <button class="chip" data-filter="Membres inférieurs">Membres inférieurs</button>
+      </div>
+
+      <div class="scroll">
+        <div id="videoList" class="video-list"></div>
+      </div>
+    </section>
+
+    <section id="player" class="screen player-screen">
+      <div class="top">
+        <button class="icon-btn" onclick="showScreen('catalog')">‹</button>
+        <div style="text-align:center;min-width:0">
+          <p class="eyebrow">Lecteur pédagogique</p>
+          <h1 style="font-size:18px" id="playerTopTitle">Technique</h1>
+        </div>
+        <button class="icon-btn" onclick="toast('Ajouté aux favoris')">☆</button>
+      </div>
+
+      <div class="scroll">
+        <div class="player-grid-ipad">
+          <div>
+            <div class="video-stage glass image-card" id="videoStage">
+              <div class="image-tint"></div>
+              <button class="play-overlay" onclick="togglePlay()">▶</button>
+            </div>
+
+            <article class="player-title glass">
+              <h2 id="playerTitle">Technique de thrust lombaire</h2>
+              <p id="playerMeta">Rachis • Lombaires • Avancé • 6 min</p>
+
+              <div class="timeline">
+                <span id="timeStart">02:35</span>
+                <input id="timeline" type="range" min="0" max="100" value="47" />
+                <span>06:00</span>
+              </div>
+
+              <div class="control-panel">
+                <button class="secondary" onclick="jump(-10)">-10 s</button>
+                <button class="primary" id="playButton" onclick="togglePlay()">Lecture</button>
+                <button class="secondary" onclick="jump(10)">+10 s</button>
+              </div>
+
+              <div class="quick-actions">
+                <button class="secondary" onclick="restartVideo()">Recommencer</button>
+                <button class="secondary" onclick="markReview()">À revoir</button>
+                <button class="secondary" onclick="markMastered()">Maîtrisée</button>
+                <button class="secondary" onclick="showScreen('quiz')">Quiz</button>
+              </div>
+            </article>
+          </div>
+
+          <div>
+            <div class="tabs">
+              <button class="tab active" data-tab="steps">Étapes</button>
+              <button class="tab" data-tab="text">Texte</button>
+              <button class="tab" data-tab="stats">Stats</button>
+            </div>
+
+            <div id="steps" class="panel glass active">
+              <ol class="steps" id="stepsList"></ol>
+            </div>
+
+            <div id="text" class="panel glass">
+              <p id="description"></p>
+            </div>
+
+            <div id="statsPanel" class="panel glass">
+              <div class="mini-stat"><span>Nombre de vues</span><strong id="views">4</strong></div>
+              <div class="mini-stat"><span>Pourcentage vu</span><strong id="percent">87 %</strong></div>
+              <div class="mini-stat"><span>Dernière position</span><strong id="lastPosition">02:35</strong></div>
+              <div class="mini-stat"><span>Statut</span><strong id="status">À revoir</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz" class="screen">
+      <div class="top">
+        <button class="icon-btn" onclick="showScreen('player')">‹</button>
+        <div>
+          <p class="eyebrow">Révision</p>
+          <h1>Quiz</h1>
+        </div>
+        <button class="icon-btn" onclick="toast('Score enregistré')">✓</button>
+      </div>
+
+      <div class="scroll">
+        <article class="quiz-card glass">
+          <p class="eyebrow">Question active</p>
+          <h2 id="quizQuestion">Quel est le point clé de sécurité ?</h2>
+          <div class="answers" id="answers"></div>
+          <div class="actions">
+            <button class="secondary" onclick="prevQuestion()">Précédent</button>
+            <button class="primary" onclick="nextQuestion()">Suivant</button>
+          </div>
+          <p class="feedback" id="feedback"></p>
+        </article>
+      </div>
+    </section>
+
+    <section id="profile" class="screen">
+      <div class="top">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            <p class="eyebrow">Étudiant</p>
+            <h1>Profil</h1>
+          </div>
+        </div>
+        <button class="icon-btn" onclick="toast('Export bientôt disponible')">⇪</button>
+      </div>
+
+      <div class="scroll">
+        <article class="hero-card glass image-card small-hero" style="--bg-img:url('assets/images/app-background.webp')">
+          <div class="image-tint"></div>
+          <div class="hero-content">
+            <span class="status">Progression</span>
+            <h2>Suivi global</h2>
+            <p>Visionnage, quiz, zones maîtrisées, vidéos à revoir et statistiques d’apprentissage.</p>
+          </div>
+        </article>
+
+        <div class="profile-metrics">
+          <div class="metric soft"><strong>72%</strong><span>Global</span></div>
+          <div class="metric soft"><strong>68%</strong><span>Rachis</span></div>
+          <div class="metric soft"><strong>54%</strong><span>Membres sup.</span></div>
+          <div class="metric soft"><strong>60%</strong><span>Membres inf.</span></div>
+          <div class="metric soft"><strong>48</strong><span>Vidéos vues</span></div>
+          <div class="metric soft"><strong>12</strong><span>À revoir</span></div>
+        </div>
+
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Version payante</p>
+            <h3>À brancher ensuite</h3>
+          </div>
+        </div>
+
+        <article class="glass info-card">
+          <p>
+            Connexion étudiant, abonnement, vidéos sécurisées, historique réel, administration des 150 vidéos, suivi école et statistiques par promotion.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <nav class="bottom-nav">
+      <button class="active" data-screen="home"><span class="ico">⌂</span>Accueil</button>
+      <button data-screen="catalog"><span class="ico">▷</span>Vidéos</button>
+      <button data-screen="player"><span class="ico">◉</span>Lecteur</button>
+      <button data-screen="quiz"><span class="ico">?</span>Quiz</button>
+      <button data-screen="profile"><span class="ico">♙</span>Profil</button>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
 
