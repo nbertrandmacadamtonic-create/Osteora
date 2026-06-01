@@ -1,349 +1,368 @@
-
-const videos = [
+const techniques = [
   {
     id:1,
-    title:"Technique de thrust lombaire",
-    category:"Rachis",
-    sub:"Lombaires",
-    level:"Avancé",
-    duration:"6 min",
-    views:4,
-    percent:87,
-    progress:47,
-    last:"02:35",
-    status:"À revoir",
-    image:"assets/images/module-rachis.webp",
-    description:"Vidéo noyau V3 : installation, prise de contact, mise en tension, verrouillage, impulsion, sécurité et retour au calme. Le texte vient autour de la vidéo, mais la vidéo reste le centre de l'application.",
-    steps:["Installation du patient en décubitus latéral.","Prise de contact précise et stable.","Mise en tension progressive.","Recherche de la barrière motrice.","Impulsion brève et contrôlée.","Vérification et retour au calme."]
-  },
-  {
-    id:7,
     title:"Dysfonction cervicale C2-C6 assis",
     category:"Rachis",
     sub:"Cervicales",
-    level:"Avancé",
-    duration:"6 min",
-    views:0,
-    percent:0,
-    progress:0,
-    last:"00:00",
-    status:"Non vue",
-    image:"assets/images/module-rachis.webp",
+    level:"Niveau intermédiaire",
+    type:"Technique structurelle",
+    duration:"06:38",
+    views:12,
+    percent:87,
+    score:"4,7/5",
+    status:"non vue",
+    icon:"▷",
+    poster:"assets/images/video-poster-cervicale-c2-c6.webp",
     video:"assets/videos/dysfonction-cervicale-c2-c6-assis.mp4",
-    description:"Technique structurelle cervicale en position assise, centrée sur l’analyse et la correction d’une dysfonction C2-C6. Cette vidéo sert de premier test réel dans le module Rachis cervical.",
-    steps:["Installation du patient en position assise.","Placement du praticien et prise de contact cervicale.","Repérage de la dysfonction C2-C6.","Mise en tension progressive et sécurisée.","Correction contrôlée dans l’axe.","Retour au neutre et réévaluation."]
+    steps:[
+      "Position du praticien",
+      "Position du patient",
+      "Contact et évaluation",
+      "Mise en tension",
+      "Thrust / impulsion",
+      "Réévaluation"
+    ]
   },
   {
     id:2,
-    title:"Technique HVLA du rachis thoracique",
+    title:"Technique de rotation cervicale assise",
     category:"Rachis",
-    sub:"Dorsales",
-    level:"Intermédiaire",
-    duration:"5 min",
-    views:2,
-    percent:54,
-    progress:31,
-    last:"01:12",
-    status:"En cours",
-    image:"assets/images/module-rachis.webp",
-    description:"Révision des appuis et des axes de correction thoraciques.",
-    steps:["Identifier le segment cible.","Positionner les mains et les leviers.","Optimiser l’appui thoracique.","Contrôler l’axe avant impulsion."]
+    sub:"Cervicales",
+    level:"Niveau intermédiaire",
+    type:"Énergie musculaire",
+    duration:"07:20",
+    views:8,
+    percent:100,
+    score:"4,4/5",
+    status:"vue",
+    icon:"↻",
+    steps:["Installation","Évaluation","Contraction isométrique","Relâchement","Gain d’amplitude"]
   },
   {
     id:3,
-    title:"Épaule : abduction et rotation",
-    category:"Membres supérieurs",
-    sub:"Épaule",
-    level:"Débutant",
-    duration:"4 min",
-    views:5,
-    percent:92,
-    progress:64,
-    last:"04:00",
-    status:"Maîtrisée",
-    image:"assets/images/module-membres-superieurs.webp",
-    description:"Travail structurel guidé autour de l’épaule.",
-    steps:["Installation de l’épaule.","Mise en tension douce.","Contrôle de l’abduction.","Rotation et libération."]
+    title:"Technique de flexion cervicale",
+    category:"Rachis",
+    sub:"Cervicales",
+    level:"Niveau débutant",
+    type:"Énergie musculaire",
+    duration:"05:45",
+    views:3,
+    percent:50,
+    score:"3,8/5",
+    status:"à revoir",
+    icon:"↓",
+    steps:["Installation","Contact","Correction","Réévaluation"]
   },
   {
     id:4,
-    title:"Poignet : correction structurelle",
-    category:"Membres supérieurs",
-    sub:"Poignet",
-    level:"Intermédiaire",
-    duration:"4 min",
-    views:1,
-    percent:21,
-    progress:12,
-    last:"00:48",
-    status:"Commencée",
-    image:"assets/images/module-membres-superieurs.webp",
-    description:"Repères et gestes clés pour le poignet.",
-    steps:["Repérer la restriction.","Positionner la prise.","Corriger l’axe.","Contrôler la mobilité finale."]
+    title:"Technique de l’élévateur de la scapula",
+    category:"Rachis",
+    sub:"Cervicales",
+    level:"Niveau intermédiaire",
+    type:"Énergie musculaire",
+    duration:"06:10",
+    views:6,
+    percent:60,
+    score:"4,1/5",
+    status:"en cours",
+    icon:"♙",
+    steps:["Repérage","Positionnement","Contraction","Relâchement","Réévaluation"]
   },
   {
     id:5,
-    title:"Cheville : mobilité et restrictions",
-    category:"Membres inférieurs",
-    sub:"Cheville",
-    level:"Intermédiaire",
-    duration:"5 min",
-    views:3,
-    percent:72,
-    progress:55,
-    last:"03:07",
-    status:"En cours",
-    image:"assets/images/module-membres-inferieurs.webp",
-    description:"Révision structurelle de la cheville, avec sécurisation des appuis.",
-    steps:["Bilan initial de la cheville.","Prise de contact et verrouillage.","Mobilité guidée.","Correction finale et contrôle."]
+    title:"Relâchement des muscles sous-occipitaux",
+    category:"Rachis",
+    sub:"Cervicales",
+    level:"Niveau débutant",
+    type:"Énergie musculaire",
+    duration:"04:50",
+    views:0,
+    percent:0,
+    score:"—",
+    status:"non vue",
+    icon:"✋",
+    steps:["Installation","Contact sous-occipital","Respiration","Relâchement","Réévaluation"]
   },
   {
     id:6,
-    title:"Genou : chaînes de correction",
+    title:"Technique de glissement cervical latéral",
+    category:"Rachis",
+    sub:"Cervicales",
+    level:"Niveau avancé",
+    type:"Technique structurelle",
+    duration:"08:12",
+    views:4,
+    percent:30,
+    score:"3,9/5",
+    status:"en cours",
+    icon:"▥",
+    steps:["Position","Contact","Mise en tension","Impulsion","Réévaluation"]
+  },
+  {
+    id:7,
+    title:"Technique dorsale à genoux",
+    category:"Rachis",
+    sub:"Dorsales",
+    level:"Niveau intermédiaire",
+    type:"Technique structurelle",
+    duration:"08:45",
+    views:10,
+    percent:78,
+    score:"4,5/5",
+    status:"vue",
+    icon:"▷",
+    steps:["Position du patient","Contact dorsal","Mise en tension","Impulsion","Réévaluation"]
+  },
+  {
+    id:8,
+    title:"Technique lombaire en décubitus",
+    category:"Rachis",
+    sub:"Lombaires",
+    level:"Niveau avancé",
+    type:"Technique structurelle",
+    duration:"09:30",
+    views:7,
+    percent:80,
+    score:"4,6/5",
+    status:"vue",
+    icon:"▷",
+    steps:["Décubitus latéral","Verrouillage","Mise en tension","Impulsion","Réévaluation"]
+  },
+  {
+    id:9,
+    title:"Correction de l’épaule en énergie musculaire",
+    category:"Membres supérieurs",
+    sub:"Épaule",
+    level:"Niveau intermédiaire",
+    type:"Énergie musculaire",
+    duration:"06:20",
+    views:5,
+    percent:62,
+    score:"4,2/5",
+    status:"en cours",
+    icon:"↻",
+    steps:["Test initial","Positionnement","Contraction","Relâchement","Contrôle"]
+  },
+  {
+    id:10,
+    title:"Technique du genou en chaîne fermée",
     category:"Membres inférieurs",
     sub:"Genou",
-    level:"Avancé",
-    duration:"7 min",
-    views:2,
-    percent:66,
-    progress:39,
-    last:"02:18",
-    status:"À revoir",
-    image:"assets/images/module-membres-inferieurs.webp",
-    description:"Technique avancée sur les chaînes de correction du genou.",
-    steps:["Identifier la chaîne dominante.","Mise en position du membre inférieur.","Correction contrôlée.","Réévaluation fonctionnelle."]
+    level:"Niveau intermédiaire",
+    type:"Énergie musculaire",
+    duration:"07:10",
+    views:3,
+    percent:43,
+    score:"3,9/5",
+    status:"à revoir",
+    icon:"↻",
+    steps:["Analyse","Contact","Correction","Contrôle"]
   }
 ];
 
-const quiz = [
-  {question:"Quel est le point clé de sécurité dans une technique structurelle ?",answers:["La force maximale","Le verrouillage et l’axe","La vitesse uniquement"],correct:1},
-  {question:"Quel élément doit rester au centre de cette application ?",answers:["Le lecteur vidéo pédagogique","Le logo","La page profil"],correct:0},
-  {question:"Quelle statistique est indispensable pour l’étudiant ?",answers:["Nombre de vues et pourcentage vu","Couleur préférée","Nom du navigateur"],correct:0}
-];
-
-let currentFilter = "Tous";
-let currentVideo = videos[0];
+let currentSubzone = "Cervicales";
+let previousTechniqueScreen = "rachis";
+let currentTechnique = techniques[0];
 let playing = false;
-let quizIndex = 0;
 
 const screens = document.querySelectorAll(".screen");
 const navButtons = document.querySelectorAll(".bottom-nav button");
-const chips = document.querySelectorAll(".chip");
-const search = document.getElementById("search");
 
 function showScreen(id){
-  screens.forEach(s => s.classList.toggle("active", s.id === id));
-  navButtons.forEach(b => b.classList.toggle("active", b.dataset.screen === id));
+  screens.forEach(screen => screen.classList.toggle("active", screen.id === id));
+  navButtons.forEach(button => button.classList.toggle("active", button.dataset.screen === id));
+  const activeScroll = document.querySelector(`#${id} .scroll`);
+  if(activeScroll) activeScroll.scrollTop = 0;
 }
 
-navButtons.forEach(btn => {
-  btn.addEventListener("click", () => showScreen(btn.dataset.screen));
+navButtons.forEach(button => {
+  button.addEventListener("click", () => showScreen(button.dataset.screen));
 });
 
-function renderVideos(){
-  const q = search.value.toLowerCase().trim();
-  const filtered = videos.filter(v => {
-    const matchFilter = currentFilter === "Tous" || v.category === currentFilter;
-    const matchSearch = !q || `${v.title} ${v.category} ${v.sub} ${v.level}`.toLowerCase().includes(q);
-    return matchFilter && matchSearch;
+function openRegion(region){
+  previousTechniqueScreen = "bodyMap";
+  document.getElementById("techScreenTitle").textContent = region;
+  currentSubzone = region;
+  renderTechniqueList(region);
+  showScreen("techniques");
+}
+
+function openSubzone(subzone){
+  previousTechniqueScreen = "rachis";
+  currentSubzone = subzone;
+  document.getElementById("techScreenTitle").textContent = subzone;
+  renderTechniqueList();
+  showScreen("techniques");
+}
+
+function backFromTechniques(){
+  if(["Cervicales","Dorsales","Lombaires"].includes(currentSubzone)){
+    showScreen("rachis");
+  } else {
+    showScreen("bodyMap");
+  }
+}
+
+function renderTechniqueList(forcedCategory){
+  const search = (document.getElementById("techSearch")?.value || "").toLowerCase().trim();
+  const list = document.getElementById("techniqueList");
+  let filtered = techniques.filter(t => {
+    const zoneMatch = forcedCategory ? t.category === forcedCategory : (t.sub === currentSubzone || t.category === currentSubzone);
+    const searchMatch = !search || `${t.title} ${t.category} ${t.sub} ${t.level} ${t.type}`.toLowerCase().includes(search);
+    return zoneMatch && searchMatch;
   });
 
-  document.getElementById("videoList").innerHTML = filtered.map(v => `
-    <article class="video-card soft" onclick="openVideo(${v.id})">
-      <div class="thumb" style="--thumb:url('${v.image}')"></div>
+  if(filtered.length === 0){
+    filtered = techniques.filter(t => t.category === forcedCategory || t.category === currentSubzone);
+  }
+
+  list.innerHTML = filtered.map((t, index) => `
+    <button class="tech-card glass ${index === 0 ? "featured" : ""}" onclick="openTechnique(${t.id})">
+      <div class="tech-icon ${t.poster ? 'poster' : ''}" style="${t.poster ? `--poster:url('${t.poster}')` : ''}">${t.poster ? '' : t.icon}</div>
       <div>
-        <h4>${v.title}</h4>
-        <p>${v.category} • ${v.sub} • ${v.duration}</p>
-        <div class="tag-row">
-          <span class="tag">${v.level}</span>
-          <span class="tag">${v.status}</span>
-          <span class="tag">${v.percent}% vu</span>
-        </div>
+        <h2>${t.title}</h2>
+        <span class="level">${t.level}</span>
       </div>
-      <div class="video-card-footer">
-        <div class="bar"><span style="width:${v.progress}%"></span></div>
-        <button class="small-btn">Ouvrir</button>
+      <div class="tech-state">
+        ${stateLabel(t)}
       </div>
-    </article>
+    </button>
   `).join("");
 }
 
-chips.forEach(chip => {
-  chip.addEventListener("click", () => {
-    currentFilter = chip.dataset.filter;
-    chips.forEach(c => c.classList.remove("active"));
-    chip.classList.add("active");
-    renderVideos();
-  });
-});
-
-search.addEventListener("input", renderVideos);
-
-function filterCategory(category){
-  currentFilter = category;
-  chips.forEach(c => c.classList.toggle("active", c.dataset.filter === category));
-  renderVideos();
-  showScreen("catalog");
+function stateLabel(t){
+  if(t.status === "vue") return `<span class="seen">vue ✓</span>`;
+  if(t.status === "à revoir") return `<span class="review">à revoir !</span>`;
+  if(t.percent > 0) return `<strong>${t.percent}%</strong>`;
+  return `<span>non vue ○</span>`;
 }
 
-function openVideo(id){
-  currentVideo = videos.find(v => v.id === id);
-  document.getElementById("playerTitle").textContent = currentVideo.title;
-  document.getElementById("playerTopTitle").textContent = currentVideo.title.length > 24 ? currentVideo.title.slice(0,24) + "…" : currentVideo.title;
-  document.getElementById("playerMeta").textContent = `${currentVideo.category} • ${currentVideo.sub} • ${currentVideo.level} • ${currentVideo.duration}`;
-  document.getElementById("timeline").value = currentVideo.progress;
-  document.getElementById("timeStart").textContent = currentVideo.last;
-  document.getElementById("description").textContent = currentVideo.description;
-  document.getElementById("views").textContent = currentVideo.views;
-  document.getElementById("percent").textContent = currentVideo.percent + " %";
-  document.getElementById("lastPosition").textContent = currentVideo.last;
-  document.getElementById("status").textContent = currentVideo.status;
-  document.getElementById("stepsList").innerHTML = currentVideo.steps.map(s => `<li>${s}</li>`).join("");
-  const videoStage = document.getElementById("videoStage");
-  videoStage.style.setProperty("--bg-img", `url('${currentVideo.image}')`);
+function openTechnique(id){
+  currentTechnique = techniques.find(t => t.id === id) || techniques[0];
 
-  if (currentVideo.video) {
+  document.getElementById("playerTopTitle").textContent = shortTitle(currentTechnique.title);
+  document.getElementById("playerTitle").textContent = currentTechnique.title;
+  document.getElementById("playerZone").textContent = `${currentTechnique.category} ${currentTechnique.sub}`.trim();
+  document.getElementById("playerType").textContent = currentTechnique.type;
+  document.getElementById("playerLevel").textContent = currentTechnique.level;
+  document.getElementById("timeEnd").textContent = currentTechnique.duration;
+  document.getElementById("playerViews").textContent = currentTechnique.views;
+  document.getElementById("playerPercent").textContent = `${currentTechnique.percent}%`;
+  document.getElementById("playerScore").textContent = currentTechnique.score;
+  document.getElementById("timeline").value = currentTechnique.percent || 0;
+  document.getElementById("stepsList").innerHTML = currentTechnique.steps.map(step => `<li><span>${step}</span><em>⌄</em></li>`).join("");
+
+  const videoStage = document.getElementById("videoStage");
+  if(currentTechnique.video){
+    videoStage.classList.toggle("poster-bg", !!currentTechnique.poster);
+    if(currentTechnique.poster){
+      videoStage.style.setProperty("--poster", `url('${currentTechnique.poster}')`);
+    }
     videoStage.innerHTML = `
-      <video id="realVideo" class="real-video" controls playsinline preload="metadata" poster="${currentVideo.image}">
-        <source src="${currentVideo.video}" type="video/mp4">
+      <video id="realVideo" class="real-video" controls playsinline preload="metadata" poster="${currentTechnique.poster || ''}">
+        <source src="${currentTechnique.video}" type="video/mp4">
         Votre navigateur ne peut pas lire cette vidéo.
       </video>
     `;
-
-    const realVideo = document.getElementById("realVideo");
-
-    realVideo.addEventListener("play", () => {
-      playing = true;
-      document.getElementById("playButton").textContent = "Pause";
-      currentVideo.views += 1;
-      document.getElementById("views").textContent = currentVideo.views;
-    });
-
-    realVideo.addEventListener("pause", () => {
-      playing = false;
-      document.getElementById("playButton").textContent = "Lecture";
-    });
-
-    realVideo.addEventListener("timeupdate", () => {
-      if (!realVideo.duration) return;
-      const percent = Math.round((realVideo.currentTime / realVideo.duration) * 100);
-      currentVideo.progress = percent;
-      currentVideo.percent = Math.max(currentVideo.percent, percent);
-      document.getElementById("timeline").value = percent;
-      document.getElementById("percent").textContent = currentVideo.percent + " %";
-      const minutes = String(Math.floor(realVideo.currentTime / 60)).padStart(2, "0");
-      const seconds = String(Math.floor(realVideo.currentTime % 60)).padStart(2, "0");
-      currentVideo.last = `${minutes}:${seconds}`;
-      document.getElementById("timeStart").textContent = currentVideo.last;
-      document.getElementById("lastPosition").textContent = currentVideo.last;
-    });
-
-    document.getElementById("timeline").oninput = () => {
-      if (!realVideo.duration) return;
-      realVideo.currentTime = (Number(document.getElementById("timeline").value) / 100) * realVideo.duration;
-    };
+    setupRealVideo();
   } else {
-    videoStage.innerHTML = `
-      <div class="image-tint"></div>
-      <button class="play-overlay" onclick="togglePlay()">▶</button>
-    `;
+    videoStage.classList.toggle("poster-bg", !!currentTechnique.poster);
+    if(currentTechnique.poster){
+      videoStage.style.setProperty("--poster", `url('${currentTechnique.poster}')`);
+    }
+    videoStage.innerHTML = `<div class="fake-video"><span>▶</span></div>`;
   }
+
   playing = false;
-  document.getElementById("playButton").textContent = "Lecture";
+  document.getElementById("playButton").textContent = "▶";
   showScreen("player");
 }
 
-function togglePlay(){
-  const realVideo = document.getElementById("realVideo");
+function setupRealVideo(){
+  const video = document.getElementById("realVideo");
+  if(!video) return;
 
-  if (realVideo) {
-    if (realVideo.paused) {
-      realVideo.play();
-    } else {
-      realVideo.pause();
-    }
+  video.addEventListener("play", () => {
+    playing = true;
+    document.getElementById("playButton").textContent = "Ⅱ";
+    currentTechnique.views += 1;
+    document.getElementById("playerViews").textContent = currentTechnique.views;
+  });
+
+  video.addEventListener("pause", () => {
+    playing = false;
+    document.getElementById("playButton").textContent = "▶";
+  });
+
+  video.addEventListener("timeupdate", () => {
+    if(!video.duration) return;
+    const percent = Math.round((video.currentTime / video.duration) * 100);
+    currentTechnique.percent = Math.max(currentTechnique.percent, percent);
+    document.getElementById("timeline").value = percent;
+    document.getElementById("playerPercent").textContent = `${currentTechnique.percent}%`;
+    document.getElementById("timeStart").textContent = formatTime(video.currentTime);
+  });
+
+  document.getElementById("timeline").oninput = () => {
+    if(!video.duration) return;
+    video.currentTime = (Number(document.getElementById("timeline").value) / 100) * video.duration;
+  };
+}
+
+function togglePlay(){
+  const video = document.getElementById("realVideo");
+  if(video){
+    video.paused ? video.play() : video.pause();
     return;
   }
-
   playing = !playing;
-  document.getElementById("playButton").textContent = playing ? "Pause" : "Lecture";
-  if(playing){
-    currentVideo.views += 1;
-    document.getElementById("views").textContent = currentVideo.views;
-  }
+  document.getElementById("playButton").textContent = playing ? "Ⅱ" : "▶";
 }
 
 function jump(seconds){
-  const realVideo = document.getElementById("realVideo");
-  if (realVideo) {
-    realVideo.currentTime = Math.max(0, Math.min(realVideo.duration || 0, realVideo.currentTime + seconds));
-    return;
+  const video = document.getElementById("realVideo");
+  if(video){
+    video.currentTime = Math.max(0, Math.min(video.duration || 0, video.currentTime + seconds));
+  } else {
+    const timeline = document.getElementById("timeline");
+    timeline.value = Math.max(0, Math.min(100, Number(timeline.value) + seconds / 3));
   }
-
-  const timeline = document.getElementById("timeline");
-  timeline.value = Math.max(0, Math.min(100, Number(timeline.value) + seconds/3));
 }
 
-function restartVideo(){
-  const realVideo = document.getElementById("realVideo");
-  if (realVideo) {
-    realVideo.currentTime = 0;
-    realVideo.pause();
-  }
-  document.getElementById("timeline").value = 0;
-  document.getElementById("timeStart").textContent = "00:00";
-  document.getElementById("lastPosition").textContent = "00:00";
-  currentVideo.last = "00:00";
-  toast("Vidéo recommencée");
-}
+function previousStep(){ toast("Étape précédente"); }
+function nextStep(){ toast("Étape suivante"); }
+function toggleFavorite(){ toast("Ajouté aux favoris"); }
 
-function markReview(){
-  currentVideo.status = "À revoir";
-  document.getElementById("status").textContent = "À revoir";
-  toast("Technique marquée à revoir");
-}
-
-function markMastered(){
-  currentVideo.status = "Maîtrisée";
-  document.getElementById("status").textContent = "Maîtrisée";
-  toast("Technique marquée maîtrisée");
-}
-
-document.querySelectorAll(".tab").forEach(tab => {
-  tab.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-    tab.classList.add("active");
-    document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
-    document.getElementById(tab.dataset.tab === "stats" ? "statsPanel" : tab.dataset.tab).classList.add("active");
+document.querySelectorAll(".content-tabs button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".content-tabs button").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-panel").forEach(panel => panel.classList.remove("active"));
+    button.classList.add("active");
+    document.getElementById(`tab-${button.dataset.tab}`).classList.add("active");
   });
 });
 
-function renderQuiz(){
-  const item = quiz[quizIndex];
-  document.getElementById("quizQuestion").textContent = item.question;
-  document.getElementById("feedback").textContent = "";
-  document.getElementById("answers").innerHTML = item.answers.map((a,i)=>`
-    <button class="answer" onclick="answerQuiz(${i})">${a}</button>
-  `).join("");
+function openRevisionCard(mode){
+  toast(mode === "random" ? "Carte tirée au sort" : "Révision ciblée");
+  showScreen("revisionCard");
 }
 
-function answerQuiz(index){
-  const item = quiz[quizIndex];
-  const buttons = document.querySelectorAll(".answer");
-  buttons.forEach(b => b.classList.remove("correct","wrong"));
-  buttons[item.correct].classList.add("correct");
-  if(index !== item.correct) buttons[index].classList.add("wrong");
-  document.getElementById("feedback").textContent = index === item.correct ? "Bonne réponse." : "À revoir : la bonne réponse est indiquée.";
+function answerQuiz(button, correct){
+  document.querySelectorAll(".answers button").forEach(b => b.classList.remove("correct","wrong"));
+  button.classList.add(correct ? "correct" : "wrong");
+  document.getElementById("quizFeedback").classList.remove("hidden");
+  if(correct) toast("Bonne réponse !");
+  else toast("À revoir");
 }
 
-function nextQuestion(){
-  quizIndex = (quizIndex + 1) % quiz.length;
-  renderQuiz();
+function formatTime(seconds){
+  const m = String(Math.floor(seconds / 60)).padStart(2,"0");
+  const s = String(Math.floor(seconds % 60)).padStart(2,"0");
+  return `${m}:${s}`;
 }
 
-function prevQuestion(){
-  quizIndex = (quizIndex - 1 + quiz.length) % quiz.length;
-  renderQuiz();
+function shortTitle(title){
+  return title.length > 28 ? `${title.slice(0,28)}…` : title;
 }
 
 function toast(message){
@@ -351,11 +370,24 @@ function toast(message){
   t.textContent = message;
   t.classList.add("show");
   clearTimeout(window.toastTimer);
-  window.toastTimer = setTimeout(()=>t.classList.remove("show"),2000);
+  window.toastTimer = setTimeout(() => t.classList.remove("show"), 1800);
 }
 
-renderVideos();
-openVideo(1);
-showScreen("home");
-renderQuiz();
+function renderFavorites(){
+  const favs = techniques.filter(t => [1,2,7].includes(t.id));
+  const container = document.getElementById("favoritesList");
+  if(!container) return;
+  container.innerHTML = favs.map(t => `
+    <button class="tech-card glass" onclick="openTechnique(${t.id})">
+      <div class="tech-icon ${t.poster ? 'poster' : ''}" style="${t.poster ? `--poster:url('${t.poster}')` : ''}">${t.poster ? '' : t.icon}</div>
+      <div>
+        <h2>${t.title}</h2>
+        <span class="level">${t.sub}</span>
+      </div>
+      <div class="tech-state">${stateLabel(t)}</div>
+    </button>
+  `).join("");
+}
 
+renderTechniqueList();
+renderFavorites();
