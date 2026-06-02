@@ -1,18 +1,445 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"><meta name="theme-color" content="#030816"><title>OSTÉO RA V7</title><link rel="stylesheet" href="styles.css"></head><body><main class="app">
-<section id="home" class="screen active">
-<header class="home-head"><button class="hex" onclick="toast('Réglages')">⌬</button><div><h1>OSTÉO <span>RA</span></h1><p>Que voulez-vous faire ?</p></div><button class="bell" onclick="toast('Notifications')">♧</button></header>
-<article class="intro"><span class="spine-ico"></span><div><b>Ostéopathie structurelle et énergie musculaire</b><p>Rachis <i></i> Membres supérieurs <i></i> Membres inférieurs</p></div></article>
-<nav class="wheel"><img src="assets/images/human-body-back.webp" onerror="this.style.display='none'" class="human"><button class="quad video" onclick="go('body')"><em>▷</em><strong>Vidéos des techniques</strong><small>Apprenez pas à pas<br>avec des experts</small><b>›</b></button><button class="quad revise" onclick="go('revisionMenu')"><em>▤</em><strong>Réviser</strong><small>Revoyez les techniques<br>et consolidez vos connaissances</small><b>›</b></button><button class="quad test" onclick="go('quiz')"><em>◎</em><strong>Tester mes connaissances</strong><small>Évaluez vos acquis<br>et progressez</small><b>›</b></button><button class="quad progress" onclick="go('progress')"><em>↗</em><strong>Suivre ma progression</strong><small>Visualisez vos progrès<br>et restez motivé</small><b>›</b></button><button class="core">⌬</button></nav>
-<article class="last card" onclick="openTechnique(1)"><div class="lastIcon">↺</div><div><small>DERNIÈRE ACTIVITÉ</small><h3>Technique dorsale à genoux</h3><span class="chip rachis">Rachis</span><div class="bar"><i style="width:58%"></i></div></div><div class="count"><b>12</b><span>techniques vues</span></div></article></section>
-<section id="body" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button onclick="toast('Catalogue')">♧</button></header><div class="title"><h1>OSTÉO <span>RA</span></h1><p>STRUCTUREL & ÉNERGIE MUSCULAIRE</p><h2>Choisissez une zone</h2><small>Sélectionnez la zone du corps sur laquelle vous souhaitez travailler</small></div><section class="bodymap"><img src="assets/images/human-body-back.webp" class="bodyimg" onerror="this.style.display='none'"><span class="pin p1"></span><span class="pin p2"></span><span class="pin p3"></span><button class="zone z1" onclick="go('rachis')"><span class="spine-ico"></span><strong>Rachis</strong><small>Techniques pour le rachis cervical, thoracique et lombaire</small><b>›</b></button><button class="zone z2" onclick="openZone('Membres supérieurs')"><span class="arm-ico"></span><strong>Membres supérieurs</strong><small>Épaule, bras, coude, avant-bras et main</small><b>›</b></button><button class="zone z3" onclick="openZone('Membres inférieurs')"><span class="leg-ico"></span><strong>Membres inférieurs</strong><small>Genou, cheville et pied</small><b>›</b></button></section><article class="learn card"><span>▷</span><div><h3>Apprenez à votre rythme</h3><p>Des vidéos claires et détaillées pour vous guider pas à pas.</p></div></article></section>
-<section id="rachis" class="screen"><header class="pagebar"><button onclick="go('body')">‹</button><button>♧</button></header><div class="title"><h1>OSTÉO <span>RA</span></h1><h2>Rachis</h2><small>Choisissez une région</small></div><section class="rachismap"><img src="assets/images/rachis-side.webp" class="rachisimg" onerror="this.style.display='none'"><button class="sub cervicales" onclick="openSub('Cervicales')"><span style="--img:url('assets/images/rachis-cervicales.webp')"></span><strong>Cervicales</strong><small>C1–C7</small><b>›</b></button><button class="sub dorsales" onclick="openSub('Dorsales')"><span style="--img:url('assets/images/rachis-dorsales.webp')"></span><strong>Dorsales</strong><small>T1–T12</small><b>›</b></button><button class="sub lombaires" onclick="openSub('Lombaires')"><span style="--img:url('assets/images/rachis-lombaires.webp')"></span><strong>Lombaires</strong><small>L1–L5</small><b>›</b></button></section></section>
-<section id="techniques" class="screen"><header class="pagebar"><button onclick="go(backTo)">‹</button><button>☷</button></header><div class="screenTitle"><h2 id="techTitle">Cervicales</h2><p>Sélectionnez une technique</p></div><label class="search"><span>⌕</span><input id="search" placeholder="Rechercher une technique" oninput="render()"></label><div id="list" class="list"></div></section>
-<section id="player" class="screen"><header class="pagebar"><button onclick="go('techniques')">‹</button><button>♡</button></header><div class="playerTitle"><h2 id="playerTitle">Dysfonction cervicale C2–C6 assis</h2><p><span>Rachis cervical</span><span>Technique structurelle</span><span>Niveau intermédiaire</span></p></div><div class="videoBox"><video id="video" controls playsinline poster="assets/images/video-poster-cervicale-c2-c6.webp"><source src="assets/videos/dysfonction-cervicale-c2-c6-assis.mp4" type="video/mp4"></video></div><div class="time"><span>01:42</span><input type="range" value="25"><span>06:38</span></div><div class="controls"><button onclick="jump(-10)">↺<small>10</small></button><button>◀</button><button class="play" onclick="toggleVideo()">Ⅱ</button><button>▶</button><button onclick="jump(10)">↻<small>10</small></button></div><nav class="tabs"><button class="active" onclick="tab('steps',this)">☷ Étapes</button><button onclick="tab('audio',this)">≋ Audio</button><button onclick="tab('notes',this)">▤ Notes</button><button onclick="tab('stats',this)">↗ Stats</button></nav><section id="steps" class="panel card active"><ol><li>Position du praticien</li><li>Position du patient</li><li>Contact et évaluation</li><li>Mise en tension</li><li>Thrust / impulsion</li><li>Réévaluation</li></ol></section><section id="audio" class="panel card"><h3>Audio – voix off</h3><div class="wave"></div><button class="primary">▷ Lecture audio</button></section><section id="notes" class="panel card"><textarea placeholder="Notes personnelles..."></textarea></section><section id="stats" class="panel card stats"><p><span>Vues</span><b>1 248</b></p><p><span>Complétion</span><b>86%</b></p><p><span>Score moyen</span><b>4,7 / 5</b></p></section></section>
-<section id="revisionMenu" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button>♧</button></header><div class="title"><h1>OSTÉO <span>RA</span></h1><h2>Comment voulez-vous <span>réviser ?</span></h2></div><article class="notice card"><span>▤</span><p>Les cartes sont tirées uniquement parmi les techniques déjà vues.</p></article><nav class="wheel smallWheel"><button class="quad video" onclick="go('revisionCard')"><em>⇄</em><strong>Aléatoire</strong><small>Révisez des cartes<br>dans un ordre aléatoire</small><b>›</b></button><button class="quad revise" onclick="go('body')"><em>♙</em><strong>Par zone</strong><small>Choisissez une zone<br>du corps à réviser</small><b>›</b></button><button class="quad test" onclick="go('revisionCard')"><em>↻</em><strong>À revoir</strong><small>Revoyez les cartes<br>encore fragiles</small><b>›</b></button><button class="quad progress" onclick="go('revisionCard')"><em>◉</em><strong>Déjà vues</strong><small>Parcourez les cartes<br>déjà maîtrisées</small><b>›</b></button><button class="core">▤</button></nav></section>
-<section id="revisionCard" class="screen"><header class="pagebar"><button onclick="go('revisionMenu')">‹</button><button>☆</button></header><div class="screenTitle"><h2>Carte de révision</h2><p>Consolidez vos connaissances, progressez durablement.</p></div><article class="revCard card"><div class="revTop"><img src="assets/images/rachis-cervicales.webp"><div><h3>Dysfonction cervicale C2–C6 assis</h3><span class="chip rachis">Cervicales</span></div></div><div class="revStats"><div><b>◉</b><span>Vues</span><strong>12</strong></div><div><b>↻</b><span>Révisions</span><strong>3</strong></div><div><b>◷</b><span>Statut</span><strong class="orange">À revoir</strong></div><div><b>♕</b><span>Score</span><strong class="green">80%</strong></div></div><p class="enc">Continuez comme ça, chaque révision renforce votre maîtrise !</p><section class="self"><h3>Pouvez-vous rappeler cette technique ?</h3><p>Testez-vous avant de retourner voir la réponse.</p><div><button class="fail">✕<span>Je ne sais pas</span><small>Difficile</small></button><button class="mid">−<span>Moyen</span><small>À revoir plus tard</small></button><button class="ok">✓<span>Je sais</span><small>Bien mémorisé</small></button></div></section><button class="replay" onclick="openTechnique(1)">▷ Revoir la vidéo <b>›</b></button><p class="info">Les cartes sont générées uniquement à partir des techniques que vous avez déjà consultées.</p></article></section>
-<section id="quiz" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button>✓</button></header><div class="screenTitle"><h2>Quiz</h2></div><div class="qprog"><b>Question <span>4</span> / 20</b><div><i style="width:35%"></i></div></div><article class="quiz card"><div class="question"><b>?</b><h3>Quelle est la première étape essentielle avant d’appliquer une technique structurelle sur une dysfonction cervicale ?</h3></div><button><span>A</span>Appliquer directement la manipulation spécifique</button><button class="right"><span>B</span>Évaluer la posture, la mobilité et les tissus environnants <em>✓</em></button><button><span>C</span>Chauffer la zone avec des étirements actifs</button><button><span>D</span>Informer le patient uniquement si une douleur est présente</button></article><article class="feedback card"><h3>✓ Bonne réponse !</h3><p>L’évaluation permet d’identifier la cause réelle de la dysfonction, d’assurer la sécurité du traitement et d’adapter votre approche.</p></article><div class="scores"><div class="card"><small>Votre score</small><b>80%</b><span>3 bonnes réponses</span></div><div class="card"><small>Série en cours</small><b class="orange">3</b><span>bonnes réponses</span></div></div><button class="next">Question suivante →</button></section>
-<section id="progress" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button>↗</button></header><div class="screenTitle"><h2>Progression</h2><p>Visualisez vos progrès et vos zones à renforcer.</p></div><article class="progHero card"><div class="ring">68%</div><div><h3>Très bonne dynamique !</h3><p>Vous progressez régulièrement sur les techniques déjà vues.</p></div></article><section class="lines card"><p><b>Rachis</b><span><i style="width:72%"></i></span><em>72%</em></p><p><b>Cervicales</b><span><i style="width:70%"></i></span><em>70%</em></p><p><b>Dorsales</b><span><i style="width:65%"></i></span><em>65%</em></p><p><b>Lombaires</b><span><i style="width:80%"></i></span><em>80%</em></p></section></section>
-<section id="favorites" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button>♡</button></header><div class="screenTitle"><h2>Favoris</h2><p>Techniques sauvegardées.</p></div><div id="favList" class="list"></div></section><section id="profile" class="screen"><header class="pagebar"><button onclick="go('home')">‹</button><button>⚙</button></header><div class="screenTitle"><h2>Profil</h2><p>Compte étudiant.</p></div><article class="profile card"><div>RA</div><h3>Étudiant Ostéo RA</h3><p>Parcours structurel et énergie musculaire</p></article></section>
-<nav class="bottom"><button data-target="home" class="active" onclick="go('home')">⌂<span>Accueil</span></button><button data-target="body" onclick="go('body')">▥<span>Catalogue</span></button><button data-target="revisionMenu" onclick="go('revisionMenu')">⇄<span>Parcours</span></button><button data-target="favorites" onclick="go('favorites')">♡<span>Favoris</span></button><button data-target="profile" onclick="go('profile')">♙<span>Profil</span></button></nav><div id="toast" class="toast"></div></main><script src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#030816" />
+  <title>OSTÉO RA — V8 Mobile First</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
 
+    <!-- ACCUEIL -->
+    <section id="home" class="screen active">
+      <header class="top">
+        <button class="icon hex" onclick="toast('Réglages à venir')" aria-label="Réglages">⌬</button>
+        <div class="brand">
+          <h1>OSTÉO <span>RA</span></h1>
+          <p>Que voulez-vous faire ?</p>
+        </div>
+        <button class="icon" onclick="toast('Notifications à venir')" aria-label="Notifications">♧</button>
+      </header>
 
+      <article class="intro card">
+        <span class="round spine"></span>
+        <div>
+          <strong>Ostéopathie structurelle et énergie musculaire</strong>
+          <p>Rachis • Membres supérieurs • Membres inférieurs</p>
+        </div>
+      </article>
+
+      <section class="home-menu">
+        <div class="human-center">
+          <img src="assets/images/human-body-back.webp" alt="" onerror="this.style.display='none'" />
+        </div>
+
+        <button class="home-choice violet" onclick="go('body')">
+          <span class="choice-icon">▷</span>
+          <strong>Vidéos des techniques</strong>
+          <small>Apprendre pas à pas</small>
+        </button>
+
+        <button class="home-choice green" onclick="go('revision')">
+          <span class="choice-icon">▤</span>
+          <strong>Réviser</strong>
+          <small>Cartes déjà vues</small>
+        </button>
+
+        <button class="home-choice orange" onclick="go('quiz')">
+          <span class="choice-icon">◎</span>
+          <strong>Tester mes connaissances</strong>
+          <small>Quiz et correction</small>
+        </button>
+
+        <button class="home-choice cyan" onclick="go('progress')">
+          <span class="choice-icon">↗</span>
+          <strong>Suivre ma progression</strong>
+          <small>Scores et zones faibles</small>
+        </button>
+      </section>
+
+      <article class="last card" onclick="openTechnique(1)">
+        <span class="last-icon">↺</span>
+        <div>
+          <small>Dernière activité</small>
+          <strong>Technique dorsale à genoux</strong>
+          <em>Rachis</em>
+          <div class="bar"><i style="width:58%"></i></div>
+        </div>
+        <b>12</b>
+      </article>
+    </section>
+
+    <!-- CATALOGUE / CORPS -->
+    <section id="body" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Catalogue</h2>
+          <p>Choisissez une zone</p>
+        </div>
+        <button class="icon" onclick="toast('Catalogue')">♧</button>
+      </header>
+
+      <section class="body-card card">
+        <img src="assets/images/human-body-back.webp" alt="Corps humain" onerror="this.style.display='none'" />
+        <div class="body-actions">
+          <button class="zone-btn cyan" onclick="go('rachis')">
+            <span class="round spine"></span>
+            <strong>Rachis</strong>
+            <small>Cervicales, dorsales, lombaires</small>
+          </button>
+
+          <button class="zone-btn violet" onclick="openGenericZone('Membres supérieurs')">
+            <span class="round arm"></span>
+            <strong>Membres supérieurs</strong>
+            <small>Épaule, coude, poignet, main</small>
+          </button>
+
+          <button class="zone-btn green" onclick="openGenericZone('Membres inférieurs')">
+            <span class="round leg"></span>
+            <strong>Membres inférieurs</strong>
+            <small>Genou, cheville, pied</small>
+          </button>
+        </div>
+      </section>
+
+      <article class="info card">
+        <span>▷</span>
+        <div>
+          <strong>Apprenez à votre rythme</strong>
+          <p>Chaque technique pourra contenir une vidéo, un audio, des étapes et un quiz.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- RACHIS -->
+    <section id="rachis" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('body')">‹</button>
+        <div>
+          <h2>Rachis</h2>
+          <p>Choisissez une région</p>
+        </div>
+        <button class="icon" onclick="toast('Rachis')">♧</button>
+      </header>
+
+      <section class="rachis-card card">
+        <img src="assets/images/rachis-side.webp" alt="Rachis" onerror="this.style.display='none'" />
+
+        <div class="rachis-list">
+          <button class="sub-btn violet" onclick="openSubzone('Cervicales')">
+            <span class="thumb" style="--img:url('assets/images/rachis-cervicales.webp')"></span>
+            <div>
+              <strong>Cervicales</strong>
+              <small>C1–C7</small>
+            </div>
+            <em>›</em>
+          </button>
+
+          <button class="sub-btn cyan" onclick="openSubzone('Dorsales')">
+            <span class="thumb" style="--img:url('assets/images/rachis-dorsales.webp')"></span>
+            <div>
+              <strong>Dorsales</strong>
+              <small>T1–T12</small>
+            </div>
+            <em>›</em>
+          </button>
+
+          <button class="sub-btn orange" onclick="openSubzone('Lombaires')">
+            <span class="thumb" style="--img:url('assets/images/rachis-lombaires.webp')"></span>
+            <div>
+              <strong>Lombaires</strong>
+              <small>L1–L5</small>
+            </div>
+            <em>›</em>
+          </button>
+        </div>
+      </section>
+    </section>
+
+    <!-- LISTE TECHNIQUES -->
+    <section id="techniques" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go(currentBack)">‹</button>
+        <div>
+          <h2 id="techTitle">Cervicales</h2>
+          <p>Sélectionnez une technique</p>
+        </div>
+        <button class="icon" onclick="toast('Filtres')">☷</button>
+      </header>
+
+      <div class="search card">
+        <span>⌕</span>
+        <input id="searchInput" placeholder="Rechercher une technique" oninput="renderTechniques()" />
+      </div>
+
+      <div id="techList" class="tech-list"></div>
+    </section>
+
+    <!-- LECTEUR -->
+    <section id="player" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('techniques')">‹</button>
+        <div>
+          <h2>Lecteur</h2>
+          <p>Vidéo technique</p>
+        </div>
+        <button class="icon" onclick="toast('Favori')">♡</button>
+      </header>
+
+      <article class="player-title">
+        <h2 id="playerTitle">Dysfonction cervicale C2–C6 assis</h2>
+        <div>
+          <span>Rachis cervical</span>
+          <span>Technique structurelle</span>
+          <span>Niveau intermédiaire</span>
+        </div>
+      </article>
+
+      <section class="video card">
+        <video id="video" controls playsinline preload="metadata" poster="assets/images/video-poster-cervicale-c2-c6.webp">
+          <source src="assets/videos/dysfonction-cervicale-c2-c6-assis.mp4" type="video/mp4" />
+        </video>
+      </section>
+
+      <div class="time">
+        <span>00:00</span>
+        <input type="range" min="0" max="100" value="0" />
+        <span>06:38</span>
+      </div>
+
+      <div class="controls">
+        <button onclick="jump(-10)">↺10</button>
+        <button onclick="toast('Étape précédente')">◀</button>
+        <button class="main-play" onclick="toggleVideo()">Ⅱ</button>
+        <button onclick="toast('Étape suivante')">▶</button>
+        <button onclick="jump(10)">10↻</button>
+      </div>
+
+      <nav class="tabs">
+        <button class="active" onclick="showTab('steps', this)">Étapes</button>
+        <button onclick="showTab('audio', this)">Audio</button>
+        <button onclick="showTab('notes', this)">Notes</button>
+        <button onclick="showTab('stats', this)">Stats</button>
+      </nav>
+
+      <section id="steps" class="tab card active">
+        <ol>
+          <li>Position du praticien</li>
+          <li>Position du patient</li>
+          <li>Contact et évaluation</li>
+          <li>Mise en tension</li>
+          <li>Thrust / impulsion</li>
+          <li>Réévaluation</li>
+        </ol>
+      </section>
+
+      <section id="audio" class="tab card">
+        <h3>Audio — voix off</h3>
+        <div class="wave"></div>
+        <button class="primary" onclick="toast('Audio ElevenLabs à intégrer')">Lecture audio</button>
+      </section>
+
+      <section id="notes" class="tab card">
+        <textarea placeholder="Notes personnelles..."></textarea>
+      </section>
+
+      <section id="stats" class="tab card stats">
+        <p><span>Vues</span><strong>12</strong></p>
+        <p><span>Complétion</span><strong>86%</strong></p>
+        <p><span>Score moyen</span><strong>4,7 / 5</strong></p>
+      </section>
+    </section>
+
+    <!-- REVISION -->
+    <section id="revision" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Réviser</h2>
+          <p>Techniques déjà vues</p>
+        </div>
+        <button class="icon" onclick="toast('Révision')">▤</button>
+      </header>
+
+      <article class="notice card">
+        <span>▤</span>
+        <p>Les cartes sont tirées uniquement parmi les techniques déjà consultées.</p>
+      </article>
+
+      <section class="revision-grid">
+        <button class="mode card violet" onclick="go('revisionCard')">
+          <span>⇄</span>
+          <strong>Aléatoire</strong>
+          <small>Cartes dans un ordre aléatoire</small>
+        </button>
+
+        <button class="mode card green" onclick="go('body')">
+          <span>♙</span>
+          <strong>Par zone</strong>
+          <small>Choisir une zone du corps</small>
+        </button>
+
+        <button class="mode card orange" onclick="go('revisionCard')">
+          <span>↻</span>
+          <strong>À revoir</strong>
+          <small>Techniques fragiles</small>
+        </button>
+
+        <button class="mode card cyan" onclick="go('revisionCard')">
+          <span>◉</span>
+          <strong>Déjà vues</strong>
+          <small>Toutes les cartes disponibles</small>
+        </button>
+      </section>
+    </section>
+
+    <!-- CARTE REVISION -->
+    <section id="revisionCard" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('revision')">‹</button>
+        <div>
+          <h2>Carte de révision</h2>
+          <p>Consolidez vos connaissances</p>
+        </div>
+        <button class="icon" onclick="toast('Favori')">☆</button>
+      </header>
+
+      <article class="review-card card">
+        <div class="review-head">
+          <img src="assets/images/rachis-cervicales.webp" alt="" onerror="this.style.display='none'" />
+          <div>
+            <h3>Dysfonction cervicale C2–C6 assis</h3>
+            <em>Cervicales</em>
+          </div>
+        </div>
+
+        <div class="review-stats">
+          <div><span>Vues</span><strong>12</strong></div>
+          <div><span>Révisions</span><strong>3</strong></div>
+          <div><span>Statut</span><strong class="orange-text">À revoir</strong></div>
+          <div><span>Score</span><strong class="green-text">80%</strong></div>
+        </div>
+
+        <section class="self card">
+          <h3>Pouvez-vous rappeler cette technique ?</h3>
+          <p>Testez-vous avant de retourner voir la réponse.</p>
+          <div>
+            <button class="bad" onclick="toast('À revoir rapidement')">✕<span>Je ne sais pas</span></button>
+            <button class="mid" onclick="toast('À revoir plus tard')">−<span>Moyen</span></button>
+            <button class="good" onclick="toast('Bien mémorisé')">✓<span>Je sais</span></button>
+          </div>
+        </section>
+
+        <button class="wide" onclick="openTechnique(1)">▷ Revoir la vidéo</button>
+      </article>
+    </section>
+
+    <!-- QUIZ -->
+    <section id="quiz" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Quiz</h2>
+          <p>Question 4 / 20</p>
+        </div>
+        <button class="icon" onclick="toast('Quiz')">✓</button>
+      </header>
+
+      <div class="quiz-progress"><i style="width:35%"></i></div>
+
+      <article class="quiz card">
+        <div class="question">
+          <b>?</b>
+          <h3>Quelle est la première étape essentielle avant d’appliquer une technique structurelle sur une dysfonction cervicale ?</h3>
+        </div>
+
+        <button><span>A</span>Appliquer directement la manipulation spécifique</button>
+        <button class="right"><span>B</span>Évaluer la posture, la mobilité et les tissus environnants</button>
+        <button><span>C</span>Chauffer la zone avec des étirements actifs</button>
+        <button><span>D</span>Informer le patient uniquement si une douleur est présente</button>
+      </article>
+
+      <article class="feedback card">
+        <h3>Bonne réponse !</h3>
+        <p>L’évaluation permet d’identifier la cause réelle de la dysfonction et d’adapter votre approche.</p>
+      </article>
+
+      <button class="primary">Question suivante →</button>
+    </section>
+
+    <!-- PROGRESSION -->
+    <section id="progress" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Progression</h2>
+          <p>Suivi pédagogique</p>
+        </div>
+        <button class="icon" onclick="toast('Export')">↗</button>
+      </header>
+
+      <article class="progress-card card">
+        <div class="ring">68%</div>
+        <div>
+          <h3>Très bonne dynamique</h3>
+          <p>Vous progressez régulièrement sur les techniques déjà vues.</p>
+        </div>
+      </article>
+
+      <section class="progress-list card">
+        <p><strong>Rachis</strong><span><i style="width:72%"></i></span><b>72%</b></p>
+        <p><strong>Cervicales</strong><span><i style="width:70%"></i></span><b>70%</b></p>
+        <p><strong>Dorsales</strong><span><i style="width:65%"></i></span><b>65%</b></p>
+        <p><strong>Lombaires</strong><span><i style="width:80%"></i></span><b>80%</b></p>
+        <p><strong>Membres supérieurs</strong><span><i style="width:66%"></i></span><b>66%</b></p>
+        <p><strong>Membres inférieurs</strong><span><i style="width:63%"></i></span><b>63%</b></p>
+      </section>
+    </section>
+
+    <!-- FAVORIS -->
+    <section id="favorites" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Favoris</h2>
+          <p>Techniques sauvegardées</p>
+        </div>
+        <button class="icon">♡</button>
+      </header>
+      <div id="favList" class="tech-list"></div>
+    </section>
+
+    <!-- PROFIL -->
+    <section id="profile" class="screen">
+      <header class="page-top">
+        <button class="back" onclick="go('home')">‹</button>
+        <div>
+          <h2>Profil</h2>
+          <p>Compte étudiant</p>
+        </div>
+        <button class="icon">⚙</button>
+      </header>
+
+      <article class="profile card">
+        <div>RA</div>
+        <h3>Étudiant Ostéo RA</h3>
+        <p>Parcours structurel et énergie musculaire</p>
+      </article>
+    </section>
+
+    <nav class="bottom">
+      <button class="active" data-target="home" onclick="go('home')">⌂<span>Accueil</span></button>
+      <button data-target="body" onclick="go('body')">▥<span>Catalogue</span></button>
+      <button data-target="revision" onclick="go('revision')">⇄<span>Parcours</span></button>
+      <button data-target="favorites" onclick="go('favorites')">♡<span>Favoris</span></button>
+      <button data-target="profile" onclick="go('profile')">♙<span>Profil</span></button>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
