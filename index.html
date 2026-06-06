@@ -109,9 +109,779 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   color: var(--cyan);
 }
 
-#home .intro p::after {
-  content: " · bassin inclus";
+
+
+/* === CATALOGUE 4 GRANDES RÉGIONS === */
+.catalogue-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.catalogue-card {
+  width: 100%;
+  min-height: 116px;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 62px;
+  gap: 12px;
+  align-items: center;
+  padding: 15px;
+  border-radius: 26px;
+  border: 1px solid currentColor;
+  background:
+    radial-gradient(circle at 88% 22%, color-mix(in srgb, currentColor 18%, transparent), transparent 42%),
+    linear-gradient(145deg, rgba(10,29,55,.82), rgba(5,15,31,.88));
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.34),
+    0 0 24px color-mix(in srgb, currentColor 18%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  text-align: left;
+}
+
+.catalogue-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: currentColor;
+  border: 1px solid currentColor;
+  background: rgba(255,255,255,.05);
+  box-shadow: 0 0 18px color-mix(in srgb,currentColor 28%,transparent);
+  font-size: 27px;
+  font-weight: 900;
+}
+
+.catalogue-card strong {
+  display: block;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.05;
+}
+
+.catalogue-card p {
+  margin: 6px 0 0;
+  color: #c2ccdc;
+  font-size: 13px;
+  line-height: 1.28;
+}
+
+.catalogue-card b {
+  display: grid;
+  place-items: center;
+  justify-self: end;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  color: #fff;
+  border: 1px solid currentColor;
+  background: rgba(255,255,255,.055);
+  font-size: 22px;
+  box-shadow: inset 0 0 18px color-mix(in srgb,currentColor 14%,transparent);
+}
+
+.catalogue-card em {
+  grid-column: 2 / 4;
+  justify-self: end;
+  font-style: normal;
+  color: currentColor;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.catalogue-total {
+  display: grid;
+  grid-template-columns: 58px minmax(0,1fr);
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 24px;
+  background: linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.88));
+  border: 1px solid var(--line);
+  box-shadow: 0 18px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.catalogue-total .pill-icon {
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.catalogue-total strong {
+  display: block;
+  color: #fff;
+  font-size: 17px;
+}
+
+.catalogue-total p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+
+/* === COULEURS SOUS-MENU RACHIS === */
+.row.tech.sub-all {
+  color: #f6fbff;
+  border-color: rgba(246,251,255,.32);
+  background:
+    radial-gradient(circle at 94% 18%, rgba(246,251,255,.10), transparent 42%),
+    linear-gradient(145deg,rgba(10,29,55,.88),rgba(5,15,31,.92));
+}
+
+.row.tech.sub-cervicales {
+  color: var(--violet);
+  border-color: rgba(168,85,255,.62);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(168,85,255,.22), transparent 44%),
+    linear-gradient(145deg,rgba(28,18,58,.86),rgba(5,15,31,.90));
+}
+
+.row.tech.sub-dorsales {
   color: var(--cyan);
+  border-color: rgba(0,229,255,.62);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(0,229,255,.20), transparent 44%),
+    linear-gradient(145deg,rgba(10,34,58,.86),rgba(5,15,31,.90));
+}
+
+.row.tech.sub-cotes {
+  color: var(--green);
+  border-color: rgba(0,230,167,.62);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(0,230,167,.18), transparent 44%),
+    linear-gradient(145deg,rgba(8,44,37,.84),rgba(5,15,31,.90));
+}
+
+.row.tech.sub-lombaires {
+  color: var(--orange);
+  border-color: rgba(255,176,32,.68);
+  background:
+    radial-gradient(circle at 92% 18%, rgba(255,176,32,.20), transparent 44%),
+    linear-gradient(145deg,rgba(58,36,10,.84),rgba(5,15,31,.90));
+}
+
+.row.tech.sub-all .tech-icon,
+.row.tech.sub-cervicales .tech-icon,
+.row.tech.sub-dorsales .tech-icon,
+.row.tech.sub-cotes .tech-icon,
+.row.tech.sub-lombaires .tech-icon {
+  color: currentColor;
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.row.tech.sub-all small,
+.row.tech.sub-cervicales small,
+.row.tech.sub-dorsales small,
+.row.tech.sub-cotes small,
+.row.tech.sub-lombaires small {
+  color: currentColor;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  border-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+
+/* === CARTOUCHES ACCUEIL SIMPLIFIÉS === */
+.orbit-card small {
+  display: none !important;
+}
+
+.videos strong,
+.revision strong,
+.quiz strong,
+.progress strong {
+  top: 138px;
+  font-size: 17px;
+  line-height: 1.12;
+}
+
+.videos strong,
+.quiz strong {
+  left: 24px;
+  text-align: left;
+}
+
+.revision strong,
+.progress strong {
+  right: 24px;
+  text-align: right;
+}
+
+
+/* === POSITIONNEMENT FINAL DES 4 CARTOUCHES ACCUEIL === */
+/* Objectif : logos centrés dans chaque quart, titres lisibles sur la zone horizontale. */
+
+.orbit-card {
+  display: block;
+  padding: 0 !important;
+}
+
+.orbit-card strong {
+  position: absolute;
+  z-index: 4;
+  left: 16px !important;
+  right: 16px !important;
+  max-width: none !important;
+  width: auto;
+  color: #fff;
+  font-size: 15.5px !important;
+  line-height: 1.12 !important;
+  font-weight: 950;
+  text-align: center !important;
+  white-space: normal;
+  overflow: visible;
+  text-wrap: balance;
+}
+
+/* Titres placés sur la partie horizontale libre de chaque cartouche */
+.videos strong,
+.revision strong {
+  top: 116px !important;
+}
+
+.quiz strong,
+.progress strong {
+  top: 108px !important;
+}
+
+/* Logos vraiment centrés dans chaque cartouche */
+.orbit-icon {
+  left: 50% !important;
+  right: auto !important;
+  top: 42px !important;
+  transform: translateX(-50%);
+  z-index: 3;
+}
+
+.quiz .orbit-icon,
+.progress .orbit-icon {
+  top: 42px !important;
+}
+
+/* Flèches centrées en bas de chaque cartouche */
+.orbit-arrow {
+  left: 50% !important;
+  right: auto !important;
+  bottom: 16px !important;
+  transform: translateX(-50%);
+}
+
+/* Ajustements des textes longs */
+.quiz strong {
+  font-size: 14.8px !important;
+}
+
+.progress strong {
+  font-size: 14.8px !important;
+}
+
+/* Plus de sous-textes */
+.orbit-card small {
+  display: none !important;
+}
+
+@media(max-width:380px){
+  .orbit-card strong {
+    left: 12px !important;
+    right: 12px !important;
+    font-size: 14.5px !important;
+  }
+
+  .quiz strong,
+  .progress strong {
+    font-size: 13.8px !important;
+  }
+
+  .orbit-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 27px;
+    top: 38px !important;
+  }
+
+  .quiz .orbit-icon,
+  .progress .orbit-icon {
+    top: 38px !important;
+  }
+}
+
+
+/* === CARTOUCHES ACCUEIL : TITRES EN 2 LIGNES, SANS FLÈCHES === */
+.orbit-arrow {
+  display: none !important;
+}
+
+.orbit-card strong {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  text-align: center !important;
+  white-space: normal;
+}
+
+.orbit-card strong .main-word {
+  display: block;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.orbit-card strong .sub-word {
+  display: block;
+  font-size: 13.5px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: 0;
+  opacity: .94;
+}
+
+.videos strong,
+.revision strong,
+.quiz strong,
+.progress strong {
+  top: 112px !important;
+  left: 14px !important;
+  right: 14px !important;
+  max-width: none !important;
+}
+
+.revision strong .main-word {
+  font-size: 22px;
+}
+
+.quiz strong .main-word,
+.progress strong .main-word {
+  font-size: 22px;
+}
+
+.quiz strong .sub-word,
+.progress strong .sub-word {
+  font-size: 13.5px;
+}
+
+.videos strong .sub-word {
+  font-size: 13.5px;
+}
+
+/* On recentre un peu les logos maintenant que les flèches ont disparu */
+.orbit-icon {
+  top: 42px !important;
+}
+
+@media(max-width:380px){
+  .orbit-card strong .main-word {
+    font-size: 20px;
+  }
+
+  .revision strong .main-word,
+  .quiz strong .main-word,
+  .progress strong .main-word {
+    font-size: 20px;
+  }
+
+  .orbit-card strong .sub-word {
+    font-size: 12.5px;
+  }
+
+  .videos strong,
+  .revision strong,
+  .quiz strong,
+  .progress strong {
+    top: 108px !important;
+    left: 10px !important;
+    right: 10px !important;
+  }
+}
+
+
+/* === ACCUEIL EN ARC DE CERCLE — VERSION FIDÈLE À LA MAQUETTE === */
+
+#home .intro {
+  min-height: 76px;
+  grid-template-columns: 54px minmax(0,1fr);
+  margin: 14px 0 16px;
+}
+
+#home .intro strong {
+  display: block;
+  color: #fff;
+  font-size: 20px;
+  line-height: 1.18;
+  font-weight: 900;
+  text-align: center;
+}
+
+#home .intro p {
+  display: none !important;
+}
+
+.home-orbit {
+  position: relative;
+  width: 100%;
+  height: 432px;
+  margin: 0 auto 18px;
+  isolation: isolate;
+}
+
+/* Personnage central : présent, mais sous les cartouches */
+.body-center.home-personnage {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 245px !important;
+  height: 420px !important;
+  transform: translate(-50%, -50%);
+  opacity: .48 !important;
+  z-index: 2 !important;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, #000 64%, transparent 84%);
+  mask-image: radial-gradient(ellipse at center, #000 0%, #000 64%, transparent 84%);
+}
+
+.body-center.home-personnage img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter:
+    brightness(.92)
+    contrast(1.04)
+    saturate(1.08);
+}
+
+/* Les 4 cartouches en quarts de cercle */
+.orbit-card {
+  position: absolute;
+  width: calc(50% - 8px);
+  height: calc(50% - 8px);
+  padding: 0 !important;
+  border: 2px solid currentColor;
+  background:
+    radial-gradient(circle at 50% 32%, color-mix(in srgb,currentColor 13%,transparent), transparent 68%),
+    rgba(5,15,31,.70) !important;
+  box-shadow:
+    0 0 24px color-mix(in srgb,currentColor 32%,transparent),
+    inset 0 0 26px rgba(255,255,255,.025);
+  backdrop-filter: blur(1px);
+  overflow: hidden;
+  z-index: 4 !important;
+}
+
+/* Arrondis en arc comme la proposition visuelle */
+.orbit-card.videos {
+  left: 0;
+  top: 0;
+  color: var(--violet);
+  border-radius: 140px 26px 18px 26px !important;
+}
+
+.orbit-card.revision {
+  right: 0;
+  top: 0;
+  color: var(--green);
+  border-radius: 26px 140px 26px 18px !important;
+}
+
+.orbit-card.quiz {
+  left: 0;
+  bottom: 0;
+  color: var(--orange);
+  border-radius: 26px 18px 26px 140px !important;
+}
+
+.orbit-card.progress {
+  right: 0;
+  bottom: 0;
+  color: var(--cyan);
+  border-radius: 18px 26px 140px 26px !important;
+}
+
+/* Logos centrés dans chaque quart */
+.orbit-icon {
+  position: absolute;
+  z-index: 7 !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 44px !important;
+  width: 66px;
+  height: 66px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid currentColor;
+  background: rgba(5,15,31,.50);
+  color: currentColor;
+  box-shadow:
+    0 0 18px color-mix(in srgb,currentColor 42%,transparent),
+    inset 0 0 18px rgba(255,255,255,.035);
+  font-size: 34px;
+}
+
+/* Titres lisibles et équilibrés */
+.orbit-card strong {
+  position: absolute;
+  z-index: 7 !important;
+  left: 12px !important;
+  right: 12px !important;
+  top: 126px !important;
+  max-width: none !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-align: center !important;
+  color: #fff;
+  font-weight: 950;
+  text-shadow: 0 3px 12px rgba(0,0,0,.55);
+}
+
+.orbit-card strong .main-word {
+  display: block;
+  font-size: 25px;
+  line-height: .98;
+  letter-spacing: -0.04em;
+}
+
+.orbit-card strong .sub-word {
+  display: block;
+  font-size: 14.2px;
+  line-height: 1.05;
+  font-weight: 780;
+  opacity: .94;
+  letter-spacing: 0;
+}
+
+.revision strong .main-word {
+  font-size: 25px;
+}
+
+.quiz strong .main-word,
+.progress strong .main-word {
+  font-size: 25px;
+}
+
+.quiz strong .sub-word,
+.progress strong .sub-word,
+.videos strong .sub-word {
+  font-size: 14.2px;
+}
+
+/* Plus aucune petite flèche dans les cartouches */
+.orbit-arrow {
+  display: none !important;
+}
+
+/* Bouton central comme pivot de navigation */
+.center-button {
+  width: 88px;
+  height: 88px;
+  z-index: 9 !important;
+  background: rgba(5,15,31,.88);
+  border: 3px solid rgba(180,235,255,.95);
+  box-shadow:
+    0 0 24px rgba(0,229,255,.42),
+    inset 0 0 20px rgba(0,229,255,.16);
+}
+
+/* On évite que l’image centrale affadisse les textes */
+.orbit-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(2,7,20,.10) 58%, rgba(2,7,20,.22) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.orbit-card > * {
+  position: relative;
+}
+
+/* Carte dernière pratique conservée sous les arcs */
+.last-card {
+  margin-top: 10px;
+}
+
+/* Ajustement petits écrans */
+@media(max-width:380px){
+  .home-orbit {
+    height: 410px;
+  }
+
+  .body-center.home-personnage {
+    width: 228px !important;
+    height: 395px !important;
+    opacity: .45 !important;
+  }
+
+  .orbit-icon {
+    width: 58px;
+    height: 58px;
+    top: 40px !important;
+    font-size: 30px;
+  }
+
+  .orbit-card strong {
+    top: 112px !important;
+    left: 10px !important;
+    right: 10px !important;
+  }
+
+  .orbit-card strong .main-word,
+  .revision strong .main-word,
+  .quiz strong .main-word,
+  .progress strong .main-word {
+    font-size: 22px;
+  }
+
+  .orbit-card strong .sub-word {
+    font-size: 12.8px;
+  }
+
+  .center-button {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+
+/* === CORRECTION FINALE : LOGOS CENTRÉS + TITRES LISIBLES === */
+/* Les logos sont centrés dans chaque quart. Les titres sont placés sous les logos, sans chevauchement. */
+
+.orbit-card {
+  position: absolute !important;
+  overflow: hidden !important;
+}
+
+/* Logo : centre horizontal de chaque cartouche, avec position fixe */
+.orbit-card .orbit-icon {
+  position: absolute !important;
+  left: 50% !important;
+  right: auto !important;
+  top: 36px !important;
+  transform: translateX(-50%) !important;
+  width: 62px !important;
+  height: 62px !important;
+  margin: 0 !important;
+  z-index: 8 !important;
+  font-size: 31px !important;
+}
+
+/* Titre : sous le logo, centré, jamais posé sur le logo */
+.orbit-card strong {
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  top: 112px !important;
+  max-width: none !important;
+  width: auto !important;
+  margin: 0 !important;
+  z-index: 8 !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+
+  text-align: center !important;
+  color: #fff !important;
+  text-shadow: 0 3px 12px rgba(0,0,0,.72) !important;
+  pointer-events: none;
+}
+
+.orbit-card strong .main-word {
+  display: block !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+  white-space: nowrap !important;
+}
+
+.orbit-card strong .sub-word {
+  display: block !important;
+  font-size: 13.2px !important;
+  line-height: 1.06 !important;
+  font-weight: 780 !important;
+  letter-spacing: 0 !important;
+  white-space: nowrap !important;
+  opacity: .96 !important;
+}
+
+/* Ajustements spécifiques aux textes longs */
+.quiz strong .sub-word {
+  font-size: 12.6px !important;
+}
+
+.progress strong .sub-word {
+  font-size: 12.8px !important;
+}
+
+/* Réviser : un seul mot, même importance que les autres */
+.revision strong .main-word {
+  font-size: 24px !important;
+}
+
+/* Vidéos : éviter que "des techniques" soit trop bas */
+.videos strong .sub-word {
+  font-size: 13.2px !important;
+}
+
+/* Les petites flèches restent supprimées */
+.orbit-arrow {
+  display: none !important;
+}
+
+/* Le personnage reste derrière, les cartouches devant */
+.body-center.home-personnage {
+  z-index: 2 !important;
+}
+
+.orbit-card {
+  z-index: 5 !important;
+}
+
+.center-button {
+  z-index: 10 !important;
+}
+
+/* Sur iPhone étroit : on réduit juste un peu, sans changer la hiérarchie */
+@media(max-width:380px){
+  .orbit-card .orbit-icon {
+    top: 34px !important;
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 28px !important;
+  }
+
+  .orbit-card strong {
+    top: 102px !important;
+    left: 8px !important;
+    right: 8px !important;
+  }
+
+  .orbit-card strong .main-word,
+  .revision strong .main-word {
+    font-size: 21px !important;
+  }
+
+  .orbit-card strong .sub-word {
+    font-size: 11.8px !important;
+  }
+
+  .quiz strong .sub-word,
+  .progress strong .sub-word {
+    font-size: 11.4px !important;
+  }
 }
 
 </style>
@@ -121,39 +891,84 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 
 <section id="home" class="screen active">
   <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><h1 class="logo">OSTÉO <span>RA</span></h1><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
-  <article class="intro"><div class="pill-icon">⌇</div><div><strong>Structurel & énergie musculaire</strong><p>Rachis · Bassin · Membres supérieurs · Membres inférieurs</p></div></article>
+  <article class="intro"><div class="pill-icon">⌇</div><div><strong>Apprenez · Comprenez · Corrigez · Révisez</strong></div></article>
   <section class="home-orbit">
-    <div class="body-center">
-      <img src="assets/images/human-body-back.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-      <div class="anatomy-person fallback-home" style="display:none;position:relative;left:auto;top:auto;transform:none;width:100%;height:100%">
-        <div class="head"></div><div class="torso"></div><div class="pelvis"></div><div class="spine-line"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>
-      </div>
+    <div class="body-center home-personnage">
+      <img src="data:image/webp;base64,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" alt="">
     </div>
-    <button class="orbit-card videos" onclick="go('zones')"><div class="orbit-icon">▷</div><strong>Vidéos des techniques</strong><small>Apprenez pas à pas avec des experts</small><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon">▤</div><strong>Réviser</strong><small>Revoyez les techniques et consolidez vos connaissances</small><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card quiz" onclick="go('quiz')"><div class="orbit-icon">◎</div><strong>Tester mes connaissances</strong><small>Évaluez vos acquis et progressez</small><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon">↗</div><strong>Suivre ma progression</strong><small>Visualisez vos progrès et restez motivé</small><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card videos" onclick="go('zones')"><div class="orbit-icon">▷</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon">▤</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card quiz" onclick="go('quiz')"><div class="orbit-icon">◎</div><strong><span class="main-word">Tester</span><span class="sub-word">mes connaissances</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon">↗</div><strong><span class="main-word">Suivre</span><span class="sub-word">ma progression</span></strong><em class="orbit-arrow">›</em></button>
     <button class="center-button" onclick="toast('OSTÉO RA')">⌬</button>
   </section>
-  <article class="last-card"><div class="pill-icon">↺</div><div><small>Dernière activité</small><strong>Dysfonction facettaire des dorsales</strong><span>Rachis</span><div class="bar"><i style="width:58%"></i></div></div><b id="homeCount">0</b></article>
+  <article class="last-card"><div class="pill-icon">↺</div><div><small>Votre dernière pratique</small><strong>Dysfonction facettaire des dorsales</strong><span>Rachis</span><div class="bar"><i style="width:58%"></i></div></div><b id="homeCount">0</b></article>
 </section>
 
 <section id="zones" class="screen">
-  <header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">OSTÉO <span>RA</span></h1><p class="subtitle">Catalogue anatomique</p></div><button class="icon" onclick="toast('Choisissez une flèche')">i</button></header>
-  <div class="page-title"><h1>Choisissez une zone</h1><p>Touchez une flèche anatomique pour ouvrir le sous-menu.</p></div>
-  <section class="anatomy-map">
-    <div class="anatomy-person image-person">
-      <img src="assets/images/human-body-back.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-      <div class="fallback-map" style="display:none">
-        <div class="head"></div><div class="torso"></div><div class="pelvis"></div><div class="spine-line"></div><div class="arm left"></div><div class="arm right"></div><div class="leg left"></div><div class="leg right"></div>
-      </div>
+  <header class="top">
+    <button class="icon round" onclick="go('home')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Catalogue</h1>
+      <p class="subtitle">128 techniques</p>
     </div>
-    <div class="anatomy-line line-rachis"></div><div class="anatomy-line line-msup"></div><div class="anatomy-line line-bassin"></div><div class="anatomy-line line-minf"></div>
-    <button class="anatomy-arrow rachis" onclick="go('rachis')"><div class="tech-icon">⌇</div><div><strong>Rachis</strong><small>Cervicales · Dorsales · Lombaires</small></div><em>›</em></button>
-    <button class="anatomy-arrow msup" onclick="openZone('Membres supérieurs')"><div class="tech-icon">◜</div><div><strong>Membre sup.</strong><small>Clavicule · Épaule · Main</small></div><em>›</em></button>
-    <button class="anatomy-arrow bassin" onclick="openZone('Bassin')"><div class="tech-icon">◡</div><div><strong>Bassin</strong><small>Ilium · Sacrum · Symphyse</small></div><em>›</em></button>
-    <button class="anatomy-arrow minf" onclick="openZone('Membres inférieurs')"><div class="tech-icon">◟</div><div><strong>Membre inf.</strong><small>Hanche · Genou · Pied</small></div><em>›</em></button>
+    <button class="icon" onclick="toast('Catalogue par grandes régions')">i</button>
+  </header>
+
+  <div class="page-title">
+    <h1>Catalogue des techniques</h1>
+    <p>Choisissez une grande région pour afficher toutes les techniques correspondantes.</p>
+  </div>
+
+  <section class="catalogue-grid">
+    <button class="catalogue-card cyan" onclick="openZone('Rachis')">
+      <div class="catalogue-icon">⌇</div>
+      <div>
+        <strong>Rachis</strong>
+        <p>Cervicales · dorsales · côtes · lombaires</p>
+      </div>
+      <b id="countRachis">60</b>
+      <em>sous-menu ›</em>
+    </button>
+
+    <button class="catalogue-card orange" onclick="openZoneAll('Bassin')">
+      <div class="catalogue-icon">◡</div>
+      <div>
+        <strong>Bassin</strong>
+        <p>Ilium · sacrum · symphyse pubienne</p>
+      </div>
+      <b id="countBassin">20</b>
+      <em>techniques ›</em>
+    </button>
+
+    <button class="catalogue-card violet" onclick="openZoneAll('Membres supérieurs')">
+      <div class="catalogue-icon">◜</div>
+      <div>
+        <strong>Membre supérieur</strong>
+        <p>Clavicule · épaule · coude · poignet · main</p>
+      </div>
+      <b id="countMSup">17</b>
+      <em>techniques ›</em>
+    </button>
+
+    <button class="catalogue-card green" onclick="openZoneAll('Membres inférieurs')">
+      <div class="catalogue-icon">◟</div>
+      <div>
+        <strong>Membre inférieur</strong>
+        <p>Hanche · genou · tibia-fibula · cheville · pied</p>
+      </div>
+      <b id="countMInf">31</b>
+      <em>techniques ›</em>
+    </button>
   </section>
+
+  <article class="catalogue-total">
+    <div class="pill-icon">128</div>
+    <div>
+      <strong>Total catalogue</strong>
+      <p>Les techniques sont ensuite filtrables par recherche dans chaque grande région.</p>
+    </div>
+  </article>
 </section>
 
 <section id="rachis" class="screen">
@@ -202,6 +1017,13 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
 const techniques = [{"id": 1, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, position assise, à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 2, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, en procubitus à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 3, "title": "Dysfonction de la région cervico-dorsale C7–D2, composantes multiples à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C/D"}, {"id": 4, "title": "Dysfonction de l’occiput, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 5, "title": "Dysfonction de l’occiput, en translation à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 6, "title": "Dysfonction articulaire globale occiput-atlas-axis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "OAA"}, {"id": 7, "title": "Dysfonction de l’atlas, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 8, "title": "Dysfonction de l’atlas, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 9, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, variante", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "en cours", "percent": 60, "icon": "C"}, {"id": 10, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, prise mentonnière", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 11, "title": "Dysfonction facettaire des cervicales C2–C6, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↔"}, {"id": 12, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à gauche, sujet assis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 13, "title": "Dysfonction des cervicales C2–C7, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "vue", "percent": 100, "icon": "EM"}, {"id": 14, "title": "Dysfonction des cervicales C2–C7, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 0, "icon": "EM"}, {"id": 15, "title": "Dysfonction atloïdo-axoïdienne, en rotation droite, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 16, "title": "Dysfonction occipito-atloïdienne, en ESgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 17, "title": "Dysfonction occipito-atloïdienne, en FSgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 101, "title": "Dysfonction facettaire des dorsales, en flexion, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "vue", "percent": 80, "icon": "D"}, {"id": 102, "title": "Dysfonction facettaire des dorsales, en extension, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 103, "title": "Dysfonction facettaire des dorsales, technique en simple appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 104, "title": "Dysfonction facettaire des dorsales, avec les pisiformes croisés, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✕"}, {"id": 105, "title": "Dysfonction facettaire des dorsales, technique en pisiforme simple, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◈"}, {"id": 106, "title": "Dysfonction facettaire des dorsales D9 à D12, assis, technique en pisiforme simple, postériorité à gauche", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D12"}, {"id": 107, "title": "Dysfonction facettaire des dorsales, technique en double Nelson", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "N"}, {"id": 108, "title": "Dysfonction des vertèbres dorsales, technique en lift, composantes multiples, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 109, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 110, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 111, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 112, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 113, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 114, "title": "Dysfonction d’une vertèbre dorsale D1–D4, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 115, "title": "Dysfonction d’une vertèbre dorsale D1–D3, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 151, "title": "Dysfonction costo-transversaire de la 1re côte, en élévation, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 152, "title": "Dysfonction costo-transversaire antéro-médiane, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↘"}, {"id": 153, "title": "Dysfonction costo-transversaire postéro-latérale, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↖"}, {"id": 154, "title": "Dysfonction costo-transversaire, composantes multiples, technique structurelle, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 155, "title": "Dysfonction costo-transversaire antéro-médiane, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 156, "title": "Dysfonction costo-transversaire postéro-latérale, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 157, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 158, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 159, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 160, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 161, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 162, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 163, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 164, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 165, "title": "Dysfonction des 3e–10e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 166, "title": "Dysfonction des 11e–12e côtes, en élévation, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 167, "title": "Dysfonction des 11e–12e côtes, en abaissement, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 201, "title": "Dysfonction facettaire des lombaires, en NSR à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 45, "icon": "L"}, {"id": 202, "title": "Dysfonction facettaire des lombaires, en ERS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 203, "title": "Dysfonction facettaire des lombaires, en FRS à droite, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 204, "title": "Dysfonction facettaire des lombaires, assis, à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 205, "title": "Dysfonction des lombaires, en NSR à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 206, "title": "Dysfonction des lombaires, en ERS à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 207, "title": "Dysfonction des lombaires, en FRS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 208, "title": "Dysfonction de la charnière D12/L1, technique en double appui", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "D/L"}, {"id": 209, "title": "Dysfonction de la charnière D12/L1, technique indirecte à droite en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 210, "title": "Dysfonction de L3, technique semi-directe à gauche en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 211, "title": "Charnière D12/L1, technique en Lift, postériorité à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 301, "title": "Dysfonction de l’ilium, en antériorité à gauche", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 302, "title": "Dysfonction de l’ilium, en antériorité à gauche, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 303, "title": "Dysfonction de l’ilium, en postériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 304, "title": "Dysfonction de l’ilium, en postériorité à droite, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 305, "title": "Dysfonction de l’ilium, en supériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↥"}, {"id": 306, "title": "Dysfonction de l’ilium, en antériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 307, "title": "Dysfonction de l’ilium, en postériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 308, "title": "Dysfonction de l’ilium, en postériorité à droite en procubitus, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 309, "title": "Dysfonction de l’ilium, en fermeture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 310, "title": "Dysfonction de l’ilium, en ouverture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 351, "title": "Dysfonction du sacrum, en torsion postérieure avec le pisiforme direct, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 352, "title": "Dysfonction du sacrum, en flexion unilatérale sur axe horizontal, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 353, "title": "Dysfonction du sacrum, en torsion postérieure gauche sur axe oblique droit", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 354, "title": "Dysfonction du sacrum, en torsion antérieure droite sur axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 355, "title": "Dysfonction du sacrum, en torsion postérieure droite sur un axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 356, "title": "Dysfonction du sacrum, en antériorité unilatérale, manœuvre avec le pisiforme direct", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 357, "title": "Dysfonction du sacrum, en extension unilatérale sur axe horizontal, à droite", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 381, "title": "Dysfonction de la symphyse pubienne, en supériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 382, "title": "Dysfonction de la symphyse pubienne, en infériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 383, "title": "Dysfonction combinée de la symphyse pubienne, en supériorité et infériorité", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 401, "title": "Dysfonction pré-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 402, "title": "Dysfonction sus-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 403, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 404, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à gauche", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 405, "title": "Dysfonction acromio-claviculaire, en rotation antérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 406, "title": "Dysfonction acromio-claviculaire, en rotation postérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 407, "title": "Dysfonction gléno-humérale, en antériorité, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 408, "title": "Dysfonction huméro-ulnaire, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 409, "title": "Dysfonction huméro-ulnaire, en adduction, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 410, "title": "Dysfonction huméro-radiale, en antériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 411, "title": "Dysfonction huméro-radiale, en postériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 412, "title": "Dysfonction huméro-radiale, en postériorité, variante", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 413, "title": "Dysfonction radio-carpienne du scaphoïde ou du lunatum, en postériorité, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 414, "title": "Dysfonction radio-carpienne, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 415, "title": "Dysfonction articulaire globale des médio-carpiennes, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 416, "title": "Dysfonction articulaire globale des inter-carpiennes, à gauche", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 417, "title": "Dysfonction articulaire globale de la trapézo-métacarpienne, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 501, "title": "Dysfonction de la coxo-fémorale, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 502, "title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 503, "title": "Dysfonction de la coxo-fémorale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 504, "title": "Dysfonction de la coxo-fémorale, en adduction, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 505, "title": "Dysfonction de la coxo-fémorale, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 506, "title": "Dysfonction de la coxo-fémorale, en antériorité classique, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 507, "title": "Dysfonction de la coxo-fémorale, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 508, "title": "Dysfonction de la coxo-fémorale articulaire globale dans un axe transversal, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◎"}, {"id": 509, "title": "Dysfonction de la fémoro-tibiale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 510, "title": "Dysfonction de la fémoro-tibiale, en adduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 511, "title": "Dysfonction de la fémoro-tibiale, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 512, "title": "Dysfonction de la fémoro-tibiale, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 513, "title": "Dysfonction de la fémoro-tibiale, en rotation interne, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 514, "title": "Dysfonction de la fémoro-tibiale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 515, "title": "Dysfonction du ménisque médial, en postériorité et en extension, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 516, "title": "Dysfonction du ménisque médial en postériorité, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 551, "title": "Dysfonction de la fibulo-tibiale supérieure, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 552, "title": "Dysfonction de la fibulo-tibiale inférieure, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 553, "title": "Dysfonction de la fibulo-tibiale inférieure, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 554, "title": "Dysfonction de la tibio-tarsienne articulaire globale, en décubitus ventral, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 555, "title": "Entorse tibio-tarsienne externe, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "!"}, {"id": 556, "title": "Décoaptation de la tibio-tarsienne globale, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "↧"}, {"id": 557, "title": "Dysfonction de la tibio-tarsienne, en antériorité, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 558, "title": "Dysfonction de la sous-astragalienne antéro-interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 559, "title": "Dysfonction de la sous-astragalienne postéro-externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 560, "title": "Dysfonction de la sous-talienne, calcanéus en valgus, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 561, "title": "Dysfonction de la sous-talienne, calcanéus en varus, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 562, "title": "Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 563, "title": "Dysfonction talo-naviculaire, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 564, "title": "Dysfonction de la naviculo-cuboïdienne articulaire globale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 565, "title": "Dysfonction de la métatarso-phalangienne de la 1re phalange, en flexion dorsale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◟"}];
 
 const zoneSubzones = {
+  "Rachis": [
+    { label: "Toutes les techniques", icon: "⌇", detail: "Afficher les cervicales, dorsales, côtes et lombaires", mode: "all-rachis", colorClass: "sub-all" },
+    { label: "Cervicales", icon: "C", detail: "Occiput, atlas, axis, C2–C7 et C7–D2", colorClass: "sub-cervicales" },
+    { label: "Dorsales", icon: "D", detail: "Vertèbres dorsales D1–D12", colorClass: "sub-dorsales" },
+    { label: "Côtes", icon: "12", detail: "Costo-transversaires et dysfonctions respiratoires", mode: "cotes", colorClass: "sub-cotes" },
+    { label: "Lombaires", icon: "L", detail: "Lombaires, D12/L1, L5/S1, Lumbar Roll et Lift", colorClass: "sub-lombaires" }
+  ],
   "Bassin": [
     { label: "Ilium", icon: "◜", detail: "Antériorité, postériorité, ouverture, fermeture" },
     { label: "Sacrum", icon: "S", detail: "Torsions, flexions et extensions unilatérales" },
@@ -253,6 +1075,16 @@ function openSubzone(subzone){
   clearSearch(); renderTechniques(); go("techniques");
 }
 
+function openZoneAll(zone){
+  currentZone = zone;
+  currentSubzone = "__ALL__";
+  currentBack = "zones";
+  setTitle(zone, "Toutes les techniques");
+  clearSearch();
+  renderTechniques();
+  go("techniques");
+}
+
 function openZone(zone){
   currentZone=zone; currentSubzone=zone; currentBack="zones";
   setTitle(zone, zoneSubzones[zone] ? "Choisissez une sous-zone" : "Sélectionnez une technique");
@@ -263,6 +1095,15 @@ function openMemberSubzone(zone, subzone){
   currentZone=zone; currentSubzone=subzone; currentBack="techniques";
   setTitle(subzone, "Sélectionnez une technique");
   clearSearch(); renderTechniques();
+}
+
+function openSpecialSubzone(zone, subzone){
+  currentZone = zone;
+  currentSubzone = "__" + subzone.toUpperCase() + "__";
+  currentBack = "techniques";
+  setTitle(subzone, "Sélectionnez une technique");
+  clearSearch();
+  renderTechniques();
 }
 
 function backFromTechniques(){
@@ -291,16 +1132,43 @@ function renderTechniques(){
   const query=(document.getElementById("searchInput")?.value||"").toLowerCase();
 
   if(zoneSubzones[currentSubzone]){
-    list.innerHTML = zoneSubzones[currentSubzone].map(item => `
-      <button class="row tech featured" onclick="openMemberSubzone('${currentSubzone}','${item.label}')">
-        <div class="tech-icon">${item.icon}</div>
-        <div><h3>${item.label}</h3><small>${item.detail}</small></div>
-        <div class="state"><span>ouvrir ›</span></div>
-      </button>`).join("");
+    list.innerHTML = zoneSubzones[currentSubzone].map(item => {
+      const action = item.mode === "all-rachis"
+        ? "openZoneAll('Rachis')"
+        : item.mode === "cotes"
+          ? "openSpecialSubzone('Rachis','Côtes')"
+          : `openMemberSubzone('${currentSubzone}','${item.label}')`;
+
+      return `
+        <button class="row tech featured ${item.colorClass || ""}" onclick="${action}">
+          <div class="tech-icon">${item.icon}</div>
+          <div><h3>${item.label}</h3><small>${item.detail}</small></div>
+          <div class="state"><span>ouvrir ›</span></div>
+        </button>`;
+    }).join("");
     return;
   }
 
-  const items = techniques.filter(t => t.sub === currentSubzone && t.title.toLowerCase().includes(query));
+  const items = techniques.filter(t => {
+    const title = t.title.toLowerCase();
+    const matchText = title.includes(query) || t.sub.toLowerCase().includes(query);
+
+    if (currentSubzone === "__ALL__") return t.zone === currentZone && matchText;
+
+    if (currentSubzone === "__CÔTES__") {
+      const isCote =
+        t.zone === "Rachis" &&
+        (
+          title.includes("côte") ||
+          title.includes("côtes") ||
+          title.includes("costo") ||
+          title.includes("respiratoire")
+        );
+      return isCote && matchText;
+    }
+
+    return t.sub === currentSubzone && matchText;
+  });
   if(items.length === 0){
     list.innerHTML = `<article class="empty"><h3>Aucune technique pour l’instant</h3><p>Les vidéos seront ajoutées progressivement dans cette sous-zone.</p></article>`;
     return;
@@ -309,7 +1177,7 @@ function renderTechniques(){
   list.innerHTML = items.map((t,i)=>`
     <button class="row tech ${i===0?'featured':''}" onclick="openTechnique(${t.id})">
       <div class="tech-icon">${t.icon}</div>
-      <div><h3>${t.title}</h3><small>${t.level}</small></div>
+      <div><h3>${t.title}</h3><small>${(currentSubzone === "__ALL__" || currentSubzone === "__CÔTES__") ? t.sub + " · " + t.level : t.level}</small></div>
       <div class="state">${stateLabel(t)}</div>
     </button>`).join("");
 }
@@ -339,7 +1207,22 @@ function slugify(text){
   return text.toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"-").replace(/–/g,"-").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase();
 }
 
+function updateCatalogueCounts(){
+  const counts = {
+    Rachis: techniques.filter(t => t.zone === "Rachis").length,
+    Bassin: techniques.filter(t => t.zone === "Bassin").length,
+    MSup: techniques.filter(t => t.zone === "Membres supérieurs").length,
+    MInf: techniques.filter(t => t.zone === "Membres inférieurs").length
+  };
+  const set = (id, value) => { const el = document.getElementById(id); if(el) el.textContent = value; };
+  set("countRachis", counts.Rachis);
+  set("countBassin", counts.Bassin);
+  set("countMSup", counts.MSup);
+  set("countMInf", counts.MInf);
+}
+
 document.getElementById("homeCount").textContent = techniques.length;
+updateCatalogueCounts();
 renderTechniques();
 </script>
 </body>
