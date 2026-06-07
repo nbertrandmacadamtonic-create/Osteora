@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>OSTÉO PRATIK — Techniques · Vidéos · Révision</title>
+<title>Ostéo Pratik — Techniques · Vidéos · Révision</title>
 <style>
 :root{
   --cyan:#00e5ff;--violet:#a855ff;--green:#00e6a7;--orange:#ffb020;--blue:#2d8cff;
@@ -6137,15 +6137,16 @@ button[data-tech-id="12"]{
 
 .brand-title-only span{
   color:#ffffff;
-  font-size:28px;
+  font-size:36px;
   font-weight:950;
+  letter-spacing:.04em;
 }
 
 .brand-title-only b{
   color:var(--cyan);
-  font-size:22px;
+  font-size:29px;
   font-weight:950;
-  letter-spacing:.20em;
+  letter-spacing:.08em;
 }
 
 .brand .subtitle{
@@ -6221,11 +6222,11 @@ button[data-tech-id="12"]{
   }
 
   .brand-title-only span{
-    font-size:26px;
+    font-size:32px;
   }
 
   .brand-title-only b{
-    font-size:20px;
+    font-size:25px;
   }
 
   .brand .subtitle{
@@ -6242,11 +6243,11 @@ button[data-tech-id="12"]{
 
 @media(max-width:380px){
   .brand-title-only span{
-    font-size:23px;
+    font-size:28px;
   }
 
   .brand-title-only b{
-    font-size:18px;
+    font-size:22px;
   }
 
   .bottom{
@@ -6320,6 +6321,81 @@ button[data-tech-id="12"]{
   }
 }
 
+
+/* === PATCH FINAL : logo plus grand dans le cartouche Apprenez === */
+/* Le fichier image reste : assets/images/icon-osteo-pratik.png */
+
+.home-learning-pill{
+  grid-template-columns:66px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+}
+
+.home-learning-logo{
+  width:62px !important;
+  height:62px !important;
+  min-width:62px !important;
+  border-radius:18px !important;
+  background:#020714 !important;
+  border:1px solid rgba(0,229,255,.30) !important;
+  box-shadow:
+    0 0 24px rgba(0,229,255,.22),
+    inset 0 1px 0 rgba(255,255,255,.04) !important;
+  overflow:hidden !important;
+  padding:0 !important;
+}
+
+.home-learning-logo img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:cover !important;
+  display:block !important;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.34)) !important;
+}
+
+.home-learning-pill strong{
+  text-align:center !important;
+  color:#fff !important;
+  font-size:19px !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+}
+
+@media(max-width:430px){
+  .home-learning-pill{
+    grid-template-columns:60px minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+
+  .home-learning-logo{
+    width:56px !important;
+    height:56px !important;
+    min-width:56px !important;
+    border-radius:17px !important;
+  }
+
+  .home-learning-pill strong{
+    font-size:17px !important;
+  }
+}
+
+@media(max-width:380px){
+  .home-learning-pill{
+    grid-template-columns:56px minmax(0,1fr) !important;
+  }
+
+  .home-learning-logo{
+    width:52px !important;
+    height:52px !important;
+    min-width:52px !important;
+  }
+
+  .home-learning-pill strong{
+    font-size:16px !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6332,8 +6408,8 @@ button[data-tech-id="12"]{
 
 <section id="home" class="screen active">
   <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
   <article class="intro home-learning-pill">
   <div class="pill-icon home-learning-logo">
@@ -6361,8 +6437,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
       <p class="subtitle video-brand-subtitle-hidden"></p>
     </div>
@@ -6464,8 +6540,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
       <p class="subtitle">Rachis</p>
     </div>
@@ -6642,8 +6718,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
     </div>
     <button class="icon" onclick="toast('Modes de révision')">▤</button>
@@ -6755,8 +6831,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
       <p class="subtitle">Membres supérieurs</p>
     </div>
@@ -6797,8 +6873,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
       <p class="subtitle">Membres inférieurs</p>
     </div>
@@ -6839,8 +6915,8 @@ button[data-tech-id="12"]{
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
       <div class="brand-title-only">
-  <span>OSTÉO</span>
-  <b>PRATIK</b>
+  <span>Ostéo</span>
+  <b>Pratik</b>
 </div>
       <p class="subtitle">Bassin</p>
     </div>
