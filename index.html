@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>OSTÉO RA — Index autonome premium</title>
+<title>OSTÉO PRATIK — Techniques · Vidéos · Révision</title>
 <style>
 :root{
   --cyan:#00e5ff;--violet:#a855ff;--green:#00e6a7;--orange:#ffb020;--blue:#2d8cff;
@@ -4576,7 +4576,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   mix-blend-mode:screen;
   background:
     linear-gradient(180deg, rgba(4,15,31,.14), rgba(4,15,31,.42)),
-    url("assets/images/revision-bg.webp") center 58% / contain no-repeat;
+    url("assets/images/osteo-ra-bg-01.webp") center 58% / contain no-repeat;
   filter: drop-shadow(0 0 28px rgba(0,229,255,.18));
 }
 
@@ -4734,7 +4734,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
     opacity:.44;
     background:
       linear-gradient(180deg, rgba(4,15,31,.16), rgba(4,15,31,.42)),
-      url("assets/images/revision-bg.webp") center 58% / contain no-repeat;
+      url("assets/images/osteo-ra-bg-02.webp") center 58% / contain no-repeat;
   }
 
   .revision-orbit-card{
@@ -5807,23 +5807,138 @@ button[data-tech-id="12"]{
   }
 }
 
+
+/* === BRANDING OSTÉO PRATIK === */
+.brand{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  min-width:0 !important;
+}
+
+.brand-logo-full{
+  display:block;
+  width:min(230px, 72vw);
+  max-height:58px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 14px rgba(0,229,255,.22));
+}
+
+.brand .subtitle{
+  margin-top:6px !important;
+}
+
+/* Header plus compact quand le logo est complet */
+.top .brand-logo-full{
+  width:min(220px, 64vw);
+  max-height:54px;
+}
+
+/* Icône seule utilisable dans certaines zones futures */
+.app-icon-logo{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.28));
+}
+
+/* Accueil : nom de marque cohérent */
+.logo-text-fallback{
+  font-size:0;
+}
+
+@media(max-width:430px){
+  .top{
+    grid-template-columns:52px minmax(0,1fr) 52px !important;
+    gap:12px !important;
+    margin-bottom:14px !important;
+    min-height:64px !important;
+  }
+
+  .icon{
+    width:50px !important;
+    height:50px !important;
+    border-radius:18px !important;
+    font-size:27px !important;
+  }
+
+  .icon.round{
+    font-size:34px !important;
+  }
+
+  .brand-logo-full{
+    width:min(220px, 70vw);
+    max-height:56px;
+  }
+
+  .top .brand-logo-full{
+    width:min(210px, 64vw);
+    max-height:52px;
+  }
+
+  .brand .subtitle,
+  .subtitle{
+    margin-top:6px !important;
+    font-size:15px !important;
+    line-height:1.15 !important;
+  }
+
+  .screen{
+    padding-top:calc(18px + var(--safe-top)) !important;
+  }
+}
+
+@media(max-width:380px){
+  .top{
+    grid-template-columns:50px minmax(0,1fr) 50px !important;
+    gap:10px !important;
+  }
+
+  .icon{
+    width:48px !important;
+    height:48px !important;
+  }
+
+  .brand-logo-full{
+    width:min(200px, 68vw);
+    max-height:50px;
+  }
+
+  .top .brand-logo-full{
+    width:min(190px, 62vw);
+    max-height:48px;
+  }
+
+  .brand .subtitle,
+  .subtitle{
+    font-size:14px !important;
+  }
+}
+
 </style>
+
+<link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
+<link rel="apple-touch-icon" href="assets/images/icon-osteo-pratik.png">
+<meta name="theme-color" content="#07162E">
+
 </head>
 <body>
 <main class="app">
 
 <section id="home" class="screen active">
-  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><h1 class="logo">OSTÉO <span>RA</span></h1><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
+  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full"><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
   <article class="intro"><div class="pill-icon">⌇</div><div><strong>Apprenez · Comprenez · Corrigez · Révisez</strong></div></article>
   <section class="home-orbit">
     <div class="body-center home-personnage">
-      <img src="assets/images/home-personnage.webp" alt="">
+      <img src="assets/images/osteo-ra-image-01.webp" alt="">
     </div>
     <button class="orbit-card videos" onclick="go('videoMap')"><div class="orbit-icon">▷</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
     <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon">▤</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
     <button class="orbit-card quiz" onclick="go('quiz')"><div class="orbit-icon">◎</div><strong><span class="main-word">Tester</span><span class="sub-word">mes connaissances</span></strong><em class="orbit-arrow">›</em></button>
     <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon">↗</div><strong><span class="main-word">Suivre</span><span class="sub-word">ma progression</span></strong><em class="orbit-arrow">›</em></button>
-    <button class="center-button" onclick="toast('OSTÉO RA')">⌬</button>
+    <button class="center-button" onclick="toast('OSTÉO PRATIK')">⌬</button>
   </section>
   <article class="last-card"><div class="pill-icon">↺</div><div><small>Votre dernière pratique</small><strong>Dysfonction facettaire des dorsales</strong><span>Rachis</span><div class="bar"><i style="width:58%"></i></div></div><b id="homeCount">0</b></article>
 </section>
@@ -5832,20 +5947,20 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
       <p class="subtitle video-brand-subtitle-hidden"></p>
     </div>
     <button class="icon" onclick="toast('Touchez une zone du corps')">i</button>
   </header>
 
   <div class="video-page-title">
-    <h1>Choisissez une zone</h1>
-    <p>Rachis · Bassin · Membres supérieurs · Membres inférieurs</p>
+    <h1>Vidéo</h1>
+    <p>Choisissez une zone</p>
   </div>
 
   <section class="video-zone-layout">
     <div class="video-zone-person">
-      <img src="assets/images/video-zone-person.png" alt="">
+      <img src="assets/images/osteo-ra-image-02.png" alt="">
     </div>
 
     <div class="video-hotspot-dot dot-rachis"></div>
@@ -5932,7 +6047,7 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
       <p class="subtitle">Rachis</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du rachis')">i</button>
@@ -5945,7 +6060,7 @@ button[data-tech-id="12"]{
 
   <section class="rachis-region-layout">
     <div class="rachis-side-image">
-      <img src="assets/images/rachis-side.png" alt="">
+      <img src="assets/images/osteo-ra-image-03.png" alt="">
     </div>
 
     <button class="rachis-region-card cervicales" onclick="openRachisRegion('Cervicales')">
@@ -6107,7 +6222,7 @@ button[data-tech-id="12"]{
   <header class="top revision-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
     </div>
     <button class="icon" onclick="toast('Modes de révision')">▤</button>
   </header>
@@ -6217,7 +6332,7 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
       <p class="subtitle">Membres supérieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre supérieur')">i</button>
@@ -6227,7 +6342,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image msup"><img src="assets/images/msup-side.png" alt="Membres supérieurs"/></div>
+    <div class="module-side-image msup"><img src="assets/images/osteo-ra-image-04.png" alt="Membres supérieurs"/></div>
     <button class="module-region-card shoulder purple-card left" onclick="openMappedSubzone('msupMenu','Membres supérieurs','Épaule',['Clavicule','Épaule'])">
       <div class="region-icon">E</div><div><h3>Épaule</h3><small>Clavicule · Épaule</small></div><div class="arrow">›</div>
     </button>
@@ -6256,7 +6371,7 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
       <p class="subtitle">Membres inférieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre inférieur')">i</button>
@@ -6266,7 +6381,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image minf"><img src="assets/images/minf-side.png" alt="Membres inférieurs"/></div>
+    <div class="module-side-image minf"><img src="assets/images/osteo-ra-image-05.png" alt="Membres inférieurs"/></div>
     <button class="module-region-card hip purple-card left" onclick="openMappedSubzone('minfMenu','Membres inférieurs','Hanche',['Hanche'])">
       <div class="region-icon">H</div><div><h3>Hanche</h3><small>Coxo-fémorale</small></div><div class="arrow">›</div>
     </button>
@@ -6295,7 +6410,7 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <h1 class="logo">OSTÉO <span>RA</span></h1>
+      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
       <p class="subtitle">Bassin</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du bassin')">i</button>
@@ -6305,7 +6420,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image bassin"><img src="assets/images/bassin-side.png" alt="Bassin"/></div>
+    <div class="module-side-image bassin"><img src="assets/images/osteo-ra-image-06.png" alt="Bassin"/></div>
     <button class="module-region-card ilium purple-card left" onclick="openMappedSubzone('bassinMenu','Bassin','Sacro-iliaques',['Ilium'])">
       <div class="region-icon">SI</div><div><h3>Sacro-iliaques</h3><small>Antériorité · postériorité · ouverture · fermeture</small></div><div class="arrow">›</div>
     </button>
@@ -6327,7 +6442,7 @@ button[data-tech-id="12"]{
 </section>
 
 <section id="favorites" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Favoris</h1><p class="subtitle">Techniques sauvegardées</p></div><button class="icon">♡</button></header><div class="empty">Aucun favori pour l’instant.</div></section>
-<section id="profile" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Profil</h1><p class="subtitle">Compte étudiant</p></div><button class="icon">⚙</button></header><article class="profile"><div>RA</div><h2>Étudiant Ostéo RA</h2><p>Parcours structurel et énergie musculaire</p></article></section>
+<section id="profile" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Profil</h1><p class="subtitle">Compte étudiant</p></div><button class="icon">⚙</button></header><article class="profile"><div>RA</div><h2>Étudiant Ostéo Pratik</h2><p>Parcours structurel et énergie musculaire</p></article></section>
 
 
 <!-- === Overlay carte plein écran : collection déjà vues === -->
@@ -7067,7 +7182,7 @@ renderTechniques();
 </script>
 
 <script>
-console.log("OSTEO RA debug: modules rachis / membres supérieurs / membres inférieurs / bassin actifs");
+console.log("OSTÉO PRATIK debug: modules rachis / membres supérieurs / membres inférieurs / bassin actifs");
 </script>
 
 </body>
