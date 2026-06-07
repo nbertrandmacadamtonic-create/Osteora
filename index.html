@@ -4576,7 +4576,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   mix-blend-mode:screen;
   background:
     linear-gradient(180deg, rgba(4,15,31,.14), rgba(4,15,31,.42)),
-    url("assets/images/osteo-ra-bg-01.webp") center 58% / contain no-repeat;
+    url("assets/images/revision-bg.webp") center 58% / contain no-repeat;
   filter: drop-shadow(0 0 28px rgba(0,229,255,.18));
 }
 
@@ -4734,7 +4734,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
     opacity:.44;
     background:
       linear-gradient(180deg, rgba(4,15,31,.16), rgba(4,15,31,.42)),
-      url("assets/images/osteo-ra-bg-02.webp") center 58% / contain no-repeat;
+      url("assets/images/revision-bg.webp") center 58% / contain no-repeat;
   }
 
   .revision-orbit-card{
@@ -5917,6 +5917,198 @@ button[data-tech-id="12"]{
   }
 }
 
+
+/* === CORRECTION BRANDING / CHEMINS / BARRE BASSE === */
+/* Le titre est maintenant du texte réel + icône, donc il reste lisible même si l'image complète du logo pose problème. */
+
+.brand{
+  text-align:center !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.brand-op{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  max-width:100%;
+  min-width:0;
+}
+
+.brand-op-icon{
+  width:34px;
+  height:34px;
+  object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 0 10px rgba(0,229,255,.34));
+  flex:0 0 auto;
+}
+
+.brand-op-text{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  line-height:.95;
+  letter-spacing:.12em;
+  white-space:nowrap;
+  text-align:left;
+}
+
+.brand-op-text span{
+  color:#ffffff;
+  font-size:20px;
+  font-weight:900;
+}
+
+.brand-op-text b{
+  color:var(--cyan);
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:.18em;
+}
+
+.brand .subtitle{
+  margin:6px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.15 !important;
+  color:var(--muted) !important;
+}
+
+/* Header : on revient à une taille propre, pas énorme */
+.top{
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  gap:10px !important;
+  margin-bottom:12px !important;
+  min-height:54px !important;
+}
+
+.icon{
+  width:44px !important;
+  height:44px !important;
+  border-radius:16px !important;
+  font-size:24px !important;
+}
+
+.icon.round{
+  font-size:30px !important;
+}
+
+/* Barre de menu : moins haute et moins massive */
+.bottom{
+  left:18px !important;
+  right:18px !important;
+  bottom:calc(10px + var(--safe-bottom)) !important;
+  height:62px !important;
+  border-radius:24px !important;
+  max-width:394px !important;
+  margin:0 auto !important;
+}
+
+.bottom button{
+  font-size:21px !important;
+  gap:3px !important;
+}
+
+.bottom span{
+  font-size:10px !important;
+}
+
+/* Les images anatomiques doivent reprendre les chemins GitHub réels */
+.body-center img,
+.video-zone-person img,
+.rachis-side-image img,
+.module-side-image img,
+.rachis-body img,
+.mini-rachis{
+  display:block;
+}
+
+/* Titre page vidéo */
+#videoMap .video-page-title h1{
+  font-size:42px !important;
+  line-height:1 !important;
+}
+
+#videoMap .video-page-title p{
+  font-size:16px !important;
+}
+
+/* Mobile serré */
+@media(max-width:430px){
+  .top{
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+    gap:8px !important;
+    min-height:52px !important;
+    margin-bottom:10px !important;
+  }
+
+  .icon{
+    width:42px !important;
+    height:42px !important;
+    border-radius:15px !important;
+    font-size:22px !important;
+  }
+
+  .brand-op-icon{
+    width:32px;
+    height:32px;
+  }
+
+  .brand-op-text span{
+    font-size:19px;
+  }
+
+  .brand-op-text b{
+    font-size:16px;
+  }
+
+  .brand .subtitle{
+    font-size:13px !important;
+    margin-top:5px !important;
+  }
+
+  .bottom{
+    left:16px !important;
+    right:16px !important;
+    height:60px !important;
+    border-radius:22px !important;
+  }
+
+  .bottom button{
+    font-size:20px !important;
+  }
+
+  .bottom span{
+    font-size:9.5px !important;
+  }
+}
+
+@media(max-width:380px){
+  .brand-op-icon{
+    width:29px;
+    height:29px;
+  }
+
+  .brand-op-text span{
+    font-size:17px;
+  }
+
+  .brand-op-text b{
+    font-size:14px;
+  }
+
+  .bottom{
+    left:12px !important;
+    right:12px !important;
+    height:58px !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -5928,11 +6120,17 @@ button[data-tech-id="12"]{
 <main class="app">
 
 <section id="home" class="screen active">
-  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full"><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
+  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
   <article class="intro"><div class="pill-icon">⌇</div><div><strong>Apprenez · Comprenez · Corrigez · Révisez</strong></div></article>
   <section class="home-orbit">
     <div class="body-center home-personnage">
-      <img src="assets/images/osteo-ra-image-01.webp" alt="">
+      <img src="assets/images/home-personnage.webp" alt="">
     </div>
     <button class="orbit-card videos" onclick="go('videoMap')"><div class="orbit-icon">▷</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
     <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon">▤</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
@@ -5947,7 +6145,13 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
       <p class="subtitle video-brand-subtitle-hidden"></p>
     </div>
     <button class="icon" onclick="toast('Touchez une zone du corps')">i</button>
@@ -5960,7 +6164,7 @@ button[data-tech-id="12"]{
 
   <section class="video-zone-layout">
     <div class="video-zone-person">
-      <img src="assets/images/osteo-ra-image-02.png" alt="">
+      <img src="assets/images/video-zone-person.png" alt="">
     </div>
 
     <div class="video-hotspot-dot dot-rachis"></div>
@@ -6047,7 +6251,13 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
       <p class="subtitle">Rachis</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du rachis')">i</button>
@@ -6060,7 +6270,7 @@ button[data-tech-id="12"]{
 
   <section class="rachis-region-layout">
     <div class="rachis-side-image">
-      <img src="assets/images/osteo-ra-image-03.png" alt="">
+      <img src="assets/images/rachis-side.png" alt="">
     </div>
 
     <button class="rachis-region-card cervicales" onclick="openRachisRegion('Cervicales')">
@@ -6222,7 +6432,13 @@ button[data-tech-id="12"]{
   <header class="top revision-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
     </div>
     <button class="icon" onclick="toast('Modes de révision')">▤</button>
   </header>
@@ -6332,7 +6548,13 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
       <p class="subtitle">Membres supérieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre supérieur')">i</button>
@@ -6342,7 +6564,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image msup"><img src="assets/images/osteo-ra-image-04.png" alt="Membres supérieurs"/></div>
+    <div class="module-side-image msup"><img src="assets/images/msup-side.png" alt="Membres supérieurs"/></div>
     <button class="module-region-card shoulder purple-card left" onclick="openMappedSubzone('msupMenu','Membres supérieurs','Épaule',['Clavicule','Épaule'])">
       <div class="region-icon">E</div><div><h3>Épaule</h3><small>Clavicule · Épaule</small></div><div class="arrow">›</div>
     </button>
@@ -6371,7 +6593,13 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
       <p class="subtitle">Membres inférieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre inférieur')">i</button>
@@ -6381,7 +6609,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image minf"><img src="assets/images/osteo-ra-image-05.png" alt="Membres inférieurs"/></div>
+    <div class="module-side-image minf"><img src="assets/images/minf-side.png" alt="Membres inférieurs"/></div>
     <button class="module-region-card hip purple-card left" onclick="openMappedSubzone('minfMenu','Membres inférieurs','Hanche',['Hanche'])">
       <div class="region-icon">H</div><div><h3>Hanche</h3><small>Coxo-fémorale</small></div><div class="arrow">›</div>
     </button>
@@ -6410,7 +6638,13 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik.png" alt="OSTÉO PRATIK" class="brand-logo-full">
+      <div class="brand-op">
+  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
+  <div class="brand-op-text">
+    <span>OSTÉO</span>
+    <b>PRATIK</b>
+  </div>
+</div>
       <p class="subtitle">Bassin</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du bassin')">i</button>
@@ -6420,7 +6654,7 @@ button[data-tech-id="12"]{
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image bassin"><img src="assets/images/osteo-ra-image-06.png" alt="Bassin"/></div>
+    <div class="module-side-image bassin"><img src="assets/images/bassin-side.png" alt="Bassin"/></div>
     <button class="module-region-card ilium purple-card left" onclick="openMappedSubzone('bassinMenu','Bassin','Sacro-iliaques',['Ilium'])">
       <div class="region-icon">SI</div><div><h3>Sacro-iliaques</h3><small>Antériorité · postériorité · ouverture · fermeture</small></div><div class="arrow">›</div>
     </button>
