@@ -6255,6 +6255,71 @@ button[data-tech-id="12"]{
   }
 }
 
+
+/* === ACCUEIL : logo dans le cartouche "Apprenez · Comprenez · Corrigez · Révisez" === */
+.home-learning-pill{
+  grid-template-columns:58px minmax(0,1fr) !important;
+  gap:14px !important;
+  align-items:center !important;
+}
+
+.home-learning-logo{
+  width:54px !important;
+  height:54px !important;
+  border-radius:18px !important;
+  background:rgba(0,229,255,.08) !important;
+  border:1px solid rgba(0,229,255,.26) !important;
+  box-shadow:
+    0 0 22px rgba(0,229,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+  overflow:hidden !important;
+}
+
+.home-learning-logo img{
+  width:38px !important;
+  height:38px !important;
+  object-fit:contain !important;
+  display:block !important;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.34)) !important;
+}
+
+.home-learning-pill strong{
+  text-align:center !important;
+  color:#fff !important;
+  font-size:19px !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.02em !important;
+}
+
+@media(max-width:430px){
+  .home-learning-pill{
+    grid-template-columns:52px minmax(0,1fr) !important;
+    gap:12px !important;
+  }
+
+  .home-learning-logo{
+    width:50px !important;
+    height:50px !important;
+    border-radius:16px !important;
+  }
+
+  .home-learning-logo img{
+    width:34px !important;
+    height:34px !important;
+  }
+
+  .home-learning-pill strong{
+    font-size:17px !important;
+  }
+}
+
+@media(max-width:380px){
+  .home-learning-pill strong{
+    font-size:16px !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6270,7 +6335,14 @@ button[data-tech-id="12"]{
   <span>OSTÉO</span>
   <b>PRATIK</b>
 </div><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
-  <article class="intro"><div class="pill-icon">⌇</div><div><strong>Apprenez · Comprenez · Corrigez · Révisez</strong></div></article>
+  <article class="intro home-learning-pill">
+  <div class="pill-icon home-learning-logo">
+    <img src="assets/images/icon-osteo-pratik.png" alt="Ostéo Pratik">
+  </div>
+  <div>
+    <strong>Apprenez · Comprenez ·<br>Corrigez · Révisez</strong>
+  </div>
+</article>
   <section class="home-orbit">
     <div class="body-center home-personnage">
       <img src="assets/images/home-personnage.webp" alt="">
