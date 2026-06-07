@@ -6396,6 +6396,129 @@ button[data-tech-id="12"]{
   }
 }
 
+
+
+/* === PATCH FINAL PREMIUM : titre + logo cartouche + baseline sur une ligne === */
+.brand-title-only{
+  display:flex !important;
+  flex-direction:row !important;
+  align-items:baseline !important;
+  justify-content:center !important;
+  gap:8px !important;
+  line-height:1 !important;
+  letter-spacing:0 !important;
+  text-align:center !important;
+  white-space:nowrap !important;
+  filter:drop-shadow(0 0 14px rgba(0,229,255,.18)) !important;
+}
+
+.brand-title-only span{
+  color:#ffffff !important;
+  font-size:34px !important;
+  font-weight:950 !important;
+  letter-spacing:.02em !important;
+}
+
+.brand-title-only b{
+  color:var(--cyan) !important;
+  font-size:34px !important;
+  font-weight:950 !important;
+  letter-spacing:.04em !important;
+}
+
+.brand .subtitle{
+  margin:6px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.1 !important;
+}
+
+.home-learning-pill{
+  grid-template-columns:54px minmax(0,1fr) !important;
+  gap:12px !important;
+  align-items:center !important;
+}
+
+.home-learning-logo{
+  width:48px !important;
+  height:48px !important;
+  min-width:48px !important;
+  border-radius:14px !important;
+  background:#020714 !important;
+  border:none !important;
+  box-shadow:
+    0 0 18px rgba(0,229,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.03) !important;
+  overflow:hidden !important;
+  padding:0 !important;
+}
+
+.home-learning-logo img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:#020714 !important;
+}
+
+.home-learning-pill strong{
+  display:block !important;
+  font-size:13.8px !important;
+  line-height:1.08 !important;
+  font-weight:950 !important;
+  letter-spacing:-.01em !important;
+  white-space:nowrap !important;
+  text-align:center !important;
+}
+
+@media (max-width:430px){
+  .brand-title-only span,
+  .brand-title-only b{
+    font-size:31px !important;
+  }
+
+  .brand .subtitle{
+    font-size:13px !important;
+  }
+
+  .home-learning-pill{
+    grid-template-columns:50px minmax(0,1fr) !important;
+    gap:10px !important;
+  }
+
+  .home-learning-logo{
+    width:44px !important;
+    height:44px !important;
+    min-width:44px !important;
+    border-radius:13px !important;
+  }
+
+  .home-learning-pill strong{
+    font-size:12.4px !important;
+  }
+}
+
+@media (max-width:380px){
+  .brand-title-only span,
+  .brand-title-only b{
+    font-size:28px !important;
+  }
+
+  .home-learning-pill{
+    grid-template-columns:46px minmax(0,1fr) !important;
+    gap:9px !important;
+  }
+
+  .home-learning-logo{
+    width:40px !important;
+    height:40px !important;
+    min-width:40px !important;
+  }
+
+  .home-learning-pill strong{
+    font-size:11.3px !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6416,7 +6539,7 @@ button[data-tech-id="12"]{
     <img src="assets/images/icon-osteo-pratik.png" alt="Ostéo Pratik">
   </div>
   <div>
-    <strong>Apprenez · Comprenez ·<br>Corrigez · Révisez</strong>
+    <strong>Apprenez · Comprenez · Corrigez · Révisez</strong>
   </div>
 </article>
   <section class="home-orbit">
