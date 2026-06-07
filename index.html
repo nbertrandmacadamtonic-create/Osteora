@@ -6109,6 +6109,152 @@ button[data-tech-id="12"]{
   }
 }
 
+
+/* === CORRECTION FINALE HEADER : icône app séparée + titre texte === */
+/* Le logo icon-osteo-pratik.png reste utilisé comme favicon / icône d'app.
+   Dans le header, on affiche un titre texte plus propre et plus lisible. */
+
+.brand{
+  text-align:center !important;
+  min-width:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+.brand-title-only{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  line-height:.92;
+  letter-spacing:.12em;
+  white-space:nowrap;
+  text-align:center;
+  filter:drop-shadow(0 0 12px rgba(0,229,255,.18));
+}
+
+.brand-title-only span{
+  color:#ffffff;
+  font-size:28px;
+  font-weight:950;
+}
+
+.brand-title-only b{
+  color:var(--cyan);
+  font-size:22px;
+  font-weight:950;
+  letter-spacing:.20em;
+}
+
+.brand .subtitle{
+  margin:7px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.15 !important;
+  color:var(--muted) !important;
+}
+
+/* Header bien aligné : bouton gauche / titre / bouton droit */
+.top{
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  gap:10px !important;
+  align-items:center !important;
+  margin-bottom:12px !important;
+  min-height:66px !important;
+}
+
+.icon{
+  width:44px !important;
+  height:44px !important;
+  border-radius:16px !important;
+  font-size:23px !important;
+}
+
+.icon.round{
+  font-size:30px !important;
+}
+
+/* Barre basse recentrée et moins envahissante */
+.bottom{
+  left:50% !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+  width:min(calc(100% - 32px), 390px) !important;
+  height:60px !important;
+  bottom:calc(10px + var(--safe-bottom)) !important;
+  border-radius:22px !important;
+  margin:0 !important;
+}
+
+.bottom button{
+  font-size:20px !important;
+  gap:3px !important;
+}
+
+.bottom span{
+  font-size:9.5px !important;
+}
+
+/* L’icône existe encore pour favicon / apple-touch / futurs écrans */
+.app-icon-logo{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  display:block;
+}
+
+/* Mobile */
+@media(max-width:430px){
+  .top{
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+    gap:8px !important;
+    min-height:62px !important;
+    margin-bottom:10px !important;
+  }
+
+  .icon{
+    width:42px !important;
+    height:42px !important;
+    border-radius:15px !important;
+    font-size:22px !important;
+  }
+
+  .brand-title-only span{
+    font-size:26px;
+  }
+
+  .brand-title-only b{
+    font-size:20px;
+  }
+
+  .brand .subtitle{
+    font-size:13px !important;
+    margin-top:6px !important;
+  }
+
+  .bottom{
+    width:min(calc(100% - 28px), 380px) !important;
+    height:58px !important;
+    border-radius:21px !important;
+  }
+}
+
+@media(max-width:380px){
+  .brand-title-only span{
+    font-size:23px;
+  }
+
+  .brand-title-only b{
+    font-size:18px;
+  }
+
+  .bottom{
+    width:min(calc(100% - 24px), 360px) !important;
+    height:56px !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6120,12 +6266,9 @@ button[data-tech-id="12"]{
 <main class="app">
 
 <section id="home" class="screen active">
-  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
   <article class="intro"><div class="pill-icon">⌇</div><div><strong>Apprenez · Comprenez · Corrigez · Révisez</strong></div></article>
   <section class="home-orbit">
@@ -6145,12 +6288,9 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
       <p class="subtitle video-brand-subtitle-hidden"></p>
     </div>
@@ -6251,12 +6391,9 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
       <p class="subtitle">Rachis</p>
     </div>
@@ -6432,12 +6569,9 @@ button[data-tech-id="12"]{
   <header class="top revision-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
     </div>
     <button class="icon" onclick="toast('Modes de révision')">▤</button>
@@ -6548,12 +6682,9 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
       <p class="subtitle">Membres supérieurs</p>
     </div>
@@ -6593,12 +6724,9 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
       <p class="subtitle">Membres inférieurs</p>
     </div>
@@ -6638,12 +6766,9 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <div class="brand-op">
-  <img src="assets/images/icon-osteo-pratik.png" alt="" class="brand-op-icon" onerror="this.style.display='none'">
-  <div class="brand-op-text">
-    <span>OSTÉO</span>
-    <b>PRATIK</b>
-  </div>
+      <div class="brand-title-only">
+  <span>OSTÉO</span>
+  <b>PRATIK</b>
 </div>
       <p class="subtitle">Bassin</p>
     </div>
