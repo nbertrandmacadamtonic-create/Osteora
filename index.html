@@ -7324,29 +7324,61 @@ button[data-tech-id="12"]{
 
 
 
-<section id="techniqueDetail" class="screen technique-detail-screen">
-  <header class="top">
+
+<section id="techniqueDetail" class="screen technique-detail-screen fiche-premium-screen">
+  <header class="top fiche-top">
     <button class="icon round" onclick="go('player')">‹</button>
     <div class="brand">
-      <h1 class="logo">Fiche</h1>
-      <p class="subtitle" id="detailSubtitle">Texte et images</p>
+      <h1 class="logo">Fiche technique</h1>
+      <p class="subtitle" id="detailSubtitle">Technique détaillée</p>
     </div>
-    <button class="icon" onclick="toggleDetailMode()">▣</button>
+    <button class="icon" onclick="toast('Fiche ajoutée aux favoris')">♡</button>
   </header>
 
-  <section class="detail-hero">
-    <small id="detailKicker">Technique</small>
-    <h2 id="detailTitle">Titre de la technique</h2>
-    <p id="detailIntro">Texte associé à la vidéo.</p>
+  <section class="fiche-hero">
+    <div class="fiche-hero-copy">
+      <small id="detailKicker">Membres inférieurs · Pied</small>
+      <h2 id="detailTitle">Dysfonction de la sous-talienne, calcanéus en valgus, à droite</h2>
+      <p id="detailIntro">Accédez au texte, aux images et aux repères clés de la technique.</p>
+
+      <div class="fiche-hero-actions">
+        <button class="primary fiche-video-btn" onclick="go('player')">▷ Voir la vidéo</button>
+        <button class="secondary fiche-card-btn" onclick="openTechniqueCardFromDetail()">▱ Carte à jouer</button>
+      </div>
+    </div>
+
+    <div class="fiche-hero-visual">
+      <div class="fiche-side-badge">
+        <strong>D</strong>
+        <span>Droite</span>
+      </div>
+      <div class="fiche-foot-glow">
+        <span>Articulation<br>sous-astragalienne</span>
+      </div>
+    </div>
   </section>
 
-  <section class="detail-tabs">
-    <button id="detailTabText" class="active" onclick="renderTechniqueDetail('text')">Texte</button>
-    <button id="detailTabImages" onclick="renderTechniqueDetail('images')">Images</button>
+  <section id="ficheTimeline" class="fiche-timeline"></section>
+
+  <section class="fiche-keypoints">
+    <div class="fiche-key-icon">☼</div>
+    <div>
+      <h3>Points clés</h3>
+      <ul id="ficheKeypointsList">
+        <li>Respecter l’axe du pied et rester progressif.</li>
+        <li>Aller jusqu’à la barrière motrice, sans forcer.</li>
+        <li>Réévaluer la mobilité après la normalisation.</li>
+      </ul>
+    </div>
   </section>
 
-  <section id="detailTextContent" class="detail-content detail-text-content"></section>
-  <section id="detailImagesContent" class="detail-content detail-images-content" style="display:none"></section>
+  <section class="fiche-bottom-actions">
+    <button class="secondary" onclick="openFichePlancheComplete()">Voir la planche complète</button>
+    <button class="primary" onclick="toast('Technique ajoutée au parcours de révision')">Réviser cette technique</button>
+    <button class="secondary" onclick="toast('Partage à venir')">Partager</button>
+  </section>
+
+  <section id="fichePlancheComplete" class="fiche-planche-complete" style="display:none"></section>
 </section>
 
 <section id="revision" class="screen revision-orbit-screen">
@@ -8145,25 +8177,54 @@ function getTechniqueDetail(t){
   };
 }
 
+
 function openTechniqueTextPage(){
-  currentDetailMode = "text";
-  renderTechniqueDetail("text");
+  currentDetailMode = "fiche";
+  renderTechniqueDetail();
   go("techniqueDetail");
 }
 
 function openTechniqueImagesPage(){
-  currentDetailMode = "images";
-  renderTechniqueDetail("images");
+  currentDetailMode = "fiche";
+  renderTechniqueDetail();
   go("techniqueDetail");
 }
 
 function toggleDetailMode(){
-  renderTechniqueDetail(currentDetailMode === "text" ? "images" : "text");
+  openFichePlancheComplete();
 }
 
-function renderTechniqueDetail(mode){
-  currentDetailMode = mode || currentDetailMode || "text";
+function openTechniqueCardFromDetail(){
+  const t = getCurrentTechnique();
+  if(t && typeof openFullCard === "function" && typeof isTechniqueUnlocked === "function" && isTechniqueUnlocked(t)){
+    openFullCard(t.id);
+    return;
+  }
+  toast("Carte à jouer pas encore débloquée");
+}
 
+function openFichePlancheComplete(){
+  const box = document.getElementById("fichePlancheComplete");
+  if(!box) return;
+
+  const isOpen = box.style.display !== "none";
+  box.style.display = isOpen ? "none" : "grid";
+
+  if(!isOpen){
+    const t = getCurrentTechnique();
+    const detail = getTechniqueDetail(t);
+    const plates = (detail.images || []).map(src => `
+      <article class="detail-plate-card">
+        <img src="${src}?v=4" alt="Planche technique">
+      </article>
+    `).join("");
+
+    box.innerHTML = plates || `<article class="empty"><strong>Aucune planche complète pour le moment.</strong></article>`;
+    box.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+}
+
+function renderTechniqueDetail(){
   const t = getCurrentTechnique();
   const detail = getTechniqueDetail(t);
 
@@ -8171,57 +8232,69 @@ function renderTechniqueDetail(mode){
   const kicker = document.getElementById("detailKicker");
   const title = document.getElementById("detailTitle");
   const intro = document.getElementById("detailIntro");
-  const textWrap = document.getElementById("detailTextContent");
-  const imageWrap = document.getElementById("detailImagesContent");
-  const tabText = document.getElementById("detailTabText");
-  const tabImages = document.getElementById("detailTabImages");
+  const timeline = document.getElementById("ficheTimeline");
+  const planche = document.getElementById("fichePlancheComplete");
+  const keypoints = document.getElementById("ficheKeypointsList");
 
-  if(subtitle) subtitle.textContent = currentDetailMode === "text" ? "Texte de la technique" : "Images associées";
-  if(kicker) kicker.textContent = `${t.zone} · ${t.sub} · ${detail.source}`;
+  if(subtitle) subtitle.textContent = "Technique détaillée";
+  if(kicker) kicker.textContent = `${t.zone} · ${t.sub}`;
   if(title) title.textContent = t.title;
-  if(intro) intro.textContent = detail.intro;
+  if(intro) intro.textContent = detail.intro || "Texte, images et repères clés de la technique.";
 
-  if(tabText) tabText.classList.toggle("active", currentDetailMode === "text");
-  if(tabImages) tabImages.classList.toggle("active", currentDetailMode === "images");
+  if(planche){
+    planche.style.display = "none";
+    planche.innerHTML = "";
+  }
 
-  if(textWrap){
-    textWrap.innerHTML = detail.steps.map(s => `
-      <article class="detail-step-card">
-        <div class="detail-step-logo">
-          ${s.logo ? `<img src="${s.logo}?v=3" alt="${escapeHtml(s.label)}">` : `<span>${escapeHtml(s.label.slice(0,1))}</span>`}
+  if(keypoints){
+    keypoints.innerHTML = `
+      <li>Respecter l’axe du pied et la mise en tension progressive.</li>
+      <li>Ne pas forcer : aller uniquement jusqu’à la barrière motrice.</li>
+      <li>Le thrust est porté par la main céphalique en direction de la table.</li>
+    `;
+  }
+
+  if(timeline){
+    timeline.innerHTML = detail.steps.map((s, index) => `
+      <article class="fiche-step-card">
+        <div class="fiche-step-left">
+          <div class="fiche-step-logo">
+            ${s.logo ? `<img src="${s.logo}?v=4" alt="${escapeHtml(s.label)}">` : `<span>${index + 1}</span>`}
+          </div>
+          <i></i>
         </div>
-        <div class="detail-step-copy">
-          <small>${escapeHtml(s.label)}</small>
+
+        <div class="fiche-step-copy">
+          <small>${index + 1}. ${escapeHtml(s.label)}</small>
           <h3>${escapeHtml(s.title)}</h3>
           <p>${escapeHtml(s.body)}</p>
         </div>
+
+        <button class="fiche-step-image" onclick="openStepImage('${escapeHtml(s.photo || '')}', '${escapeHtml(s.label)}')">
+          ${s.photo ? `<img src="${s.photo}?v=4" alt="${escapeHtml(s.label)}">` : `<span>Image à ajouter</span>`}
+        </button>
       </article>
     `).join("");
   }
-
-  if(imageWrap){
-    const stepImages = detail.steps.filter(s => s.photo).map(s => `
-      <article class="detail-photo-card">
-        <img src="${s.photo}?v=3" alt="${escapeHtml(s.label)}">
-        <strong>${escapeHtml(s.label)}</strong>
-      </article>
-    `).join("");
-
-    const plates = (detail.images || []).map(src => `
-      <article class="detail-plate-card">
-        <img src="${src}?v=3" alt="Planche technique">
-      </article>
-    `).join("");
-
-    imageWrap.innerHTML = (stepImages || plates)
-      ? `<div class="detail-photo-grid">${stepImages}</div>${plates ? `<div class="detail-plates">${plates}</div>` : ""}`
-      : `<article class="empty"><strong>Aucune image associée pour le moment.</strong><p>Les images de la vidéo pourront être ajoutées ici.</p></article>`;
-  }
-
-  if(textWrap) textWrap.style.display = currentDetailMode === "text" ? "block" : "none";
-  if(imageWrap) imageWrap.style.display = currentDetailMode === "images" ? "block" : "none";
 }
 
+function openStepImage(src, label){
+  if(!src){
+    toast("Image à ajouter");
+    return;
+  }
+
+  const box = document.getElementById("fichePlancheComplete");
+  if(!box) return;
+
+  box.style.display = "grid";
+  box.innerHTML = `
+    <article class="detail-plate-card single-step-image">
+      <img src="${src}?v=4" alt="${escapeHtml(label)}">
+    </article>
+  `;
+  box.scrollIntoView({behavior:"smooth", block:"nearest"});
+}
 
 function slugify(text){
   return text.toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"-").replace(/–/g,"-").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase();
@@ -10356,6 +10429,442 @@ Embed utilisé : https://player.vimeo.com/video/1198534346?title=0&byline=0&port
 
   .detail-photo-grid{
     grid-template-columns:1fr;
+  }
+}
+</style>
+
+
+<style>
+/* === FICHE TECHNIQUE PREMIUM — texte + image au même endroit === */
+.fiche-premium-screen{
+  padding-bottom:calc(118px + var(--safe-bottom)) !important;
+}
+
+.fiche-top{
+  margin-bottom:12px !important;
+}
+
+.fiche-hero{
+  position:relative;
+  min-height:318px;
+  border-radius:30px;
+  padding:22px 18px;
+  overflow:hidden;
+  border:1px solid rgba(0,229,255,.28);
+  background:
+    radial-gradient(circle at 78% 36%, rgba(0,229,255,.18), transparent 35%),
+    radial-gradient(circle at 58% 70%, rgba(168,85,255,.10), transparent 30%),
+    linear-gradient(145deg, rgba(8,31,60,.84), rgba(3,10,24,.96));
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.42),
+    0 0 34px rgba(0,229,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.fiche-hero-copy{
+  position:relative;
+  z-index:2;
+  width:58%;
+  min-width:210px;
+}
+
+.fiche-hero small{
+  display:block;
+  color:#31ecff;
+  font-size:11px;
+  line-height:1.25;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.16em;
+}
+
+.fiche-hero h2{
+  margin:13px 0 14px;
+  color:#fff;
+  font-size:30px;
+  line-height:1.02;
+  letter-spacing:-.055em;
+  font-weight:950;
+  text-wrap:balance;
+}
+
+.fiche-hero p{
+  margin:0;
+  color:#d8e5f7;
+  font-size:15px;
+  line-height:1.35;
+  max-width:310px;
+  border-left:3px solid #00e5ff;
+  padding-left:14px;
+}
+
+.fiche-hero-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:22px;
+  max-width:360px;
+}
+
+.fiche-hero-actions button{
+  min-height:54px;
+  border-radius:18px;
+  font-size:14px;
+  font-weight:950;
+}
+
+.fiche-video-btn{
+  box-shadow:0 0 26px rgba(0,229,255,.18) !important;
+}
+
+.fiche-hero-visual{
+  position:absolute;
+  right:-22px;
+  top:24px;
+  width:58%;
+  height:270px;
+  z-index:1;
+  background:
+    radial-gradient(ellipse at 55% 60%, rgba(0,229,255,.30), transparent 30%),
+    url("assets/images/techniques/sous-talienne-valgus-droite/planche-texte.webp?v=4");
+  background-size:cover;
+  background-position:center;
+  opacity:.88;
+  mix-blend-mode:screen;
+  mask-image:radial-gradient(ellipse at center, #000 0%, #000 62%, transparent 82%);
+  -webkit-mask-image:radial-gradient(ellipse at center, #000 0%, #000 62%, transparent 82%);
+}
+
+.fiche-hero-visual::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 52% 62%, rgba(168,85,255,.48), transparent 12%),
+    radial-gradient(circle at 48% 58%, rgba(0,229,255,.50), transparent 19%);
+}
+
+.fiche-side-badge{
+  position:absolute;
+  right:36px;
+  top:14px;
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  z-index:3;
+  background:rgba(1,15,34,.82);
+  border:1px solid rgba(0,229,255,.35);
+  box-shadow:0 0 26px rgba(0,229,255,.18);
+}
+
+.fiche-side-badge strong{
+  display:block;
+  color:#4bf6ff;
+  font-size:28px;
+  line-height:.85;
+}
+
+.fiche-side-badge span{
+  display:block;
+  color:#4bf6ff;
+  font-size:8px;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  margin-top:-12px;
+}
+
+.fiche-foot-glow{
+  position:absolute;
+  right:84px;
+  top:126px;
+  color:#52f7ff;
+  font-size:12px;
+  line-height:1.25;
+  text-align:left;
+  z-index:3;
+  text-shadow:0 0 16px rgba(0,229,255,.35);
+}
+
+.fiche-timeline{
+  margin-top:16px;
+  display:grid;
+  gap:12px;
+}
+
+.fiche-step-card{
+  position:relative;
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr) 146px;
+  gap:14px;
+  align-items:center;
+  padding:14px;
+  min-height:138px;
+  border-radius:26px;
+  border:1px solid rgba(170,205,225,.16);
+  background:
+    radial-gradient(circle at 0% 50%, rgba(0,229,255,.08), transparent 36%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92));
+  box-shadow:0 14px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  overflow:hidden;
+}
+
+.fiche-step-left{
+  height:100%;
+  display:grid;
+  place-items:center;
+  position:relative;
+}
+
+.fiche-step-left i{
+  position:absolute;
+  top:70px;
+  bottom:-26px;
+  left:50%;
+  width:1px;
+  transform:translateX(-50%);
+  background:linear-gradient(#00e5ff, transparent);
+  opacity:.55;
+}
+
+.fiche-step-card:last-child .fiche-step-left i{
+  display:none;
+}
+
+.fiche-step-logo{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  background:rgba(255,255,255,.94);
+  box-shadow:0 0 22px rgba(0,229,255,.12);
+}
+
+.fiche-step-logo img{
+  width:46px;
+  height:46px;
+  object-fit:contain;
+}
+
+.fiche-step-logo span{
+  color:#00bcd4;
+  font-size:22px;
+  font-weight:950;
+}
+
+.fiche-step-copy small{
+  display:block;
+  color:#33f3ff;
+  font-size:11px;
+  line-height:1.15;
+  font-weight:950;
+  text-transform:uppercase;
+  letter-spacing:.15em;
+}
+
+.fiche-step-copy h3{
+  margin:6px 0 7px;
+  color:#fff;
+  font-size:18px;
+  line-height:1.12;
+  letter-spacing:-.025em;
+}
+
+.fiche-step-copy p{
+  margin:0;
+  color:#d7e2f2;
+  font-size:14px;
+  line-height:1.36;
+}
+
+.fiche-step-image{
+  display:block;
+  width:146px;
+  height:102px;
+  border-radius:18px;
+  overflow:hidden;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 12px 28px rgba(0,0,0,.30);
+}
+
+.fiche-step-image img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.fiche-step-image span{
+  display:grid;
+  place-items:center;
+  height:100%;
+  color:#aeb8cc;
+  font-size:12px;
+  font-weight:800;
+}
+
+.fiche-keypoints{
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:14px;
+  margin-top:18px;
+  padding:16px;
+  border-radius:26px;
+  border:1px solid rgba(0,229,255,.22);
+  background:linear-gradient(145deg, rgba(0,229,255,.08), rgba(5,15,31,.92));
+  box-shadow:0 14px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.fiche-key-icon{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#00e5ff;
+  border:1px solid rgba(0,229,255,.25);
+  background:rgba(0,229,255,.08);
+  font-size:28px;
+}
+
+.fiche-keypoints h3{
+  margin:0 0 7px;
+  color:#4df6ff;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:13px;
+}
+
+.fiche-keypoints ul{
+  margin:0;
+  padding-left:18px;
+  color:#dbe8f6;
+  font-size:14px;
+  line-height:1.42;
+}
+
+.fiche-bottom-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.fiche-bottom-actions button{
+  min-height:54px;
+  border-radius:20px;
+  font-weight:950;
+}
+
+.fiche-planche-complete{
+  display:grid;
+  gap:12px;
+  margin-top:16px;
+}
+
+.single-step-image img{
+  width:100%;
+  max-height:520px;
+  object-fit:contain;
+  background:#fff;
+}
+
+@media(max-width:430px){
+  .fiche-hero{
+    min-height:350px;
+    padding:20px 16px;
+  }
+
+  .fiche-hero-copy{
+    width:100%;
+    min-width:0;
+  }
+
+  .fiche-hero h2{
+    width:72%;
+    font-size:25px;
+  }
+
+  .fiche-hero p{
+    width:66%;
+    font-size:14px;
+  }
+
+  .fiche-hero-visual{
+    right:-54px;
+    top:54px;
+    width:72%;
+    height:250px;
+    opacity:.74;
+  }
+
+  .fiche-side-badge{
+    right:18px;
+    top:18px;
+    transform:scale(.85);
+  }
+
+  .fiche-foot-glow{
+    right:24px;
+    top:118px;
+    font-size:11px;
+  }
+
+  .fiche-hero-actions{
+    grid-template-columns:1fr 1fr;
+    width:100%;
+    max-width:none;
+    margin-top:20px;
+  }
+
+  .fiche-step-card{
+    grid-template-columns:58px minmax(0,1fr);
+    min-height:0;
+  }
+
+  .fiche-step-image{
+    grid-column:2;
+    width:100%;
+    height:132px;
+    margin-top:8px;
+  }
+
+  .fiche-step-logo{
+    width:52px;
+    height:52px;
+  }
+
+  .fiche-step-logo img{
+    width:42px;
+    height:42px;
+  }
+}
+
+@media(max-width:380px){
+  .fiche-hero h2{
+    font-size:23px;
+    width:75%;
+  }
+
+  .fiche-hero p{
+    width:70%;
+  }
+
+  .fiche-hero-actions button{
+    font-size:13px;
+  }
+
+  .fiche-step-copy h3{
+    font-size:17px;
+  }
+
+  .fiche-step-copy p{
+    font-size:13.5px;
   }
 }
 </style>
