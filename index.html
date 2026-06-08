@@ -6755,6 +6755,226 @@ button[data-tech-id="12"]{
   }
 }
 
+
+
+/* === PATCH CIBLÉ : titre plus gros/centré + ligne premium sans encadrement === */
+.top{
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:98px !important;
+  margin-bottom:4px !important;
+}
+
+.brand{
+  width:100% !important;
+  justify-self:center !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  overflow:visible !important;
+}
+
+.brand-title-webp{
+  display:block !important;
+  width:min(400px, 96vw) !important;
+  max-height:176px !important;
+  height:auto !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:0 auto !important;
+  transform:scale(1.12) !important;
+  transform-origin:center center !important;
+  filter:drop-shadow(0 0 18px rgba(0,229,255,.22)) !important;
+}
+
+.brand .subtitle{
+  margin-top:2px !important;
+  text-align:center !important;
+  font-size:16px !important;
+  color:#dbe8f6 !important;
+}
+
+.premium-learning-line{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:9px !important;
+  flex-wrap:nowrap !important;
+  margin:12px 0 14px !important;
+  padding:2px 4px 6px !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  text-align:center !important;
+}
+
+.premium-learning-line span{
+  color:#f7fbff !important;
+  font-size:15.2px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  letter-spacing:.015em !important;
+  text-shadow:0 0 14px rgba(255,255,255,.06), 0 0 20px rgba(0,229,255,.08) !important;
+  white-space:nowrap !important;
+}
+
+.premium-learning-line .sep{
+  color:#48d9ff !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  opacity:.95 !important;
+}
+
+@media(max-width:430px){
+  .top{
+    min-height:92px !important;
+  }
+
+  .brand-title-webp{
+    width:min(372px, 94vw) !important;
+    max-height:164px !important;
+    transform:scale(1.08) !important;
+  }
+
+  .brand .subtitle{
+    font-size:15px !important;
+  }
+
+  .premium-learning-line{
+    gap:8px !important;
+    margin:10px 0 12px !important;
+  }
+
+  .premium-learning-line span{
+    font-size:14px !important;
+  }
+}
+
+@media(max-width:380px){
+  .top{
+    min-height:88px !important;
+  }
+
+  .brand-title-webp{
+    width:min(344px, 92vw) !important;
+    max-height:152px !important;
+    transform:scale(1.05) !important;
+  }
+
+  .brand .subtitle{
+    font-size:14px !important;
+  }
+
+  .premium-learning-line{
+    gap:6px !important;
+  }
+
+  .premium-learning-line span{
+    font-size:12.9px !important;
+    letter-spacing:0 !important;
+  }
+
+  .premium-learning-line .sep{
+    font-size:9px !important;
+  }
+}
+
+
+/* === PATCH TITRE CADRÉ / CODEPEN / GITHUB === */
+/* Dans CodePen, assets/images/... ne charge pas.
+   On utilise donc l’URL GitHub Pages, avec un fallback local pour GitHub. */
+
+.brand{
+  position:relative !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  width:100% !important;
+  min-width:0 !important;
+  overflow:visible !important;
+}
+
+.brand-title-webp{
+  display:block !important;
+  width:min(330px, 78vw) !important;
+  max-width:330px !important;
+  height:auto !important;
+  max-height:100px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:0 auto !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 0 16px rgba(0,229,255,.22)) !important;
+}
+
+.brand-title-fallback{
+  display:none;
+  margin:0 auto;
+  color:#fff;
+  font-size:34px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:.02em;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.brand-title-fallback span{
+  color:var(--cyan);
+}
+
+.top{
+  grid-template-columns:44px minmax(0,1fr) 44px !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:104px !important;
+  margin-bottom:4px !important;
+}
+
+.brand .subtitle{
+  margin-top:4px !important;
+  text-align:center !important;
+  font-size:15px !important;
+  color:#dbe8f6 !important;
+}
+
+@media(max-width:430px){
+  .brand-title-webp{
+    width:min(310px, 76vw) !important;
+    max-width:310px !important;
+    max-height:94px !important;
+  }
+
+  .top{
+    min-height:98px !important;
+  }
+}
+
+@media(max-width:380px){
+  .brand-title-webp{
+    width:min(285px, 74vw) !important;
+    max-width:285px !important;
+    max-height:88px !important;
+  }
+
+  .top{
+    min-height:92px !important;
+  }
+
+  .brand-title-fallback{
+    font-size:30px;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6766,12 +6986,34 @@ button[data-tech-id="12"]{
 <main class="app">
 
 <section id="home" class="screen active">
-  <header class="top"><button class="icon" onclick="toast('Réglages')">⌬</button><div class="brand"><img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp"><p class="subtitle">Que voulez-vous faire ?</p></div><button class="icon" onclick="toast('Notifications')">♧</button></header>
-  <article class="intro home-learning-pill premium-learning-pill">
-  <div class="home-learning-copy">
-    <strong>Apprenez · Comprenez · Corrigez · Révisez</strong>
-  </div>
-</article>
+  <header class="top home-top">
+    <button class="icon home-side-icon home-settings" onclick="toast('Réglages')">⌬</button>
+
+    <div class="brand home-brand">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
+
+      <div class="premium-learning-line" aria-label="Apprenez, Comprenez, Corrigez, Révisez">
+        <span>Apprenez</span>
+        <b class="sep">•</b>
+        <span>Comprenez</span>
+        <b class="sep">•</b>
+        <span>Corrigez</span>
+        <b class="sep">•</b>
+        <span>Révisez</span>
+      </div>
+
+      <p class="subtitle">Que voulez-vous faire ?</p>
+    </div>
+
+    <button class="icon home-side-icon home-notifications" onclick="toast('Notifications')">♧</button>
+  </header>
   <section class="home-orbit">
     <div class="body-center home-personnage">
       <img src="assets/images/home-personnage.webp" alt="">
@@ -6789,7 +7031,14 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
       <p class="subtitle video-brand-subtitle-hidden"></p>
     </div>
     <button class="icon" onclick="toast('Touchez une zone du corps')">i</button>
@@ -6889,7 +7138,14 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
       <p class="subtitle">Rachis</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du rachis')">i</button>
@@ -7054,17 +7310,57 @@ button[data-tech-id="12"]{
   <header class="top"><button class="icon round" onclick="go('techniques')">‹</button><div class="brand"><h1 class="logo">Lecteur</h1><p class="subtitle">Vidéo technique</p></div><button class="icon">♡</button></header>
   <h2 id="playerTitle" class="tech-title">Technique</h2>
   <div id="playerChips" class="chips"></div>
-  <div class="video-box"><video id="video" controls playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video></div>
-  <div id="videoPathDebug" class="video-path-debug">Chemin vidéo : —</div>
+  <div class="video-box video-box-adaptive">
+    <video id="video" controls playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video>
+    <iframe id="vimeoPlayer" class="vimeo-player" src="" title="Vidéo Vimeo" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+  </div>
+  <div class="video-premium-actions">
+    <button class="secondary" onclick="openTechniqueTextPage()">Texte de la technique</button>
+    <button class="secondary" onclick="openTechniqueImagesPage()">Images associées</button>
+  </div>
+  
   <section class="steps"><h3>Étapes</h3><ol><li>Position du praticien</li><li>Position du patient</li><li>Contact et évaluation</li><li>Mise en tension</li><li>Thrust / impulsion</li><li>Réévaluation</li></ol></section>
 </section>
 
+
+
+<section id="techniqueDetail" class="screen technique-detail-screen">
+  <header class="top">
+    <button class="icon round" onclick="go('player')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Fiche</h1>
+      <p class="subtitle" id="detailSubtitle">Texte et images</p>
+    </div>
+    <button class="icon" onclick="toggleDetailMode()">▣</button>
+  </header>
+
+  <section class="detail-hero">
+    <small id="detailKicker">Technique</small>
+    <h2 id="detailTitle">Titre de la technique</h2>
+    <p id="detailIntro">Texte associé à la vidéo.</p>
+  </section>
+
+  <section class="detail-tabs">
+    <button id="detailTabText" class="active" onclick="renderTechniqueDetail('text')">Texte</button>
+    <button id="detailTabImages" onclick="renderTechniqueDetail('images')">Images</button>
+  </section>
+
+  <section id="detailTextContent" class="detail-content detail-text-content"></section>
+  <section id="detailImagesContent" class="detail-content detail-images-content" style="display:none"></section>
+</section>
 
 <section id="revision" class="screen revision-orbit-screen">
   <header class="top revision-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
     </div>
     <button class="icon" onclick="toast('Modes de révision')">▤</button>
   </header>
@@ -7076,7 +7372,7 @@ button[data-tech-id="12"]{
 
   <div class="revision-orbit-nav">
     <div class="revision-orbit-backdrop" aria-hidden="true"></div>
-    <button class="revision-orbit-card revision-random" onclick="go('revisionCard')">
+    <button class="revision-orbit-card revision-random" onclick="openRevisionWheel()">
       <div class="revision-orbit-icon">⇄</div>
       <strong>Aléatoire</strong>
       <small>ordre aléatoire</small>
@@ -7102,6 +7398,51 @@ button[data-tech-id="12"]{
 
     <div class="revision-orbit-center">▱</div>
   </div>
+</section>
+
+
+<section id="revisionWheel" class="screen revision-wheel-screen">
+  <header class="top">
+    <button class="icon round" onclick="go('revision')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Roue</h1>
+      <p class="subtitle">Techniques déjà vues</p>
+    </div>
+    <button class="icon" onclick="toast('La roue ne tire que les techniques visionnées')">?</button>
+  </header>
+
+  <section class="revision-wheel-panel">
+    <div class="wheel-count" id="wheelCount">0 technique débloquée</div>
+
+    <div class="wheel-stage">
+      <div class="wheel-pointer">▼</div>
+      <div id="revisionWheelDisc" class="revision-wheel-disc">
+        <div class="wheel-ring ring-one"></div>
+        <div class="wheel-ring ring-two"></div>
+        <button class="wheel-core" type="button" onclick="spinRevisionWheel()" aria-label="Lancer la roue">
+          <span id="wheelTicker">Appuyez ici</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="wheel-result-card" id="wheelResultCard">
+      <small id="wheelResultKicker">Tirage aléatoire</small>
+      <strong id="wheelResultTitle">Lancez la roue pour choisir une carte débloquée.</strong>
+      <span id="wheelResultMeta">Seules les cartes à jouer déjà débloquées entrent dans le tirage.</span>
+    </div>
+
+    <div class="wheel-actions wheel-actions-choice">
+      <button class="primary wheel-spin-button" id="wheelSpinButton" onclick="spinRevisionWheel()">Lancer la roue</button>
+      <button class="secondary wheel-card-button wheel-choice-button" id="wheelCardButton" onclick="openSelectedWheelCard()" disabled>Visionner la carte</button>
+      <button class="secondary wheel-video-button wheel-choice-button" id="wheelVideoButton" onclick="openSelectedWheelVideo()" disabled>Lancer la vidéo</button>
+    </div>
+
+    <article class="wheel-empty-message" id="wheelEmptyMessage">
+      <strong>Aucune carte à jouer débloquée pour le moment.</strong>
+      <p>La roue ne tire que dans les cartes déjà débloquées. Visionnez une technique complète pour débloquer sa carte.</p>
+      <button class="primary" onclick="go('videoMap')">Voir les vidéos</button>
+    </article>
+  </section>
 </section>
 
 <section id="revisionCard" class="screen"><header class="top"><button class="icon round" onclick="go('revision')">‹</button><div class="brand"><h1 class="logo">Carte</h1><p class="subtitle">Révision</p></div><button class="icon">☆</button></header><article class="intro"><div class="pill-icon">C</div><div><strong>Dysfonction cervicale</strong><p>Essayez de rappeler la position, les contacts et le geste.</p></div></article><button class="primary" onclick="openTechnique(1)">Revoir la vidéo</button></section>
@@ -7174,7 +7515,14 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
       <p class="subtitle">Membres supérieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre supérieur')">i</button>
@@ -7213,7 +7561,14 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
       <p class="subtitle">Membres inférieurs</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du membre inférieur')">i</button>
@@ -7252,7 +7607,14 @@ button[data-tech-id="12"]{
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik" class="brand-title-webp">
+      <img
+  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+  data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+  alt="Ostéo Pratik"
+  class="brand-title-webp"
+  onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+>
+<div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
       <p class="subtitle">Bassin</p>
     </div>
     <button class="icon" onclick="toast('Choisissez une région du bassin')">i</button>
@@ -7339,7 +7701,7 @@ button[data-tech-id="12"]{
 </main>
 
 <script>
-const techniques = [{"id": 1, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, position assise, à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 2, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, en procubitus à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 3, "title": "Dysfonction de la région cervico-dorsale C7–D2, composantes multiples à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C/D"}, {"id": 4, "title": "Dysfonction de l’occiput, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 5, "title": "Dysfonction de l’occiput, en translation à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 6, "title": "Dysfonction articulaire globale occiput-atlas-axis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "OAA"}, {"id": 7, "title": "Dysfonction de l’atlas, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 8, "title": "Dysfonction de l’atlas, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 9, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, variante", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "en cours", "percent": 60, "icon": "C"}, {"id": 10, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, prise mentonnière", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 11, "title": "Dysfonction facettaire des cervicales C2–C6, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↔"}, {"id": 12, "title": "Dysfonction cervicale C2–C6, assis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "vue", "percent": 100, "icon": "C2"}, {"id": 13, "title": "Dysfonction des cervicales C2–C7, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "vue", "percent": 100, "icon": "EM"}, {"id": 14, "title": "Dysfonction des cervicales C2–C7, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 0, "icon": "EM"}, {"id": 15, "title": "Dysfonction atloïdo-axoïdienne, en rotation droite, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 16, "title": "Dysfonction occipito-atloïdienne, en ESgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 17, "title": "Dysfonction occipito-atloïdienne, en FSgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 101, "title": "Dysfonction facettaire des dorsales, en flexion, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "vue", "percent": 80, "icon": "D"}, {"id": 102, "title": "Dysfonction facettaire des dorsales, en extension, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 103, "title": "Dysfonction facettaire des dorsales, technique en simple appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 104, "title": "Dysfonction facettaire des dorsales, avec les pisiformes croisés, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✕"}, {"id": 105, "title": "Dysfonction facettaire des dorsales, technique en pisiforme simple, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◈"}, {"id": 106, "title": "Dysfonction facettaire des dorsales D9 à D12, assis, technique en pisiforme simple, postériorité à gauche", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D12"}, {"id": 107, "title": "Dysfonction facettaire des dorsales, technique en double Nelson", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "N"}, {"id": 108, "title": "Dysfonction des vertèbres dorsales, technique en lift, composantes multiples, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 109, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 110, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 111, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 112, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 113, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 114, "title": "Dysfonction d’une vertèbre dorsale D1–D4, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 115, "title": "Dysfonction d’une vertèbre dorsale D1–D3, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 151, "title": "Dysfonction costo-transversaire de la 1re côte, en élévation, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 152, "title": "Dysfonction costo-transversaire antéro-médiane, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↘"}, {"id": 153, "title": "Dysfonction costo-transversaire postéro-latérale, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↖"}, {"id": 154, "title": "Dysfonction costo-transversaire, composantes multiples, technique structurelle, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 155, "title": "Dysfonction costo-transversaire antéro-médiane, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 156, "title": "Dysfonction costo-transversaire postéro-latérale, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 157, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 158, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 159, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 160, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 161, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 162, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 163, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 164, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 165, "title": "Dysfonction des 3e–10e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 166, "title": "Dysfonction des 11e–12e côtes, en élévation, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 167, "title": "Dysfonction des 11e–12e côtes, en abaissement, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 201, "title": "Dysfonction facettaire des lombaires, en NSR à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 45, "icon": "L"}, {"id": 202, "title": "Dysfonction facettaire des lombaires, en ERS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 203, "title": "Dysfonction facettaire des lombaires, en FRS à droite, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 204, "title": "Dysfonction facettaire des lombaires, assis, à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 205, "title": "Dysfonction des lombaires, en NSR à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 206, "title": "Dysfonction des lombaires, en ERS à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 207, "title": "Dysfonction des lombaires, en FRS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 208, "title": "Dysfonction de la charnière D12/L1, technique en double appui", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "D/L"}, {"id": 209, "title": "Dysfonction de la charnière D12/L1, technique indirecte à droite en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 210, "title": "Dysfonction de L3, technique semi-directe à gauche en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 211, "title": "Charnière D12/L1, technique en Lift, postériorité à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 301, "title": "Dysfonction de l’ilium, en antériorité à gauche", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 302, "title": "Dysfonction de l’ilium, en antériorité à gauche, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 303, "title": "Dysfonction de l’ilium, en postériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 304, "title": "Dysfonction de l’ilium, en postériorité à droite, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 305, "title": "Dysfonction de l’ilium, en supériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↥"}, {"id": 306, "title": "Dysfonction de l’ilium, en antériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 307, "title": "Dysfonction de l’ilium, en postériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 308, "title": "Dysfonction de l’ilium, en postériorité à droite en procubitus, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 309, "title": "Dysfonction de l’ilium, en fermeture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 310, "title": "Dysfonction de l’ilium, en ouverture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 351, "title": "Dysfonction du sacrum, en torsion postérieure avec le pisiforme direct, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 352, "title": "Dysfonction du sacrum, en flexion unilatérale sur axe horizontal, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 353, "title": "Dysfonction du sacrum, en torsion postérieure gauche sur axe oblique droit", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 354, "title": "Dysfonction du sacrum, en torsion antérieure droite sur axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 355, "title": "Dysfonction du sacrum, en torsion postérieure droite sur un axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 356, "title": "Dysfonction du sacrum, en antériorité unilatérale, manœuvre avec le pisiforme direct", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 357, "title": "Dysfonction du sacrum, en extension unilatérale sur axe horizontal, à droite", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 381, "title": "Dysfonction de la symphyse pubienne, en supériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 382, "title": "Dysfonction de la symphyse pubienne, en infériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 383, "title": "Dysfonction combinée de la symphyse pubienne, en supériorité et infériorité", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 401, "title": "Dysfonction pré-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 402, "title": "Dysfonction sus-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 403, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 404, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à gauche", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 405, "title": "Dysfonction acromio-claviculaire, en rotation antérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 406, "title": "Dysfonction acromio-claviculaire, en rotation postérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 407, "title": "Dysfonction gléno-humérale, en antériorité, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 408, "title": "Dysfonction huméro-ulnaire, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 409, "title": "Dysfonction huméro-ulnaire, en adduction, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 410, "title": "Dysfonction huméro-radiale, en antériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 411, "title": "Dysfonction huméro-radiale, en postériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 412, "title": "Dysfonction huméro-radiale, en postériorité, variante", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 413, "title": "Dysfonction radio-carpienne du scaphoïde ou du lunatum, en postériorité, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 414, "title": "Dysfonction radio-carpienne, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 415, "title": "Dysfonction articulaire globale des médio-carpiennes, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 416, "title": "Dysfonction articulaire globale des inter-carpiennes, à gauche", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 417, "title": "Dysfonction articulaire globale de la trapézo-métacarpienne, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 501, "title": "Dysfonction de la coxo-fémorale, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 502, "title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 503, "title": "Dysfonction de la coxo-fémorale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 504, "title": "Dysfonction de la coxo-fémorale, en adduction, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 505, "title": "Dysfonction de la coxo-fémorale, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 506, "title": "Dysfonction de la coxo-fémorale, en antériorité classique, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 507, "title": "Dysfonction de la coxo-fémorale, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 508, "title": "Dysfonction de la coxo-fémorale articulaire globale dans un axe transversal, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◎"}, {"id": 509, "title": "Dysfonction de la fémoro-tibiale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 510, "title": "Dysfonction de la fémoro-tibiale, en adduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 511, "title": "Dysfonction de la fémoro-tibiale, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 512, "title": "Dysfonction de la fémoro-tibiale, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 513, "title": "Dysfonction de la fémoro-tibiale, en rotation interne, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 514, "title": "Dysfonction de la fémoro-tibiale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 515, "title": "Dysfonction du ménisque médial, en postériorité et en extension, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 516, "title": "Dysfonction du ménisque médial en postériorité, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 551, "title": "Dysfonction de la fibulo-tibiale supérieure, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 552, "title": "Dysfonction de la fibulo-tibiale inférieure, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 553, "title": "Dysfonction de la fibulo-tibiale inférieure, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 554, "title": "Dysfonction de la tibio-tarsienne articulaire globale, en décubitus ventral, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 555, "title": "Entorse tibio-tarsienne externe, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "!"}, {"id": 556, "title": "Décoaptation de la tibio-tarsienne globale, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "↧"}, {"id": 557, "title": "Dysfonction de la tibio-tarsienne, en antériorité, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 558, "title": "Dysfonction de la sous-astragalienne antéro-interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 559, "title": "Dysfonction de la sous-astragalienne postéro-externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 560, "title": "Dysfonction de la sous-talienne, calcanéus en valgus, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 561, "title": "Dysfonction de la sous-talienne, calcanéus en varus, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 562, "title": "Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 563, "title": "Dysfonction talo-naviculaire, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 564, "title": "Dysfonction de la naviculo-cuboïdienne articulaire globale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 565, "title": "Dysfonction de la métatarso-phalangienne de la 1re phalange, en flexion dorsale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◟"}];
+const techniques = [{"id": 1, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, position assise, à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 2, "title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, en procubitus à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C7"}, {"id": 3, "title": "Dysfonction de la région cervico-dorsale C7–D2, composantes multiples à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C/D"}, {"id": 4, "title": "Dysfonction de l’occiput, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 5, "title": "Dysfonction de l’occiput, en translation à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 6, "title": "Dysfonction articulaire globale occiput-atlas-axis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "OAA"}, {"id": 7, "title": "Dysfonction de l’atlas, en postériorité à droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 8, "title": "Dysfonction de l’atlas, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 9, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, variante", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "en cours", "percent": 60, "icon": "C"}, {"id": 10, "title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, prise mentonnière", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 11, "title": "Dysfonction facettaire des cervicales C2–C6, en translation droite", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↔"}, {"id": 12, "title": "Dysfonction cervicale C2–C6, assis", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "vue", "percent": 100, "icon": "C2"}, {"id": 13, "title": "Dysfonction des cervicales C2–C7, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "vue", "percent": 100, "icon": "EM"}, {"id": 14, "title": "Dysfonction des cervicales C2–C7, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 0, "icon": "EM"}, {"id": 15, "title": "Dysfonction atloïdo-axoïdienne, en rotation droite, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C1"}, {"id": 16, "title": "Dysfonction occipito-atloïdienne, en ESgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 17, "title": "Dysfonction occipito-atloïdienne, en FSgRd, énergie musculaire", "zone": "Rachis", "sub": "Cervicales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "O"}, {"id": 101, "title": "Dysfonction facettaire des dorsales, en flexion, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "vue", "percent": 80, "icon": "D"}, {"id": 102, "title": "Dysfonction facettaire des dorsales, en extension, technique en double appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 103, "title": "Dysfonction facettaire des dorsales, technique en simple appui", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "D"}, {"id": 104, "title": "Dysfonction facettaire des dorsales, avec les pisiformes croisés, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✕"}, {"id": 105, "title": "Dysfonction facettaire des dorsales, technique en pisiforme simple, postériorité à droite", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◈"}, {"id": 106, "title": "Dysfonction facettaire des dorsales D9 à D12, assis, technique en pisiforme simple, postériorité à gauche", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "D12"}, {"id": 107, "title": "Dysfonction facettaire des dorsales, technique en double Nelson", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "N"}, {"id": 108, "title": "Dysfonction des vertèbres dorsales, technique en lift, composantes multiples, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 109, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 110, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en ERdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 111, "title": "Dysfonction d’une vertèbre dorsale D8–D12, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 112, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 113, "title": "Dysfonction d’une vertèbre dorsale D4–D8, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 114, "title": "Dysfonction d’une vertèbre dorsale D1–D4, en NSgRd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 115, "title": "Dysfonction d’une vertèbre dorsale D1–D3, en FRdSd, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 151, "title": "Dysfonction costo-transversaire de la 1re côte, en élévation, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 152, "title": "Dysfonction costo-transversaire antéro-médiane, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↘"}, {"id": 153, "title": "Dysfonction costo-transversaire postéro-latérale, technique structurelle", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↖"}, {"id": 154, "title": "Dysfonction costo-transversaire, composantes multiples, technique structurelle, assis", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "C"}, {"id": 155, "title": "Dysfonction costo-transversaire antéro-médiane, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 156, "title": "Dysfonction costo-transversaire postéro-latérale, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 157, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 158, "title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "1"}, {"id": 159, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 160, "title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "6"}, {"id": 161, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 162, "title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 163, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan sagittal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 164, "title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "2"}, {"id": 165, "title": "Dysfonction des 3e–10e côtes, en abaissement dans le plan frontal, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "10"}, {"id": 166, "title": "Dysfonction des 11e–12e côtes, en élévation, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 167, "title": "Dysfonction des 11e–12e côtes, en abaissement, énergie musculaire", "zone": "Rachis", "sub": "Dorsales", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "12"}, {"id": 201, "title": "Dysfonction facettaire des lombaires, en NSR à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "à revoir", "percent": 45, "icon": "L"}, {"id": 202, "title": "Dysfonction facettaire des lombaires, en ERS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 203, "title": "Dysfonction facettaire des lombaires, en FRS à droite, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 204, "title": "Dysfonction facettaire des lombaires, assis, à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 205, "title": "Dysfonction des lombaires, en NSR à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 206, "title": "Dysfonction des lombaires, en ERS à gauche, énergie musculaire", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 207, "title": "Dysfonction des lombaires, en FRS à droite", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "L"}, {"id": 208, "title": "Dysfonction de la charnière D12/L1, technique en double appui", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "D/L"}, {"id": 209, "title": "Dysfonction de la charnière D12/L1, technique indirecte à droite en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 210, "title": "Dysfonction de L3, technique semi-directe à gauche en Lumbar Roll", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 211, "title": "Charnière D12/L1, technique en Lift, postériorité à gauche", "zone": "Rachis", "sub": "Lombaires", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "↟"}, {"id": 301, "title": "Dysfonction de l’ilium, en antériorité à gauche", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 302, "title": "Dysfonction de l’ilium, en antériorité à gauche, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 303, "title": "Dysfonction de l’ilium, en postériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 304, "title": "Dysfonction de l’ilium, en postériorité à droite, variante sujet laxe", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◝"}, {"id": 305, "title": "Dysfonction de l’ilium, en supériorité à droite", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↥"}, {"id": 306, "title": "Dysfonction de l’ilium, en antériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 307, "title": "Dysfonction de l’ilium, en postériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 308, "title": "Dysfonction de l’ilium, en postériorité à droite en procubitus, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 309, "title": "Dysfonction de l’ilium, en fermeture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 310, "title": "Dysfonction de l’ilium, en ouverture à droite, énergie musculaire", "zone": "Bassin", "sub": "Ilium", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 351, "title": "Dysfonction du sacrum, en torsion postérieure avec le pisiforme direct, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 352, "title": "Dysfonction du sacrum, en flexion unilatérale sur axe horizontal, à gauche", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 353, "title": "Dysfonction du sacrum, en torsion postérieure gauche sur axe oblique droit", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 354, "title": "Dysfonction du sacrum, en torsion antérieure droite sur axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 355, "title": "Dysfonction du sacrum, en torsion postérieure droite sur un axe droit, énergie musculaire", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 356, "title": "Dysfonction du sacrum, en antériorité unilatérale, manœuvre avec le pisiforme direct", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 357, "title": "Dysfonction du sacrum, en extension unilatérale sur axe horizontal, à droite", "zone": "Bassin", "sub": "Sacrum", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "S"}, {"id": 381, "title": "Dysfonction de la symphyse pubienne, en supériorité à droite, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 382, "title": "Dysfonction de la symphyse pubienne, en infériorité à gauche, énergie musculaire", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 383, "title": "Dysfonction combinée de la symphyse pubienne, en supériorité et infériorité", "zone": "Bassin", "sub": "Symphyse pubienne", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "SP"}, {"id": 401, "title": "Dysfonction pré-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 402, "title": "Dysfonction sus-sternale de la clavicule, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 403, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à droite", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 404, "title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à gauche", "zone": "Membres supérieurs", "sub": "Clavicule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "EM"}, {"id": 405, "title": "Dysfonction acromio-claviculaire, en rotation antérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 406, "title": "Dysfonction acromio-claviculaire, en rotation postérieure, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◜"}, {"id": 407, "title": "Dysfonction gléno-humérale, en antériorité, à gauche", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "↻"}, {"id": 408, "title": "Dysfonction huméro-ulnaire, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 409, "title": "Dysfonction huméro-ulnaire, en adduction, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 410, "title": "Dysfonction huméro-radiale, en antériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 411, "title": "Dysfonction huméro-radiale, en postériorité, à droite", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 412, "title": "Dysfonction huméro-radiale, en postériorité, variante", "zone": "Membres supérieurs", "sub": "Coude", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 413, "title": "Dysfonction radio-carpienne du scaphoïde ou du lunatum, en postériorité, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 414, "title": "Dysfonction radio-carpienne, en abduction, à gauche", "zone": "Membres supérieurs", "sub": "Poignet", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "▧"}, {"id": 415, "title": "Dysfonction articulaire globale des médio-carpiennes, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 416, "title": "Dysfonction articulaire globale des inter-carpiennes, à gauche", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 417, "title": "Dysfonction articulaire globale de la trapézo-métacarpienne, à droite", "zone": "Membres supérieurs", "sub": "Main", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "✋"}, {"id": 501, "title": "Dysfonction de la coxo-fémorale, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 502, "title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 503, "title": "Dysfonction de la coxo-fémorale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 504, "title": "Dysfonction de la coxo-fémorale, en adduction, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 505, "title": "Dysfonction de la coxo-fémorale, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 506, "title": "Dysfonction de la coxo-fémorale, en antériorité classique, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 507, "title": "Dysfonction de la coxo-fémorale, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 508, "title": "Dysfonction de la coxo-fémorale articulaire globale dans un axe transversal, à droite", "zone": "Membres inférieurs", "sub": "Hanche", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "◎"}, {"id": 509, "title": "Dysfonction de la fémoro-tibiale, en abduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 510, "title": "Dysfonction de la fémoro-tibiale, en adduction, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 511, "title": "Dysfonction de la fémoro-tibiale, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 512, "title": "Dysfonction de la fémoro-tibiale, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◉"}, {"id": 513, "title": "Dysfonction de la fémoro-tibiale, en rotation interne, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 514, "title": "Dysfonction de la fémoro-tibiale, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "⟳"}, {"id": 515, "title": "Dysfonction du ménisque médial, en postériorité et en extension, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 516, "title": "Dysfonction du ménisque médial en postériorité, en flexion, à droite", "zone": "Membres inférieurs", "sub": "Genou", "level": "Niveau avancé", "status": "non vue", "percent": 0, "icon": "M"}, {"id": 551, "title": "Dysfonction de la fibulo-tibiale supérieure, en postériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 552, "title": "Dysfonction de la fibulo-tibiale inférieure, en antériorité, à gauche", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 553, "title": "Dysfonction de la fibulo-tibiale inférieure, en postériorité, à droite", "zone": "Membres inférieurs", "sub": "Tibia-fibula", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "TF"}, {"id": 554, "title": "Dysfonction de la tibio-tarsienne articulaire globale, en décubitus ventral, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 555, "title": "Entorse tibio-tarsienne externe, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "!"}, {"id": 556, "title": "Décoaptation de la tibio-tarsienne globale, à gauche", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "↧"}, {"id": 557, "title": "Dysfonction de la tibio-tarsienne, en antériorité, à droite", "zone": "Membres inférieurs", "sub": "Cheville", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◌"}, {"id": 558, "title": "Dysfonction de la sous-astragalienne antéro-interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 559, "title": "Dysfonction de la sous-astragalienne postéro-externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 560, "title": "Dysfonction de la sous-talienne, calcanéus en valgus, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 561, "title": "Dysfonction de la sous-talienne, calcanéus en varus, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 562, "title": "Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟", "videoUrl": "https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0", "videoProvider": "vimeo"}, {"id": 563, "title": "Dysfonction talo-naviculaire, en rotation externe, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 564, "title": "Dysfonction de la naviculo-cuboïdienne articulaire globale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 565, "title": "Dysfonction de la métatarso-phalangienne de la 1re phalange, en flexion dorsale, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau débutant", "status": "non vue", "percent": 0, "icon": "◟"}, {"id": 999, "title": "TEST VIDÉO VIMEO — Épaule", "zone": "Membres supérieurs", "sub": "Épaule", "level": "Test vidéo", "status": "non vue", "percent": 0, "icon": "◜", "videoUrl": "https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0", "videoProvider": "vimeo"}, {"id": 1000, "title": "Dysfonction de la sous-talienne, calcanéus en valgus, à droite", "zone": "Membres inférieurs", "sub": "Pied", "level": "Niveau intermédiaire", "status": "non vue", "percent": 0, "icon": "◟", "detailId": "sousTalienneValgusDroite"}];
 
 const zoneSubzones = {
   "Rachis": [
@@ -7382,7 +7744,7 @@ function go(id){
   });
   document.querySelectorAll(".bottom button").forEach(b=>{
     const t=b.dataset.target;
-    const active=t===id || (t==="zones"&&["zones","rachis","techniques","player"].includes(id)) || (t==="revision"&&["revision","revisionCard","seenCollections","seenCards"].includes(id)) || (t==="home"&&["quiz","progress","videoMap","rachisMenu","msupMenu","minfMenu","bassinMenu"].includes(id));
+    const active=t===id || (t==="zones"&&["zones","rachis","techniques","player"].includes(id)) || (t==="revision"&&["revision","revisionWheel","revisionCard","seenCollections","seenCards"].includes(id)) || (t==="home"&&["quiz","progress","videoMap","rachisMenu","msupMenu","minfMenu","bassinMenu"].includes(id));
     b.classList.toggle("active",active);
   });
 }
@@ -7622,8 +7984,7 @@ function getVideoCandidates(t){
 }
 
 function setVideoDebug(text){
-  const debug = document.getElementById("videoPathDebug");
-  if(debug) debug.textContent = text;
+  // Supprimé : l'app ne montre plus l'item "Chemin vidéo".
 }
 
 function loadVideoCandidate(video, source, candidates, index){
@@ -7649,6 +8010,7 @@ function loadVideoCandidate(video, source, candidates, index){
 }
 
 function openTechnique(id){
+  currentPlayerTechniqueId = id;
   const t = techniques.find(x => x.id === id) || techniques[0];
 
   document.getElementById("playerTitle").textContent = t.title;
@@ -7658,16 +8020,198 @@ function openTechnique(id){
 
   const source = document.getElementById("videoSource");
   const video = document.getElementById("video");
+  const vimeo = document.getElementById("vimeoPlayer");
 
-  video.removeAttribute("poster");
-  video.onerror = null;
-  video.onloadedmetadata = null;
+  if(video){
+    video.pause();
+    video.removeAttribute("poster");
+    video.onerror = null;
+    video.onloadedmetadata = null;
+    video.style.display = "block";
+  }
+
+  if(vimeo){
+    vimeo.src = "";
+    vimeo.style.display = "none";
+  }
+
+  if(t.videoProvider === "vimeo" && t.videoUrl){
+    if(video){
+      video.pause();
+      video.removeAttribute("src");
+      if(source) source.src = "";
+      video.load();
+      video.style.display = "none";
+    }
+
+    if(vimeo){
+      vimeo.src = t.videoUrl;
+      vimeo.style.display = "block";
+    }
+
+    setVideoDebug("Vidéo Vimeo : " + t.title);
+    go("player");
+    return;
+  }
 
   const candidates = getVideoCandidates(t);
   loadVideoCandidate(video, source, candidates, 0);
 
   go("player");
 }
+
+
+/* === FICHES TEXTE / IMAGES PAR VIDÉO === */
+let currentPlayerTechniqueId = null;
+let currentDetailMode = "text";
+
+const TECHNIQUE_DETAILS = {
+  sousTalienneValgusDroite: {
+    source: "PDF OSTPRA3 - Partie 50",
+    intro: "Fiche associée à la dysfonction de la sous-talienne, calcanéus en valgus, à droite.",
+    steps: [
+      {
+        key: "position",
+        label: "Position",
+        logo: "assets/images/techniques/sous-talienne-valgus-droite/logo-position.png",
+        photo: "assets/images/techniques/sous-talienne-valgus-droite/photo-position.webp",
+        title: "Patient et praticien",
+        body: "Patient en décubitus dorsal, genoux fléchis, pied en dysfonction en dehors de la table. Le praticien est debout en bout de table, à hauteur des pieds."
+      },
+      {
+        key: "mains",
+        label: "Position des mains",
+        logo: "assets/images/techniques/sous-talienne-valgus-droite/logo-mains.png",
+        photo: "assets/images/techniques/sous-talienne-valgus-droite/photo-mains.webp",
+        title: "Fixation de l’avant-pied et prise du calcanéus",
+        body: "Le talon en dysfonction est amené en dehors de la table. La main caudale empaume et fixe l’avant-pied en éversion. La main céphalique empaume la face interne du calcanéus."
+      },
+      {
+        key: "barriere",
+        label: "Barrière motrice",
+        logo: "assets/images/techniques/sous-talienne-valgus-droite/logo-barriere.png",
+        photo: "assets/images/techniques/sous-talienne-valgus-droite/photo-barriere.webp",
+        title: "Mise en tension",
+        body: "La main céphalique maintient le calcanéus en valgus. La main caudale exerce une pression progressive vers la table jusqu’à la barrière motrice."
+      },
+      {
+        key: "normalisation",
+        label: "Normalisation",
+        logo: "assets/images/techniques/sous-talienne-valgus-droite/logo-normalisation.png",
+        photo: "assets/images/techniques/sous-talienne-valgus-droite/photo-normalisation.webp",
+        title: "Thrust",
+        body: "Porter le thrust par la main céphalique en direction de la table."
+      }
+    ],
+    images: [
+      "assets/images/techniques/sous-talienne-valgus-droite/planche-photos.webp",
+      "assets/images/techniques/sous-talienne-valgus-droite/planche-texte.webp"
+    ]
+  }
+};
+
+function getCurrentTechnique(){
+  return techniques.find(t => Number(t.id) === Number(currentPlayerTechniqueId)) || techniques[0];
+}
+
+function getTechniqueDetail(t){
+  if(!t) return null;
+  if(t.detailId && TECHNIQUE_DETAILS[t.detailId]) return TECHNIQUE_DETAILS[t.detailId];
+
+  return {
+    source: "Fiche à compléter",
+    intro: "Aucun texte détaillé n’a encore été associé à cette vidéo.",
+    steps: [
+      {
+        key: "position",
+        label: "Position",
+        logo: "",
+        photo: "",
+        title: "Texte à renseigner",
+        body: "Cette zone permettra d’ajouter la position du patient, la position du praticien, les contacts, la mise en tension et la normalisation."
+      }
+    ],
+    images: []
+  };
+}
+
+function openTechniqueTextPage(){
+  currentDetailMode = "text";
+  renderTechniqueDetail("text");
+  go("techniqueDetail");
+}
+
+function openTechniqueImagesPage(){
+  currentDetailMode = "images";
+  renderTechniqueDetail("images");
+  go("techniqueDetail");
+}
+
+function toggleDetailMode(){
+  renderTechniqueDetail(currentDetailMode === "text" ? "images" : "text");
+}
+
+function renderTechniqueDetail(mode){
+  currentDetailMode = mode || currentDetailMode || "text";
+
+  const t = getCurrentTechnique();
+  const detail = getTechniqueDetail(t);
+
+  const subtitle = document.getElementById("detailSubtitle");
+  const kicker = document.getElementById("detailKicker");
+  const title = document.getElementById("detailTitle");
+  const intro = document.getElementById("detailIntro");
+  const textWrap = document.getElementById("detailTextContent");
+  const imageWrap = document.getElementById("detailImagesContent");
+  const tabText = document.getElementById("detailTabText");
+  const tabImages = document.getElementById("detailTabImages");
+
+  if(subtitle) subtitle.textContent = currentDetailMode === "text" ? "Texte de la technique" : "Images associées";
+  if(kicker) kicker.textContent = `${t.zone} · ${t.sub} · ${detail.source}`;
+  if(title) title.textContent = t.title;
+  if(intro) intro.textContent = detail.intro;
+
+  if(tabText) tabText.classList.toggle("active", currentDetailMode === "text");
+  if(tabImages) tabImages.classList.toggle("active", currentDetailMode === "images");
+
+  if(textWrap){
+    textWrap.innerHTML = detail.steps.map(s => `
+      <article class="detail-step-card">
+        <div class="detail-step-logo">
+          ${s.logo ? `<img src="${s.logo}" alt="${escapeHtml(s.label)}">` : `<span>${escapeHtml(s.label.slice(0,1))}</span>`}
+        </div>
+        <div class="detail-step-copy">
+          <small>${escapeHtml(s.label)}</small>
+          <h3>${escapeHtml(s.title)}</h3>
+          <p>${escapeHtml(s.body)}</p>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  if(imageWrap){
+    const stepImages = detail.steps.filter(s => s.photo).map(s => `
+      <article class="detail-photo-card">
+        <img src="${s.photo}" alt="${escapeHtml(s.label)}">
+        <strong>${escapeHtml(s.label)}</strong>
+      </article>
+    `).join("");
+
+    const plates = (detail.images || []).map(src => `
+      <article class="detail-plate-card">
+        <img src="${src}" alt="Planche technique">
+      </article>
+    `).join("");
+
+    imageWrap.innerHTML = (stepImages || plates)
+      ? `<div class="detail-photo-grid">${stepImages}</div>${plates ? `<div class="detail-plates">${plates}</div>` : ""}`
+      : `<article class="empty"><strong>Aucune image associée pour le moment.</strong><p>Les images de la vidéo pourront être ajoutées ici.</p></article>`;
+  }
+
+  if(textWrap) textWrap.style.display = currentDetailMode === "text" ? "block" : "none";
+  if(imageWrap) imageWrap.style.display = currentDetailMode === "images" ? "block" : "none";
+}
+
 
 function slugify(text){
   return text.toString().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[’']/g,"-").replace(/–/g,"-").replace(/[^a-zA-Z0-9]+/g,"-").replace(/^-+|-+$/g,"").toLowerCase();
@@ -8014,6 +8558,281 @@ function escapeAttr(value){
 }
 
 
+
+/* === ROUE ALÉATOIRE DE RÉVISION === */
+const VIEWED_TECHNIQUES_KEY = "osteoPratikViewedTechniqueIds";
+let selectedWheelTechniqueId = null;
+let wheelRotation = 0;
+let wheelSpinTimer = null;
+
+function readViewedTechniqueIds(){
+  try{
+    const raw = localStorage.getItem(VIEWED_TECHNIQUES_KEY);
+    const ids = raw ? JSON.parse(raw) : [];
+    return Array.isArray(ids) ? ids.map(Number).filter(Boolean) : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function saveViewedTechniqueId(id){
+  if(!id) return;
+  const ids = new Set(readViewedTechniqueIds());
+  ids.add(Number(id));
+  localStorage.setItem(VIEWED_TECHNIQUES_KEY, JSON.stringify(Array.from(ids)));
+}
+
+function isTechniqueViewedForRevision(t){
+  // IMPORTANT : la roue ne tire QUE les techniques qui ont une carte à jouer débloquée.
+  // Donc on se base sur la même logique que l’album de cartes.
+  return typeof isTechniqueUnlocked === "function" && isTechniqueUnlocked(t);
+}
+
+function getViewedTechniquesForWheel(){
+  return techniques
+    .filter(isTechniqueViewedForRevision)
+    .sort((a,b)=>String(a.zone).localeCompare(String(b.zone)) || String(a.sub).localeCompare(String(b.sub)) || a.id - b.id);
+}
+
+function shortenWheelTitle(title){
+  const clean = String(title || "").replace(/\s+/g, " ").trim();
+  return clean.length > 44 ? clean.slice(0, 42) + "…" : clean;
+}
+
+function openRevisionWheel(){
+  selectedWheelTechniqueId = null;
+  renderRevisionWheel();
+  go("revisionWheel");
+}
+
+function renderRevisionWheel(){
+  const list = getViewedTechniquesForWheel();
+  const panel = document.querySelector("#revisionWheel .revision-wheel-panel");
+  const count = document.getElementById("wheelCount");
+  const ticker = document.getElementById("wheelTicker");
+  const resultTitle = document.getElementById("wheelResultTitle");
+  const resultKicker = document.getElementById("wheelResultKicker");
+  const resultMeta = document.getElementById("wheelResultMeta");
+  const cardBtn = document.getElementById("wheelCardButton");
+  const videoBtn = document.getElementById("wheelVideoButton");
+  const disc = document.getElementById("revisionWheelDisc");
+
+  if(!panel) return;
+
+  panel.classList.toggle("empty", list.length === 0);
+
+  if(count){
+    count.textContent = list.length <= 1
+      ? list.length + " technique débloquée"
+      : list.length + " techniques débloquées";
+  }
+
+  if(!list.length){
+    if(disc) disc.classList.remove("selected");
+    if(ticker) ticker.textContent = "Vide";
+    [cardBtn, videoBtn].forEach(btn => {
+    if(btn){
+      btn.disabled = true;
+      btn.classList.remove("ready");
+    }
+  });
+    selectedWheelTechniqueId = null;
+    return;
+  }
+
+  if(ticker) ticker.textContent = "Appuyez ici";
+  if(resultKicker) resultKicker.textContent = "Tirage aléatoire";
+  if(resultTitle) resultTitle.textContent = "Lancez la roue pour choisir une carte débloquée.";
+  if(resultMeta) resultMeta.textContent = "Seules les cartes à jouer déjà débloquées entrent dans le tirage.";
+  [cardBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
+  if(disc) disc.classList.remove("spinning", "selected");
+}
+
+
+let wheelAudioCtx = null;
+let wheelSoundTimer = null;
+
+function getWheelAudioContext(){
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if(!AudioCtx) return null;
+  if(!wheelAudioCtx) wheelAudioCtx = new AudioCtx();
+  if(wheelAudioCtx.state === "suspended") wheelAudioCtx.resume();
+  return wheelAudioCtx;
+}
+
+function playWheelTick(){
+  const ctx = getWheelAudioContext();
+  if(!ctx) return;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = "square";
+  osc.frequency.setValueAtTime(880 + Math.random() * 180, ctx.currentTime);
+
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.045);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + 0.05);
+}
+
+function playWheelWin(){
+  const ctx = getWheelAudioContext();
+  if(!ctx) return;
+
+  [523, 659, 784].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.08);
+
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + i * 0.08 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.08 + 0.22);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(ctx.currentTime + i * 0.08);
+    osc.stop(ctx.currentTime + i * 0.08 + 0.24);
+  });
+}
+
+function startWheelSound(){
+  stopWheelSound();
+  let delay = 42;
+  const tickLoop = () => {
+    playWheelTick();
+    delay = Math.min(delay + 7, 175);
+    wheelSoundTimer = setTimeout(tickLoop, delay);
+  };
+  tickLoop();
+}
+
+function stopWheelSound(){
+  if(wheelSoundTimer){
+    clearTimeout(wheelSoundTimer);
+    wheelSoundTimer = null;
+  }
+}
+
+function spinRevisionWheel(){
+  const spinBtn = document.getElementById("wheelSpinButton");
+  if(spinBtn && spinBtn.disabled) return;
+
+  const list = getViewedTechniquesForWheel();
+  if(!list.length){
+    renderRevisionWheel();
+    toast("Aucune technique visionnée");
+    return;
+  }
+
+  const disc = document.getElementById("revisionWheelDisc");
+  const ticker = document.getElementById("wheelTicker");
+  const resultTitle = document.getElementById("wheelResultTitle");
+  const resultKicker = document.getElementById("wheelResultKicker");
+  const resultMeta = document.getElementById("wheelResultMeta");
+  const cardBtn = document.getElementById("wheelCardButton");
+  const videoBtn = document.getElementById("wheelVideoButton");
+
+  const selected = list[Math.floor(Math.random() * list.length)];
+  selectedWheelTechniqueId = selected.id;
+  startWheelSound();
+
+  [cardBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
+  if(spinBtn) spinBtn.disabled = true;
+  if(resultKicker) resultKicker.textContent = "La roue tourne";
+  if(resultTitle) resultTitle.textContent = "Sélection en cours…";
+  if(resultMeta) resultMeta.textContent = "La carte choisie apparaîtra dans quelques secondes.";
+
+  if(disc){
+    disc.classList.add("spinning");
+    wheelRotation += 1440 + Math.floor(Math.random() * 720);
+    disc.style.transform = "rotate(" + wheelRotation + "deg)";
+  }
+
+  let tickIndex = 0;
+  clearInterval(wheelSpinTimer);
+  wheelSpinTimer = setInterval(()=>{
+    const t = list[tickIndex % list.length];
+    if(ticker) ticker.textContent = shortenWheelTitle(t.title);
+    tickIndex++;
+  }, 90);
+
+  setTimeout(()=>{
+    clearInterval(wheelSpinTimer);
+    stopWheelSound();
+    playWheelWin();
+    if(disc) disc.classList.remove("spinning");
+
+    if(ticker) ticker.textContent = shortenWheelTitle(selected.title);
+    if(disc) disc.classList.add("selected");
+    if(resultKicker) resultKicker.textContent = selected.zone + " · " + selected.sub;
+    if(resultTitle) resultTitle.textContent = selected.title;
+    if(resultMeta) resultMeta.textContent = selected.level + " · Carte débloquée";
+    [cardBtn, videoBtn].forEach(btn => {
+      if(btn){
+        btn.disabled = false;
+        btn.classList.add("ready");
+      }
+    });
+    if(spinBtn) spinBtn.disabled = false;
+
+    toast("Technique tirée : " + shortenWheelTitle(selected.title));
+  }, 3200);
+}
+
+function getSelectedWheelTechnique(){
+  if(!selectedWheelTechniqueId) return null;
+  return techniques.find(x => Number(x.id) === Number(selectedWheelTechniqueId)) || null;
+}
+
+function openSelectedWheelCard(){
+  const t = getSelectedWheelTechnique();
+  if(!t){
+    toast("Lancez d’abord la roue");
+    return;
+  }
+
+  if(!(typeof isTechniqueUnlocked === "function" && isTechniqueUnlocked(t))){
+    toast("Carte non débloquée");
+    return;
+  }
+
+  if(typeof openFullCard === "function"){
+    openFullCard(t.id);
+    return;
+  }
+
+  go("seenCards");
+}
+
+function openSelectedWheelVideo(){
+  const t = getSelectedWheelTechnique();
+  if(!t){
+    toast("Lancez d’abord la roue");
+    return;
+  }
+
+  openTechnique(t.id);
+}
+
+// Compatibilité avec l’ancien bouton si besoin.
+function openSelectedWheelTechnique(){
+  openSelectedWheelCard();
+}
+
+const originalOpenTechniqueForWheel = openTechnique;
+openTechnique = function(id){
+  saveViewedTechniqueId(id);
+  originalOpenTechniqueForWheel(id);
+};
+
+
 document.getElementById("homeCount").textContent = techniques.length;
 updateCatalogueCounts();
 updateRachisRegionCounts();
@@ -8026,6 +8845,1510 @@ renderTechniques();
 <script>
 console.log("OSTÉO PRATIK debug: modules rachis / membres supérieurs / membres inférieurs / bassin actifs");
 </script>
+
+
+<style>
+/* === PATCH FINAL HEADER : titre centré sans chevauchement === */
+/* Objectif : titre plus grand, bien centré, sans toucher au reste de la maquette. */
+
+#home .top{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:46px minmax(0,1fr) 46px !important;
+  align-items:start !important;
+  gap:10px !important;
+  min-height:168px !important;
+  margin-bottom:0 !important;
+  padding-top:4px !important;
+  overflow:visible !important;
+}
+
+#home .top > .icon{
+  position:relative !important;
+  z-index:3 !important;
+  width:46px !important;
+  height:46px !important;
+  margin-top:12px !important;
+}
+
+#home .top .brand{
+  position:absolute !important;
+  left:50% !important;
+  top:0 !important;
+  transform:translateX(-50%) !important;
+  width:min(390px, 86vw) !important;
+  height:160px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  text-align:center !important;
+  overflow:visible !important;
+  z-index:1 !important;
+}
+
+#home .brand-title-webp{
+  display:block !important;
+  width:min(360px, 82vw) !important;
+  max-width:360px !important;
+  height:auto !important;
+  max-height:118px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:0 auto !important;
+  transform:none !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 0 18px rgba(0,229,255,.22)) !important;
+}
+
+#home .brand-title-fallback{
+  display:none;
+  font-size:38px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+}
+
+#home .brand .subtitle{
+  margin:6px 0 0 !important;
+  font-size:15px !important;
+  line-height:1.12 !important;
+  color:#dbe8f6 !important;
+  text-align:center !important;
+  width:100% !important;
+  position:relative !important;
+  z-index:2 !important;
+}
+
+#home .premium-learning-line{
+  position:relative !important;
+  z-index:2 !important;
+  margin:0 0 16px !important;
+  padding:0 4px 4px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:9px !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+#home .premium-learning-line span{
+  font-size:15.5px !important;
+  font-weight:850 !important;
+  letter-spacing:.01em !important;
+  white-space:nowrap !important;
+  color:#ffffff !important;
+  text-align:center !important;
+}
+
+#home .premium-learning-line .sep{
+  color:#39dfff !important;
+  font-size:10px !important;
+  opacity:.9 !important;
+}
+
+@media(max-width:430px){
+  #home .top{
+    min-height:160px !important;
+  }
+
+  #home .top .brand{
+    width:min(360px, 86vw) !important;
+    height:152px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(335px, 80vw) !important;
+    max-width:335px !important;
+    max-height:112px !important;
+  }
+
+  #home .brand .subtitle{
+    font-size:14.5px !important;
+  }
+
+  #home .premium-learning-line{
+    gap:8px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:14.2px !important;
+  }
+}
+
+@media(max-width:380px){
+  #home .top{
+    min-height:150px !important;
+  }
+
+  #home .top .brand{
+    width:min(330px, 86vw) !important;
+    height:142px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(305px, 78vw) !important;
+    max-width:305px !important;
+    max-height:104px !important;
+  }
+
+  #home .brand .subtitle{
+    font-size:13.5px !important;
+  }
+
+  #home .premium-learning-line{
+    gap:6px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:12.8px !important;
+  }
+
+  #home .premium-learning-line .sep{
+    font-size:9px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === HEADER ACCUEIL FINAL === */
+/* Ordre demandé :
+   1. Titre plus gros et centré
+   2. Apprenez · Comprenez · Corrigez · Révisez juste en dessous
+   3. Que voulez-vous faire ? en dessous
+   4. Boutons gauche/droite alignés sur cette dernière ligne
+*/
+
+#home .home-top{
+  position:relative !important;
+  display:block !important;
+  min-height:178px !important;
+  margin:0 0 10px !important;
+  padding:0 !important;
+  overflow:visible !important;
+}
+
+#home .home-brand{
+  position:static !important;
+  transform:none !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  text-align:center !important;
+  overflow:visible !important;
+  z-index:1 !important;
+}
+
+#home .brand-title-webp{
+  display:block !important;
+  width:min(385px, 91vw) !important;
+  max-width:385px !important;
+  height:auto !important;
+  max-height:122px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:-4px auto 0 !important;
+  transform:none !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 0 18px rgba(0,229,255,.24)) !important;
+}
+
+#home .brand-title-fallback{
+  display:none;
+  font-size:42px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  margin:14px auto 4px !important;
+}
+
+#home .premium-learning-line{
+  position:static !important;
+  z-index:2 !important;
+  margin:-2px auto 12px !important;
+  padding:0 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:9px !important;
+  flex-wrap:nowrap !important;
+  width:100% !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+  text-align:center !important;
+}
+
+#home .premium-learning-line span{
+  font-size:15.8px !important;
+  line-height:1 !important;
+  font-weight:850 !important;
+  letter-spacing:.01em !important;
+  color:#ffffff !important;
+  white-space:nowrap !important;
+  text-shadow:0 0 14px rgba(255,255,255,.06), 0 0 20px rgba(0,229,255,.08) !important;
+}
+
+#home .premium-learning-line .sep{
+  color:#39dfff !important;
+  font-size:10px !important;
+  line-height:1 !important;
+  opacity:.92 !important;
+}
+
+#home .home-brand .subtitle{
+  margin:0 auto !important;
+  padding:0 58px !important;
+  width:100% !important;
+  min-height:46px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  color:#dbe8f6 !important;
+  font-size:15px !important;
+  line-height:1.15 !important;
+}
+
+#home .home-side-icon{
+  position:absolute !important;
+  top:auto !important;
+  bottom:0 !important;
+  z-index:5 !important;
+  width:46px !important;
+  height:46px !important;
+  margin:0 !important;
+}
+
+#home .home-settings{
+  left:0 !important;
+}
+
+#home .home-notifications{
+  right:0 !important;
+}
+
+@media(max-width:430px){
+  #home .home-top{
+    min-height:170px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(365px, 89vw) !important;
+    max-width:365px !important;
+    max-height:116px !important;
+  }
+
+  #home .premium-learning-line{
+    gap:8px !important;
+    margin:-1px auto 10px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:14.5px !important;
+  }
+
+  #home .home-brand .subtitle{
+    font-size:14.5px !important;
+  }
+}
+
+@media(max-width:380px){
+  #home .home-top{
+    min-height:162px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(338px, 87vw) !important;
+    max-width:338px !important;
+    max-height:108px !important;
+  }
+
+  #home .premium-learning-line{
+    gap:6px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:13px !important;
+    letter-spacing:0 !important;
+  }
+
+  #home .premium-learning-line .sep{
+    font-size:9px !important;
+  }
+
+  #home .home-brand .subtitle{
+    font-size:13.5px !important;
+    padding:0 54px !important;
+  }
+
+  #home .home-side-icon{
+    width:44px !important;
+    height:44px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === PATCH GLOBAL : centrage des titres sur toutes les pages === */
+/* Le header reste stable : bouton gauche à gauche, bouton droit à droite,
+   et le titre est centré par rapport à l’écran, pas seulement dans la colonne centrale. */
+
+/* Toutes les pages sauf l'accueil, qui a déjà son header spécifique */
+.screen:not(#home) .top{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:46px minmax(0,1fr) 46px !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:82px !important;
+  margin-bottom:12px !important;
+  overflow:visible !important;
+}
+
+.screen:not(#home) .top > .icon,
+.screen:not(#home) .top > button.icon{
+  position:relative !important;
+  z-index:3 !important;
+  width:46px !important;
+  height:46px !important;
+}
+
+.screen:not(#home) .top > .icon:first-child,
+.screen:not(#home) .top > button.icon:first-child{
+  justify-self:start !important;
+}
+
+.screen:not(#home) .top > .icon:last-child,
+.screen:not(#home) .top > button.icon:last-child{
+  justify-self:end !important;
+}
+
+.screen:not(#home) .top .brand{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  transform:translate(-50%, -50%) !important;
+  width:min(310px, calc(100vw - 112px)) !important;
+  max-width:310px !important;
+  min-width:0 !important;
+  z-index:1 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  overflow:visible !important;
+  pointer-events:none !important;
+}
+
+.screen:not(#home) .top .brand .logo,
+.screen:not(#home) .top .brand h1,
+.screen:not(#home) .top .brand h2{
+  display:block !important;
+  width:100% !important;
+  margin:0 auto !important;
+  text-align:center !important;
+  white-space:normal !important;
+  line-height:1.02 !important;
+}
+
+.screen:not(#home) .top .brand .subtitle,
+.screen:not(#home) .top .brand p{
+  display:block !important;
+  width:100% !important;
+  margin:7px auto 0 !important;
+  text-align:center !important;
+  line-height:1.15 !important;
+}
+
+/* Les titres image Ostéo Pratik restent eux aussi centrés sur les pages concernées */
+.screen:not(#home) .top .brand-title-webp{
+  display:block !important;
+  width:min(250px, 64vw) !important;
+  max-width:250px !important;
+  height:auto !important;
+  max-height:76px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:0 auto !important;
+  border:0 !important;
+  outline:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+/* Titres internes de page : Vidéo, zones, listes, collections */
+.video-page-title,
+.revision-orbit-screen .revision-title,
+.catalogue-title,
+.zone-page-title,
+.collection-title,
+.page-title,
+.section-title{
+  text-align:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.video-page-title h1,
+.video-page-title p,
+.revision-orbit-screen .revision-title h1,
+.revision-orbit-screen .revision-title p,
+.catalogue-title h1,
+.catalogue-title p,
+.zone-page-title h1,
+.zone-page-title p,
+.collection-title h1,
+.collection-title p,
+.page-title h1,
+.page-title p,
+.section-title h1,
+.section-title p{
+  text-align:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Sécurité : si un ancien style forçait un alignement à gauche */
+.screen .brand,
+.screen .brand *{
+  text-align:center;
+}
+
+@media(max-width:430px){
+  .screen:not(#home) .top{
+    grid-template-columns:44px minmax(0,1fr) 44px !important;
+    min-height:78px !important;
+  }
+
+  .screen:not(#home) .top .brand{
+    width:min(286px, calc(100vw - 104px)) !important;
+    max-width:286px !important;
+  }
+
+  .screen:not(#home) .top .brand .logo,
+  .screen:not(#home) .top .brand h1{
+    font-size:31px !important;
+  }
+
+  .screen:not(#home) .top .brand .subtitle,
+  .screen:not(#home) .top .brand p{
+    font-size:14px !important;
+  }
+
+  .screen:not(#home) .top .brand-title-webp{
+    width:min(230px, 60vw) !important;
+    max-width:230px !important;
+    max-height:70px !important;
+  }
+}
+
+@media(max-width:380px){
+  .screen:not(#home) .top{
+    grid-template-columns:42px minmax(0,1fr) 42px !important;
+    min-height:74px !important;
+  }
+
+  .screen:not(#home) .top .brand{
+    width:min(260px, calc(100vw - 98px)) !important;
+    max-width:260px !important;
+  }
+
+  .screen:not(#home) .top .brand .logo,
+  .screen:not(#home) .top .brand h1{
+    font-size:28px !important;
+  }
+
+  .screen:not(#home) .top .brand .subtitle,
+  .screen:not(#home) .top .brand p{
+    font-size:13px !important;
+  }
+
+  .screen:not(#home) .top .brand-title-webp{
+    width:min(205px, 58vw) !important;
+    max-width:205px !important;
+    max-height:64px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === RÉVISER : ROUE ALÉATOIRE DES TECHNIQUES DÉJÀ VUES === */
+.revision-wheel-screen{
+  --wheel-cyan:#00e5ff;
+  --wheel-green:#00e6a7;
+  --wheel-violet:#a855ff;
+  --wheel-orange:#ffb020;
+}
+
+.revision-wheel-panel{
+  margin-top:14px;
+  padding:18px 16px 22px;
+  border-radius:28px;
+  border:1px solid rgba(170,205,225,.16);
+  background:
+    radial-gradient(circle at 50% 18%, rgba(0,229,255,.13), transparent 32%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92));
+  box-shadow:0 18px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05);
+  overflow:hidden;
+  position:relative;
+}
+
+.wheel-count{
+  text-align:center;
+  color:#aeb8cc;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+.wheel-stage{
+  position:relative;
+  width:100%;
+  height:292px;
+  display:grid;
+  place-items:center;
+}
+
+.wheel-pointer{
+  position:absolute;
+  top:4px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#fff;
+  font-size:28px;
+  z-index:5;
+  text-shadow:0 0 16px rgba(0,229,255,.85);
+}
+
+.revision-wheel-disc{
+  width:246px;
+  height:246px;
+  border-radius:50%;
+  position:relative;
+  display:grid;
+  place-items:center;
+  transform:rotate(0deg);
+  transition:transform 3.1s cubic-bezier(.13,.8,.18,1);
+  background:
+    conic-gradient(
+      from -90deg,
+      rgba(168,85,255,.92) 0deg 50deg,
+      rgba(0,229,255,.95) 50deg 105deg,
+      rgba(0,230,167,.92) 105deg 160deg,
+      rgba(255,176,32,.92) 160deg 215deg,
+      rgba(45,140,255,.92) 215deg 270deg,
+      rgba(168,85,255,.92) 270deg 360deg
+    );
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.08),
+    0 0 34px rgba(0,229,255,.28),
+    inset 0 0 32px rgba(0,0,0,.42);
+}
+
+.revision-wheel-disc::before{
+  content:"";
+  position:absolute;
+  inset:13px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255,255,255,.12), transparent 22%),
+    linear-gradient(145deg, rgba(3,12,30,.88), rgba(1,6,17,.96));
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 0 26px rgba(0,0,0,.56);
+}
+
+.wheel-ring{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.18);
+  pointer-events:none;
+}
+
+.ring-one{
+  inset:28px;
+  box-shadow:0 0 22px rgba(0,229,255,.16);
+}
+
+.ring-two{
+  inset:54px;
+  border-color:rgba(0,229,255,.34);
+}
+
+.wheel-core{
+  position:relative;
+  appearance:none;
+  -webkit-appearance:none;
+  z-index:3;
+  width:122px;
+  height:122px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  padding:14px;
+  background:rgba(2,7,20,.92);
+  border:2px solid rgba(0,229,255,.62);
+  box-shadow:
+    0 0 28px rgba(0,229,255,.22),
+    inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.wheel-core span{
+  display:block;
+  color:#fff;
+  font-size:13px;
+  line-height:1.12;
+  font-weight:900;
+  letter-spacing:-.02em;
+  text-shadow:0 0 16px rgba(0,229,255,.2);
+}
+
+.revision-wheel-disc.spinning .wheel-core span{
+  animation:wheelTickerPulse .34s linear infinite;
+}
+
+@keyframes wheelTickerPulse{
+  0%,100%{opacity:.55; transform:scale(.98)}
+  50%{opacity:1; transform:scale(1)}
+}
+
+.wheel-result-card{
+  min-height:112px;
+  border-radius:24px;
+  border:1px solid rgba(170,205,225,.16);
+  background:rgba(2,9,25,.62);
+  padding:16px;
+  text-align:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.wheel-result-card small{
+  display:block;
+  color:#00e5ff;
+  text-transform:uppercase;
+  letter-spacing:.13em;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.wheel-result-card strong{
+  display:block;
+  color:#fff;
+  font-size:18px;
+  line-height:1.13;
+  font-weight:950;
+  letter-spacing:-.02em;
+}
+
+.wheel-result-card span{
+  display:block;
+  margin-top:10px;
+  color:#aeb8cc;
+  font-size:13px;
+  line-height:1.25;
+}
+
+.wheel-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:14px;
+}
+
+.wheel-spin-button,
+.wheel-open-button{
+  width:100%;
+}
+
+.wheel-open-button:disabled{
+  opacity:.38;
+  filter:saturate(.4);
+}
+
+.wheel-empty-message{
+  display:none;
+  margin-top:14px;
+  text-align:center;
+  border-radius:24px;
+  border:1px dashed rgba(170,205,225,.22);
+  background:rgba(255,255,255,.035);
+  padding:18px 16px;
+}
+
+.wheel-empty-message strong{
+  display:block;
+  color:#fff;
+  font-size:17px;
+  line-height:1.18;
+}
+
+.wheel-empty-message p{
+  margin:8px 0 14px;
+  color:#aeb8cc;
+  font-size:14px;
+  line-height:1.28;
+}
+
+.revision-wheel-panel.empty .wheel-stage,
+.revision-wheel-panel.empty .wheel-result-card,
+.revision-wheel-panel.empty .wheel-actions{
+  display:none;
+}
+
+.revision-wheel-panel.empty .wheel-empty-message{
+  display:block;
+}
+
+@media(max-width:430px){
+  .wheel-stage{height:274px}
+  .revision-wheel-disc{width:226px;height:226px}
+  .wheel-core{width:112px;height:112px}
+  .wheel-core span{font-size:12px}
+  .wheel-result-card strong{font-size:17px}
+}
+</style>
+
+
+<style>
+/* === PATCH ROUE : titre dans le centre + clic au centre === */
+.wheel-core{
+  cursor:pointer !important;
+  border:2px solid rgba(0,229,255,.72) !important;
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255,255,255,.10), transparent 32%),
+    rgba(2,7,20,.94) !important;
+  transition:transform .18s ease, box-shadow .18s ease !important;
+}
+
+.wheel-core:active{
+  transform:scale(.96) !important;
+}
+
+.wheel-core span{
+  max-width:96px !important;
+  color:#fff !important;
+  font-size:12px !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.03em !important;
+  text-align:center !important;
+  display:-webkit-box !important;
+  -webkit-line-clamp:5 !important;
+  -webkit-box-orient:vertical !important;
+  overflow:hidden !important;
+  text-shadow:0 0 14px rgba(0,229,255,.26) !important;
+}
+
+.revision-wheel-disc.spinning .wheel-core span{
+  -webkit-line-clamp:4 !important;
+}
+
+.wheel-core.selected span{
+  color:#fff !important;
+  font-size:11.5px !important;
+}
+
+.wheel-result-card{
+  margin-top:4px !important;
+}
+
+@media(max-width:430px){
+  .wheel-core span{
+    max-width:88px !important;
+    font-size:11.2px !important;
+  }
+
+  .wheel-core.selected span{
+    font-size:10.8px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === PATCH ROUE : bouton Réviser cette technique actif === */
+.wheel-open-button.ready{
+  opacity:1 !important;
+  filter:none !important;
+  border-color:rgba(0,229,255,.42) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.18), transparent 45%),
+    linear-gradient(145deg, rgba(0,229,255,.18), rgba(5,15,31,.82)) !important;
+  box-shadow:
+    0 0 22px rgba(0,229,255,.22),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.wheel-open-button.ready::after{
+  content:" ›";
+}
+</style>
+
+
+<style>
+/* === PATCH ROUE : cartes débloquées seulement + choix carte / vidéo === */
+.wheel-actions-choice{
+  grid-template-columns:1fr !important;
+}
+
+.wheel-choice-button.ready{
+  opacity:1 !important;
+  filter:none !important;
+  border-color:rgba(0,229,255,.42) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.16), transparent 45%),
+    linear-gradient(145deg, rgba(0,229,255,.15), rgba(5,15,31,.82)) !important;
+  box-shadow:
+    0 0 22px rgba(0,229,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.wheel-card-button.ready::after{
+  content:" ›";
+}
+
+.wheel-video-button.ready{
+  border-color:rgba(255,176,32,.38) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,176,32,.15), transparent 45%),
+    linear-gradient(145deg, rgba(255,176,32,.12), rgba(5,15,31,.82)) !important;
+}
+
+.wheel-video-button.ready::after{
+  content:" ▷";
+}
+
+.wheel-core{
+  cursor:pointer !important;
+}
+
+.wheel-core::after{
+  content:"tap";
+  position:absolute;
+  bottom:13px;
+  left:50%;
+  transform:translateX(-50%);
+  color:rgba(174,184,204,.72);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+.wheel-core.selected::after,
+.revision-wheel-disc.spinning .wheel-core::after{
+  content:"";
+}
+</style>
+
+
+<style>
+/* === PATCH ROUE : boutons choix même taille que "Lancer la roue" === */
+.wheel-actions,
+.wheel-actions-choice{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:12px !important;
+}
+
+.wheel-actions .primary,
+.wheel-actions .secondary,
+.wheel-spin-button,
+.wheel-choice-button,
+.wheel-card-button,
+.wheel-video-button{
+  width:100% !important;
+  min-height:58px !important;
+  height:58px !important;
+  padding:0 18px !important;
+  border-radius:22px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  font-size:16px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+  letter-spacing:-.01em !important;
+}
+
+.wheel-choice-button{
+  opacity:.42 !important;
+}
+
+.wheel-choice-button.ready{
+  opacity:1 !important;
+}
+
+/* === PATCH SON : roue plus premium, plus douce, moins "bip" === */
+</style>
+
+<script>
+/* Son premium de roue : clics feutrés + léger souffle + accord de validation */
+let premiumWheelWhoosh = null;
+
+function playWheelTick(){
+  const ctx = getWheelAudioContext();
+  if(!ctx) return;
+
+  const now = ctx.currentTime;
+
+  // Clic feutré : petit bruit filtré, façon cliquet mécanique doux.
+  const bufferSize = Math.floor(ctx.sampleRate * 0.035);
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for(let i = 0; i < bufferSize; i++){
+    const env = Math.pow(1 - i / bufferSize, 4.2);
+    data[i] = (Math.random() * 2 - 1) * env;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = buffer;
+
+  const filter = ctx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.setValueAtTime(1450 + Math.random() * 420, now);
+  filter.Q.setValueAtTime(8.5, now);
+
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.032, now + 0.004);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.034);
+
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  noise.start(now);
+  noise.stop(now + 0.04);
+
+  // Mini impact grave très discret pour donner du corps.
+  const osc = ctx.createOscillator();
+  const ogain = ctx.createGain();
+  osc.type = "triangle";
+  osc.frequency.setValueAtTime(145 + Math.random() * 20, now);
+  ogain.gain.setValueAtTime(0.0001, now);
+  ogain.gain.exponentialRampToValueAtTime(0.018, now + 0.006);
+  ogain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055);
+  osc.connect(ogain);
+  ogain.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 0.06);
+}
+
+function startWheelSound(){
+  stopWheelSound();
+  const ctx = getWheelAudioContext();
+  if(!ctx) return;
+
+  // Souffle léger pendant la rotation, très bas pour un effet "premium".
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(62, now);
+  osc.frequency.exponentialRampToValueAtTime(38, now + 3.1);
+
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(420, now);
+  filter.frequency.exponentialRampToValueAtTime(180, now + 3.1);
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(0.018, now + 0.16);
+  gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.15);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(now);
+  osc.stop(now + 3.2);
+  premiumWheelWhoosh = {osc, gain};
+
+  // Clics rapides puis ralentissement progressif.
+  let delay = 34;
+  let ticks = 0;
+  const tickLoop = () => {
+    playWheelTick();
+    ticks += 1;
+    delay = Math.min(34 + ticks * 6.5, 180);
+    wheelSoundTimer = setTimeout(tickLoop, delay);
+  };
+  tickLoop();
+}
+
+function stopWheelSound(){
+  if(wheelSoundTimer){
+    clearTimeout(wheelSoundTimer);
+    wheelSoundTimer = null;
+  }
+
+  try{
+    if(premiumWheelWhoosh && premiumWheelWhoosh.gain && wheelAudioCtx){
+      const now = wheelAudioCtx.currentTime;
+      premiumWheelWhoosh.gain.gain.cancelScheduledValues(now);
+      premiumWheelWhoosh.gain.gain.setValueAtTime(0.006, now);
+      premiumWheelWhoosh.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+    }
+  }catch(e){}
+}
+
+function playWheelWin(){
+  const ctx = getWheelAudioContext();
+  if(!ctx) return;
+
+  const now = ctx.currentTime;
+
+  // Petit accord élégant, pas trop jeu vidéo.
+  const notes = [
+    {f:392, t:0.00, g:0.040},
+    {f:523.25, t:0.07, g:0.050},
+    {f:659.25, t:0.14, g:0.042},
+    {f:783.99, t:0.21, g:0.032}
+  ];
+
+  notes.forEach(n => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(n.f, now + n.t);
+
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(1400, now + n.t);
+
+    gain.gain.setValueAtTime(0.0001, now + n.t);
+    gain.gain.exponentialRampToValueAtTime(n.g, now + n.t + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + n.t + 0.42);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now + n.t);
+    osc.stop(now + n.t + 0.46);
+  });
+}
+</script>
+
+
+<style>
+/* === PATCH VIDÉO VIMEO TECHNIQUE 562 === */
+.video-box-adaptive{
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.video-box-adaptive video,
+.video-box-adaptive iframe{
+  width:100% !important;
+  aspect-ratio:16 / 9 !important;
+  min-height:220px !important;
+  border:0 !important;
+  border-radius:22px !important;
+  background:#020714 !important;
+  display:block;
+}
+
+.vimeo-player{
+  display:none;
+}
+</style>
+
+
+<!-- VIDÉO AJOUTÉE
+Technique #562 : Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche
+Lien original fourni : https://vimeo.com/540123060/eed12a4a77?share=copy&fl=sv&fe=ci
+Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0
+-->
+
+
+<!-- ITEM TEST VIDÉO AJOUTÉ
+Technique test #999 : TEST VIDÉO VIMEO — Épaule
+Zone : Membres supérieurs > Épaule
+Lien original fourni : https://vimeo.com/1198534346?share=copy&fl=sv&fe=ci
+Embed utilisé : https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0
+-->
+
+
+<style>
+/* === PATCH : suppression du petit texte orange/jaune sous la vidéo === */
+#videoDebug,
+#playerDebug,
+#videoPath,
+.video-debug,
+.player-debug,
+.video-source-debug,
+.video-path,
+.debug-video,
+.video-origin{
+  display:none !important;
+  visibility:hidden !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+</style>
+
+
+<style>
+/* === PATCH PREMIUM : écran vidéo sans item "Chemin vidéo" === */
+
+/* Suppression définitive du texte technique sous le lecteur */
+#videoDebug,
+#playerDebug,
+#videoPath,
+.video-debug,
+.player-debug,
+.video-source-debug,
+.video-path,
+.debug-video,
+.video-origin{
+  display:none !important;
+  visibility:hidden !important;
+  height:0 !important;
+  min-height:0 !important;
+  max-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+/* Habillage premium du bloc lecteur */
+#player .video-box,
+#player .video-box-adaptive{
+  position:relative !important;
+  margin-top:18px !important;
+  padding:10px !important;
+  border-radius:30px !important;
+  border:1px solid rgba(0,229,255,.18) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.18), transparent 42%),
+    linear-gradient(145deg, rgba(12,35,66,.72), rgba(3,10,24,.94)) !important;
+  box-shadow:
+    0 24px 70px rgba(0,0,0,.42),
+    0 0 34px rgba(0,229,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+  overflow:hidden !important;
+}
+
+#player .video-box::before,
+#player .video-box-adaptive::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:30px;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+  opacity:.24;
+}
+
+#player .video-box video,
+#player .video-box iframe,
+#player .video-box-adaptive video,
+#player .video-box-adaptive iframe{
+  position:relative !important;
+  z-index:1 !important;
+  width:100% !important;
+  aspect-ratio:16/9 !important;
+  min-height:220px !important;
+  border:0 !important;
+  border-radius:22px !important;
+  background:#020714 !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 0 26px rgba(0,0,0,.34) !important;
+}
+
+/* Titre vidéo plus éditorial */
+#player #playerTitle{
+  display:block !important;
+  margin:18px 0 10px !important;
+  color:#ffffff !important;
+  font-size:23px !important;
+  line-height:1.08 !important;
+  font-weight:950 !important;
+  letter-spacing:-.035em !important;
+  text-align:left !important;
+  text-wrap:balance !important;
+  text-shadow:0 0 22px rgba(0,229,255,.08) !important;
+}
+
+/* Chips zone / région / niveau : plus propres */
+#player #playerChips{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+  margin:8px 0 12px !important;
+}
+
+#player #playerChips span{
+  display:inline-flex !important;
+  align-items:center !important;
+  min-height:30px !important;
+  padding:7px 11px !important;
+  border-radius:999px !important;
+  color:#dff8ff !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:850 !important;
+  letter-spacing:.015em !important;
+  background:rgba(0,229,255,.075) !important;
+  border:1px solid rgba(0,229,255,.18) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04) !important;
+}
+
+/* Petit bandeau discret au-dessus du lecteur */
+#player .video-box::after,
+#player .video-box-adaptive::after{
+  content:"Lecture technique";
+  position:absolute;
+  top:15px;
+  left:18px;
+  z-index:2;
+  padding:6px 10px;
+  border-radius:999px;
+  color:rgba(255,255,255,.88);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  background:rgba(2,7,20,.58);
+  border:1px solid rgba(255,255,255,.10);
+  backdrop-filter:blur(8px);
+}
+
+/* Meilleur confort mobile */
+@media(max-width:430px){
+  #player #playerTitle{
+    font-size:21px !important;
+  }
+
+  #player .video-box,
+  #player .video-box-adaptive{
+    padding:8px !important;
+    border-radius:28px !important;
+  }
+
+  #player .video-box video,
+  #player .video-box iframe,
+  #player .video-box-adaptive video,
+  #player .video-box-adaptive iframe{
+    min-height:205px !important;
+    border-radius:20px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === FICHES TEXTE / IMAGES ASSOCIÉES AUX VIDÉOS === */
+.video-premium-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0 4px;
+}
+
+.video-premium-actions button{
+  min-height:50px;
+  border-radius:20px;
+  border:1px solid rgba(0,229,255,.18);
+  background:rgba(255,255,255,.045);
+  color:#f6fbff;
+  font-weight:900;
+  font-size:14px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.technique-detail-screen .top{
+  margin-bottom:10px;
+}
+
+.detail-hero{
+  border-radius:28px;
+  padding:18px 16px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.16), transparent 44%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92));
+  border:1px solid rgba(170,205,225,.16);
+  box-shadow:0 18px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.detail-hero small{
+  display:block;
+  color:#00e5ff;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  line-height:1.25;
+}
+
+.detail-hero h2{
+  margin:8px 0 8px;
+  color:#fff;
+  font-size:22px;
+  line-height:1.08;
+  letter-spacing:-.035em;
+}
+
+.detail-hero p{
+  margin:0;
+  color:#aeb8cc;
+  font-size:14px;
+  line-height:1.35;
+}
+
+.detail-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:14px 0;
+}
+
+.detail-tabs button{
+  min-height:46px;
+  border-radius:18px;
+  background:rgba(255,255,255,.045);
+  border:1px solid rgba(170,205,225,.14);
+  color:#aeb8cc;
+  font-weight:900;
+}
+
+.detail-tabs button.active{
+  color:#fff;
+  border-color:rgba(0,229,255,.34);
+  background:linear-gradient(145deg, rgba(0,229,255,.15), rgba(5,15,31,.88));
+  box-shadow:0 0 22px rgba(0,229,255,.13);
+}
+
+.detail-step-card{
+  display:grid;
+  grid-template-columns:56px minmax(0,1fr);
+  gap:14px;
+  align-items:flex-start;
+  margin:12px 0;
+  padding:14px;
+  border-radius:24px;
+  border:1px solid rgba(170,205,225,.16);
+  background:rgba(255,255,255,.04);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.detail-step-logo{
+  width:54px;
+  height:54px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.95);
+  border:1px solid rgba(255,255,255,.18);
+  overflow:hidden;
+}
+
+.detail-step-logo img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+}
+
+.detail-step-logo span{
+  color:#00e5ff;
+  font-size:22px;
+  font-weight:950;
+}
+
+.detail-step-copy small{
+  display:block;
+  color:#00e5ff;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  font-size:10px;
+  font-weight:950;
+}
+
+.detail-step-copy h3{
+  margin:5px 0 7px;
+  color:#fff;
+  font-size:17px;
+  line-height:1.15;
+}
+
+.detail-step-copy p{
+  margin:0;
+  color:#d7e2f2;
+  font-size:14px;
+  line-height:1.38;
+}
+
+.detail-photo-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.detail-photo-card,
+.detail-plate-card{
+  border-radius:22px;
+  overflow:hidden;
+  border:1px solid rgba(170,205,225,.14);
+  background:rgba(255,255,255,.04);
+  box-shadow:0 14px 34px rgba(0,0,0,.25);
+}
+
+.detail-photo-card img,
+.detail-plate-card img{
+  width:100%;
+  display:block;
+}
+
+.detail-photo-card strong{
+  display:block;
+  padding:9px 10px 11px;
+  color:#fff;
+  font-size:12px;
+  line-height:1.15;
+  text-align:center;
+}
+
+.detail-plates{
+  display:grid;
+  gap:12px;
+  margin-top:14px;
+}
+
+@media(max-width:430px){
+  .video-premium-actions{
+    grid-template-columns:1fr;
+  }
+
+  .detail-photo-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
 
 </body>
 </html>
