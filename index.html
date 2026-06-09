@@ -7089,12 +7089,20 @@ button[data-tech-id="12"]{
     <div class="welcome-ambient" aria-hidden="true">
       <span class="welcome-orb orb-1"></span>
       <span class="welcome-orb orb-2"></span>
+      <span class="welcome-ring ring-1"></span>
+      <span class="welcome-ring ring-2"></span>
+      <span class="welcome-scan"></span>
+      <span class="welcome-grid-glow"></span>
       <span class="welcome-line line-1"></span>
       <span class="welcome-line line-2"></span>
+      <span class="welcome-arc arc-1"></span>
+      <span class="welcome-arc arc-2"></span>
       <span class="welcome-spark spark-1"></span>
       <span class="welcome-spark spark-2"></span>
       <span class="welcome-spark spark-3"></span>
       <span class="welcome-spark spark-4"></span>
+      <span class="welcome-spark spark-5"></span>
+      <span class="welcome-spark spark-6"></span>
     </div>
 
     <div class="welcome-poster-actions">
@@ -11680,6 +11688,225 @@ body.onboarding-open .bottom{
   display:none !important;
 }
 
+
+.welcome-poster-page{
+  perspective:1200px;
+}
+
+.welcome-poster-page::before{
+  content:"";
+  position:absolute;
+  inset:-8% -12%;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(255,255,255,.09), transparent 11%),
+    radial-gradient(circle at 50% 18%, rgba(0,229,255,.16), transparent 24%),
+    repeating-linear-gradient(90deg, rgba(0,229,255,.035) 0 1px, transparent 1px 26px),
+    repeating-linear-gradient(180deg, rgba(0,229,255,.03) 0 1px, transparent 1px 26px);
+  opacity:.38;
+  transform:perspective(1000px) rotateX(68deg) translateY(34%);
+  transform-origin:center bottom;
+  animation:welcomeGridShift 12s linear infinite;
+}
+
+.welcome-poster-actions{
+  transform:translateZ(0);
+}
+
+.welcome-poster-actions .welcome-start,
+.welcome-poster-actions .welcome-signup,
+.welcome-poster-actions .welcome-login{
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 14px 40px rgba(0,0,0,.28), 0 0 24px rgba(0,229,255,.12);
+}
+
+.welcome-poster-actions .welcome-start::before,
+.welcome-poster-actions .welcome-signup::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  border-radius:inherit;
+  padding:1px;
+  background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(0,229,255,.58), rgba(255,255,255,.08));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  opacity:.8;
+  pointer-events:none;
+}
+
+.welcome-poster-actions .welcome-start::after,
+.welcome-poster-actions .welcome-signup::after,
+.welcome-poster-actions .welcome-login::after{
+  content:"";
+  position:absolute;
+  top:-120%;
+  left:-40%;
+  width:42%;
+  height:300%;
+  transform:rotate(24deg);
+  background:linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,.26), rgba(255,255,255,0));
+  animation:welcomeButtonSweep 5.4s ease-in-out infinite;
+  pointer-events:none;
+}
+
+.welcome-ring,
+.welcome-scan,
+.welcome-grid-glow,
+.welcome-arc{
+  position:absolute;
+  display:block;
+  pointer-events:none;
+}
+
+.welcome-ring{
+  left:50%;
+  top:16%;
+  border-radius:50%;
+  transform:translateX(-50%);
+  mix-blend-mode:screen;
+}
+
+.welcome-ring.ring-1{
+  width:min(430px, 88vw);
+  height:min(430px, 88vw);
+  border:1px solid rgba(0,229,255,.22);
+  box-shadow:0 0 34px rgba(0,229,255,.12), inset 0 0 26px rgba(0,229,255,.07);
+  animation:welcomeRotateSlow 16s linear infinite;
+}
+
+.welcome-ring.ring-1::before,
+.welcome-ring.ring-1::after,
+.welcome-ring.ring-2::before{
+  content:"";
+  position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,.95) 0%, rgba(0,229,255,.95) 45%, transparent 72%);
+  box-shadow:0 0 16px rgba(0,229,255,.8);
+}
+
+.welcome-ring.ring-1::before{ width:12px; height:12px; left:36px; top:88px; }
+.welcome-ring.ring-1::after{ width:10px; height:10px; right:48px; bottom:122px; }
+
+.welcome-ring.ring-2{
+  width:min(320px, 68vw);
+  height:min(320px, 68vw);
+  top:21%;
+  border:1px dashed rgba(111,235,255,.26);
+  box-shadow:0 0 22px rgba(0,229,255,.08);
+  animation:welcomeRotateReverse 11s linear infinite;
+}
+
+.welcome-ring.ring-2::before{ width:8px; height:8px; right:36px; top:40px; }
+
+.welcome-grid-glow{
+  inset:auto 0 0 0;
+  height:54%;
+  background:radial-gradient(circle at 50% 15%, rgba(0,229,255,.16), transparent 42%);
+  opacity:.7;
+  animation:welcomeGlowPulse 4.6s ease-in-out infinite;
+}
+
+.welcome-scan{
+  left:50%;
+  top:10%;
+  width:min(470px, 96vw);
+  height:68%;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg, rgba(0,229,255,0) 0%, rgba(0,229,255,.045) 46%, rgba(255,255,255,.26) 50%, rgba(0,229,255,.055) 54%, rgba(0,229,255,0) 100%);
+  filter:blur(.2px);
+  opacity:.72;
+  animation:welcomeScanSweep 6.8s ease-in-out infinite;
+}
+
+.welcome-arc{
+  border-radius:50%;
+  border-top:2px solid rgba(0,229,255,.55);
+  border-left:2px solid transparent;
+  border-right:2px solid transparent;
+  border-bottom:2px solid transparent;
+  filter:drop-shadow(0 0 10px rgba(0,229,255,.45));
+}
+
+.welcome-arc.arc-1{
+  width:min(250px, 55vw);
+  height:min(250px, 55vw);
+  left:50%;
+  top:19%;
+  transform:translateX(-50%) rotate(16deg);
+  animation:welcomeRotateSlow 9s linear infinite;
+}
+
+.welcome-arc.arc-2{
+  width:min(180px, 38vw);
+  height:min(180px, 38vw);
+  left:50%;
+  top:27%;
+  transform:translateX(-50%) rotate(-30deg);
+  border-top-color:rgba(129,255,231,.72);
+  animation:welcomeRotateReverse 7s linear infinite;
+}
+
+.welcome-line.line-1{
+  top:15.4%;
+}
+
+.welcome-line.line-2{
+  top:16.8%;
+}
+
+.welcome-spark.spark-5{ left:18%; top:57%; animation:welcomeSpark 7s linear infinite 1.6s; }
+.welcome-spark.spark-6{ left:82%; top:61%; animation:welcomeSpark 6.4s linear infinite 2.6s; }
+
+@keyframes welcomeRotateSlow{
+  from{ transform:translateX(-50%) rotate(0deg); }
+  to{ transform:translateX(-50%) rotate(360deg); }
+}
+
+@keyframes welcomeRotateReverse{
+  from{ transform:translateX(-50%) rotate(360deg); }
+  to{ transform:translateX(-50%) rotate(0deg); }
+}
+
+@keyframes welcomeScanSweep{
+  0%,100%{ transform:translateX(-50%) translateY(-2%); opacity:.28; }
+  50%{ transform:translateX(-50%) translateY(24%); opacity:.88; }
+}
+
+@keyframes welcomeGlowPulse{
+  0%,100%{ opacity:.34; }
+  50%{ opacity:.84; }
+}
+
+@keyframes welcomeGridShift{
+  from{ transform:perspective(1000px) rotateX(68deg) translateY(34%) translateX(0); }
+  to{ transform:perspective(1000px) rotateX(68deg) translateY(34%) translateX(12px); }
+}
+
+@keyframes welcomeButtonSweep{
+  0%,100%{ left:-45%; opacity:0; }
+  12%{ opacity:.78; }
+  36%{ left:115%; opacity:0; }
+}
+
+@media(max-width:430px){
+  .welcome-ring.ring-1{ width:min(350px,86vw); height:min(350px,86vw); top:17%; }
+  .welcome-ring.ring-2{ width:min(260px,64vw); height:min(260px,64vw); top:23%; }
+  .welcome-scan{ width:min(390px,96vw); height:63%; }
+  .welcome-arc.arc-1{ top:22%; }
+  .welcome-arc.arc-2{ top:29%; }
+  .welcome-line.line-1{ top:16.4%; }
+  .welcome-line.line-2{ top:17.8%; }
+}
+
+@media(max-width:380px){
+  .welcome-ring.ring-1{ width:min(320px,84vw); height:min(320px,84vw); }
+  .welcome-ring.ring-2{ width:min(232px,60vw); height:min(232px,60vw); }
+  .welcome-arc.arc-1{ width:min(210px,52vw); height:min(210px,52vw); }
+  .welcome-arc.arc-2{ width:min(150px,34vw); height:min(150px,34vw); }
+}
 @media(max-width:430px){
   .welcome-poster-actions{
     width:min(340px, calc(100vw - 32px));
