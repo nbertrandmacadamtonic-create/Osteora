@@ -1033,6 +1033,23 @@ body::before{
   display:block !important;
 }
 
+
+/* === PATCH VIMEO ROBUSTE === */
+.vimeo-fallback-btn{
+  margin: -2px 0 14px !important;
+  background: linear-gradient(135deg, #00e5ff, #2d8cff) !important;
+}
+.video-box.has-vimeo{
+  padding:0 !important;
+  overflow:hidden !important;
+}
+.video-box.has-vimeo iframe.vimeo-frame{
+  width:100% !important;
+  min-height:230px !important;
+  aspect-ratio:16/9 !important;
+  display:block !important;
+}
+
 </style>
 </head>
 
@@ -1217,11 +1234,16 @@ body::before{
       class="vimeo-frame"
       src=""
       title="Vidéo Vimeo"
-      allow="autoplay; fullscreen; picture-in-picture"
+      allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
       allowfullscreen
+      referrerpolicy="strict-origin-when-cross-origin"
       loading="lazy">
     </iframe>
   </div>
+
+  <button id="openVimeoFallback" class="primary vimeo-fallback-btn" style="display:none" onclick="window.open('https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci','_blank')">
+    Ouvrir la vidéo sur Vimeo
+  </button>
 
   <section class="steps">
     <h3>Étapes</h3>
@@ -1395,7 +1417,7 @@ const techniques=[
 {id:6,title:"Technique de glissement cervical latéral",sub:"Cervicales",level:"Niveau avancé",status:"en cours",percent:30,icon:"▥"},
 {id:7,title:"Technique dorsale à genoux",sub:"Dorsales",level:"Niveau intermédiaire",status:"vue",percent:80,icon:"▷"},
 {id:8,title:"Technique lombaire en décubitus",sub:"Lombaires",level:"Niveau avancé",status:"à revoir",percent:45,icon:"▷"},
-{id:13,title:"Dysfonction sous-astragalienne du calcanéum en valgus",sub:"Membres inférieurs",level:"Niveau intermédiaire",status:"non vue",percent:0,icon:"▷",vimeo:"https://player.vimeo.com/video/1199647853?title=0&byline=0&portrait=0",chips:["Membre inférieur","Sous-astragalienne","Calcanéum en valgus"]}
+{id:13,title:"Dysfonction sous-astragalienne du calcanéum en valgus",sub:"Membres inférieurs",level:"Niveau intermédiaire",status:"non vue",percent:0,icon:"▷",vimeo:"https://player.vimeo.com/video/1199647853?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",chips:["Membre inférieur","Sous-astragalienne","Calcanéum en valgus"]}
 ];
 
 let currentSubzone="Cervicales";
@@ -1456,7 +1478,7 @@ function renderTechniques(){
     items=[
       {id:11,title:"Technique du genou en chaîne fermée",level:"Niveau intermédiaire",status:"non vue",percent:0,icon:"▷",sub:"Membres inférieurs"},
       {id:12,title:"Technique de cheville en énergie musculaire",level:"Niveau débutant",status:"non vue",percent:0,icon:"↻",sub:"Membres inférieurs"},
-      {id:13,title:"Dysfonction sous-astragalienne du calcanéum en valgus",level:"Niveau intermédiaire",status:"non vue",percent:0,icon:"▷",sub:"Membres inférieurs",vimeo:"https://player.vimeo.com/video/1199647853?title=0&byline=0&portrait=0",chips:["Membre inférieur","Sous-astragalienne","Calcanéum en valgus"]}
+      {id:13,title:"Dysfonction sous-astragalienne du calcanéum en valgus",level:"Niveau intermédiaire",status:"non vue",percent:0,icon:"▷",sub:"Membres inférieurs",vimeo:"https://player.vimeo.com/video/1199647853?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",chips:["Membre inférieur","Sous-astragalienne","Calcanéum en valgus"]}
     ];
   }
 
@@ -1482,11 +1504,10 @@ function stateLabel(t){
   return `<span>non vue ○</span>`;
 }
 
-function openTechnique(id){
-  let t=techniques.find(x=>x.id===id);
+function getTechniqueById(id){
+  let t=techniques.find(x=>Number(x.id)===Number(id));
 
-  // Les techniques ajoutées dynamiquement dans les sous-menus ne sont pas toutes dans le tableau principal.
-  if(!t && currentSubzone==="Membres inférieurs" && id===13){
+  if(!t && currentSubzone==="Membres inférieurs" && Number(id)===13){
     t={
       id:13,
       title:"Dysfonction sous-astragalienne du calcanéum en valgus",
@@ -1495,12 +1516,17 @@ function openTechnique(id){
       percent:0,
       icon:"▷",
       sub:"Membres inférieurs",
-      vimeo:"https://player.vimeo.com/video/1199647853?title=0&byline=0&portrait=0",
+      vimeo:"https://player.vimeo.com/video/1199647853?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
+      directVimeo:"https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci",
       chips:["Membre inférieur","Sous-astragalienne","Calcanéum en valgus"]
     };
   }
 
-  t=t||techniques[0];
+  return t || techniques[0];
+}
+
+function openTechnique(id){
+  const t=getTechniqueById(id);
 
   document.getElementById("playerTitle").textContent=t.title;
 
@@ -1513,20 +1539,21 @@ function openTechnique(id){
   const videoBox=document.getElementById("videoBox");
   const video=document.getElementById("video");
   const vimeoFrame=document.getElementById("vimeoFrame");
-  const videoSource=document.getElementById("videoSource");
+  const fallback=document.getElementById("openVimeoFallback");
 
   if(videoBox && vimeoFrame && video){
     if(t.vimeo){
-      video.pause();
+      try{ video.pause(); }catch(e){}
       videoBox.classList.add("has-vimeo");
       vimeoFrame.src=t.vimeo;
+      if(fallback){
+        fallback.style.display="block";
+        fallback.onclick=function(){ window.open(t.directVimeo || "https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci", "_blank"); };
+      }
     }else{
       videoBox.classList.remove("has-vimeo");
       vimeoFrame.src="";
-      if(videoSource && !videoSource.src){
-        videoSource.src="assets/videos/dysfonction-cervicale-c2-c6-assis.mp4";
-        video.load();
-      }
+      if(fallback) fallback.style.display="none";
     }
   }
 
