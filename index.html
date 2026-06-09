@@ -7024,7 +7024,17 @@ button[data-tech-id="12"]{
     <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon">↗</div><strong><span class="main-word">Suivre</span><span class="sub-word">ma progression</span></strong><em class="orbit-arrow">›</em></button>
     <button class="center-button" onclick="toast('OSTÉO PRATIK')">⌬</button>
   </section>
-  <article class="last-card"><div class="pill-icon">↺</div><div><small>Votre dernière pratique</small><strong>Dysfonction facettaire des dorsales</strong><span>Rachis</span><div class="bar"><i style="width:58%"></i></div></div><b id="homeCount">0</b></article>
+  
+<article class="last-card home-live-activity" id="homeLiveActivity" onclick="openLastActivity()">
+  <div class="pill-icon" id="lastActivityIcon">↺</div>
+  <div class="home-live-copy">
+    <small id="lastActivityLabel">Votre dernière activité</small>
+    <strong id="lastActivityTitle">Aucune activité pour le moment</strong>
+    <span id="lastActivityMeta">Commencez par ouvrir une vidéo ou une fiche.</span>
+    <div class="bar"><i id="lastActivityBar" style="width:0%"></i></div>
+  </div>
+  <b id="homeCount">0</b>
+</article>
 </section>
 
 <section id="videoMap" class="screen video-map-screen">
@@ -8045,6 +8055,16 @@ function openTechnique(id){
   currentPlayerTechniqueId = id;
   const t = techniques.find(x => x.id === id) || techniques[0];
 
+  saveLastActivity({
+    type:"video",
+    techniqueId:t.id,
+    title:t.title,
+    meta:t.zone + " · " + t.sub,
+    icon:"▷",
+    progress:62,
+    action:"openTechnique"
+  });
+
   document.getElementById("playerTitle").textContent = t.title;
 
   const chips = document.getElementById("playerChips");
@@ -8180,6 +8200,18 @@ function getTechniqueDetail(t){
 
 function openTechniqueTextPage(){
   currentDetailMode = "fiche";
+  const t = getCurrentTechnique();
+  if(t){
+    saveLastActivity({
+      type:"fiche",
+      techniqueId:t.id,
+      title:t.title,
+      meta:t.zone + " · " + t.sub,
+      icon:"▤",
+      progress:78,
+      action:"openFiche"
+    });
+  }
   renderTechniqueDetail();
   go("techniqueDetail");
 }
@@ -8555,6 +8587,16 @@ function openFullCard(id){
   const t = techniques.find(x => x.id === id);
   if(!t || !isTechniqueUnlocked(t)) return;
 
+  saveLastActivity({
+    type:"card",
+    techniqueId:t.id,
+    title:t.title,
+    meta:t.zone + " · " + t.sub,
+    icon:"▱",
+    progress:88,
+    action:"openCard"
+  });
+
   window.currentFullCardId = id;
 
   const overlay = document.getElementById("cardFullscreenOverlay");
@@ -8916,7 +8958,116 @@ openTechnique = function(id){
 };
 
 
+
+/* === ACCUEIL : DERNIÈRE ACTIVITÉ RÉELLEMENT CONNECTÉE === */
+const LAST_ACTIVITY_KEY = "osteoPratikLastActivityV1";
+
+function saveLastActivity(activity){
+  try{
+    const payload = {
+      type: activity.type || "activity",
+      techniqueId: activity.techniqueId || currentPlayerTechniqueId || null,
+      title: activity.title || "Activité",
+      meta: activity.meta || "",
+      icon: activity.icon || "↺",
+      progress: typeof activity.progress === "number" ? activity.progress : 58,
+      action: activity.action || "none",
+      time: Date.now()
+    };
+    localStorage.setItem(LAST_ACTIVITY_KEY, JSON.stringify(payload));
+    renderLastActivity();
+  }catch(e){}
+}
+
+function readLastActivity(){
+  try{
+    const raw = localStorage.getItem(LAST_ACTIVITY_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function formatLastActivityTime(ts){
+  if(!ts) return "";
+  const diff = Date.now() - ts;
+  const min = Math.max(1, Math.round(diff / 60000));
+  if(min < 2) return "à l’instant";
+  if(min < 60) return "il y a " + min + " min";
+  const h = Math.round(min / 60);
+  if(h < 24) return "il y a " + h + " h";
+  const d = Math.round(h / 24);
+  return "il y a " + d + " j";
+}
+
+function renderLastActivity(){
+  const card = document.getElementById("homeLiveActivity");
+  const icon = document.getElementById("lastActivityIcon");
+  const label = document.getElementById("lastActivityLabel");
+  const title = document.getElementById("lastActivityTitle");
+  const meta = document.getElementById("lastActivityMeta");
+  const bar = document.getElementById("lastActivityBar");
+
+  if(!card || !icon || !label || !title || !meta || !bar) return;
+
+  const last = readLastActivity();
+
+  if(!last){
+    card.classList.add("empty-live");
+    icon.textContent = "↺";
+    label.textContent = "Votre dernière activité";
+    title.textContent = "Aucune activité pour le moment";
+    meta.textContent = "Commencez par ouvrir une vidéo ou une fiche.";
+    bar.style.width = "0%";
+    return;
+  }
+
+  card.classList.remove("empty-live");
+  icon.textContent = last.icon || "↺";
+  label.textContent = last.type === "video" ? "Dernière vidéo vue"
+    : last.type === "fiche" ? "Dernière fiche consultée"
+    : last.type === "card" ? "Dernière carte ouverte"
+    : "Votre dernière activité";
+
+  title.textContent = last.title || "Activité";
+  meta.textContent = [last.meta, formatLastActivityTime(last.time)].filter(Boolean).join(" · ");
+  bar.style.width = Math.max(8, Math.min(100, Number(last.progress || 58))) + "%";
+}
+
+function openLastActivity(){
+  const last = readLastActivity();
+  if(!last){
+    toast("Aucune activité enregistrée");
+    return;
+  }
+
+  if(last.action === "openTechnique" && last.techniqueId){
+    openTechnique(Number(last.techniqueId));
+    return;
+  }
+
+  if(last.action === "openFiche" && last.techniqueId){
+    currentPlayerTechniqueId = Number(last.techniqueId);
+    openTechniqueTextPage();
+    return;
+  }
+
+  if(last.action === "openCard" && last.techniqueId && typeof openFullCard === "function"){
+    openFullCard(Number(last.techniqueId));
+    return;
+  }
+
+  if(last.techniqueId){
+    openTechnique(Number(last.techniqueId));
+    return;
+  }
+
+  toast("Activité introuvable");
+}
+
+
 document.getElementById("homeCount").textContent = techniques.length;
+renderLastActivity();
 updateCatalogueCounts();
 updateRachisRegionCounts();
 updateMSupRegionCounts();
@@ -10865,6 +11016,81 @@ Embed utilisé : https://player.vimeo.com/video/1198534346?title=0&byline=0&port
 
   .fiche-step-copy p{
     font-size:13.5px;
+  }
+}
+</style>
+
+
+<style>
+/* === ACCUEIL : dernière activité dynamique === */
+.home-live-activity{
+  cursor:pointer !important;
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+.home-live-activity::after{
+  content:"Reprendre";
+  position:absolute;
+  right:16px;
+  top:14px;
+  color:#00e5ff;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  opacity:.9;
+}
+
+.home-live-activity.empty-live::after{
+  content:"";
+}
+
+.home-live-activity .home-live-copy{
+  min-width:0;
+}
+
+.home-live-activity small{
+  color:#aeb8cc !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+  font-size:10px !important;
+  font-weight:900 !important;
+}
+
+.home-live-activity strong{
+  display:block !important;
+  padding-right:72px !important;
+  white-space:normal !important;
+  line-height:1.12 !important;
+}
+
+.home-live-activity span{
+  display:block !important;
+  margin-top:4px !important;
+  color:#aeb8cc !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+}
+
+.home-live-activity.empty-live{
+  opacity:.86;
+}
+
+.home-live-activity.empty-live strong{
+  padding-right:0 !important;
+  color:#dbe8f6 !important;
+}
+
+@media(max-width:430px){
+  .home-live-activity::after{
+    right:14px;
+    top:12px;
+    font-size:9px;
+  }
+
+  .home-live-activity strong{
+    padding-right:64px !important;
   }
 }
 </style>
