@@ -6988,6 +6988,75 @@ button[data-tech-id="12"]{
   border-color:rgba(0,229,255,.34) !important;
 }
 
+
+/* === PATCH VIDÉO PLEIN ÉCRAN === */
+.video-box{position:relative;}
+.video-close-fullscreen{
+  display:none;
+  position:absolute;
+  top:calc(12px + env(safe-area-inset-top,0px));
+  right:12px;
+  z-index:99999;
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  color:#fff;
+  background:rgba(5,15,31,.78);
+  border:1px solid rgba(255,255,255,.26);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  font-size:30px;
+  line-height:1;
+  box-shadow:0 0 22px rgba(0,229,255,.22);
+}
+.video-box.app-fullscreen-video{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:99998 !important;
+  width:100vw !important;
+  height:100dvh !important;
+  margin:0 !important;
+  padding:0 !important;
+  border-radius:0 !important;
+  border:0 !important;
+  background:#000 !important;
+  display:grid !important;
+  place-items:center !important;
+  overflow:hidden !important;
+}
+.video-box.app-fullscreen-video .video-close-fullscreen{
+  display:grid !important;
+  place-items:center !important;
+}
+.video-box.app-fullscreen-video video,
+.video-box.app-fullscreen-video iframe{
+  width:100vw !important;
+  height:100dvh !important;
+  min-height:100dvh !important;
+  max-height:100dvh !important;
+  aspect-ratio:auto !important;
+  object-fit:contain !important;
+  border-radius:0 !important;
+  background:#000 !important;
+}
+.video-fullscreen-open .bottom,
+.video-fullscreen-open .top,
+.video-fullscreen-open .video-premium-actions,
+.video-fullscreen-open .steps{
+  visibility:hidden !important;
+}
+.video-fullscreen-open #videoBox{
+  visibility:visible !important;
+}
+@supports not (height:100dvh){
+  .video-box.app-fullscreen-video,
+  .video-box.app-fullscreen-video video,
+  .video-box.app-fullscreen-video iframe{
+    height:100vh !important;
+    min-height:100vh !important;
+  }
+}
+
 </style>
 
 <link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
@@ -6998,7 +7067,85 @@ button[data-tech-id="12"]{
 <body>
 <main class="app">
 
-<section id="home" class="screen active">
+
+<section id="welcome" class="screen active welcome-screen">
+  <div class="welcome-poster-page">
+    <img
+      class="welcome-poster-img"
+      src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/welcome-presentation.png"
+      data-fallback-src="assets/images/welcome-presentation.png"
+      alt="Présentation Ostéo Pratik"
+      onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';document.querySelector('.welcome-poster-fallback').style.display='grid';}"
+    >
+    <div class="welcome-poster-fallback">
+      <img
+        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+        alt="Ostéo Pratik"
+      >
+      <div class="welcome-blue-line"><i></i></div>
+      <p>Apprenez · Comprenez · Corrigez · Révisez</p>
+    </div>
+
+    <div class="welcome-ambient" aria-hidden="true">
+      <span class="welcome-orb orb-1"></span>
+      <span class="welcome-orb orb-2"></span>
+      <span class="welcome-line line-1"></span>
+      <span class="welcome-line line-2"></span>
+      <span class="welcome-spark spark-1"></span>
+      <span class="welcome-spark spark-2"></span>
+      <span class="welcome-spark spark-3"></span>
+      <span class="welcome-spark spark-4"></span>
+    </div>
+
+    <div class="welcome-poster-actions">
+      <button class="primary welcome-start" onclick="go('home')">Commencer <span>→</span></button>
+      <button class="secondary welcome-signup" onclick="go('signup')">S’inscrire <span>→</span></button>
+      <button class="welcome-login" onclick="toast('Connexion à venir')">J’ai déjà un compte ›</button>
+    </div>
+  </div>
+</section>
+
+<section id="signup" class="screen signup-screen">
+  <header class="top">
+    <button class="icon round" onclick="go('welcome')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Inscription</h1>
+      <p class="subtitle">Accès étudiant</p>
+    </div>
+    <button class="icon" onclick="toast('Compte premium à venir')">✦</button>
+  </header>
+
+  <article class="signup-card">
+    <div class="pill-icon">▱</div>
+    <h2>Créer votre accès Ostéo Pratik</h2>
+    <p>Cette étape permettra ensuite d’ouvrir un accès premium, de suivre la progression et de gérer l’abonnement.</p>
+
+    <label>
+      <span>Nom et prénom</span>
+      <input id="signupName" placeholder="Votre nom">
+    </label>
+
+    <label>
+      <span>Email</span>
+      <input id="signupEmail" type="email" placeholder="votre@email.com">
+    </label>
+
+    <label>
+      <span>Profil</span>
+      <select id="signupProfile">
+        <option>Étudiant en ostéopathie</option>
+        <option>Praticien</option>
+        <option>Enseignant</option>
+      </select>
+    </label>
+
+    <button class="primary" onclick="saveSignupLead()">Préparer mon accès</button>
+    <button class="secondary" onclick="go('home')">Continuer sans compte pour tester</button>
+  </article>
+</section>
+
+
+<section id="home" class="screen">
   <header class="top home-top">
     <button class="icon home-side-icon home-settings" onclick="toast('Réglages')">⌬</button>
 
@@ -7011,6 +7158,8 @@ button[data-tech-id="12"]{
   onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
 >
 <div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
+
+      <div class="osteo-title-blue-line" aria-hidden="true"><i></i></div>
 
       <div class="premium-learning-line" aria-label="Apprenez, Comprenez, Corrigez, Révisez">
         <span>Apprenez</span>
@@ -7323,13 +7472,15 @@ button[data-tech-id="12"]{
   <header class="top"><button class="icon round" onclick="go('techniques')">‹</button><div class="brand"><h1 class="logo">Lecteur</h1><p class="subtitle">Vidéo technique</p></div><button class="icon">♡</button></header>
   <h2 id="playerTitle" class="tech-title">Technique</h2>
   <div id="playerChips" class="chips"></div>
-  <div class="video-box video-box-adaptive">
+  <div id="videoBox" class="video-box video-box-adaptive">
+    <button id="closeFullscreenVideo" class="video-close-fullscreen" onclick="closeVideoFullscreen()" aria-label="Fermer le plein écran">×</button>
     <video id="video" controls playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video>
-    <iframe id="vimeoPlayer" class="vimeo-player" src="" title="Vidéo Vimeo" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    <iframe id="vimeoPlayer" class="vimeo-player" src="" title="Vidéo Vimeo" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" allowfullscreen loading="lazy"></iframe>
   </div>
   <div class="video-premium-actions">
     <button class="secondary" onclick="openTechniqueTextPage()">Texte de la technique</button>
     <button class="secondary" onclick="openTechniqueImagesPage()">Images associées</button>
+    <button class="secondary" onclick="openVideoFullscreen()">⛶ Plein écran</button>
     <button id="openVimeoDirectButton" class="secondary" style="display:none" onclick="window.open('https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci','_blank')">Ouvrir sur Vimeo</button>
   </div>
   
@@ -7784,6 +7935,8 @@ let currentBack = "rachis";
 let currentFilters = null;
 
 function go(id){
+  document.body.classList.toggle("onboarding-open", ["welcome","signup"].includes(id));
+
   document.querySelectorAll(".screen").forEach(s=>{
     s.classList.toggle("active", s.id === id);
     if(s.id === id) s.scrollTop = 0;
@@ -7801,6 +7954,27 @@ function toast(message){
   el.textContent=message; el.classList.add("show");
   clearTimeout(window.toastTimer);
   window.toastTimer=setTimeout(()=>el.classList.remove("show"),1500);
+}
+
+function saveSignupLead(){
+  const name = (document.getElementById("signupName")?.value || "").trim();
+  const email = (document.getElementById("signupEmail")?.value || "").trim();
+  const profile = document.getElementById("signupProfile")?.value || "Étudiant en ostéopathie";
+
+  if(!name || !email){
+    toast("Indiquez au moins un nom et un email");
+    return;
+  }
+
+  localStorage.setItem("osteoPratikLead", JSON.stringify({
+    name,
+    email,
+    profile,
+    date:new Date().toISOString()
+  }));
+
+  toast("Accès préparé");
+  setTimeout(()=>go("home"), 450);
 }
 
 function openSubzone(subzone){
@@ -8118,6 +8292,67 @@ function openTechnique(id){
 
   go("player");
 }
+
+
+/* === PLEIN ÉCRAN VIDÉO === */
+function openVideoFullscreen(){
+  const box = document.getElementById("videoBox");
+  const video = document.getElementById("video");
+  const vimeo = document.getElementById("vimeoPlayer");
+  const current = currentPlayerTechniqueId ? techniques.find(t => Number(t.id) === Number(currentPlayerTechniqueId)) : null;
+
+  if(!box){
+    toast("Lecteur vidéo introuvable");
+    return;
+  }
+
+  box.classList.add("app-fullscreen-video");
+  document.body.classList.add("video-fullscreen-open");
+
+  if(box.requestFullscreen){
+    box.requestFullscreen().catch(()=>{});
+  }else if(box.webkitRequestFullscreen){
+    box.webkitRequestFullscreen();
+  }else if(video && video.webkitEnterFullscreen && video.style.display !== "none"){
+    video.webkitEnterFullscreen();
+  }else if(current && current.directVimeo){
+    window.open(current.directVimeo, "_blank");
+  }else{
+    toast("Mode plein écran activé");
+  }
+
+  if(vimeo && vimeo.style.display !== "none"){
+    vimeo.focus();
+  }
+}
+
+function closeVideoFullscreen(){
+  const box = document.getElementById("videoBox");
+  if(box) box.classList.remove("app-fullscreen-video");
+  document.body.classList.remove("video-fullscreen-open");
+
+  if(document.fullscreenElement && document.exitFullscreen){
+    document.exitFullscreen().catch(()=>{});
+  }else if(document.webkitFullscreenElement && document.webkitExitFullscreen){
+    document.webkitExitFullscreen();
+  }
+}
+
+document.addEventListener("fullscreenchange", ()=>{
+  if(!document.fullscreenElement){
+    const box = document.getElementById("videoBox");
+    if(box) box.classList.remove("app-fullscreen-video");
+    document.body.classList.remove("video-fullscreen-open");
+  }
+});
+
+document.addEventListener("webkitfullscreenchange", ()=>{
+  if(!document.webkitFullscreenElement){
+    const box = document.getElementById("videoBox");
+    if(box) box.classList.remove("app-fullscreen-video");
+    document.body.classList.remove("video-fullscreen-open");
+  }
+});
 
 
 /* === FICHES TEXTE / IMAGES PAR VIDÉO === */
@@ -8955,360 +9190,6 @@ renderTechniques();
 <script>
 console.log("OSTÉO PRATIK debug: modules rachis / membres supérieurs / membres inférieurs / bassin actifs");
 </script>
-
-
-<style>
-/* === PATCH FINAL HEADER : titre centré sans chevauchement === */
-/* Objectif : titre plus grand, bien centré, sans toucher au reste de la maquette. */
-
-#home .top{
-  position:relative !important;
-  display:grid !important;
-  grid-template-columns:46px minmax(0,1fr) 46px !important;
-  align-items:start !important;
-  gap:10px !important;
-  min-height:168px !important;
-  margin-bottom:0 !important;
-  padding-top:4px !important;
-  overflow:visible !important;
-}
-
-#home .top > .icon{
-  position:relative !important;
-  z-index:3 !important;
-  width:46px !important;
-  height:46px !important;
-  margin-top:12px !important;
-}
-
-#home .top .brand{
-  position:absolute !important;
-  left:50% !important;
-  top:0 !important;
-  transform:translateX(-50%) !important;
-  width:min(390px, 86vw) !important;
-  height:160px !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-  text-align:center !important;
-  overflow:visible !important;
-  z-index:1 !important;
-}
-
-#home .brand-title-webp{
-  display:block !important;
-  width:min(360px, 82vw) !important;
-  max-width:360px !important;
-  height:auto !important;
-  max-height:118px !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  margin:0 auto !important;
-  transform:none !important;
-  border:0 !important;
-  outline:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  filter:drop-shadow(0 0 18px rgba(0,229,255,.22)) !important;
-}
-
-#home .brand-title-fallback{
-  display:none;
-  font-size:38px !important;
-  line-height:1 !important;
-  font-weight:950 !important;
-}
-
-#home .brand .subtitle{
-  margin:6px 0 0 !important;
-  font-size:15px !important;
-  line-height:1.12 !important;
-  color:#dbe8f6 !important;
-  text-align:center !important;
-  width:100% !important;
-  position:relative !important;
-  z-index:2 !important;
-}
-
-#home .premium-learning-line{
-  position:relative !important;
-  z-index:2 !important;
-  margin:0 0 16px !important;
-  padding:0 4px 4px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:9px !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-}
-
-#home .premium-learning-line span{
-  font-size:15.5px !important;
-  font-weight:850 !important;
-  letter-spacing:.01em !important;
-  white-space:nowrap !important;
-  color:#ffffff !important;
-  text-align:center !important;
-}
-
-#home .premium-learning-line .sep{
-  color:#39dfff !important;
-  font-size:10px !important;
-  opacity:.9 !important;
-}
-
-@media(max-width:430px){
-  #home .top{
-    min-height:160px !important;
-  }
-
-  #home .top .brand{
-    width:min(360px, 86vw) !important;
-    height:152px !important;
-  }
-
-  #home .brand-title-webp{
-    width:min(335px, 80vw) !important;
-    max-width:335px !important;
-    max-height:112px !important;
-  }
-
-  #home .brand .subtitle{
-    font-size:14.5px !important;
-  }
-
-  #home .premium-learning-line{
-    gap:8px !important;
-  }
-
-  #home .premium-learning-line span{
-    font-size:14.2px !important;
-  }
-}
-
-@media(max-width:380px){
-  #home .top{
-    min-height:150px !important;
-  }
-
-  #home .top .brand{
-    width:min(330px, 86vw) !important;
-    height:142px !important;
-  }
-
-  #home .brand-title-webp{
-    width:min(305px, 78vw) !important;
-    max-width:305px !important;
-    max-height:104px !important;
-  }
-
-  #home .brand .subtitle{
-    font-size:13.5px !important;
-  }
-
-  #home .premium-learning-line{
-    gap:6px !important;
-  }
-
-  #home .premium-learning-line span{
-    font-size:12.8px !important;
-  }
-
-  #home .premium-learning-line .sep{
-    font-size:9px !important;
-  }
-}
-</style>
-
-
-<style>
-/* === HEADER ACCUEIL FINAL === */
-/* Ordre demandé :
-   1. Titre plus gros et centré
-   2. Apprenez · Comprenez · Corrigez · Révisez juste en dessous
-   3. Que voulez-vous faire ? en dessous
-   4. Boutons gauche/droite alignés sur cette dernière ligne
-*/
-
-#home .home-top{
-  position:relative !important;
-  display:block !important;
-  min-height:178px !important;
-  margin:0 0 10px !important;
-  padding:0 !important;
-  overflow:visible !important;
-}
-
-#home .home-brand{
-  position:static !important;
-  transform:none !important;
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  align-items:center !important;
-  justify-content:flex-start !important;
-  text-align:center !important;
-  overflow:visible !important;
-  z-index:1 !important;
-}
-
-#home .brand-title-webp{
-  display:block !important;
-  width:min(385px, 91vw) !important;
-  max-width:385px !important;
-  height:auto !important;
-  max-height:122px !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  margin:-4px auto 0 !important;
-  transform:none !important;
-  border:0 !important;
-  outline:0 !important;
-  background:transparent !important;
-  box-shadow:none !important;
-  filter:drop-shadow(0 0 18px rgba(0,229,255,.24)) !important;
-}
-
-#home .brand-title-fallback{
-  display:none;
-  font-size:42px !important;
-  line-height:1 !important;
-  font-weight:950 !important;
-  margin:14px auto 4px !important;
-}
-
-#home .premium-learning-line{
-  position:static !important;
-  z-index:2 !important;
-  margin:-2px auto 12px !important;
-  padding:0 !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:9px !important;
-  flex-wrap:nowrap !important;
-  width:100% !important;
-  background:transparent !important;
-  border:0 !important;
-  box-shadow:none !important;
-  text-align:center !important;
-}
-
-#home .premium-learning-line span{
-  font-size:15.8px !important;
-  line-height:1 !important;
-  font-weight:850 !important;
-  letter-spacing:.01em !important;
-  color:#ffffff !important;
-  white-space:nowrap !important;
-  text-shadow:0 0 14px rgba(255,255,255,.06), 0 0 20px rgba(0,229,255,.08) !important;
-}
-
-#home .premium-learning-line .sep{
-  color:#39dfff !important;
-  font-size:10px !important;
-  line-height:1 !important;
-  opacity:.92 !important;
-}
-
-#home .home-brand .subtitle{
-  margin:0 auto !important;
-  padding:0 58px !important;
-  width:100% !important;
-  min-height:46px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  text-align:center !important;
-  color:#dbe8f6 !important;
-  font-size:15px !important;
-  line-height:1.15 !important;
-}
-
-#home .home-side-icon{
-  position:absolute !important;
-  top:auto !important;
-  bottom:0 !important;
-  z-index:5 !important;
-  width:46px !important;
-  height:46px !important;
-  margin:0 !important;
-}
-
-#home .home-settings{
-  left:0 !important;
-}
-
-#home .home-notifications{
-  right:0 !important;
-}
-
-@media(max-width:430px){
-  #home .home-top{
-    min-height:170px !important;
-  }
-
-  #home .brand-title-webp{
-    width:min(365px, 89vw) !important;
-    max-width:365px !important;
-    max-height:116px !important;
-  }
-
-  #home .premium-learning-line{
-    gap:8px !important;
-    margin:-1px auto 10px !important;
-  }
-
-  #home .premium-learning-line span{
-    font-size:14.5px !important;
-  }
-
-  #home .home-brand .subtitle{
-    font-size:14.5px !important;
-  }
-}
-
-@media(max-width:380px){
-  #home .home-top{
-    min-height:162px !important;
-  }
-
-  #home .brand-title-webp{
-    width:min(338px, 87vw) !important;
-    max-width:338px !important;
-    max-height:108px !important;
-  }
-
-  #home .premium-learning-line{
-    gap:6px !important;
-  }
-
-  #home .premium-learning-line span{
-    font-size:13px !important;
-    letter-spacing:0 !important;
-  }
-
-  #home .premium-learning-line .sep{
-    font-size:9px !important;
-  }
-
-  #home .home-brand .subtitle{
-    font-size:13.5px !important;
-    padding:0 54px !important;
-  }
-
-  #home .home-side-icon{
-    width:44px !important;
-    height:44px !important;
-  }
-}
-</style>
 
 
 <style>
@@ -10892,6 +10773,924 @@ Embed utilisé : https://player.vimeo.com/video/1198534346?title=0&byline=0&port
 
   .fiche-step-copy p{
     font-size:13.5px;
+  }
+}
+</style>
+
+
+
+<style>
+/* === HEADER ACCUEIL NETTOYÉ — structure unique === */
+/* Objectif : 1 picto gauche / titre parfaitement centré / 1 picto droite.
+   Aucun positionnement absolu parasite sur le bloc titre. */
+
+#home .home-top{
+  display:grid !important;
+  grid-template-columns:54px minmax(0,1fr) 54px !important;
+  align-items:start !important;
+  gap:8px !important;
+  min-height:166px !important;
+  margin:0 0 8px !important;
+  padding:0 !important;
+  position:relative !important;
+  overflow:visible !important;
+}
+
+#home .home-side-icon{
+  position:relative !important;
+  top:20px !important;
+  bottom:auto !important;
+  left:auto !important;
+  right:auto !important;
+  width:46px !important;
+  height:46px !important;
+  margin:0 !important;
+  z-index:5 !important;
+}
+
+#home .home-settings{
+  grid-column:1 !important;
+  justify-self:start !important;
+}
+
+#home .home-notifications{
+  grid-column:3 !important;
+  justify-self:end !important;
+}
+
+#home .home-brand{
+  grid-column:2 !important;
+  width:100% !important;
+  max-width:none !important;
+  min-width:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  transform:none !important;
+  position:relative !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  text-align:center !important;
+  overflow:visible !important;
+}
+
+/* Le logo est centré dans la colonne centrale, pas dépendant des pictos */
+#home .brand-title-webp{
+  display:block !important;
+  width:min(300px, 100%) !important;
+  max-width:300px !important;
+  height:auto !important;
+  max-height:98px !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  margin:-1px auto -11px !important;
+  transform:none !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+  filter:drop-shadow(0 0 16px rgba(0,229,255,.24)) !important;
+}
+
+#home .brand-title-fallback{
+  display:none;
+  margin:8px auto -7px !important;
+  font-size:40px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  color:#fff !important;
+}
+
+#home .brand-title-fallback span{
+  color:var(--cyan) !important;
+}
+
+/* Ligne bleue remontée : sous le titre, centrée dans la même colonne */
+#home .osteo-title-blue-line{
+  position:relative !important;
+  display:block !important;
+  width:min(210px, 82%) !important;
+  height:9px !important;
+  margin:-8px auto 8px !important;
+  pointer-events:none !important;
+}
+
+#home .osteo-title-blue-line::before{
+  content:"" !important;
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:100% !important;
+  height:2px !important;
+  transform:translate(-50%,-50%) !important;
+  border-radius:999px !important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(0,229,255,.16) 10%,
+    rgba(0,229,255,.95) 48%,
+    rgba(103,175,255,.95) 52%,
+    rgba(0,229,255,.16) 90%,
+    transparent 100%) !important;
+  box-shadow:0 0 10px rgba(0,229,255,.62), 0 0 24px rgba(45,140,255,.30) !important;
+}
+
+#home .osteo-title-blue-line i{
+  position:absolute !important;
+  left:50% !important;
+  top:50% !important;
+  width:42px !important;
+  height:6px !important;
+  transform:translate(-50%,-50%) !important;
+  border-radius:999px !important;
+  background:radial-gradient(circle, rgba(246,251,255,.95) 0%, rgba(0,229,255,.92) 34%, rgba(45,140,255,.18) 72%, transparent 100%) !important;
+  box-shadow:0 0 16px rgba(0,229,255,.70) !important;
+  display:block !important;
+}
+
+/* Baseline resserrée et centrée sous la ligne */
+#home .premium-learning-line{
+  position:relative !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  flex-wrap:nowrap !important;
+  white-space:nowrap !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 auto 9px !important;
+  padding:0 !important;
+  transform:none !important;
+  text-align:center !important;
+  background:transparent !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+
+#home .premium-learning-line span{
+  display:inline-block !important;
+  color:#fff !important;
+  font-size:12.8px !important;
+  line-height:1 !important;
+  font-weight:850 !important;
+  letter-spacing:-.02em !important;
+  text-shadow:0 0 12px rgba(0,229,255,.12) !important;
+}
+
+#home .premium-learning-line .sep{
+  color:#49dfff !important;
+  font-size:7.5px !important;
+  line-height:1 !important;
+  margin:0 !important;
+  opacity:.95 !important;
+}
+
+#home .home-brand .subtitle{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:100% !important;
+  min-height:28px !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  color:#dbe8f6 !important;
+  font-size:14.4px !important;
+  line-height:1.1 !important;
+  text-align:center !important;
+}
+
+@media(max-width:430px){
+  #home .home-top{
+    grid-template-columns:50px minmax(0,1fr) 50px !important;
+    gap:6px !important;
+    min-height:162px !important;
+  }
+
+  #home .home-side-icon{
+    top:19px !important;
+    width:44px !important;
+    height:44px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(280px, 100%) !important;
+    max-width:280px !important;
+    max-height:92px !important;
+    margin:-1px auto -10px !important;
+  }
+
+  #home .osteo-title-blue-line{
+    width:min(195px, 80%) !important;
+    margin:-7px auto 8px !important;
+  }
+
+  #home .premium-learning-line{
+    gap:3px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:12px !important;
+  }
+
+  #home .home-brand .subtitle{
+    font-size:13.7px !important;
+  }
+}
+
+@media(max-width:380px){
+  #home .home-top{
+    grid-template-columns:46px minmax(0,1fr) 46px !important;
+    min-height:158px !important;
+  }
+
+  #home .home-side-icon{
+    top:18px !important;
+    width:42px !important;
+    height:42px !important;
+  }
+
+  #home .brand-title-webp{
+    width:min(255px, 100%) !important;
+    max-width:255px !important;
+    max-height:86px !important;
+  }
+
+  #home .premium-learning-line span{
+    font-size:11.3px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === PAGE DE PRÉSENTATION / ONBOARDING === */
+body.onboarding-open .bottom{
+  display:none !important;
+}
+
+.welcome-screen,
+.signup-screen{
+  padding-bottom:calc(26px + var(--safe-bottom)) !important;
+}
+
+.welcome-shell{
+  min-height:calc(100dvh - 36px - var(--safe-top) - var(--safe-bottom));
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:12px;
+  padding:8px 0 0;
+}
+
+.welcome-logo-wrap{
+  text-align:center;
+  margin:0 auto;
+}
+
+.welcome-logo{
+  display:block;
+  width:min(330px, 82vw);
+  max-height:126px;
+  object-fit:contain;
+  margin:0 auto -10px;
+  filter:drop-shadow(0 0 20px rgba(0,229,255,.24));
+}
+
+.welcome-logo-fallback{
+  display:none;
+  color:#fff;
+  font-size:44px;
+  font-weight:950;
+  line-height:1;
+}
+
+.welcome-logo-fallback span{
+  color:var(--cyan);
+}
+
+.welcome-blue-line{
+  position:relative;
+  width:min(260px, 70vw);
+  height:12px;
+  margin:-6px auto 8px;
+}
+
+.welcome-blue-line::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:100%;
+  height:2px;
+  transform:translate(-50%,-50%);
+  border-radius:999px;
+  background:linear-gradient(90deg, transparent, rgba(0,229,255,.92), rgba(103,175,255,.92), transparent);
+  box-shadow:0 0 12px rgba(0,229,255,.70),0 0 26px rgba(45,140,255,.32);
+}
+
+.welcome-blue-line i{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:48px;
+  height:6px;
+  transform:translate(-50%,-50%);
+  border-radius:999px;
+  background:radial-gradient(circle, #fff 0%, rgba(0,229,255,.9) 38%, transparent 78%);
+  box-shadow:0 0 18px rgba(0,229,255,.70);
+}
+
+.welcome-baseline{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+  color:#fff;
+  font-size:15px;
+  font-weight:850;
+  letter-spacing:-.01em;
+}
+
+.welcome-baseline b{
+  color:#42dfff;
+  font-size:9px;
+}
+
+.welcome-visual{
+  position:relative;
+  min-height:305px;
+  display:grid;
+  place-items:center;
+  margin:2px 0 0;
+  overflow:hidden;
+}
+
+.welcome-orbit{
+  position:absolute;
+  width:315px;
+  height:315px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.26);
+  box-shadow:
+    0 0 36px rgba(0,229,255,.18),
+    inset 0 0 34px rgba(0,229,255,.08);
+  animation:welcomeSpin 10s linear infinite;
+}
+
+.welcome-orbit::before,
+.welcome-orbit::after{
+  content:"";
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#00e5ff;
+  box-shadow:0 0 18px #00e5ff;
+}
+
+.welcome-orbit::before{
+  left:28px;
+  top:74px;
+}
+
+.welcome-orbit::after{
+  right:22px;
+  bottom:92px;
+}
+
+.welcome-body{
+  position:relative;
+  width:245px;
+  height:300px;
+  display:grid;
+  place-items:center;
+  opacity:.9;
+  mix-blend-mode:screen;
+}
+
+.welcome-body img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 0 28px rgba(0,229,255,.30));
+}
+
+.welcome-body-fallback{
+  display:none;
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  place-items:center;
+  color:#00e5ff;
+  border:2px solid #00e5ff;
+  font-size:42px;
+  font-weight:950;
+  box-shadow:0 0 32px rgba(0,229,255,.38);
+}
+
+.welcome-op-medallion{
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#5eeaff;
+  border:2px solid rgba(180,245,255,.92);
+  background:rgba(5,15,31,.74);
+  box-shadow:
+    0 0 28px rgba(0,229,255,.50),
+    inset 0 0 22px rgba(0,229,255,.18);
+  font-size:29px;
+  font-weight:950;
+  letter-spacing:-.08em;
+}
+
+.welcome-copy h1{
+  margin:0 auto;
+  max-width:345px;
+  text-align:center;
+  color:#fff;
+  font-size:24px;
+  line-height:1.18;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+
+.welcome-copy h1::first-letter{
+  color:inherit;
+}
+
+.welcome-benefits{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+  border-radius:24px;
+  border:1px solid rgba(0,229,255,.22);
+  background:rgba(5,15,31,.58);
+  box-shadow:0 0 26px rgba(0,229,255,.12), inset 0 1px 0 rgba(255,255,255,.05);
+  overflow:hidden;
+}
+
+.welcome-benefits div{
+  min-height:72px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:8px 7px;
+  text-align:center;
+  border-right:1px solid rgba(0,229,255,.18);
+}
+
+.welcome-benefits div:last-child{
+  border-right:0;
+}
+
+.welcome-benefits strong{
+  color:#39dfff;
+  font-size:24px;
+  line-height:1;
+}
+
+.welcome-benefits span{
+  color:#e6effb;
+  font-size:12px;
+  line-height:1.12;
+  font-weight:750;
+}
+
+.welcome-actions{
+  display:grid;
+  gap:10px;
+}
+
+.welcome-actions button{
+  min-height:56px;
+  border-radius:20px;
+  font-size:20px;
+}
+
+.welcome-actions button span{
+  float:right;
+  font-size:25px;
+}
+
+.welcome-start{
+  box-shadow:0 0 28px rgba(0,229,255,.34);
+}
+
+.welcome-signup{
+  width:100%;
+  border:1px solid rgba(0,229,255,.70) !important;
+  background:rgba(5,15,31,.58) !important;
+  color:#fff !important;
+  font-weight:900 !important;
+}
+
+.welcome-login{
+  min-height:38px !important;
+  color:#30dfff !important;
+  font-size:16px !important;
+  font-weight:850 !important;
+}
+
+.signup-card{
+  padding:18px;
+  border-radius:28px;
+  border:1px solid rgba(0,229,255,.24);
+  background:
+    radial-gradient(circle at 82% 20%, rgba(0,229,255,.13), transparent 34%),
+    linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));
+  box-shadow:0 18px 55px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.signup-card .pill-icon{
+  margin:0 auto 12px;
+}
+
+.signup-card h2{
+  margin:0;
+  text-align:center;
+  font-size:25px;
+  line-height:1.08;
+}
+
+.signup-card p{
+  margin:10px 0 18px;
+  color:var(--muted);
+  text-align:center;
+  font-size:14px;
+  line-height:1.35;
+}
+
+.signup-card label{
+  display:block;
+  margin:0 0 12px;
+}
+
+.signup-card label span{
+  display:block;
+  color:#dbe8f6;
+  font-size:12px;
+  font-weight:850;
+  margin:0 0 6px;
+}
+
+.signup-card input,
+.signup-card select{
+  width:100%;
+  min-height:52px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(255,255,255,.045);
+  color:#fff;
+  padding:0 13px;
+  outline:0;
+}
+
+.signup-card select option{
+  color:#111;
+}
+
+.signup-card .primary{
+  margin-top:8px;
+}
+
+.signup-card .secondary{
+  width:100%;
+  margin-top:10px;
+}
+
+@keyframes welcomeSpin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+
+@media(max-width:430px){
+  .welcome-shell{
+    gap:10px;
+  }
+
+  .welcome-logo{
+    width:min(305px, 80vw);
+    max-height:116px;
+  }
+
+  .welcome-baseline{
+    font-size:13.8px;
+    gap:5px;
+  }
+
+  .welcome-visual{
+    min-height:285px;
+  }
+
+  .welcome-orbit{
+    width:292px;
+    height:292px;
+  }
+
+  .welcome-body{
+    width:230px;
+    height:280px;
+  }
+
+  .welcome-copy h1{
+    font-size:22px;
+    max-width:325px;
+  }
+
+  .welcome-actions button{
+    min-height:54px;
+    font-size:19px;
+  }
+}
+
+@media(max-width:380px){
+  .welcome-logo{
+    width:min(280px, 78vw);
+  }
+
+  .welcome-baseline{
+    font-size:12.5px;
+    gap:4px;
+  }
+
+  .welcome-visual{
+    min-height:260px;
+  }
+
+  .welcome-orbit{
+    width:260px;
+    height:260px;
+  }
+
+  .welcome-body{
+    width:205px;
+    height:250px;
+  }
+
+  .welcome-op-medallion{
+    width:82px;
+    height:82px;
+    font-size:25px;
+  }
+
+  .welcome-copy h1{
+    font-size:20px;
+  }
+
+  .welcome-benefits span{
+    font-size:10.8px;
+  }
+}
+</style>
+
+
+<style>
+/* === FIX CODEPEN : page présentation en image légère, sans base64 === */
+.welcome-screen{
+  padding:0 !important;
+  overflow:hidden !important;
+  background:#020714 !important;
+}
+
+.welcome-poster-page{
+  position:relative;
+  width:100%;
+  min-height:100dvh;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(0,229,255,.14), transparent 34%),
+    linear-gradient(180deg,#020714,#061a33 52%,#020714);
+}
+
+.welcome-poster-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center top;
+  z-index:0;
+}
+
+.welcome-poster-page::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(180deg, rgba(2,7,20,0) 0%, rgba(2,7,20,.08) 48%, rgba(2,7,20,.72) 78%, rgba(2,7,20,.96) 100%);
+}
+
+
+.welcome-poster-img{
+  animation:welcomePosterBreath 18s ease-in-out infinite alternate;
+  transform-origin:center top;
+  filter:saturate(1.03) contrast(1.02);
+}
+
+.welcome-ambient{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+.welcome-orb,
+.welcome-line,
+.welcome-spark{
+  position:absolute;
+  display:block;
+}
+
+.welcome-orb{
+  border-radius:999px;
+  filter:blur(10px);
+  opacity:.55;
+  mix-blend-mode:screen;
+}
+
+.welcome-orb.orb-1{
+  width:180px;
+  height:180px;
+  left:-30px;
+  top:16%;
+  background:radial-gradient(circle, rgba(0,229,255,.26) 0%, rgba(0,229,255,.08) 45%, rgba(0,229,255,0) 72%);
+  animation:welcomeFloatOne 12s ease-in-out infinite;
+}
+
+.welcome-orb.orb-2{
+  width:220px;
+  height:220px;
+  right:-50px;
+  top:8%;
+  background:radial-gradient(circle, rgba(129,255,231,.22) 0%, rgba(129,255,231,.06) 42%, rgba(129,255,231,0) 74%);
+  animation:welcomeFloatTwo 15s ease-in-out infinite;
+}
+
+.welcome-line{
+  left:50%;
+  transform:translateX(-50%);
+  border-radius:999px;
+  opacity:.85;
+}
+
+.welcome-line.line-1{
+  top:17%;
+  width:min(360px,72vw);
+  height:3px;
+  background:linear-gradient(90deg, rgba(0,229,255,0), rgba(0,229,255,.95), rgba(255,255,255,.95), rgba(0,229,255,.95), rgba(0,229,255,0));
+  box-shadow:0 0 18px rgba(0,229,255,.45);
+  animation:welcomePulseLine 4.2s ease-in-out infinite;
+}
+
+.welcome-line.line-2{
+  top:18.6%;
+  width:min(220px,50vw);
+  height:1px;
+  background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.9), rgba(255,255,255,0));
+  opacity:.55;
+  animation:welcomePulseLineTwo 5.3s ease-in-out infinite;
+}
+
+.welcome-spark{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(182,246,255,.9);
+  box-shadow:0 0 10px rgba(0,229,255,.7);
+  opacity:0;
+}
+
+.welcome-spark.spark-1{ left:22%; top:22%; animation:welcomeSpark 5.5s linear infinite .2s; }
+.welcome-spark.spark-2{ left:77%; top:26%; animation:welcomeSpark 6.2s linear infinite 1.1s; }
+.welcome-spark.spark-3{ left:30%; top:38%; animation:welcomeSpark 5.8s linear infinite 2.2s; }
+.welcome-spark.spark-4{ left:70%; top:42%; animation:welcomeSpark 6.6s linear infinite 3s; }
+
+@keyframes welcomePosterBreath{
+  0%{ transform:scale(1) translateY(0); }
+  100%{ transform:scale(1.045) translateY(-8px); }
+}
+
+@keyframes welcomeFloatOne{
+  0%,100%{ transform:translate3d(0,0,0); opacity:.42; }
+  50%{ transform:translate3d(26px,-14px,0); opacity:.62; }
+}
+
+@keyframes welcomeFloatTwo{
+  0%,100%{ transform:translate3d(0,0,0); opacity:.32; }
+  50%{ transform:translate3d(-22px,16px,0); opacity:.54; }
+}
+
+@keyframes welcomePulseLine{
+  0%,100%{ opacity:.58; transform:translateX(-50%) scaleX(.96); }
+  50%{ opacity:1; transform:translateX(-50%) scaleX(1.03); }
+}
+
+@keyframes welcomePulseLineTwo{
+  0%,100%{ opacity:.25; transform:translateX(-50%) scaleX(.92); }
+  50%{ opacity:.7; transform:translateX(-50%) scaleX(1.06); }
+}
+
+@keyframes welcomeSpark{
+  0%{ transform:translateY(0) scale(.35); opacity:0; }
+  18%{ opacity:.85; }
+  100%{ transform:translateY(-22px) scale(1); opacity:0; }
+}
+
+.welcome-poster-fallback{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:none;
+  place-items:center;
+  text-align:center;
+  padding:30px;
+}
+
+.welcome-poster-fallback img{
+  width:min(330px,82vw);
+  height:auto;
+  filter:drop-shadow(0 0 20px rgba(0,229,255,.26));
+}
+
+.welcome-poster-fallback p{
+  color:#fff;
+  font-size:18px;
+  font-weight:850;
+}
+
+.welcome-poster-actions{
+  position:relative;
+  z-index:2;
+  width:min(360px, calc(100vw - 36px));
+  display:grid;
+  gap:12px;
+  padding:0 0 calc(28px + var(--safe-bottom));
+}
+
+.welcome-poster-actions .welcome-start,
+.welcome-poster-actions .welcome-signup{
+  min-height:58px;
+  border-radius:20px;
+  font-size:20px;
+  font-weight:900;
+}
+
+.welcome-poster-actions .welcome-start span,
+.welcome-poster-actions .welcome-signup span{
+  float:right;
+  font-size:25px;
+}
+
+.welcome-poster-actions .welcome-signup{
+  border:1px solid rgba(0,229,255,.70) !important;
+  background:rgba(5,15,31,.52) !important;
+  color:#fff !important;
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+
+.welcome-poster-actions .welcome-login{
+  min-height:40px !important;
+  color:#8fefff !important;
+  font-size:16px !important;
+  font-weight:850 !important;
+  background:rgba(4,14,30,.34) !important;
+  border-radius:14px !important;
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+
+body.onboarding-open .bottom{
+  display:none !important;
+}
+
+@media(max-width:430px){
+  .welcome-poster-actions{
+    width:min(340px, calc(100vw - 32px));
+    gap:10px;
+    padding-bottom:calc(22px + var(--safe-bottom));
+  }
+
+  .welcome-poster-actions .welcome-start,
+  .welcome-poster-actions .welcome-signup{
+    min-height:56px;
+    font-size:19px;
   }
 }
 </style>
