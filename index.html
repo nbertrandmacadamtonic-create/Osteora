@@ -7188,13 +7188,22 @@ button[data-tech-id="12"]{
     <div class="body-center home-personnage">
       <img src="assets/images/home-personnage.webp" alt="">
     </div>
-    <button class="orbit-card videos" onclick="go('videoMap')"><div class="orbit-icon">▷</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon">▤</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card quiz" onclick="go('quiz')"><div class="orbit-icon">◎</div><strong><span class="main-word">Tester</span><span class="sub-word">mes connaissances</span></strong><em class="orbit-arrow">›</em></button>
-    <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon">↗</div><strong><span class="main-word">Suivre</span><span class="sub-word">ma progression</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card videos" onclick="go('videoMap')"><div class="orbit-icon home-icon-video">▶</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon home-icon-revision">↻</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card quiz" onclick="go('quiz')"><div class="orbit-icon home-icon-acquis">✓</div><strong><span class="main-word">Tester</span><span class="sub-word">mes acquis</span></strong><em class="orbit-arrow">›</em></button>
+    <button class="orbit-card progress" onclick="go('progress')"><div class="orbit-icon home-icon-stats"><i></i><i></i><i></i></div><strong><span class="main-word">Stats</span><span class="sub-word">mes statistiques</span></strong><em class="orbit-arrow">›</em></button>
     <button class="center-button" onclick="toast('OSTÉO PRATIK')">⌬</button>
   </section>
-  <article class="last-card"><div class="pill-icon">↺</div><div><small>Votre dernière pratique</small><strong>Dysfonction facettaire des dorsales</strong><span>Rachis</span><div class="bar"><i style="width:58%"></i></div></div><b id="homeCount">0</b></article>
+  <article id="lastPracticeCard" class="last-card last-practice-active" role="button" tabindex="0" onclick="openLastPractice()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openLastPractice();}">
+    <div class="pill-icon">↺</div>
+    <div>
+      <small id="lastPracticeLabel">Votre dernière pratique</small>
+      <strong id="lastPracticeTitle">Aucune pratique récente</strong>
+      <span id="lastPracticeZone">Commencer</span>
+      <div class="bar"><i id="lastPracticeBar" style="width:0%"></i></div>
+    </div>
+    <b id="homeCount">0<small>vues</small></b>
+  </article>
 </section>
 
 <section id="videoMap" class="screen video-map-screen">
@@ -7387,70 +7396,79 @@ button[data-tech-id="12"]{
   </article>
 </section>
 
-<section id="zones" class="screen">
+
+<section id="zones" class="screen catalogue-premium-screen">
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <h1 class="logo">Catalogue</h1>
-      <p class="subtitle">128 techniques</p>
+      <img
+        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+        data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+        alt="Ostéo Pratik"
+        class="brand-title-webp"
+        onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+      >
+      <div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
     </div>
-    <button class="icon" onclick="toast('Catalogue par grandes régions')">i</button>
+    <button class="icon" onclick="toast('Recherche globale et grandes régions')">⌕</button>
   </header>
 
-  <div class="page-title">
-    <h1>Catalogue des techniques</h1>
-    <p>Choisissez une grande région pour afficher toutes les techniques correspondantes.</p>
+  <div class="catalogue-premium-title">
+    <div>
+      <h1>Catalogue</h1>
+      <p>128 techniques structurelles</p>
+    </div>
+    <div class="catalogue-premium-badge">
+      <strong>128</strong>
+      <span>techniques</span>
+    </div>
   </div>
 
-  <section class="catalogue-grid">
-    <button class="catalogue-card cyan" onclick="openZone('Rachis')">
-      <div class="catalogue-icon">⌇</div>
-      <div>
-        <strong>Rachis</strong>
-        <p>Cervicales · dorsales · côtes · lombaires</p>
-      </div>
-      <b id="countRachis">60</b>
-      <em>sous-menu ›</em>
+  <section class="catalogue-search-card catalogue-search-card-premium">
+    <label class="search catalogue-search">
+      <span>⌕</span>
+      <input id="catalogueSearchInput" placeholder="Rechercher une technique, une zone ou une articulation" oninput="renderCatalogueSearch()">
+      <button type="button" onclick="clearCatalogueSearch()" aria-label="Effacer">×</button>
+    </label>
+    <div class="catalogue-search-hint">Exemple : cervicale, lombaire, cheville, valgus, côte, bassin…</div>
+    <div id="catalogueSearchResults" class="catalogue-search-results"></div>
+  </section>
+
+  <section class="catalogue-anatomy-premium">
+    <div class="catalogue-anatomy-bg" aria-hidden="true">
+      <span class="cat-ring r1"></span>
+      <span class="cat-ring r2"></span>
+      <span class="cat-pulse p1"></span>
+      <span class="cat-pulse p2"></span>
+      <span class="cat-pulse p3"></span>
+    </div>
+
+    <div class="catalogue-zone-figure" aria-hidden="true">
+      <img src="assets/images/video-zone-person.png" alt="">
+    </div>
+
+    <button class="catalogue-zone-pill pill-rachis" onclick="openZoneAll('Rachis')">
+      <b>Rachis</b>
+      <span>60</span>
     </button>
 
-    <button class="catalogue-card orange" onclick="openZoneAll('Bassin')">
-      <div class="catalogue-icon">◡</div>
-      <div>
-        <strong>Bassin</strong>
-        <p>Ilium · sacrum · symphyse pubienne</p>
-      </div>
-      <b id="countBassin">20</b>
-      <em>techniques ›</em>
+    <button class="catalogue-zone-pill pill-msup" onclick="openZoneAll('Membres supérieurs')">
+      <b>Membres sup.</b>
+      <span>17</span>
     </button>
 
-    <button class="catalogue-card violet" onclick="openZoneAll('Membres supérieurs')">
-      <div class="catalogue-icon">◜</div>
-      <div>
-        <strong>Membre supérieur</strong>
-        <p>Clavicule · épaule · coude · poignet · main</p>
-      </div>
-      <b id="countMSup">17</b>
-      <em>techniques ›</em>
+    <button class="catalogue-zone-pill pill-bassin" onclick="openZoneAll('Bassin')">
+      <b>Bassin</b>
+      <span>20</span>
     </button>
 
-    <button class="catalogue-card green" onclick="openZoneAll('Membres inférieurs')">
-      <div class="catalogue-icon">◟</div>
-      <div>
-        <strong>Membre inférieur</strong>
-        <p>Hanche · genou · tibia-fibula · cheville · pied</p>
-      </div>
-      <b id="countMInf">31</b>
-      <em>techniques ›</em>
+    <button class="catalogue-zone-pill pill-minf" onclick="openZoneAll('Membres inférieurs')">
+      <b>Membres inf.</b>
+      <span>31</span>
     </button>
   </section>
 
-  <article class="catalogue-total">
-    <div class="pill-icon">128</div>
-    <div>
-      <strong>Total catalogue</strong>
-      <p>Les techniques sont ensuite filtrables par recherche dans chaque grande région.</p>
-    </div>
-  </article>
+
 </section>
 
 <section id="rachis" class="screen">
@@ -7580,7 +7598,7 @@ button[data-tech-id="12"]{
     <button class="revision-orbit-card revision-random" onclick="openRevisionWheel()">
       <div class="revision-orbit-icon">⇄</div>
       <strong>Aléatoire</strong>
-      <small>ordre aléatoire</small>
+      <small>fais tourner</small>
     </button>
 
     <button class="revision-orbit-card revision-zone" onclick="go('zones')">
@@ -7603,6 +7621,8 @@ button[data-tech-id="12"]{
 
     <div class="revision-orbit-center">▱</div>
   </div>
+
+  <div class="revision-scroll-spacer" aria-hidden="true"></div>
 </section>
 
 
@@ -7713,7 +7733,178 @@ button[data-tech-id="12"]{
 </section>
 
 <section id="quiz" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Quiz</h1><p class="subtitle">Question 1 / 20</p></div><button class="icon">✓</button></header><div class="quizbar"><i style="width:35%"></i></div><article class="quiz-card"><h2>Quelle est la première étape essentielle avant d’appliquer une technique structurelle ?</h2><button><span>A</span>Appliquer directement la manipulation spécifique</button><button class="right"><span>B</span>Évaluer la posture, la mobilité et les tissus environnants</button><button><span>C</span>Chauffer la zone uniquement</button><button><span>D</span>Informer uniquement si douleur</button></article><article class="feedback"><strong>Bonne réponse !</strong><p>L’évaluation permet d’adapter la technique.</p></article></section>
-<section id="progress" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Progression</h1><p class="subtitle">Suivi pédagogique</p></div><button class="icon">↗</button></header><article class="progress-hero"><div class="ring">68%</div><div><h2>Très bonne dynamique</h2><p>Vous progressez régulièrement sur les techniques déjà vues.</p></div></article><section class="progress-list"><p><strong>Rachis</strong><span><i style="width:72%"></i></span><b>72%</b></p><p><strong>Bassin</strong><span><i style="width:20%"></i></span><b>20%</b></p><p><strong>Membres supérieurs</strong><span><i style="width:35%"></i></span><b>35%</b></p><p><strong>Membres inférieurs</strong><span><i style="width:30%"></i></span><b>30%</b></p></section></section>
+
+<section id="progress" class="screen stats-screen">
+  <header class="top stats-top">
+    <button class="icon round" onclick="go('home')">‹</button>
+    <div class="brand">
+      <img
+        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+        data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
+        alt="Ostéo Pratik"
+        class="brand-title-webp"
+        onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';this.nextElementSibling.style.display='block';}"
+      >
+      <div class="brand-title-fallback">Ostéo <span>Pratik</span></div>
+    </div>
+    <button class="icon" onclick="toast('Statistiques')">▥</button>
+  </header>
+
+  <div class="stats-page-title">
+    <div>
+      <h1>Statistiques</h1>
+      <p>Votre progression en un coup d’œil</p>
+    </div>
+    <div class="stats-title-visual" aria-hidden="true">
+      <span></span>
+    </div>
+  </div>
+
+  <section class="stats-global-card">
+    <div class="stats-card-head">
+      <div class="stats-head-icon">↗</div>
+      <h2>Progression globale</h2>
+    </div>
+
+    <div class="stats-global-grid">
+      <div class="stats-ring" style="--value:68">
+        <div class="stats-ring-inner">
+          <strong>68<span>%</span></strong>
+          <small>de progression</small>
+        </div>
+      </div>
+
+      <div class="stats-main-kpis">
+        <article>
+          <i>▷</i>
+          <span>Vidéos vues</span>
+          <strong id="statsVideos">42</strong>
+          <small>/ 128</small>
+        </article>
+        <article>
+          <i>▤</i>
+          <span>Fiches consultées</span>
+          <strong id="statsSheets">31</strong>
+          <small>/ 128</small>
+        </article>
+        <article>
+          <i>◎</i>
+          <span>Quiz réussis</span>
+          <strong id="statsQuiz">76<span>%</span></strong>
+          <small>taux de réussite</small>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats-two-grid">
+    <article class="stats-mini-card">
+      <div class="stats-card-head">
+        <div class="stats-head-icon violet">▷</div>
+        <h2>Dernière activité</h2>
+      </div>
+      <p>Aujourd’hui · 21:36</p>
+      <strong>Technique HVLA lombaire</strong>
+      <button onclick="toast('Historique à venir')">Voir l’historique <span>›</span></button>
+    </article>
+
+    <article class="stats-mini-card">
+      <div class="stats-card-head">
+        <div class="stats-head-icon orange">◔</div>
+        <h2>Série</h2>
+      </div>
+      <div class="stats-streak">
+        <b>14</b>
+        <div>
+          <strong>jours actifs</strong>
+          <p>Continuez comme ça !</p>
+          <div class="stats-days"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span class="off">D</span></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="stats-two-grid">
+    <article class="stats-mini-card stats-zone-focus">
+      <div class="stats-card-head">
+        <div class="stats-head-icon">⌇</div>
+        <h2>Zone la plus travaillée</h2>
+      </div>
+      <div class="stats-zone-focus-body">
+        <div class="stats-zone-orb">⌇</div>
+        <div>
+          <span>Rachis</span>
+          <strong>72<span>%</span></strong>
+          <p>de votre temps d’étude</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="stats-mini-card stats-bars-card">
+      <div class="stats-card-head">
+        <div class="stats-head-icon">▥</div>
+        <h2>Progression par zone</h2>
+      </div>
+      <div class="stats-zone-bars">
+        <p><span>Rachis</span><i><b style="width:72%"></b></i><strong>72%</strong></p>
+        <p><span>Membres supérieurs</span><i><b class="violet-bar" style="width:48%"></b></i><strong class="violet-text">48%</strong></p>
+        <p><span>Membres inférieurs</span><i><b class="orange-bar" style="width:41%"></b></i><strong class="orange-text">41%</strong></p>
+        <p><span>Bassin</span><i><b class="green-bar" style="width:35%"></b></i><strong class="green-text">35%</strong></p>
+      </div>
+    </article>
+  </section>
+
+  <section class="stats-quiz-card">
+    <div class="stats-card-head">
+      <div class="stats-head-icon green">◎</div>
+      <h2>Performance aux quiz</h2>
+    </div>
+
+    <div class="stats-quiz-layout">
+      <div class="stats-chart" aria-hidden="true">
+        <svg viewBox="0 0 320 150" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="statsLineGradient" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stop-color="#42dfff"/>
+              <stop offset="100%" stop-color="#67afff"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="30" x2="320" y2="30"></line>
+          <line x1="0" y1="65" x2="320" y2="65"></line>
+          <line x1="0" y1="100" x2="320" y2="100"></line>
+          <line x1="0" y1="135" x2="320" y2="135"></line>
+          <polyline points="10,108 60,92 110,28 160,104 210,56 260,92 310,62"></polyline>
+          <circle cx="10" cy="108" r="5"></circle>
+          <circle cx="60" cy="92" r="5"></circle>
+          <circle cx="110" cy="28" r="5"></circle>
+          <circle cx="160" cy="104" r="5"></circle>
+          <circle cx="210" cy="56" r="5"></circle>
+          <circle cx="260" cy="92" r="5"></circle>
+          <circle cx="310" cy="62" r="5"></circle>
+        </svg>
+        <div class="stats-chart-labels"><span>04/06</span><span>05/06</span><span>06/06</span><span>07/06</span><span>08/06</span><span>09/06</span><span>10/06</span></div>
+      </div>
+
+      <div class="stats-quiz-score">
+        <strong>76<span>%</span></strong>
+        <p>taux de réussite moyen</p>
+        <em>↥ +12%<small>vs semaine précédente</small></em>
+      </div>
+    </div>
+  </section>
+
+  <article class="stats-last-practice">
+    <div class="pill-icon">↺</div>
+    <div>
+      <small>Votre dernière pratique</small>
+      <strong>Dysfonction facettaire des dorsales</strong>
+      <span>Rachis</span>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+    <b>128<small>points</small></b>
+    <button onclick="go('revision')">›</button>
+  </article>
+</section>
 
 
 <section id="msupMenu" class="screen module-menu-screen">
@@ -7901,8 +8092,13 @@ button[data-tech-id="12"]{
   </div>
 </div>
 
-<nav class="bottom"><button class="active" data-target="home" onclick="go('home')">⌂<span>Accueil</span></button><button data-target="zones" onclick="go('zones')">▤<span>Catalogue</span></button><button data-target="revision" onclick="go('revision')">⇄<span>Parcours</span></button><button data-target="favorites" onclick="go('favorites')">♡<span>Favoris</span></button><button data-target="profile" onclick="go('profile')">♙<span>Profil</span></button></nav>
+<nav class="bottom"><button class="active" data-target="home" onclick="go('home')">⌂<span>Accueil</span></button><button data-target="zones" onclick="go('zones')">▤<span>Catalogue</span></button><button data-target="revision" onclick="go('revision')">⇄<span>Révision</span></button><button data-target="favorites" onclick="go('favorites')">♡<span>Favoris</span></button><button data-target="profile" onclick="go('profile')">♙<span>Profil</span></button></nav>
 <div id="toast" class="toast"></div>
+
+<button id="scrollHintArrow" class="scroll-hint-arrow" onclick="scrollActiveScreenDown()" aria-label="Descendre">
+  ↓
+</button>
+
 </main>
 
 <script>
@@ -8111,6 +8307,91 @@ function setTitle(title, subtitle){
 function clearSearch(){
   const input=document.getElementById("searchInput");
   if(input) input.value="";
+}
+
+function normalizeCatalogueText(value){
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function catalogueSearchText(t){
+  return normalizeCatalogueText([
+    t.title,
+    t.zone,
+    t.sub,
+    t.level,
+    t.status,
+    t.icon
+  ].join(" "));
+}
+
+function renderCatalogueSearch(){
+  const input = document.getElementById("catalogueSearchInput");
+  const box = document.getElementById("catalogueSearchResults");
+  if(!input || !box) return;
+
+  const raw = input.value.trim();
+  const query = normalizeCatalogueText(raw);
+
+  if(query.length < 2){
+    box.innerHTML = "";
+    box.classList.remove("active");
+    return;
+  }
+
+  const words = query.split(/\s+/).filter(Boolean);
+
+  const results = techniques
+    .filter(t => words.every(word => catalogueSearchText(t).includes(word)))
+    .slice(0, 40);
+
+  box.classList.add("active");
+
+  if(results.length === 0){
+    box.innerHTML = `
+      <article class="catalogue-no-result">
+        <strong>Aucun résultat</strong>
+        <p>Essayez un autre mot : cervicale, lombaire, cheville, valgus, bassin…</p>
+      </article>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="catalogue-result-count">${results.length} résultat${results.length > 1 ? "s" : ""}</div>
+    ${results.map(t => `
+      <button class="row tech catalogue-result-row" onclick="openTechniqueFromCatalogue(${t.id})">
+        <div class="tech-icon">${t.icon || "OP"}</div>
+        <div>
+          <h3>${t.title}</h3>
+          <small>${t.zone} · ${t.sub} · ${t.level || ""}</small>
+        </div>
+        <div class="state"><span>ouvrir ›</span></div>
+      </button>
+    `).join("")}
+  `;
+}
+
+function clearCatalogueSearch(){
+  const input = document.getElementById("catalogueSearchInput");
+  const box = document.getElementById("catalogueSearchResults");
+  if(input) input.value = "";
+  if(box){
+    box.innerHTML = "";
+    box.classList.remove("active");
+  }
+}
+
+function openTechniqueFromCatalogue(id){
+  const t = techniques.find(item => item.id === id);
+  if(t){
+    currentZone = t.zone;
+    currentSubzone = t.sub;
+    currentBack = "zones";
+    currentFilters = null;
+  }
+  openTechnique(id);
 }
 
 function renderTechniques(){
@@ -9179,14 +9460,99 @@ function openSelectedWheelTechnique(){
   openSelectedWheelCard();
 }
 
+const LAST_PRACTICE_KEY = "osteoPratikLastPractice";
+
+function saveLastPracticeId(id){
+  const t = techniques.find(item => Number(item.id) === Number(id));
+  if(!t) return;
+
+  localStorage.setItem(LAST_PRACTICE_KEY, JSON.stringify({
+    id:Number(t.id),
+    title:t.title,
+    zone:t.zone,
+    sub:t.sub,
+    level:t.level,
+    date:new Date().toISOString()
+  }));
+}
+
+function readLastPractice(){
+  try{
+    const raw = localStorage.getItem(LAST_PRACTICE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){
+    return null;
+  }
+}
+
+function getLastPracticeTechnique(){
+  const saved = readLastPractice();
+  if(saved && saved.id){
+    const t = techniques.find(item => Number(item.id) === Number(saved.id));
+    if(t) return t;
+  }
+
+  const viewed = typeof readViewedTechniqueIds === "function" ? readViewedTechniqueIds() : [];
+  if(viewed.length){
+    const lastId = viewed[viewed.length - 1];
+    const t = techniques.find(item => Number(item.id) === Number(lastId));
+    if(t) return t;
+  }
+
+  return null;
+}
+
+function shortenHomeTitle(title){
+  const clean = String(title || "").replace(/\s+/g, " ").trim();
+  return clean.length > 58 ? clean.slice(0, 56) + "…" : clean;
+}
+
+function renderLastPracticeCard(){
+  const card = document.getElementById("lastPracticeCard");
+  const title = document.getElementById("lastPracticeTitle");
+  const zone = document.getElementById("lastPracticeZone");
+  const bar = document.getElementById("lastPracticeBar");
+  const count = document.getElementById("homeCount");
+  if(!card || !title || !zone || !bar || !count) return;
+
+  const t = getLastPracticeTechnique();
+  const viewedCount = typeof readViewedTechniqueIds === "function" ? readViewedTechniqueIds().length : 0;
+  count.innerHTML = `${viewedCount}<small>vue${viewedCount > 1 ? "s" : ""}</small>`;
+
+  if(!t){
+    title.textContent = "Commencer votre première technique";
+    zone.textContent = "Catalogue";
+    bar.style.width = "0%";
+    card.classList.add("empty-last-practice");
+    return;
+  }
+
+  title.textContent = shortenHomeTitle(t.title);
+  zone.textContent = `${t.zone} · ${t.sub}`;
+  const percent = t.percent ? Number(t.percent) : 58;
+  bar.style.width = Math.max(18, Math.min(100, percent)) + "%";
+  card.classList.remove("empty-last-practice");
+}
+
+function openLastPractice(){
+  const t = getLastPracticeTechnique();
+  if(t){
+    openTechnique(t.id);
+  }else{
+    go("videoMap");
+  }
+}
+
 const originalOpenTechniqueForWheel = openTechnique;
 openTechnique = function(id){
   saveViewedTechniqueId(id);
+  saveLastPracticeId(id);
   originalOpenTechniqueForWheel(id);
+  renderLastPracticeCard();
 };
 
 
-document.getElementById("homeCount").textContent = techniques.length;
+renderLastPracticeCard();
 updateCatalogueCounts();
 updateRachisRegionCounts();
 updateMSupRegionCounts();
@@ -11918,6 +12284,2803 @@ body.onboarding-open .bottom{
   .welcome-poster-actions .welcome-signup{
     min-height:56px;
     font-size:19px;
+  }
+}
+</style>
+
+
+<style>
+/* === PATCH RÉVISER : encadrer le titre comme la page Vidéo === */
+/* On ne touche pas à la roue, aux boutons, aux vidéos ni au reste de l'app. */
+
+#revision .revision-page-title{
+  margin:12px 0 14px !important;
+  padding:18px 18px 16px !important;
+  border-radius:24px !important;
+  border:1px solid var(--line) !important;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(0,229,255,.10), transparent 28%),
+    radial-gradient(circle at 88% 76%, rgba(168,85,255,.08), transparent 24%),
+    linear-gradient(145deg, rgba(10,29,55,.86), rgba(5,15,31,.90)) !important;
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.28),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+  text-align:center !important;
+}
+
+#revision .revision-page-title h1{
+  margin:0 0 8px !important;
+  color:#fff !important;
+  font-size:42px !important;
+  line-height:1 !important;
+  letter-spacing:-.04em !important;
+  font-weight:950 !important;
+  text-align:center !important;
+}
+
+#revision .revision-page-title p{
+  max-width:100% !important;
+  margin:0 auto !important;
+  color:rgba(221,232,255,.78) !important;
+  font-size:16px !important;
+  line-height:1.35 !important;
+  letter-spacing:.2px !important;
+  text-align:center !important;
+}
+
+@media(max-width:430px){
+  #revision .revision-page-title{
+    padding:16px 14px 14px !important;
+    border-radius:22px !important;
+  }
+
+  #revision .revision-page-title h1{
+    font-size:38px !important;
+  }
+
+  #revision .revision-page-title p{
+    font-size:15px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === PAGE STATS : tableau de bord dans le style de l'application === */
+
+.stats-screen{
+  padding-bottom:calc(112px + var(--safe-bottom)) !important;
+}
+
+.stats-page-title{
+  margin:12px 0 14px !important;
+  padding:18px 18px 16px !important;
+  min-height:154px;
+  border-radius:24px !important;
+  border:1px solid var(--line) !important;
+  background:
+    radial-gradient(circle at 86% 50%, rgba(0,229,255,.14), transparent 30%),
+    radial-gradient(circle at 12% 18%, rgba(0,229,255,.10), transparent 28%),
+    linear-gradient(145deg, rgba(10,29,55,.86), rgba(5,15,31,.90)) !important;
+  box-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.stats-page-title::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:19px;
+  border:1px solid rgba(0,229,255,.28);
+  clip-path:polygon(0 0, 38% 0, 44% 16%, 100% 16%, 100% 100%, 0 100%);
+  pointer-events:none;
+}
+
+.stats-page-title h1{
+  position:relative;
+  z-index:1;
+  margin:0 0 8px;
+  color:#fff;
+  font-size:44px;
+  line-height:1;
+  letter-spacing:-.05em;
+  font-weight:950;
+}
+
+.stats-page-title p{
+  position:relative;
+  z-index:1;
+  margin:0;
+  color:rgba(221,232,255,.78);
+  font-size:16px;
+  line-height:1.35;
+}
+
+.stats-title-visual{
+  position:relative;
+  z-index:1;
+  width:122px;
+  height:122px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.35);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,.18), transparent 52%),
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent);
+  box-shadow:0 0 28px rgba(0,229,255,.16), inset 0 0 24px rgba(0,229,255,.08);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+
+.stats-title-visual span{
+  width:56px;
+  height:86px;
+  border-radius:30px 30px 10px 10px;
+  border:1px solid rgba(110,235,255,.70);
+  border-bottom:0;
+  box-shadow:0 0 18px rgba(0,229,255,.34);
+  position:relative;
+}
+
+.stats-title-visual span::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:8px;
+  bottom:-4px;
+  width:3px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:linear-gradient(180deg, transparent, rgba(0,229,255,1), transparent);
+  box-shadow:0 0 12px rgba(0,229,255,.8);
+}
+
+.stats-global-card,
+.stats-mini-card,
+.stats-quiz-card,
+.stats-last-practice{
+  border:1px solid rgba(0,229,255,.25);
+  background:
+    radial-gradient(circle at 82% 18%, rgba(0,229,255,.10), transparent 30%),
+    linear-gradient(145deg, rgba(10,29,55,.74), rgba(5,15,31,.92));
+  border-radius:24px;
+  box-shadow:0 16px 46px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.stats-global-card{
+  padding:16px;
+}
+
+.stats-card-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.stats-card-head h2{
+  margin:0;
+  color:#fff;
+  font-size:21px;
+  line-height:1.1;
+  letter-spacing:-.02em;
+}
+
+.stats-head-icon{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  color:var(--cyan);
+  border:1px solid rgba(0,229,255,.42);
+  background:rgba(255,255,255,.045);
+  box-shadow:0 0 18px rgba(0,229,255,.16);
+  font-weight:900;
+}
+
+.stats-head-icon.violet{color:#a855ff;border-color:rgba(168,85,255,.48);box-shadow:0 0 18px rgba(168,85,255,.20);}
+.stats-head-icon.orange{color:#ffb020;border-color:rgba(255,176,32,.48);box-shadow:0 0 18px rgba(255,176,32,.20);}
+.stats-head-icon.green{color:#35e6a7;border-color:rgba(53,230,167,.48);box-shadow:0 0 18px rgba(53,230,167,.20);}
+
+.stats-global-grid{
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:16px;
+  align-items:center;
+}
+
+.stats-ring{
+  --angle:calc(var(--value) * 3.6deg);
+  width:150px;
+  height:150px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:
+    conic-gradient(var(--cyan) 0deg var(--angle), rgba(255,255,255,.065) var(--angle) 360deg);
+  box-shadow:0 0 24px rgba(0,229,255,.25);
+  position:relative;
+}
+
+.stats-ring::before{
+  content:"";
+  position:absolute;
+  inset:12px;
+  border-radius:50%;
+  background:linear-gradient(145deg, rgba(5,15,31,.95), rgba(2,8,18,.98));
+  box-shadow:inset 0 0 24px rgba(0,0,0,.55);
+}
+
+.stats-ring-inner{
+  position:relative;
+  z-index:1;
+  text-align:center;
+}
+
+.stats-ring-inner strong{
+  color:#fff;
+  font-size:42px;
+  line-height:1;
+  font-weight:950;
+}
+
+.stats-ring-inner strong span{
+  font-size:22px;
+}
+
+.stats-ring-inner small{
+  display:block;
+  color:rgba(221,232,255,.70);
+  font-size:12px;
+  margin-top:5px;
+}
+
+.stats-main-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0;
+}
+
+.stats-main-kpis article{
+  min-height:122px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:8px;
+  border-left:1px solid rgba(255,255,255,.10);
+}
+
+.stats-main-kpis article:first-child{
+  border-left:0;
+}
+
+.stats-main-kpis i{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:var(--cyan);
+  border:1px solid currentColor;
+  font-style:normal;
+  margin-bottom:10px;
+  box-shadow:0 0 16px rgba(0,229,255,.20);
+}
+
+.stats-main-kpis span{
+  color:rgba(221,232,255,.78);
+  font-size:13px;
+  line-height:1.15;
+}
+
+.stats-main-kpis strong{
+  color:#fff;
+  font-size:32px;
+  line-height:1;
+  margin-top:8px;
+  font-weight:950;
+}
+
+.stats-main-kpis strong span{
+  font-size:18px;
+}
+
+.stats-main-kpis small{
+  color:rgba(221,232,255,.66);
+  margin-top:5px;
+}
+
+.stats-two-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:12px;
+}
+
+.stats-mini-card{
+  padding:16px;
+  min-height:154px;
+}
+
+.stats-mini-card p{
+  margin:0;
+  color:rgba(221,232,255,.72);
+  font-size:13px;
+}
+
+.stats-mini-card > strong{
+  display:block;
+  color:#fff;
+  margin-top:8px;
+  font-size:16px;
+  line-height:1.2;
+}
+
+.stats-mini-card button{
+  margin-top:14px;
+  color:#42dfff;
+  background:transparent;
+  font-weight:800;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.stats-streak{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.stats-streak b{
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#fff;
+  font-size:32px;
+  border:6px solid rgba(255,176,32,.88);
+  box-shadow:0 0 22px rgba(255,176,32,.22);
+}
+
+.stats-streak strong{
+  color:#fff;
+  font-size:15px;
+}
+
+.stats-days{
+  margin-top:9px;
+  display:flex;
+  gap:7px;
+}
+
+.stats-days span{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:transparent;
+  background:#ffb020;
+  box-shadow:0 0 12px rgba(255,176,32,.28);
+  font-size:0;
+}
+
+.stats-days .off{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.25);
+  box-shadow:none;
+}
+
+.stats-zone-focus-body{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.stats-zone-orb{
+  width:86px;
+  height:86px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:var(--cyan);
+  border:1px solid rgba(0,229,255,.48);
+  background:radial-gradient(circle, rgba(0,229,255,.15), transparent 62%);
+  box-shadow:0 0 24px rgba(0,229,255,.18);
+  font-size:36px;
+}
+
+.stats-zone-focus-body span{
+  color:#42dfff;
+  font-weight:800;
+}
+
+.stats-zone-focus-body strong{
+  display:block;
+  color:#fff;
+  font-size:38px;
+  line-height:1;
+  margin:8px 0 4px;
+}
+
+.stats-zone-focus-body strong span{
+  font-size:20px;
+}
+
+.stats-zone-bars{
+  display:grid;
+  gap:13px;
+}
+
+.stats-zone-bars p{
+  display:grid;
+  grid-template-columns:108px minmax(0,1fr) 42px;
+  gap:9px;
+  align-items:center;
+  margin:0;
+}
+
+.stats-zone-bars span{
+  color:#fff;
+  font-size:13px;
+}
+
+.stats-zone-bars i{
+  height:8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  overflow:hidden;
+}
+
+.stats-zone-bars b{
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#2d8cff,#42dfff);
+  box-shadow:0 0 12px rgba(0,229,255,.24);
+}
+
+.stats-zone-bars strong{
+  color:#42dfff;
+  text-align:right;
+  font-size:16px;
+}
+
+.violet-bar{background:linear-gradient(90deg,#7c4dff,#c461ff) !important;box-shadow:0 0 12px rgba(168,85,255,.24) !important;}
+.orange-bar{background:linear-gradient(90deg,#ff8a20,#ffb020) !important;box-shadow:0 0 12px rgba(255,176,32,.24) !important;}
+.green-bar{background:linear-gradient(90deg,#35e6a7,#7dffd7) !important;box-shadow:0 0 12px rgba(53,230,167,.24) !important;}
+.violet-text{color:#b867ff !important;}
+.orange-text{color:#ffb020 !important;}
+.green-text{color:#35e6a7 !important;}
+
+.stats-quiz-card{
+  margin-top:12px;
+  padding:16px;
+}
+
+.stats-quiz-layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 148px;
+  gap:16px;
+  align-items:center;
+}
+
+.stats-chart svg{
+  width:100%;
+  height:145px;
+  overflow:visible;
+}
+
+.stats-chart line{
+  stroke:rgba(255,255,255,.09);
+  stroke-width:1;
+}
+
+.stats-chart polyline{
+  fill:none;
+  stroke:url(#statsLineGradient);
+  stroke-width:5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  filter:drop-shadow(0 0 7px rgba(0,229,255,.55));
+}
+
+.stats-chart circle{
+  fill:#67dfff;
+  stroke:#bff9ff;
+  stroke-width:2;
+  filter:drop-shadow(0 0 5px rgba(0,229,255,.75));
+}
+
+.stats-chart-labels{
+  display:flex;
+  justify-content:space-between;
+  color:rgba(221,232,255,.62);
+  font-size:11px;
+}
+
+.stats-quiz-score{
+  border-left:1px solid rgba(255,255,255,.11);
+  padding-left:16px;
+}
+
+.stats-quiz-score strong{
+  display:block;
+  color:#fff;
+  font-size:46px;
+  line-height:1;
+}
+
+.stats-quiz-score strong span{
+  font-size:24px;
+}
+
+.stats-quiz-score p{
+  margin:8px 0 14px;
+  color:rgba(221,232,255,.70);
+  font-size:13px;
+}
+
+.stats-quiz-score em{
+  display:block;
+  color:#35e6a7;
+  font-style:normal;
+  font-weight:900;
+  padding:10px;
+  border-radius:14px;
+  border:1px solid rgba(53,230,167,.22);
+  background:rgba(53,230,167,.06);
+}
+
+.stats-quiz-score small{
+  display:block;
+  color:rgba(221,232,255,.65);
+  font-weight:650;
+  font-size:11px;
+  margin-top:4px;
+}
+
+.stats-last-practice{
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) 74px 24px;
+  align-items:center;
+  gap:14px;
+  margin-top:12px;
+  padding:16px;
+}
+
+.stats-last-practice small{
+  display:block;
+  color:#8fb7ff;
+  text-transform:uppercase;
+  letter-spacing:.09em;
+  font-size:10px;
+  font-weight:850;
+}
+
+.stats-last-practice strong{
+  display:block;
+  color:#fff;
+  font-size:17px;
+  line-height:1.12;
+  margin:5px 0 7px;
+}
+
+.stats-last-practice span{
+  display:inline-block;
+  color:#8fdcff;
+  border:1px solid rgba(0,229,255,.28);
+  background:rgba(0,229,255,.08);
+  border-radius:999px;
+  padding:3px 10px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.stats-last-practice .bar{
+  margin-top:9px;
+}
+
+.stats-last-practice > b{
+  color:#42dfff;
+  font-size:38px;
+  line-height:.9;
+  text-align:center;
+}
+
+.stats-last-practice > b small{
+  color:rgba(221,232,255,.70);
+  text-transform:none;
+  letter-spacing:0;
+  font-size:12px;
+  margin-top:5px;
+}
+
+.stats-last-practice button{
+  color:#42dfff;
+  font-size:34px;
+  background:transparent;
+}
+
+@media(max-width:430px){
+  .stats-page-title{
+    min-height:140px;
+    padding:16px 14px 14px !important;
+  }
+
+  .stats-page-title h1{
+    font-size:38px;
+  }
+
+  .stats-page-title p{
+    font-size:14.5px;
+  }
+
+  .stats-title-visual{
+    width:96px;
+    height:96px;
+  }
+
+  .stats-title-visual span{
+    width:44px;
+    height:70px;
+  }
+
+  .stats-global-grid{
+    grid-template-columns:130px minmax(0,1fr);
+    gap:12px;
+  }
+
+  .stats-ring{
+    width:130px;
+    height:130px;
+  }
+
+  .stats-ring-inner strong{
+    font-size:36px;
+  }
+
+  .stats-main-kpis strong{
+    font-size:27px;
+  }
+
+  .stats-main-kpis span{
+    font-size:11.5px;
+  }
+
+  .stats-two-grid{
+    grid-template-columns:1fr;
+  }
+
+  .stats-mini-card{
+    min-height:auto;
+  }
+
+  .stats-quiz-layout{
+    grid-template-columns:1fr;
+  }
+
+  .stats-quiz-score{
+    border-left:0;
+    border-top:1px solid rgba(255,255,255,.11);
+    padding-left:0;
+    padding-top:14px;
+  }
+
+  .stats-last-practice{
+    grid-template-columns:50px minmax(0,1fr) 60px 18px;
+    gap:10px;
+  }
+
+  .stats-last-practice > b{
+    font-size:30px;
+  }
+}
+
+@media(max-width:380px){
+  .stats-global-grid{
+    grid-template-columns:1fr;
+    justify-items:center;
+  }
+
+  .stats-main-kpis{
+    width:100%;
+  }
+
+  .stats-main-kpis article{
+    min-height:108px;
+    padding:6px 4px;
+  }
+
+  .stats-zone-bars p{
+    grid-template-columns:96px minmax(0,1fr) 38px;
+  }
+
+  .stats-zone-bars span{
+    font-size:12px;
+  }
+}
+</style>
+
+
+<style>
+/* === FIX STATS : centrage + suppression des débordements horizontaux === */
+/* Les cartes Stats sont de vrais blocs HTML : pour l’instant elles affichent des données de démonstration.
+   Ce patch corrige surtout le centrage et évite que les cartes sortent de l’écran CodePen/iPad. */
+
+#progress.stats-screen{
+  width:100% !important;
+  max-width:430px !important;
+  margin:0 auto !important;
+  overflow-x:hidden !important;
+  box-sizing:border-box !important;
+  padding-left:18px !important;
+  padding-right:18px !important;
+}
+
+#progress.stats-screen *,
+#progress.stats-screen *::before,
+#progress.stats-screen *::after{
+  box-sizing:border-box !important;
+}
+
+#progress .stats-page-title,
+#progress .stats-global-card,
+#progress .stats-mini-card,
+#progress .stats-quiz-card,
+#progress .stats-last-practice{
+  width:100% !important;
+  max-width:100% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Sur l’app mobile, on évite les deux colonnes qui débordaient à droite */
+#progress .stats-two-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  width:100% !important;
+  max-width:100% !important;
+  gap:12px !important;
+}
+
+/* La carte globale devient plus lisible et parfaitement centrée */
+#progress .stats-global-grid{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  justify-items:center !important;
+  gap:14px !important;
+}
+
+#progress .stats-ring{
+  margin:0 auto !important;
+}
+
+#progress .stats-main-kpis{
+  width:100% !important;
+  display:grid !important;
+  grid-template-columns:repeat(3, minmax(0,1fr)) !important;
+}
+
+#progress .stats-main-kpis article{
+  min-width:0 !important;
+  padding:8px 5px !important;
+}
+
+#progress .stats-main-kpis span{
+  font-size:12px !important;
+  line-height:1.12 !important;
+}
+
+#progress .stats-main-kpis strong{
+  font-size:28px !important;
+}
+
+/* La carte série ne coupe plus le texte */
+#progress .stats-streak{
+  width:100% !important;
+  min-width:0 !important;
+}
+
+#progress .stats-streak > div{
+  min-width:0 !important;
+  overflow:hidden !important;
+}
+
+#progress .stats-streak p,
+#progress .stats-streak strong{
+  white-space:normal !important;
+}
+
+/* Barres de zone : aucune sortie à droite */
+#progress .stats-zone-bars p{
+  grid-template-columns:112px minmax(0,1fr) 42px !important;
+  width:100% !important;
+}
+
+#progress .stats-zone-bars span{
+  min-width:0 !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* Quiz : une colonne pour éviter les débordements */
+#progress .stats-quiz-layout{
+  grid-template-columns:1fr !important;
+  width:100% !important;
+}
+
+#progress .stats-quiz-score{
+  border-left:0 !important;
+  border-top:1px solid rgba(255,255,255,.11) !important;
+  padding-left:0 !important;
+  padding-top:14px !important;
+}
+
+/* Dernière pratique : version compacte centrée */
+#progress .stats-last-practice{
+  grid-template-columns:50px minmax(0,1fr) 58px 18px !important;
+  gap:10px !important;
+}
+
+#progress .stats-last-practice > div{
+  min-width:0 !important;
+}
+
+#progress .stats-last-practice strong{
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+#progress .stats-last-practice > b{
+  font-size:28px !important;
+}
+
+#progress .stats-last-practice > b small{
+  font-size:10px !important;
+}
+
+/* Le titre reste dans une carte centrée et ne donne plus l’impression d’être collé à gauche */
+#progress .stats-page-title{
+  text-align:left !important;
+}
+
+#progress .stats-page-title h1{
+  font-size:40px !important;
+}
+
+#progress .stats-title-visual{
+  width:88px !important;
+  height:88px !important;
+}
+
+@media(max-width:380px){
+  #progress.stats-screen{
+    padding-left:14px !important;
+    padding-right:14px !important;
+  }
+
+  #progress .stats-page-title{
+    min-height:128px !important;
+  }
+
+  #progress .stats-page-title h1{
+    font-size:34px !important;
+  }
+
+  #progress .stats-page-title p{
+    font-size:13.5px !important;
+  }
+
+  #progress .stats-title-visual{
+    width:74px !important;
+    height:74px !important;
+  }
+
+  #progress .stats-main-kpis{
+    grid-template-columns:1fr !important;
+  }
+
+  #progress .stats-main-kpis article{
+    border-left:0 !important;
+    border-top:1px solid rgba(255,255,255,.10) !important;
+    min-height:86px !important;
+  }
+
+  #progress .stats-main-kpis article:first-child{
+    border-top:0 !important;
+  }
+
+  #progress .stats-zone-bars p{
+    grid-template-columns:96px minmax(0,1fr) 38px !important;
+  }
+}
+</style>
+
+<script>
+
+function getActiveScreen(){
+  return document.querySelector(".screen.active");
+}
+
+function scrollActiveScreenDown(){
+  const screen = getActiveScreen();
+  if(!screen) return;
+
+  screen.scrollBy({
+    top: Math.max(260, Math.round(screen.clientHeight * 0.72)),
+    behavior: "smooth"
+  });
+}
+
+function updateScrollHint(){
+  const arrow = document.getElementById("scrollHintArrow");
+  const screen = getActiveScreen();
+  if(!arrow || !screen) return;
+
+  const blockedScreens = ["welcome"];
+  const hasBottomBar = !document.body.classList.contains("onboarding-open");
+  const maxScroll = screen.scrollHeight - screen.clientHeight;
+  const canScroll = maxScroll > 42;
+  const nearBottom = screen.scrollTop >= maxScroll - 42;
+
+  arrow.classList.toggle("show", canScroll && !nearBottom && !blockedScreens.includes(screen.id));
+  arrow.classList.toggle("above-bottom-bar", hasBottomBar);
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  document.querySelectorAll(".screen").forEach(screen=>{
+    screen.addEventListener("scroll", updateScrollHint, {passive:true});
+  });
+
+  const originalGo = window.go;
+  if(typeof originalGo === "function" && !window.__scrollHintGoPatched){
+    window.go = function(id){
+      originalGo(id);
+      setTimeout(updateScrollHint, 80);
+      setTimeout(updateScrollHint, 380);
+    };
+    window.__scrollHintGoPatched = true;
+  }
+
+  window.addEventListener("resize", updateScrollHint);
+  setTimeout(updateScrollHint, 300);
+});
+
+</script>
+
+<style>
+/* === PETITE FLÈCHE DE SCROLL EN BAS === */
+/* S'affiche uniquement quand la page active peut encore descendre. */
+
+.scroll-hint-arrow{
+  position:fixed;
+  left:50%;
+  bottom:calc(18px + var(--safe-bottom));
+  transform:translateX(-50%) translateY(14px);
+  z-index:9999;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#dffcff;
+  font-size:24px;
+  font-weight:950;
+  border:1px solid rgba(0,229,255,.46);
+  background:
+    radial-gradient(circle at 50% 35%, rgba(255,255,255,.16), transparent 36%),
+    rgba(5,15,31,.72);
+  box-shadow:
+    0 0 22px rgba(0,229,255,.30),
+    inset 0 1px 0 rgba(255,255,255,.10);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+  animation:scrollHintPulse 1.7s ease-in-out infinite;
+}
+
+.scroll-hint-arrow.above-bottom-bar{
+  bottom:calc(92px + var(--safe-bottom));
+}
+
+.scroll-hint-arrow.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateX(-50%) translateY(0);
+}
+
+@keyframes scrollHintPulse{
+  0%,100%{ box-shadow:0 0 18px rgba(0,229,255,.22), inset 0 1px 0 rgba(255,255,255,.10); }
+  50%{ box-shadow:0 0 34px rgba(0,229,255,.46), inset 0 1px 0 rgba(255,255,255,.15); }
+}
+</style>
+
+
+<style>
+/* === CATALOGUE : recherche globale dans toutes les techniques === */
+
+.catalogue-search-card{
+  margin:0 0 14px;
+  padding:14px;
+  border-radius:24px;
+  border:1px solid rgba(0,229,255,.22);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(0,229,255,.10), transparent 30%),
+    linear-gradient(145deg, rgba(10,29,55,.74), rgba(5,15,31,.90));
+  box-shadow:0 16px 46px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.catalogue-search{
+  margin:0 !important;
+  width:100%;
+  grid-template-columns:30px minmax(0,1fr) 34px !important;
+}
+
+.catalogue-search input{
+  width:100%;
+  min-width:0;
+  color:#fff;
+}
+
+.catalogue-search button{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  color:#8fefff;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(0,229,255,.18);
+  font-size:20px;
+  line-height:1;
+}
+
+.catalogue-search-hint{
+  margin:9px 4px 0;
+  color:rgba(221,232,255,.62);
+  font-size:12px;
+  line-height:1.25;
+}
+
+.catalogue-search-results{
+  display:none;
+  margin-top:12px;
+}
+
+.catalogue-search-results.active{
+  display:grid;
+  gap:10px;
+}
+
+.catalogue-result-count{
+  color:#42dfff;
+  font-size:12px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  padding:0 2px;
+}
+
+.catalogue-result-row{
+  margin:0 !important;
+  width:100%;
+}
+
+.catalogue-no-result{
+  padding:16px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(255,255,255,.035);
+}
+
+.catalogue-no-result strong{
+  color:#fff;
+  display:block;
+  font-size:16px;
+}
+
+.catalogue-no-result p{
+  color:rgba(221,232,255,.68);
+  margin:6px 0 0;
+  font-size:13px;
+  line-height:1.3;
+}
+
+@media(max-width:430px){
+  .catalogue-search-card{
+    padding:12px;
+    border-radius:22px;
+  }
+
+  .catalogue-search-hint{
+    font-size:11.5px;
+  }
+}
+</style>
+
+
+<style>
+/* === ACCUEIL : libellés et pictogrammes plus différenciés === */
+/* Tester = mes acquis ; Stats = mes statistiques. */
+
+.home-orbit .orbit-icon{
+  font-weight:950 !important;
+  line-height:1 !important;
+}
+
+.home-icon-video{
+  font-size:25px !important;
+  padding-left:3px !important;
+}
+
+.home-icon-revision{
+  font-size:31px !important;
+}
+
+.home-icon-acquis{
+  font-size:30px !important;
+}
+
+.home-icon-stats{
+  display:flex !important;
+  align-items:flex-end !important;
+  justify-content:center !important;
+  gap:4px !important;
+  font-size:0 !important;
+}
+
+.home-icon-stats i{
+  display:block !important;
+  width:6px !important;
+  border-radius:999px !important;
+  background:currentColor !important;
+  box-shadow:0 0 10px currentColor !important;
+}
+
+.home-icon-stats i:nth-child(1){height:14px !important; opacity:.72;}
+.home-icon-stats i:nth-child(2){height:23px !important; opacity:1;}
+.home-icon-stats i:nth-child(3){height:18px !important; opacity:.84;}
+
+.progress strong .sub-word,
+.quiz strong .sub-word{
+  display:block !important;
+  margin-top:4px !important;
+  font-size:13px !important;
+  line-height:1.05 !important;
+  font-weight:800 !important;
+  letter-spacing:-.02em !important;
+}
+
+@media(max-width:430px){
+  .progress strong .sub-word,
+  .quiz strong .sub-word{
+    font-size:12px !important;
+  }
+
+  .home-icon-stats i{
+    width:5px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === CATALOGUE PREMIUM : sans sous-menus visibles === */
+/* Les anciennes sous-zones restent disponibles dans l'app, mais le catalogue devient une entrée directe + recherche globale. */
+
+.catalogue-premium-screen{
+  padding-bottom:calc(112px + var(--safe-bottom)) !important;
+}
+
+.catalogue-premium-title{
+  margin:12px 0 14px !important;
+  padding:18px 18px 16px !important;
+  min-height:126px;
+  border-radius:24px !important;
+  border:1px solid rgba(0,229,255,.25) !important;
+  background:
+    radial-gradient(circle at 86% 50%, rgba(0,229,255,.13), transparent 30%),
+    radial-gradient(circle at 12% 18%, rgba(168,85,255,.10), transparent 28%),
+    linear-gradient(145deg, rgba(10,29,55,.86), rgba(5,15,31,.90)) !important;
+  box-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  position:relative;
+  overflow:hidden;
+}
+
+.catalogue-premium-title::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:19px;
+  border:1px solid rgba(0,229,255,.24);
+  clip-path:polygon(0 0, 44% 0, 50% 17%, 100% 17%, 100% 100%, 0 100%);
+  pointer-events:none;
+}
+
+.catalogue-premium-title h1{
+  position:relative;
+  z-index:1;
+  margin:0 0 8px;
+  color:#fff;
+  font-size:44px;
+  line-height:1;
+  letter-spacing:-.05em;
+  font-weight:950;
+}
+
+.catalogue-premium-title p{
+  position:relative;
+  z-index:1;
+  margin:0;
+  color:rgba(221,232,255,.78);
+  font-size:16px;
+  line-height:1.35;
+}
+
+.catalogue-premium-badge{
+  position:relative;
+  z-index:1;
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.42);
+  background:radial-gradient(circle, rgba(0,229,255,.17), rgba(5,15,31,.80) 62%);
+  box-shadow:0 0 26px rgba(0,229,255,.20), inset 0 0 22px rgba(0,229,255,.10);
+  display:grid;
+  place-items:center;
+  text-align:center;
+  flex:0 0 auto;
+}
+
+.catalogue-premium-badge strong{
+  color:#fff;
+  font-size:34px;
+  line-height:.9;
+  font-weight:950;
+}
+
+.catalogue-premium-badge span{
+  display:block;
+  color:#8fefff;
+  font-size:10px;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  margin-top:-22px;
+}
+
+.catalogue-search-card-premium{
+  margin-bottom:14px !important;
+}
+
+.catalogue-anatomy-premium{
+  position:relative;
+  min-height:360px;
+  border-radius:30px;
+  border:1px solid rgba(0,229,255,.25);
+  background:
+    radial-gradient(circle at 50% 26%, rgba(0,229,255,.16), transparent 36%),
+    radial-gradient(circle at 50% 72%, rgba(168,85,255,.09), transparent 34%),
+    linear-gradient(145deg, rgba(10,29,55,.66), rgba(5,15,31,.92));
+  box-shadow:0 20px 60px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+  overflow:hidden;
+  margin:0 0 14px;
+}
+
+.catalogue-anatomy-bg{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.cat-ring{
+  position:absolute;
+  left:50%;
+  top:50%;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  border:1px solid rgba(0,229,255,.18);
+  box-shadow:0 0 24px rgba(0,229,255,.10), inset 0 0 24px rgba(0,229,255,.06);
+}
+
+.cat-ring.r1{width:270px;height:270px;}
+.cat-ring.r2{width:190px;height:190px;border-style:dashed;opacity:.85;}
+
+.cat-pulse{
+  position:absolute;
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:#8fffff;
+  box-shadow:0 0 16px rgba(0,229,255,.9);
+}
+
+.cat-pulse.p1{left:50%;top:27%;}
+.cat-pulse.p2{left:38%;top:58%;}
+.cat-pulse.p3{right:36%;top:76%;}
+
+.catalogue-body-holo{
+  position:absolute;
+  left:50%;
+  top:52%;
+  width:178px;
+  height:300px;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 0 24px rgba(0,229,255,.26));
+  opacity:.9;
+}
+
+.holo-head{
+  position:absolute;
+  left:50%;
+  top:0;
+  width:48px;
+  height:58px;
+  transform:translateX(-50%);
+  border-radius:50% 50% 42% 42%;
+  border:1px solid rgba(152,245,255,.72);
+  background:radial-gradient(circle, rgba(0,229,255,.10), transparent 70%);
+}
+
+.holo-torso{
+  position:absolute;
+  left:50%;
+  top:62px;
+  width:96px;
+  height:126px;
+  transform:translateX(-50%);
+  border-radius:42px 42px 36px 36px;
+  border:1px solid rgba(152,245,255,.55);
+  background:linear-gradient(180deg, rgba(0,229,255,.08), rgba(0,229,255,.02));
+}
+
+.holo-spine{
+  position:absolute;
+  left:50%;
+  top:56px;
+  width:5px;
+  height:150px;
+  transform:translateX(-50%);
+  border-radius:999px;
+  background:linear-gradient(180deg, transparent, rgba(0,229,255,1), transparent);
+  box-shadow:0 0 12px rgba(0,229,255,.85);
+  z-index:2;
+}
+
+.holo-pelvis{
+  position:absolute;
+  left:50%;
+  top:176px;
+  width:100px;
+  height:52px;
+  transform:translateX(-50%);
+  border-radius:20px 20px 42px 42px;
+  border:1px solid rgba(255,176,32,.58);
+  box-shadow:0 0 16px rgba(255,176,32,.16);
+}
+
+.holo-arm{
+  position:absolute;
+  top:72px;
+  width:18px;
+  height:134px;
+  border-radius:999px;
+  border:1px solid rgba(168,85,255,.58);
+  box-shadow:0 0 16px rgba(168,85,255,.16);
+}
+
+.holo-arm.left{left:23px;transform:rotate(9deg);}
+.holo-arm.right{right:23px;transform:rotate(-9deg);}
+
+.holo-leg{
+  position:absolute;
+  top:222px;
+  width:22px;
+  height:78px;
+  border-radius:999px;
+  border:1px solid rgba(53,230,167,.58);
+  box-shadow:0 0 16px rgba(53,230,167,.16);
+}
+
+.holo-leg.left{left:65px;}
+.holo-leg.right{right:65px;}
+
+.catalogue-zone-pill{
+  position:absolute;
+  z-index:2;
+  min-width:118px;
+  min-height:52px;
+  border-radius:18px;
+  border:1px solid currentColor;
+  background:rgba(5,15,31,.58);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  box-shadow:0 0 22px color-mix(in srgb,currentColor 24%, transparent), inset 0 1px 0 rgba(255,255,255,.06);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:0 12px;
+  color:#42dfff;
+}
+
+.catalogue-zone-pill b{
+  color:#fff;
+  font-size:14px;
+  line-height:1.05;
+}
+
+.catalogue-zone-pill span{
+  color:currentColor;
+  font-size:18px;
+  font-weight:950;
+}
+
+.pill-rachis{left:50%;top:24px;transform:translateX(-50%);color:#42dfff;}
+.pill-msup{left:18px;top:132px;color:#b867ff;}
+.pill-bassin{right:18px;top:176px;color:#ffb020;}
+.pill-minf{left:50%;bottom:18px;transform:translateX(-50%);color:#35e6a7;}
+
+.catalogue-premium-grid{
+  display:grid;
+  gap:12px;
+  margin-bottom:14px;
+}
+
+.catalogue-premium-card{
+  width:100%;
+  min-height:94px;
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) 52px;
+  align-items:center;
+  gap:12px;
+  padding:14px;
+  border-radius:24px;
+  color:#42dfff;
+  border:1px solid currentColor;
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb,currentColor 12%, transparent), transparent 36%),
+    linear-gradient(145deg, rgba(10,29,55,.66), rgba(5,15,31,.90));
+  box-shadow:0 0 24px color-mix(in srgb,currentColor 18%, transparent), inset 0 1px 0 rgba(255,255,255,.05);
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+
+.catalogue-premium-card.orange{color:#ffb020;}
+.catalogue-premium-card.violet{color:#b867ff;}
+.catalogue-premium-card.green{color:#35e6a7;}
+
+.cat-card-icon{
+  width:52px;
+  height:52px;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  border:1px solid currentColor;
+  background:rgba(255,255,255,.045);
+  color:currentColor;
+  font-size:26px;
+  font-weight:950;
+  box-shadow:0 0 16px color-mix(in srgb,currentColor 22%, transparent);
+}
+
+.catalogue-premium-card strong{
+  display:block;
+  color:#fff;
+  font-size:19px;
+  line-height:1.05;
+}
+
+.catalogue-premium-card p{
+  margin:6px 0 0;
+  color:rgba(221,232,255,.70);
+  font-size:12.5px;
+  line-height:1.2;
+}
+
+.catalogue-premium-card > b{
+  justify-self:end;
+  color:#fff;
+  font-size:30px;
+  line-height:1;
+  font-weight:950;
+}
+
+.catalogue-premium-card em{
+  position:absolute;
+  right:14px;
+  bottom:10px;
+  color:currentColor;
+  font-size:12px;
+  font-style:normal;
+  font-weight:850;
+}
+
+@media(max-width:430px){
+  .catalogue-premium-title{
+    min-height:116px;
+    padding:16px 14px 14px !important;
+  }
+
+  .catalogue-premium-title h1{
+    font-size:39px;
+  }
+
+  .catalogue-premium-title p{
+    font-size:14.5px;
+  }
+
+  .catalogue-premium-badge{
+    width:82px;
+    height:82px;
+  }
+
+  .catalogue-premium-badge strong{
+    font-size:30px;
+  }
+
+  .catalogue-anatomy-premium{
+    min-height:338px;
+  }
+
+  .catalogue-zone-pill{
+    min-width:108px;
+    min-height:48px;
+  }
+
+  .pill-msup{left:12px;}
+  .pill-bassin{right:12px;}
+
+  .catalogue-premium-card{
+    grid-template-columns:52px minmax(0,1fr) 46px;
+    min-height:90px;
+    padding:12px;
+  }
+
+  .cat-card-icon{
+    width:48px;
+    height:48px;
+  }
+
+  .catalogue-premium-card strong{
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style>
+/* === CATALOGUE : utiliser la même image que dans la page Vidéo / Zones === */
+/* On remplace le mannequin schématique par l’image déjà utilisée pour les zones vidéo. */
+
+.catalogue-anatomy-premium{
+  min-height:390px !important;
+}
+
+.catalogue-zone-figure{
+  position:absolute;
+  left:50%;
+  top:55%;
+  width:220px;
+  height:322px;
+  transform:translate(-50%,-50%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  z-index:1;
+  filter:drop-shadow(0 0 28px rgba(0,229,255,.18));
+}
+
+.catalogue-zone-figure img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+  opacity:.96;
+}
+
+.catalogue-zone-pill{
+  z-index:2 !important;
+}
+
+.pill-rachis{
+  top:26px !important;
+}
+
+.pill-msup{
+  left:16px !important;
+  top:136px !important;
+}
+
+.pill-bassin{
+  right:16px !important;
+  top:182px !important;
+}
+
+.pill-minf{
+  bottom:18px !important;
+}
+
+@media(max-width:430px){
+  .catalogue-anatomy-premium{
+    min-height:366px !important;
+  }
+
+  .catalogue-zone-figure{
+    width:198px !important;
+    height:296px !important;
+    top:55% !important;
+  }
+
+  .pill-msup{
+    left:10px !important;
+    top:134px !important;
+  }
+
+  .pill-bassin{
+    right:10px !important;
+    top:180px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === ACCUEIL : Votre dernière pratique active === */
+
+#lastPracticeCard{
+  cursor:pointer;
+  position:relative;
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+#lastPracticeCard::after{
+  content:"›";
+  position:absolute;
+  right:16px;
+  top:50%;
+  transform:translateY(-50%);
+  color:#42dfff;
+  font-size:30px;
+  font-weight:900;
+  text-shadow:0 0 14px rgba(0,229,255,.45);
+}
+
+#lastPracticeCard:hover,
+#lastPracticeCard:focus-visible{
+  transform:translateY(-2px);
+  border-color:rgba(0,229,255,.42);
+  box-shadow:0 20px 60px rgba(0,0,0,.34), 0 0 24px rgba(0,229,255,.18), inset 0 1px 0 rgba(255,255,255,.06);
+  outline:none;
+}
+
+#lastPracticeCard > div:nth-child(2){
+  padding-right:24px;
+}
+
+#lastPracticeCard #homeCount{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  min-width:44px;
+  color:#42dfff;
+}
+
+#lastPracticeCard #homeCount small{
+  display:block;
+  color:rgba(221,232,255,.68);
+  font-size:10px;
+  line-height:1;
+  font-weight:850;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+#lastPracticeCard.empty-last-practice{
+  opacity:.94;
+}
+
+#lastPracticeCard.empty-last-practice #lastPracticeZone{
+  color:#ffb020;
+  border-color:rgba(255,176,32,.28);
+  background:rgba(255,176,32,.08);
+}
+</style>
+
+
+<style>
+/* === RÉVISER : recadrage propre des titres et icônes dans les 4 demi-cercles === */
+/* Correction ciblée uniquement sur la page Réviser. */
+
+#revision .revision-orbit-nav{
+  width:min(100%, 420px) !important;
+  height:438px !important;
+  margin:0 auto 18px !important;
+}
+
+#revision .revision-orbit-card{
+  width:calc(50% - 8px) !important;
+  height:204px !important;
+  padding:0 !important;
+  display:block !important;
+  position:absolute !important;
+  overflow:hidden !important;
+}
+
+/* On centre mieux les pictogrammes dans leur quart de cercle */
+#revision .revision-orbit-icon{
+  width:58px !important;
+  height:58px !important;
+  font-size:29px !important;
+  line-height:1 !important;
+  display:grid !important;
+  place-items:center !important;
+  margin:0 !important;
+}
+
+/* Positions harmonisées : les icônes restent dans la partie visuelle, pas collées aux bords */
+#revision .revision-random .revision-orbit-icon{
+  left:44px !important;
+  top:38px !important;
+}
+
+#revision .revision-zone .revision-orbit-icon{
+  right:44px !important;
+  top:38px !important;
+}
+
+#revision .revision-review .revision-orbit-icon{
+  left:44px !important;
+  top:46px !important;
+}
+
+#revision .revision-seen .revision-orbit-icon{
+  right:44px !important;
+  top:46px !important;
+}
+
+/* Titres : même hauteur, même taille, meilleure respiration */
+#revision .revision-orbit-card strong{
+  font-size:20px !important;
+  line-height:1.02 !important;
+  letter-spacing:-.04em !important;
+  font-weight:950 !important;
+  color:#fff !important;
+  max-width:132px !important;
+}
+
+/* Sous-titres : plus lisibles, placés juste sous le titre */
+#revision .revision-orbit-card small{
+  font-size:12px !important;
+  line-height:1.12 !important;
+  font-weight:750 !important;
+  color:rgba(255,255,255,.76) !important;
+  max-width:132px !important;
+}
+
+/* Quart haut gauche */
+#revision .revision-random strong{
+  left:26px !important;
+  top:112px !important;
+  text-align:left !important;
+}
+
+#revision .revision-random small{
+  left:26px !important;
+  top:140px !important;
+  text-align:left !important;
+}
+
+/* Quart haut droit */
+#revision .revision-zone strong{
+  right:26px !important;
+  top:112px !important;
+  text-align:right !important;
+}
+
+#revision .revision-zone small{
+  right:26px !important;
+  top:140px !important;
+  text-align:right !important;
+}
+
+/* Quart bas gauche */
+#revision .revision-review strong{
+  left:26px !important;
+  top:116px !important;
+  text-align:left !important;
+}
+
+#revision .revision-review small{
+  left:26px !important;
+  top:144px !important;
+  text-align:left !important;
+}
+
+/* Quart bas droit */
+#revision .revision-seen strong{
+  right:26px !important;
+  top:116px !important;
+  text-align:right !important;
+}
+
+#revision .revision-seen small{
+  right:26px !important;
+  top:144px !important;
+  text-align:right !important;
+}
+
+/* Le rond central ne mord plus trop sur les textes */
+#revision .revision-orbit-center{
+  width:78px !important;
+  height:78px !important;
+  font-size:24px !important;
+}
+
+/* Mobile étroit : on réduit un peu pour éviter les chevauchements */
+@media(max-width:430px){
+  #revision .revision-orbit-nav{
+    width:100% !important;
+    height:416px !important;
+  }
+
+  #revision .revision-orbit-card{
+    width:calc(50% - 7px) !important;
+    height:194px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    width:52px !important;
+    height:52px !important;
+    font-size:26px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon{left:36px !important; top:36px !important;}
+  #revision .revision-zone .revision-orbit-icon{right:36px !important; top:36px !important;}
+  #revision .revision-review .revision-orbit-icon{left:36px !important; top:44px !important;}
+  #revision .revision-seen .revision-orbit-icon{right:36px !important; top:44px !important;}
+
+  #revision .revision-orbit-card strong{
+    font-size:18.5px !important;
+    max-width:118px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    font-size:11.4px !important;
+    max-width:118px !important;
+  }
+
+  #revision .revision-random strong{left:22px !important; top:106px !important;}
+  #revision .revision-random small{left:22px !important; top:132px !important;}
+
+  #revision .revision-zone strong{right:22px !important; top:106px !important;}
+  #revision .revision-zone small{right:22px !important; top:132px !important;}
+
+  #revision .revision-review strong{left:22px !important; top:110px !important;}
+  #revision .revision-review small{left:22px !important; top:136px !important;}
+
+  #revision .revision-seen strong{right:22px !important; top:110px !important;}
+  #revision .revision-seen small{right:22px !important; top:136px !important;}
+
+  #revision .revision-orbit-center{
+    width:72px !important;
+    height:72px !important;
+    font-size:22px !important;
+  }
+}
+
+@media(max-width:380px){
+  #revision .revision-orbit-nav{
+    height:398px !important;
+  }
+
+  #revision .revision-orbit-card{
+    height:186px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    width:48px !important;
+    height:48px !important;
+    font-size:24px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon{left:31px !important;}
+  #revision .revision-zone .revision-orbit-icon{right:31px !important;}
+  #revision .revision-review .revision-orbit-icon{left:31px !important;}
+  #revision .revision-seen .revision-orbit-icon{right:31px !important;}
+
+  #revision .revision-orbit-card strong{
+    font-size:17.5px !important;
+    max-width:104px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    font-size:10.8px !important;
+    max-width:104px !important;
+  }
+
+  #revision .revision-random strong{left:18px !important; top:102px !important;}
+  #revision .revision-random small{left:18px !important; top:127px !important;}
+
+  #revision .revision-zone strong{right:18px !important; top:102px !important;}
+  #revision .revision-zone small{right:18px !important; top:127px !important;}
+
+  #revision .revision-review strong{left:18px !important; top:106px !important;}
+  #revision .revision-review small{left:18px !important; top:131px !important;}
+
+  #revision .revision-seen strong{right:18px !important; top:106px !important;}
+  #revision .revision-seen small{right:18px !important; top:131px !important;}
+}
+</style>
+
+
+<style>
+/* === RÉVISER : version premium lisible — icône + titre + sous-titre groupés === */
+/* Correction ciblée uniquement sur les 4 demi-cercles de la page Réviser. */
+
+#revision .revision-orbit-nav{
+  width:min(100%, 418px) !important;
+  height:426px !important;
+  margin:0 auto 18px !important;
+  position:relative !important;
+}
+
+#revision .revision-orbit-card{
+  width:calc(50% - 8px) !important;
+  height:198px !important;
+  position:absolute !important;
+  overflow:hidden !important;
+  padding:0 !important;
+  display:block !important;
+  isolation:isolate !important;
+}
+
+/* Halo interne : donne un repère visuel au groupe texte + icône */
+#revision .revision-orbit-card::before{
+  content:"" !important;
+  position:absolute !important;
+  z-index:1 !important;
+  width:138px !important;
+  height:118px !important;
+  border-radius:28px !important;
+  background:
+    radial-gradient(circle at 50% 20%, color-mix(in srgb,currentColor 22%, transparent), transparent 58%),
+    linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.010)) !important;
+  opacity:.72 !important;
+  pointer-events:none !important;
+}
+
+/* Position du halo dans chaque quart */
+#revision .revision-random::before{ left:18px !important; top:26px !important; }
+#revision .revision-zone::before{ right:18px !important; top:26px !important; }
+#revision .revision-review::before{ left:18px !important; top:46px !important; }
+#revision .revision-seen::before{ right:18px !important; top:46px !important; }
+
+/* Icônes : plus proches des titres et centrées dans le groupe */
+#revision .revision-orbit-icon{
+  z-index:3 !important;
+  width:56px !important;
+  height:56px !important;
+  font-size:28px !important;
+  line-height:1 !important;
+  display:grid !important;
+  place-items:center !important;
+  border-width:1.5px !important;
+  background:rgba(5,15,31,.34) !important;
+  backdrop-filter:blur(5px) !important;
+  -webkit-backdrop-filter:blur(5px) !important;
+}
+
+/* Quart haut gauche */
+#revision .revision-random .revision-orbit-icon{
+  left:40px !important;
+  top:35px !important;
+}
+
+#revision .revision-random strong{
+  left:28px !important;
+  top:100px !important;
+  max-width:138px !important;
+  text-align:left !important;
+}
+
+#revision .revision-random small{
+  left:28px !important;
+  top:128px !important;
+  max-width:138px !important;
+  text-align:left !important;
+}
+
+/* Quart haut droit */
+#revision .revision-zone .revision-orbit-icon{
+  right:40px !important;
+  top:35px !important;
+}
+
+#revision .revision-zone strong{
+  right:28px !important;
+  top:100px !important;
+  max-width:138px !important;
+  text-align:right !important;
+}
+
+#revision .revision-zone small{
+  right:28px !important;
+  top:128px !important;
+  max-width:138px !important;
+  text-align:right !important;
+}
+
+/* Quart bas gauche */
+#revision .revision-review .revision-orbit-icon{
+  left:40px !important;
+  top:54px !important;
+}
+
+#revision .revision-review strong{
+  left:28px !important;
+  top:119px !important;
+  max-width:138px !important;
+  text-align:left !important;
+}
+
+#revision .revision-review small{
+  left:28px !important;
+  top:147px !important;
+  max-width:138px !important;
+  text-align:left !important;
+}
+
+/* Quart bas droit */
+#revision .revision-seen .revision-orbit-icon{
+  right:40px !important;
+  top:54px !important;
+}
+
+#revision .revision-seen strong{
+  right:28px !important;
+  top:119px !important;
+  max-width:138px !important;
+  text-align:right !important;
+}
+
+#revision .revision-seen small{
+  right:28px !important;
+  top:147px !important;
+  max-width:138px !important;
+  text-align:right !important;
+}
+
+/* Typographie : titres plus éditoriaux, sous-titres plus visibles */
+#revision .revision-orbit-card strong{
+  z-index:3 !important;
+  color:#fff !important;
+  font-size:21px !important;
+  line-height:1.02 !important;
+  font-weight:950 !important;
+  letter-spacing:-.055em !important;
+  text-shadow:0 3px 14px rgba(0,0,0,.68) !important;
+}
+
+#revision .revision-orbit-card small{
+  z-index:3 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  color:rgba(255,255,255,.82) !important;
+  font-size:11.8px !important;
+  line-height:1.1 !important;
+  font-weight:800 !important;
+  text-shadow:0 2px 10px rgba(0,0,0,.70) !important;
+}
+
+/* Centre : légèrement plus petit, moins envahissant */
+#revision .revision-orbit-center{
+  width:74px !important;
+  height:74px !important;
+  font-size:23px !important;
+  z-index:5 !important;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,.12), transparent 62%),
+    rgba(5,15,31,.58) !important;
+}
+
+/* Mobile */
+@media(max-width:430px){
+  #revision .revision-orbit-nav{
+    height:410px !important;
+  }
+
+  #revision .revision-orbit-card{
+    height:190px !important;
+    width:calc(50% - 7px) !important;
+  }
+
+  #revision .revision-orbit-card::before{
+    width:124px !important;
+    height:110px !important;
+  }
+
+  #revision .revision-random::before{ left:14px !important; top:24px !important; }
+  #revision .revision-zone::before{ right:14px !important; top:24px !important; }
+  #revision .revision-review::before{ left:14px !important; top:42px !important; }
+  #revision .revision-seen::before{ right:14px !important; top:42px !important; }
+
+  #revision .revision-orbit-icon{
+    width:51px !important;
+    height:51px !important;
+    font-size:25px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon{ left:32px !important; top:32px !important; }
+  #revision .revision-zone .revision-orbit-icon{ right:32px !important; top:32px !important; }
+  #revision .revision-review .revision-orbit-icon{ left:32px !important; top:50px !important; }
+  #revision .revision-seen .revision-orbit-icon{ right:32px !important; top:50px !important; }
+
+  #revision .revision-orbit-card strong{
+    font-size:19px !important;
+    max-width:118px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    font-size:11px !important;
+    max-width:118px !important;
+  }
+
+  #revision .revision-random strong{ left:22px !important; top:94px !important; }
+  #revision .revision-random small{ left:22px !important; top:120px !important; }
+
+  #revision .revision-zone strong{ right:22px !important; top:94px !important; }
+  #revision .revision-zone small{ right:22px !important; top:120px !important; }
+
+  #revision .revision-review strong{ left:22px !important; top:112px !important; }
+  #revision .revision-review small{ left:22px !important; top:138px !important; }
+
+  #revision .revision-seen strong{ right:22px !important; top:112px !important; }
+  #revision .revision-seen small{ right:22px !important; top:138px !important; }
+
+  #revision .revision-orbit-center{
+    width:68px !important;
+    height:68px !important;
+    font-size:21px !important;
+  }
+}
+
+@media(max-width:380px){
+  #revision .revision-orbit-nav{
+    height:394px !important;
+  }
+
+  #revision .revision-orbit-card{
+    height:182px !important;
+  }
+
+  #revision .revision-orbit-card::before{
+    width:112px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    width:47px !important;
+    height:47px !important;
+    font-size:23px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon{ left:27px !important; }
+  #revision .revision-zone .revision-orbit-icon{ right:27px !important; }
+  #revision .revision-review .revision-orbit-icon{ left:27px !important; }
+  #revision .revision-seen .revision-orbit-icon{ right:27px !important; }
+
+  #revision .revision-orbit-card strong{
+    font-size:17.5px !important;
+    max-width:104px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    font-size:10.2px !important;
+    max-width:104px !important;
+  }
+
+  #revision .revision-random strong{ left:18px !important; top:91px !important; }
+  #revision .revision-random small{ left:18px !important; top:115px !important; }
+
+  #revision .revision-zone strong{ right:18px !important; top:91px !important; }
+  #revision .revision-zone small{ right:18px !important; top:115px !important; }
+
+  #revision .revision-review strong{ left:18px !important; top:108px !important; }
+  #revision .revision-review small{ left:18px !important; top:132px !important; }
+
+  #revision .revision-seen strong{ right:18px !important; top:108px !important; }
+  #revision .revision-seen small{ right:18px !important; top:132px !important; }
+}
+</style>
+
+
+<style>
+/* === RÉVISER : version validée type page d’accueil === */
+/* 4 grands quartiers, contenu centré dans chaque zone, plus lisible et plus premium. */
+
+#revision .revision-orbit-nav{
+  width:min(100%, 430px) !important;
+  height:492px !important;
+  margin:2px auto 18px !important;
+  position:relative !important;
+  filter:drop-shadow(0 24px 60px rgba(0,0,0,.38)) !important;
+  overflow:visible !important;
+}
+
+/* Silhouette centrale discrète, comme la maquette */
+#revision .revision-orbit-backdrop{
+  position:absolute !important;
+  z-index:1 !important;
+  inset:14px 72px 18px !important;
+  opacity:.22 !important;
+  mix-blend-mode:screen !important;
+  pointer-events:none !important;
+  background:
+    linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.50)),
+    url("assets/images/video-zone-person.png") center 54% / contain no-repeat !important;
+  filter:drop-shadow(0 0 30px rgba(0,229,255,.22)) !important;
+}
+
+/* Formes très proches de l’accueil : grands quartiers lisibles */
+#revision .revision-orbit-card{
+  width:calc(50% - 9px) !important;
+  height:232px !important;
+  position:absolute !important;
+  z-index:2 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+  display:block !important;
+  text-align:center !important;
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb,currentColor 18%, transparent), transparent 50%),
+    linear-gradient(145deg, rgba(5,15,31,.52), rgba(5,15,31,.86)) !important;
+  backdrop-filter:blur(7px) !important;
+  -webkit-backdrop-filter:blur(7px) !important;
+  border:2px solid currentColor !important;
+  box-shadow:
+    0 0 30px color-mix(in srgb,currentColor 30%, transparent),
+    inset 0 0 30px color-mix(in srgb,currentColor 10%, transparent) !important;
+}
+
+/* On annule les halos rectangulaires précédents */
+#revision .revision-orbit-card::before{
+  display:none !important;
+}
+
+#revision .revision-orbit-card::after{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.06), transparent 38%, rgba(255,255,255,.016)),
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.035), transparent 52%) !important;
+  pointer-events:none !important;
+}
+
+/* Quartiers */
+#revision .revision-random{
+  left:0 !important;
+  top:0 !important;
+  color:var(--violet) !important;
+  border-radius:128px 30px 30px 30px !important;
+}
+
+#revision .revision-zone{
+  right:0 !important;
+  top:0 !important;
+  color:var(--green) !important;
+  border-radius:30px 128px 30px 30px !important;
+}
+
+#revision .revision-review{
+  left:0 !important;
+  bottom:0 !important;
+  color:var(--orange) !important;
+  border-radius:30px 30px 30px 128px !important;
+}
+
+#revision .revision-seen{
+  right:0 !important;
+  bottom:0 !important;
+  color:var(--cyan) !important;
+  border-radius:30px 30px 128px 30px !important;
+}
+
+/* Icônes centrées dans chaque quartier, comme sur l’accueil */
+#revision .revision-orbit-icon{
+  position:absolute !important;
+  z-index:3 !important;
+  width:64px !important;
+  height:64px !important;
+  border-radius:50% !important;
+  display:grid !important;
+  place-items:center !important;
+  font-size:31px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  color:currentColor !important;
+  border:2px solid currentColor !important;
+  background:
+    radial-gradient(circle at 50% 35%, color-mix(in srgb,currentColor 18%, transparent), transparent 58%),
+    rgba(5,15,31,.42) !important;
+  box-shadow:
+    0 0 24px color-mix(in srgb,currentColor 42%, transparent),
+    inset 0 0 18px rgba(255,255,255,.04) !important;
+  text-shadow:0 0 14px currentColor !important;
+  backdrop-filter:blur(6px) !important;
+  -webkit-backdrop-filter:blur(6px) !important;
+}
+
+/* Positions icônes */
+#revision .revision-random .revision-orbit-icon{
+  left:50% !important;
+  top:56px !important;
+  transform:translateX(-50%) !important;
+}
+
+#revision .revision-zone .revision-orbit-icon{
+  left:50% !important;
+  top:56px !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+}
+
+#revision .revision-review .revision-orbit-icon{
+  left:50% !important;
+  top:56px !important;
+  transform:translateX(-50%) !important;
+}
+
+#revision .revision-seen .revision-orbit-icon{
+  left:50% !important;
+  top:56px !important;
+  right:auto !important;
+  transform:translateX(-50%) !important;
+}
+
+/* Titres et sous-titres : centrés, gros, non perdus */
+#revision .revision-orbit-card strong{
+  position:absolute !important;
+  z-index:3 !important;
+  left:16px !important;
+  right:16px !important;
+  top:138px !important;
+  max-width:none !important;
+  display:block !important;
+  color:#fff !important;
+  font-size:24px !important;
+  line-height:1.02 !important;
+  font-weight:950 !important;
+  letter-spacing:-.055em !important;
+  text-align:center !important;
+  text-shadow:0 3px 16px rgba(0,0,0,.72) !important;
+}
+
+#revision .revision-orbit-card small{
+  position:absolute !important;
+  z-index:3 !important;
+  left:14px !important;
+  right:14px !important;
+  top:170px !important;
+  max-width:none !important;
+  display:block !important;
+  color:rgba(221,232,255,.82) !important;
+  font-size:14px !important;
+  line-height:1.12 !important;
+  font-weight:850 !important;
+  text-align:center !important;
+  text-shadow:0 2px 12px rgba(0,0,0,.72) !important;
+}
+
+/* Centre : rond comme la page accueil, lisible mais pas envahissant */
+#revision .revision-orbit-center{
+  position:absolute !important;
+  z-index:5 !important;
+  left:50% !important;
+  top:50% !important;
+  width:90px !important;
+  height:90px !important;
+  transform:translate(-50%,-50%) !important;
+  border-radius:50% !important;
+  display:grid !important;
+  place-items:center !important;
+  color:var(--cyan) !important;
+  border:3px solid rgba(128,232,255,.98) !important;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(0,229,255,.18), transparent 60%),
+    rgba(5,15,31,.82) !important;
+  box-shadow:
+    0 0 34px rgba(0,229,255,.36),
+    inset 0 0 28px rgba(0,229,255,.14) !important;
+  font-size:30px !important;
+}
+
+/* Responsive iPhone / CodePen */
+@media(max-width:430px){
+  #revision .revision-orbit-nav{
+    height:468px !important;
+  }
+
+  #revision .revision-orbit-card{
+    width:calc(50% - 8px) !important;
+    height:220px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    width:58px !important;
+    height:58px !important;
+    font-size:28px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon,
+  #revision .revision-zone .revision-orbit-icon,
+  #revision .revision-review .revision-orbit-icon,
+  #revision .revision-seen .revision-orbit-icon{
+    top:50px !important;
+  }
+
+  #revision .revision-orbit-card strong{
+    top:128px !important;
+    font-size:22px !important;
+    left:12px !important;
+    right:12px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    top:158px !important;
+    font-size:13px !important;
+    left:10px !important;
+    right:10px !important;
+  }
+
+  #revision .revision-orbit-center{
+    width:84px !important;
+    height:84px !important;
+    font-size:28px !important;
+  }
+
+  #revision .revision-orbit-backdrop{
+    inset:18px 58px 18px !important;
+    opacity:.20 !important;
+  }
+}
+
+@media(max-width:380px){
+  #revision .revision-orbit-nav{
+    height:444px !important;
+  }
+
+  #revision .revision-orbit-card{
+    height:208px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    width:52px !important;
+    height:52px !important;
+    font-size:25px !important;
+  }
+
+  #revision .revision-random .revision-orbit-icon,
+  #revision .revision-zone .revision-orbit-icon,
+  #revision .revision-review .revision-orbit-icon,
+  #revision .revision-seen .revision-orbit-icon{
+    top:46px !important;
+  }
+
+  #revision .revision-orbit-card strong{
+    top:120px !important;
+    font-size:20px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    top:148px !important;
+    font-size:12px !important;
+  }
+
+  #revision .revision-orbit-center{
+    width:76px !important;
+    height:76px !important;
+    font-size:25px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === RÉVISER : retour de l'image d'étude choisie ensemble === */
+/* On remet l'image de fond de révision déjà prévue dans le code : assets/images/revision-bg.webp
+   et on garde la disposition type page d'accueil validée. */
+
+#revision .revision-orbit-backdrop{
+  position:absolute !important;
+  z-index:1 !important;
+  inset:0 22px 0 !important;
+  opacity:.58 !important;
+  mix-blend-mode:screen !important;
+  pointer-events:none !important;
+  background:
+    linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.46)),
+    url("assets/images/revision-bg.webp") center 52% / 118% auto no-repeat !important;
+  filter:
+    brightness(1.20)
+    saturate(1.18)
+    drop-shadow(0 0 28px rgba(0,229,255,.22)) !important;
+}
+
+/* On conserve les 4 grandes zones, mais l'image reste visible derrière */
+#revision .revision-orbit-card{
+  background:
+    radial-gradient(circle at 50% 38%, color-mix(in srgb,currentColor 14%, transparent), transparent 52%),
+    linear-gradient(145deg, rgba(5,15,31,.42), rgba(5,15,31,.78)) !important;
+  backdrop-filter:blur(5px) !important;
+  -webkit-backdrop-filter:blur(5px) !important;
+}
+
+/* Petit voile central pour éviter que l'image gêne les textes */
+#revision .revision-orbit-card::after{
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.05), transparent 40%, rgba(255,255,255,.012)),
+    radial-gradient(circle at 50% 58%, rgba(5,15,31,.18), transparent 56%) !important;
+}
+
+@media(max-width:430px){
+  #revision .revision-orbit-backdrop{
+    inset:2px 14px 0 !important;
+    opacity:.56 !important;
+    background:
+      linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.48)),
+      url("assets/images/revision-bg.webp") center 52% / 126% auto no-repeat !important;
+  }
+}
+
+@media(max-width:380px){
+  #revision .revision-orbit-backdrop{
+    inset:2px 8px 0 !important;
+    opacity:.54 !important;
+    background:
+      linear-gradient(180deg, rgba(4,15,31,.12), rgba(4,15,31,.50)),
+      url("assets/images/revision-bg.webp") center 52% / 134% auto no-repeat !important;
+  }
+}
+</style>
+
+
+<style>
+/* === FIX RÉVISER RÉEL : scroll contrôlé + contenu non bloqué === */
+/* Vérification : le souci venait du fait que le scroll reposait sur l'écran absolu interne.
+   On ajoute un vrai spacer HTML et on force le conteneur Réviser à devenir un scroll-container iOS. */
+
+#revision{
+  height:100dvh !important;
+  max-height:100dvh !important;
+  overflow-y:scroll !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  touch-action:auto !important;
+  overscroll-behavior-y:auto !important;
+  padding-bottom:calc(128px + var(--safe-bottom)) !important;
+  scroll-padding-bottom:calc(128px + var(--safe-bottom)) !important;
+}
+
+/* Les enfants ne doivent pas bloquer le geste vertical */
+#revision .revision-page-title,
+#revision .revision-orbit-nav,
+#revision .revision-orbit-card,
+#revision .revision-orbit-backdrop{
+  touch-action:pan-y !important;
+}
+
+/* Le bloc des 4 cases reste dans le flux et laisse de l'air sous lui */
+#revision .revision-orbit-nav{
+  width:min(100%, 430px) !important;
+  height:492px !important;
+  margin:2px auto 22px !important;
+  flex:0 0 auto !important;
+}
+
+/* Vrai espace DOM sous la roue, nécessaire sur iOS/CodePen */
+#revision .revision-scroll-spacer{
+  display:block !important;
+  width:100% !important;
+  height:calc(118px + var(--safe-bottom)) !important;
+  flex:0 0 auto !important;
+}
+
+/* On annule les pseudo-spacers précédents qui peuvent être ignorés ou instables */
+#revision::after,
+#revision.revision-orbit-screen::after{
+  content:none !important;
+  display:none !important;
+}
+
+/* Image de fond d'étude choisie ensemble */
+#revision .revision-orbit-backdrop{
+  position:absolute !important;
+  z-index:1 !important;
+  inset:0 22px 0 !important;
+  opacity:.58 !important;
+  mix-blend-mode:screen !important;
+  pointer-events:none !important;
+  background:
+    linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.46)),
+    url("assets/images/revision-bg.webp") center 52% / 118% auto no-repeat !important;
+  filter:brightness(1.20) saturate(1.18) drop-shadow(0 0 28px rgba(0,229,255,.22)) !important;
+}
+
+/* iPad/CodePen horizontal : on compacte un peu mais on garde le scroll */
+@media(max-height:820px){
+  #revision .revision-page-title{
+    margin-top:8px !important;
+    margin-bottom:12px !important;
+    padding-top:14px !important;
+    padding-bottom:13px !important;
+  }
+
+  #revision .revision-orbit-nav{
+    height:468px !important;
+    margin-bottom:20px !important;
+  }
+
+  #revision .revision-orbit-card{
+    height:220px !important;
+  }
+
+  #revision .revision-orbit-card strong{
+    top:128px !important;
+  }
+
+  #revision .revision-orbit-card small{
+    top:158px !important;
+  }
+
+  #revision .revision-orbit-icon{
+    top:50px !important;
+  }
+
+  #revision .revision-orbit-center{
+    width:84px !important;
+    height:84px !important;
+  }
+
+  #revision .revision-scroll-spacer{
+    height:calc(138px + var(--safe-bottom)) !important;
+  }
+}
+
+@media(max-width:430px){
+  #revision{
+    padding-bottom:calc(150px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-orbit-nav{
+    height:468px !important;
+  }
+
+  #revision .revision-scroll-spacer{
+    height:calc(150px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-orbit-backdrop{
+    inset:2px 14px 0 !important;
+    opacity:.56 !important;
+    background:
+      linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.48)),
+      url("assets/images/revision-bg.webp") center 52% / 126% auto no-repeat !important;
+  }
+}
+
+@media(max-width:380px){
+  #revision .revision-orbit-nav{
+    height:444px !important;
+  }
+
+  #revision .revision-scroll-spacer{
+    height:calc(160px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-orbit-backdrop{
+    inset:2px 8px 0 !important;
+    opacity:.54 !important;
+    background:
+      linear-gradient(180deg, rgba(4,15,31,.12), rgba(4,15,31,.50)),
+      url("assets/images/revision-bg.webp") center 52% / 134% auto no-repeat !important;
+  }
+}
+</style>
+
+
+<script>
+/* Sécurité scroll Réviser */
+(function(){
+  const previousGoForRevisionScroll = window.go;
+  if(typeof previousGoForRevisionScroll === "function" && !window.__revisionScrollFixed){
+    window.go = function(id){
+      previousGoForRevisionScroll(id);
+      if(id === "revision"){
+        const screen = document.getElementById("revision");
+        if(screen){
+          setTimeout(()=>{ screen.scrollTop = 0; }, 40);
+          setTimeout(()=>{ 
+            if(typeof updateScrollHint === "function") updateScrollHint();
+          }, 120);
+        }
+      }
+    };
+    window.__revisionScrollFixed = true;
+  }
+})();
+</script>
+
+
+<style>
+/* === FIX RÉVISER : suppression du grand vide sous les 4 cases === */
+/* On garde le scroll tactile, mais on enlève l'espace excessif ajouté au patch précédent. */
+
+#revision{
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  touch-action:pan-y !important;
+  padding-bottom:calc(96px + var(--safe-bottom)) !important;
+  scroll-padding-bottom:calc(96px + var(--safe-bottom)) !important;
+}
+
+/* Vrai espace minimal : juste assez pour ne pas coller au menu bas */
+#revision .revision-scroll-spacer{
+  display:block !important;
+  height:calc(18px + var(--safe-bottom)) !important;
+  width:100% !important;
+}
+
+/* On réduit aussi l'écart après le bloc des 4 zones */
+#revision .revision-orbit-nav{
+  margin-bottom:8px !important;
+}
+
+/* Sur iPad/CodePen bas en hauteur, on garde une respiration très courte, pas un grand vide */
+@media(max-height:820px){
+  #revision{
+    padding-bottom:calc(104px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-scroll-spacer{
+    height:calc(22px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-orbit-nav{
+    margin-bottom:6px !important;
+  }
+}
+
+@media(max-width:430px){
+  #revision{
+    padding-bottom:calc(108px + var(--safe-bottom)) !important;
+  }
+
+  #revision .revision-scroll-spacer{
+    height:calc(24px + var(--safe-bottom)) !important;
   }
 }
 </style>
