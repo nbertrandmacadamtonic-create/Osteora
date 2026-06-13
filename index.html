@@ -7065,6 +7065,25 @@ button[data-tech-id="12"]{
 
 </head>
 <body>
+
+<!--
+LOGOS À DÉPOSER DANS GITHUB :
+assets/images/icons/icon-videos.webp
+assets/images/icons/icon-fiches.webp
+assets/images/icons/icon-revision.webp
+assets/images/icons/icon-mes-acquis.webp
+assets/images/icons/icon-statistiques.webp
+assets/images/icons/icon-catalogue.webp
+assets/images/icons/icon-zones.webp
+assets/images/icons/icon-rachis.webp
+assets/images/icons/icon-bassin.webp
+assets/images/icons/icon-membres-superieurs.webp
+assets/images/icons/icon-membres-inferieurs.webp
+assets/images/icons/icon-lecteur.webp
+assets/images/icons/icon-favoris.webp
+assets/images/icons/icon-reglages.webp
+-->
+
 <main class="app">
 
 
@@ -7430,10 +7449,10 @@ button[data-tech-id="12"]{
 
   <section class="catalogue-book-visual" onclick="toast('Choisissez une zone ou recherchez une technique')" aria-label="Catalogue d’ostéopathie">
     <picture>
-      <source srcset="assets/images/catalogue-osteopathie-premium-mobile.webp" media="(max-width:430px)">
+      <source srcset="assets/images/catalogue-osteopathie-3d-transparent.webp" media="(max-width:430px)">
       <img
-        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/catalogue-osteopathie-premium.webp"
-        data-fallback-src="assets/images/catalogue-osteopathie-premium.webp"
+        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/catalogue-osteopathie-3d-transparent.webp"
+        data-fallback-src="assets/images/catalogue-osteopathie-3d-transparent.webp"
         alt="Catalogue d’ostéopathie"
         onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}"
       >
@@ -7444,39 +7463,31 @@ button[data-tech-id="12"]{
     <button class="catalogue-zone-mini rachis" onclick="openZoneAll('Rachis')">
       <div class="mini-zone-icon">⌇</div>
       <strong>Rachis</strong>
+      <small><b id="countRachis">60</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini msup" onclick="openZoneAll('Membres supérieurs')">
       <div class="mini-zone-icon">◜</div>
       <strong>Membres<br>supérieurs</strong>
+      <small><b id="countMSup">17</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini minf" onclick="openZoneAll('Membres inférieurs')">
       <div class="mini-zone-icon">◟</div>
       <strong>Membres<br>inférieurs</strong>
+      <small><b id="countMInf">31</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini bassin" onclick="openZoneAll('Bassin')">
       <div class="mini-zone-icon">◡</div>
       <strong>Bassin</strong>
+      <small><b id="countBassin">20</b> techniques</small>
       <span>→</span>
     </button>
   </section>
-
-  <article class="catalogue-feature-tech" onclick="openTechniqueFromCatalogue(561)" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openTechniqueFromCatalogue(561);}">
-    <div class="feature-tech-icon">
-      <span>◟</span>
-    </div>
-    <div class="feature-tech-content">
-      <small>Technique</small>
-      <strong>Dysfonction sous-talienne du calcanéum en valgus à droite</strong>
-      <em>Technique premium</em>
-    </div>
-    <button aria-label="Ouvrir la technique">→</button>
-  </article>
 </section>
 
 <section id="rachis" class="screen">
@@ -7740,7 +7751,54 @@ button[data-tech-id="12"]{
   <div id="seenCardGrid" class="card-grid"></div>
 </section>
 
-<section id="quiz" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Quiz</h1><p class="subtitle">Question 1 / 20</p></div><button class="icon">✓</button></header><div class="quizbar"><i style="width:35%"></i></div><article class="quiz-card"><h2>Quelle est la première étape essentielle avant d’appliquer une technique structurelle ?</h2><button><span>A</span>Appliquer directement la manipulation spécifique</button><button class="right"><span>B</span>Évaluer la posture, la mobilité et les tissus environnants</button><button><span>C</span>Chauffer la zone uniquement</button><button><span>D</span>Informer uniquement si douleur</button></article><article class="feedback"><strong>Bonne réponse !</strong><p>L’évaluation permet d’adapter la technique.</p></article></section>
+
+<section id="quiz" class="screen quiz-general-screen">
+  <header class="top">
+    <button class="icon round" onclick="go('home')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Quiz</h1>
+      <p id="quizSubtitle" class="subtitle">Mes acquis</p>
+    </div>
+    <button class="icon" onclick="restartGeneralQuiz()">↺</button>
+  </header>
+
+  <div class="quiz-general-title">
+    <h1>Tester mes acquis</h1>
+    <p>Quiz général · bases communes</p>
+  </div>
+
+  <div class="quizbar quiz-general-progress">
+    <i id="quizProgressBar" style="width:0%"></i>
+  </div>
+
+  <article class="quiz-card quiz-general-card">
+    <div class="quiz-kicker">
+      <span id="quizQuestionCounter">Question 1 / 15</span>
+      <em id="quizQuestionCategory">Général</em>
+    </div>
+
+    <h2 id="quizQuestionText">Question</h2>
+
+    <div id="quizAnswers" class="quiz-answers"></div>
+  </article>
+
+  <article id="quizFeedback" class="feedback quiz-feedback" style="display:none">
+    <strong id="quizFeedbackTitle">Réponse</strong>
+    <p id="quizFeedbackText"></p>
+    <button id="quizNextButton" class="primary" onclick="nextGeneralQuiz()">Question suivante</button>
+  </article>
+
+  <article id="quizResult" class="quiz-result-card" style="display:none">
+    <div class="quiz-result-score">
+      <strong id="quizFinalScore">0</strong>
+      <span>/ 15</span>
+    </div>
+    <h2 id="quizResultTitle">Quiz terminé</h2>
+    <p id="quizResultText">Vos résultats seront envoyés dans la page Stats.</p>
+    <button class="primary" onclick="restartGeneralQuiz()">Recommencer</button>
+    <button class="secondary" onclick="go('progress')">Voir mes stats</button>
+  </article>
+</section>
 
 <section id="progress" class="screen stats-screen">
   <header class="top stats-top">
@@ -7775,9 +7833,9 @@ button[data-tech-id="12"]{
     </div>
 
     <div class="stats-global-grid">
-      <div class="stats-ring" style="--value:68">
+      <div id="statsGlobalRing" class="stats-ring" style="--value:0">
         <div class="stats-ring-inner">
-          <strong>68<span>%</span></strong>
+          <strong id="statsGlobalPercent">0<span>%</span></strong>
           <small>de progression</small>
         </div>
       </div>
@@ -7785,24 +7843,45 @@ button[data-tech-id="12"]{
       <div class="stats-main-kpis">
         <article>
           <i>▷</i>
-          <span>Vidéos vues</span>
-          <strong id="statsVideos">42</strong>
-          <small>/ 128</small>
+          <span>Vidéos vues entièrement</span>
+          <strong id="statsVideos">0</strong>
+          <small id="statsVideosTotal">/ 128</small>
         </article>
         <article>
           <i>▤</i>
           <span>Fiches consultées</span>
-          <strong id="statsSheets">31</strong>
-          <small>/ 128</small>
+          <strong id="statsSheets">0</strong>
+          <small id="statsSheetsTotal">/ 128</small>
         </article>
         <article>
           <i>◎</i>
           <span>Quiz réussis</span>
-          <strong id="statsQuiz">76<span>%</span></strong>
-          <small>taux de réussite</small>
+          <strong id="statsQuiz">—</strong>
+          <small id="statsQuizDetail">Aucun quiz terminé</small>
         </article>
       </div>
     </div>
+  
+</section>
+
+  <section class="stats-quiz-card">
+    <div class="stats-card-head">
+      <div class="stats-head-icon orange">✓</div>
+      <h2>Quiz général</h2>
+    </div>
+
+    <div class="stats-quiz-body">
+      <div class="stats-quiz-score">
+        <strong id="statsQuizScore">—</strong>
+        <small id="statsQuizScoreTotal">/ 15</small>
+      </div>
+      <div class="stats-quiz-info">
+        <span id="statsQuizPercent">Aucun score</span>
+        <p id="statsQuizMessage">Terminez le quiz général pour afficher votre résultat ici.</p>
+      </div>
+    </div>
+
+    <button class="stats-quiz-button" onclick="go('quiz')">Relancer le quiz <span>›</span></button>
   </section>
 
   <section class="stats-two-grid">
@@ -7811,9 +7890,9 @@ button[data-tech-id="12"]{
         <div class="stats-head-icon violet">▷</div>
         <h2>Dernière activité</h2>
       </div>
-      <p>Aujourd’hui · 21:36</p>
-      <strong>Technique HVLA lombaire</strong>
-      <button onclick="toast('Historique à venir')">Voir l’historique <span>›</span></button>
+      <p id="statsLastActivityDate">Aucune activité récente</p>
+      <strong id="statsLastActivityTitle">Lancez une vidéo ou un quiz</strong>
+      <button onclick="go('quiz')">Reprendre le quiz <span>›</span></button>
     </article>
 
     <article class="stats-mini-card">
@@ -7841,9 +7920,9 @@ button[data-tech-id="12"]{
       <div class="stats-zone-focus-body">
         <div class="stats-zone-orb">⌇</div>
         <div>
-          <span>Rachis</span>
-          <strong>72<span>%</span></strong>
-          <p>de votre temps d’étude</p>
+          <span id="statsTopZoneName">Aucune zone</span>
+          <strong id="statsTopZonePercent">0<span>%</span></strong>
+          <p id="statsTopZoneDetail">Commencez par regarder une vidéo</p>
         </div>
       </div>
     </article>
@@ -7853,11 +7932,11 @@ button[data-tech-id="12"]{
         <div class="stats-head-icon">▥</div>
         <h2>Progression par zone</h2>
       </div>
-      <div class="stats-zone-bars">
-        <p><span>Rachis</span><i><b style="width:72%"></b></i><strong>72%</strong></p>
-        <p><span>Membres supérieurs</span><i><b class="violet-bar" style="width:48%"></b></i><strong class="violet-text">48%</strong></p>
-        <p><span>Membres inférieurs</span><i><b class="orange-bar" style="width:41%"></b></i><strong class="orange-text">41%</strong></p>
-        <p><span>Bassin</span><i><b class="green-bar" style="width:35%"></b></i><strong class="green-text">35%</strong></p>
+      <div class="stats-zone-bars" id="statsZoneBars">
+        <p><span>Rachis <em id="statsRachisCount">0/0</em></span><i><b id="statsRachisBar" style="width:0%"></b></i><strong id="statsRachisPct">0%</strong></p>
+        <p><span>Membres supérieurs <em id="statsMSupCount">0/0</em></span><i><b id="statsMSupBar" class="violet-bar" style="width:0%"></b></i><strong id="statsMSupPct" class="violet-text">0%</strong></p>
+        <p><span>Membres inférieurs <em id="statsMInfCount">0/0</em></span><i><b id="statsMInfBar" class="orange-bar" style="width:0%"></b></i><strong id="statsMInfPct" class="orange-text">0%</strong></p>
+        <p><span>Bassin <em id="statsBassinCount">0/0</em></span><i><b id="statsBassinBar" class="green-bar" style="width:0%"></b></i><strong id="statsBassinPct" class="green-text">0%</strong></p>
       </div>
     </article>
   </section>
@@ -15382,6 +15461,1354 @@ document.addEventListener("DOMContentLoaded", ()=>{
 
   .catalogue-book-visual img{
     aspect-ratio: 9 / 10.8;
+  }
+}
+</style>
+
+
+<style>
+/* === CATALOGUE : suppression technique du bas + compteurs par zone === */
+
+.catalogue-zone-mini{
+  min-height:148px !important;
+  justify-content:center !important;
+  gap:8px !important;
+}
+
+.catalogue-zone-mini small{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:4px !important;
+  min-height:24px !important;
+  padding:4px 8px !important;
+  border-radius:999px !important;
+  color:rgba(221,232,255,.78) !important;
+  background:rgba(255,255,255,.045) !important;
+  border:1px solid rgba(255,255,255,.08) !important;
+  font-size:11px !important;
+  line-height:1 !important;
+  font-weight:800 !important;
+  white-space:nowrap !important;
+}
+
+.catalogue-zone-mini small b{
+  color:currentColor !important;
+  font-size:15px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+}
+
+.catalogue-zone-mini strong{
+  margin-top:2px !important;
+}
+
+.catalogue-feature-tech{
+  display:none !important;
+}
+
+@media(max-width:430px){
+  .catalogue-zone-mini{
+    min-height:136px !important;
+    gap:7px !important;
+  }
+
+  .catalogue-zone-mini small{
+    font-size:10px !important;
+    padding:4px 7px !important;
+  }
+
+  .catalogue-zone-mini small b{
+    font-size:14px !important;
+  }
+}
+
+@media(max-width:380px){
+  .catalogue-zone-mini{
+    min-height:122px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === CATALOGUE : bonne image détourée 3D transparente === */
+/* Ligne correcte :
+   assets/images/catalogue-osteopathie-3d-transparent.webp
+*/
+
+.catalogue-book-visual{
+  background:
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,.10), transparent 58%),
+    linear-gradient(145deg, rgba(10,29,55,.34), rgba(5,15,31,.78)) !important;
+}
+
+.catalogue-book-visual img{
+  object-fit:contain !important;
+  object-position:center center !important;
+  padding:10px !important;
+  background:transparent !important;
+}
+</style>
+
+
+<style>
+/* === CATALOGUE : suppression définitive du bloc technique premium du bas === */
+.catalogue-feature-tech{
+  display:none !important;
+  visibility:hidden !important;
+  height:0 !important;
+  min-height:0 !important;
+  max-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+</style>
+
+<script>
+
+/* === QUIZ GÉNÉRAL : 15 questions de base === */
+const generalQuizQuestions = [
+  {
+    id:"general_001",
+    category:"Général",
+    question:"Avant de réaliser une technique, quel est le premier élément à vérifier ?",
+    answers:[
+      "La force du praticien",
+      "L’indication et les contre-indications",
+      "La vitesse de la manipulation",
+      "Le nombre de répétitions"
+    ],
+    correct:1,
+    explanation:"Avant toute technique, il faut vérifier que le geste est indiqué et qu’il n’existe pas de contre-indication."
+  },
+  {
+    id:"general_002",
+    category:"Général",
+    question:"Une technique ostéopathique doit toujours être réalisée avec :",
+    answers:[
+      "Le maximum de force",
+      "Une mise en tension progressive et contrôlée",
+      "Une douleur importante",
+      "Une respiration bloquée"
+    ],
+    correct:1,
+    explanation:"La mise en tension doit rester progressive, précise et contrôlée."
+  },
+  {
+    id:"general_003",
+    category:"Question bonus",
+    question:"Qui est le meilleur ostéopathe du monde ?",
+    answers:[
+      "Nicolas Bertrand",
+      "Frédéric Zenouda",
+      "Les deux"
+    ],
+    correct:0,
+    customFeedback:true
+  },
+  {
+    id:"general_004",
+    category:"Général",
+    question:"Le confort du patient pendant une technique est important parce qu’il permet :",
+    answers:[
+      "D’aller plus vite",
+      "De diminuer les tensions de défense",
+      "De remplacer le diagnostic",
+      "D’éviter toute palpation"
+    ],
+    correct:1,
+    explanation:"Le confort limite les réactions de défense et permet une technique plus précise."
+  },
+  {
+    id:"general_005",
+    category:"Général",
+    question:"Le praticien doit utiliser principalement :",
+    answers:[
+      "Ses bras uniquement",
+      "Son poids du corps et son placement",
+      "Sa force maximale",
+      "Une traction permanente"
+    ],
+    correct:1,
+    explanation:"Le placement et le poids du corps permettent un geste plus économique et plus sûr."
+  },
+  {
+    id:"general_006",
+    category:"Sécurité",
+    question:"Une douleur vive pendant une mise en tension doit conduire à :",
+    answers:[
+      "Forcer davantage",
+      "Arrêter ou modifier la technique",
+      "Accélérer le geste",
+      "Ignorer la douleur"
+    ],
+    correct:1,
+    explanation:"Une douleur vive impose d’adapter ou d’arrêter la technique."
+  },
+  {
+    id:"general_007",
+    category:"Mobilité",
+    question:"Le terme “barrière motrice” correspond à :",
+    answers:[
+      "Une limite de mouvement perçue",
+      "Une douleur musculaire obligatoire",
+      "Une contraction volontaire maximale",
+      "Un blocage visible à la radio"
+    ],
+    correct:0,
+    explanation:"La barrière motrice correspond à une limite perceptible dans le mouvement."
+  },
+  {
+    id:"general_008",
+    category:"Installation",
+    question:"Une bonne installation du patient permet surtout :",
+    answers:[
+      "De rendre le geste plus spectaculaire",
+      "De sécuriser et de préciser la technique",
+      "De supprimer l’examen clinique",
+      "D’éviter toute communication"
+    ],
+    correct:1,
+    explanation:"L’installation sécurise le patient et rend le geste plus précis."
+  },
+  {
+    id:"general_009",
+    category:"Technique",
+    question:"Avant une technique structurelle, il faut généralement rechercher :",
+    answers:[
+      "Une position de confort et de contrôle",
+      "Une position instable",
+      "Une douleur maximale",
+      "Une rotation forcée immédiate"
+    ],
+    correct:0,
+    explanation:"La position doit permettre confort, contrôle et précision."
+  },
+  {
+    id:"general_010",
+    category:"Observation",
+    question:"Le regard du praticien pendant la technique sert surtout à :",
+    answers:[
+      "Observer la réaction du patient",
+      "Éviter de parler",
+      "Se concentrer uniquement sur ses mains",
+      "Regarder ailleurs"
+    ],
+    correct:0,
+    explanation:"Le praticien doit observer les réactions du patient pendant toute la technique."
+  },
+  {
+    id:"general_011",
+    category:"Respiration",
+    question:"La respiration du patient peut aider à :",
+    answers:[
+      "Augmenter les tensions de défense",
+      "Accompagner la mise en tension",
+      "Remplacer la technique",
+      "Créer une douleur"
+    ],
+    correct:1,
+    explanation:"La respiration peut accompagner la mise en tension et favoriser le relâchement."
+  },
+  {
+    id:"general_012",
+    category:"Précision",
+    question:"Une technique bien conduite doit être :",
+    answers:[
+      "Toujours douloureuse",
+      "Toujours brutale",
+      "Précise, contrôlée et adaptée",
+      "Identique pour tous les patients"
+    ],
+    correct:2,
+    explanation:"Le geste doit être précis, contrôlé et adapté au patient."
+  },
+  {
+    id:"general_013",
+    category:"Anatomie",
+    question:"Pourquoi faut-il connaître l’anatomie avant une technique ?",
+    answers:[
+      "Pour mémoriser uniquement les noms",
+      "Pour comprendre les structures mobilisées",
+      "Pour éviter l’observation",
+      "Pour manipuler plus fort"
+    ],
+    correct:1,
+    explanation:"L’anatomie permet de comprendre les structures concernées par le geste."
+  },
+  {
+    id:"general_014",
+    category:"Sécurité",
+    question:"Une contre-indication signifie :",
+    answers:[
+      "Que la technique est obligatoire",
+      "Que la technique doit être évitée ou adaptée",
+      "Que le patient doit forcer",
+      "Que l’examen est inutile"
+    ],
+    correct:1,
+    explanation:"Une contre-indication impose d’éviter ou d’adapter le geste."
+  },
+  {
+    id:"general_015",
+    category:"Réévaluation",
+    question:"Après une technique, il est utile de :",
+    answers:[
+      "Ne rien vérifier",
+      "Réévaluer la mobilité ou le ressenti",
+      "Refaire immédiatement dix manipulations",
+      "Ignorer la réaction du patient"
+    ],
+    correct:1,
+    explanation:"La réévaluation permet de mesurer l’effet de la technique et d’adapter la suite."
+  }
+];
+
+let generalQuizIndex = 0;
+let generalQuizScore = 0;
+let generalQuizAnswered = false;
+
+function renderGeneralQuiz(){
+  const q = generalQuizQuestions[generalQuizIndex];
+  if(!q) return;
+
+  generalQuizAnswered = false;
+
+  const subtitle = document.getElementById("quizSubtitle");
+  const counter = document.getElementById("quizQuestionCounter");
+  const category = document.getElementById("quizQuestionCategory");
+  const questionText = document.getElementById("quizQuestionText");
+  const answers = document.getElementById("quizAnswers");
+  const feedback = document.getElementById("quizFeedback");
+  const result = document.getElementById("quizResult");
+  const progress = document.getElementById("quizProgressBar");
+
+  if(subtitle) subtitle.textContent = `Question ${generalQuizIndex + 1} / ${generalQuizQuestions.length}`;
+  if(counter) counter.textContent = `Question ${generalQuizIndex + 1} / ${generalQuizQuestions.length}`;
+  if(category) category.textContent = q.category || "Général";
+  if(questionText) questionText.textContent = q.question;
+  if(feedback) feedback.style.display = "none";
+  if(result) result.style.display = "none";
+  if(progress) progress.style.width = `${(generalQuizIndex / generalQuizQuestions.length) * 100}%`;
+
+  if(answers){
+    answers.innerHTML = q.answers.map((answer, index) => `
+      <button class="quiz-answer-button" onclick="answerGeneralQuiz(${index})">
+        <span>${String.fromCharCode(65 + index)}</span>
+        <strong>${answer}</strong>
+      </button>
+    `).join("");
+  }
+}
+
+function answerGeneralQuiz(index){
+  if(generalQuizAnswered) return;
+  generalQuizAnswered = true;
+
+  const q = generalQuizQuestions[generalQuizIndex];
+  const buttons = document.querySelectorAll("#quizAnswers .quiz-answer-button");
+  const feedback = document.getElementById("quizFeedback");
+  const title = document.getElementById("quizFeedbackTitle");
+  const text = document.getElementById("quizFeedbackText");
+  const next = document.getElementById("quizNextButton");
+
+  let isCorrect = index === q.correct;
+  let feedbackTitle = isCorrect ? "Bonne réponse !" : "À revoir";
+  let feedbackText = q.explanation || "Regardez l’explication avant de continuer.";
+
+  if(q.customFeedback && q.id === "general_003"){
+    if(index === 0){
+      isCorrect = true;
+      feedbackTitle = "Évidemment.";
+      feedbackText = "Nicolas Bertrand. Réponse validée.";
+    }else if(index === 1){
+      isCorrect = false;
+      feedbackTitle = "Bien essayé.";
+      feedbackText = "Frédéric Zenouda est une belle tentative, mais la réponse attendue est Nicolas Bertrand.";
+    }else if(index === 2){
+      isCorrect = true;
+      feedbackTitle = "Oui, mais pas l’un sans l’autre.";
+      feedbackText = "Accepté avec mention spéciale. Mais dans ce quiz, Nicolas Bertrand reste la réponse principale.";
+    }
+  }
+
+  if(isCorrect) generalQuizScore += 1;
+
+  buttons.forEach((btn, i)=>{
+    btn.disabled = true;
+    if(i === q.correct) btn.classList.add("right");
+    if(q.customFeedback && q.id === "general_003" && i === 2 && index === 2) btn.classList.add("right");
+    if(i === index && !isCorrect) btn.classList.add("wrong");
+  });
+
+  if(feedback) feedback.style.display = "block";
+  if(title) title.textContent = feedbackTitle;
+  if(text) text.textContent = feedbackText;
+  if(next) next.textContent = generalQuizIndex === generalQuizQuestions.length - 1 ? "Voir le résultat" : "Question suivante";
+
+  saveGeneralQuizProgress();
+}
+
+function nextGeneralQuiz(){
+  if(generalQuizIndex < generalQuizQuestions.length - 1){
+    generalQuizIndex += 1;
+    renderGeneralQuiz();
+    const quiz = document.getElementById("quiz");
+    if(quiz) quiz.scrollTop = 0;
+  }else{
+    finishGeneralQuiz();
+  }
+}
+
+function finishGeneralQuiz(){
+  const card = document.querySelector("#quiz .quiz-general-card");
+  const feedback = document.getElementById("quizFeedback");
+  const result = document.getElementById("quizResult");
+  const score = document.getElementById("quizFinalScore");
+  const title = document.getElementById("quizResultTitle");
+  const text = document.getElementById("quizResultText");
+  const progress = document.getElementById("quizProgressBar");
+
+  if(card) card.style.display = "none";
+  if(feedback) feedback.style.display = "none";
+  if(result) result.style.display = "block";
+  if(score) score.textContent = generalQuizScore;
+  if(progress) progress.style.width = "100%";
+
+  const percent = Math.round((generalQuizScore / generalQuizQuestions.length) * 100);
+
+  if(title){
+    title.textContent = percent >= 80 ? "Très bon niveau" : percent >= 60 ? "Bonne base" : "À renforcer";
+  }
+
+  if(text){
+    text.textContent = `Score : ${generalQuizScore} / ${generalQuizQuestions.length} soit ${percent} %. Ce résultat pourra alimenter la page Stats.`;
+  }
+
+  try{
+    localStorage.setItem("osteoPratikLastQuiz", JSON.stringify({
+      category:"general",
+      score:generalQuizScore,
+      total:generalQuizQuestions.length,
+      percent,
+      date:new Date().toISOString()
+    }));
+  }catch(e){}
+}
+
+function restartGeneralQuiz(){
+  generalQuizIndex = 0;
+  generalQuizScore = 0;
+  generalQuizAnswered = false;
+
+  const card = document.querySelector("#quiz .quiz-general-card");
+  if(card) card.style.display = "block";
+
+  renderGeneralQuiz();
+}
+
+function saveGeneralQuizProgress(){
+  try{
+    localStorage.setItem("osteoPratikQuizProgress", JSON.stringify({
+      index:generalQuizIndex,
+      score:generalQuizScore,
+      answered:generalQuizAnswered,
+      date:new Date().toISOString()
+    }));
+  }catch(e){}
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  renderGeneralQuiz();
+});
+
+</script>
+
+<style>
+/* === QUIZ GÉNÉRAL : interface interactive === */
+
+.quiz-general-title{
+  margin:12px 0 14px !important;
+  padding:18px 18px 16px !important;
+  border-radius:24px;
+  border:1px solid rgba(0,229,255,.25);
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255,176,32,.10), transparent 30%),
+    radial-gradient(circle at 86% 72%, rgba(0,229,255,.10), transparent 28%),
+    linear-gradient(145deg, rgba(10,29,55,.86), rgba(5,15,31,.90));
+  box-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.05);
+  text-align:center;
+}
+
+.quiz-general-title h1{
+  margin:0 0 8px;
+  color:#fff;
+  font-size:38px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-.045em;
+}
+
+.quiz-general-title p{
+  margin:0;
+  color:rgba(221,232,255,.76);
+  font-size:16px;
+  font-weight:750;
+}
+
+.quiz-general-progress{
+  margin:0 0 14px !important;
+}
+
+.quiz-general-card{
+  padding:18px !important;
+}
+
+.quiz-kicker{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+}
+
+.quiz-kicker span,
+.quiz-kicker em{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:850;
+  font-style:normal;
+}
+
+.quiz-kicker span{
+  color:#42dfff;
+  border:1px solid rgba(0,229,255,.25);
+  background:rgba(0,229,255,.07);
+}
+
+.quiz-kicker em{
+  color:#ffb020;
+  border:1px solid rgba(255,176,32,.25);
+  background:rgba(255,176,32,.07);
+}
+
+.quiz-general-card h2{
+  margin:0 0 18px;
+  color:#fff;
+  font-size:24px;
+  line-height:1.12;
+  letter-spacing:-.035em;
+}
+
+.quiz-answers{
+  display:grid;
+  gap:10px;
+}
+
+.quiz-answer-button{
+  width:100%;
+  min-height:62px;
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(145deg, rgba(10,29,55,.62), rgba(5,15,31,.88));
+  color:#fff;
+  text-align:left;
+}
+
+.quiz-answer-button span{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#42dfff;
+  border:1px solid rgba(0,229,255,.42);
+  background:rgba(0,229,255,.08);
+  font-weight:950;
+}
+
+.quiz-answer-button strong{
+  font-size:15px;
+  line-height:1.18;
+  font-weight:800;
+}
+
+.quiz-answer-button.right{
+  border-color:rgba(53,230,167,.70) !important;
+  box-shadow:0 0 24px rgba(53,230,167,.20);
+}
+
+.quiz-answer-button.right span{
+  color:#35e6a7;
+  border-color:rgba(53,230,167,.70);
+  background:rgba(53,230,167,.10);
+}
+
+.quiz-answer-button.wrong{
+  border-color:rgba(255,80,80,.70) !important;
+  box-shadow:0 0 24px rgba(255,80,80,.16);
+}
+
+.quiz-answer-button.wrong span{
+  color:#ff6b6b;
+  border-color:rgba(255,80,80,.70);
+  background:rgba(255,80,80,.10);
+}
+
+.quiz-answer-button:disabled{
+  cursor:default;
+}
+
+.quiz-feedback{
+  margin-top:14px !important;
+  padding:16px !important;
+}
+
+.quiz-feedback .primary,
+.quiz-result-card .primary,
+.quiz-result-card .secondary{
+  margin-top:14px;
+  width:100%;
+}
+
+.quiz-result-card{
+  margin-top:14px;
+  padding:20px;
+  border-radius:26px;
+  border:1px solid rgba(0,229,255,.25);
+  background:
+    radial-gradient(circle at 50% 10%, rgba(0,229,255,.14), transparent 34%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92));
+  box-shadow:0 18px 55px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.05);
+  text-align:center;
+}
+
+.quiz-result-score{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:6px;
+  color:#42dfff;
+  margin-bottom:12px;
+}
+
+.quiz-result-score strong{
+  font-size:58px;
+  line-height:.9;
+  font-weight:950;
+  color:#fff;
+}
+
+.quiz-result-score span{
+  font-size:24px;
+  font-weight:850;
+  color:#42dfff;
+}
+
+.quiz-result-card h2{
+  margin:0 0 8px;
+  color:#fff;
+  font-size:28px;
+}
+
+.quiz-result-card p{
+  margin:0;
+  color:rgba(221,232,255,.76);
+  line-height:1.35;
+}
+
+@media(max-width:430px){
+  .quiz-general-title h1{
+    font-size:34px;
+  }
+
+  .quiz-general-card h2{
+    font-size:22px;
+  }
+
+  .quiz-answer-button{
+    min-height:58px;
+  }
+}
+</style>
+
+<script>
+
+/* === STATS : connexion du quiz général === */
+function formatQuizDate(iso){
+  if(!iso) return "Quiz général";
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString("fr-FR", {day:"2-digit", month:"2-digit", year:"numeric"}) +
+      " · " +
+      d.toLocaleTimeString("fr-FR", {hour:"2-digit", minute:"2-digit"});
+  }catch(e){
+    return "Quiz général";
+  }
+}
+
+function updateQuizStats(){
+  let lastQuiz = null;
+  try{
+    lastQuiz = JSON.parse(localStorage.getItem("osteoPratikLastQuiz") || "null");
+  }catch(e){
+    lastQuiz = null;
+  }
+
+  const statsQuiz = document.getElementById("statsQuiz");
+  const statsQuizDetail = document.getElementById("statsQuizDetail");
+  const statsQuizScore = document.getElementById("statsQuizScore");
+  const statsQuizScoreTotal = document.getElementById("statsQuizScoreTotal");
+  const statsQuizPercent = document.getElementById("statsQuizPercent");
+  const statsQuizMessage = document.getElementById("statsQuizMessage");
+  const lastDate = document.getElementById("statsLastActivityDate");
+  const lastTitle = document.getElementById("statsLastActivityTitle");
+
+  if(!lastQuiz){
+    if(statsQuiz) statsQuiz.textContent = "—";
+    if(statsQuizDetail) statsQuizDetail.textContent = "Aucun quiz terminé";
+    if(statsQuizScore) statsQuizScore.textContent = "—";
+    if(statsQuizScoreTotal) statsQuizScoreTotal.textContent = "/ 15";
+    if(statsQuizPercent) statsQuizPercent.textContent = "Aucun score";
+    if(statsQuizMessage) statsQuizMessage.textContent = "Terminez le quiz général pour afficher votre résultat ici.";
+    return;
+  }
+
+  const score = Number(lastQuiz.score || 0);
+  const total = Number(lastQuiz.total || 15);
+  const percent = Number(lastQuiz.percent || Math.round((score / total) * 100));
+
+  if(statsQuiz) statsQuiz.innerHTML = `${percent}<span>%</span>`;
+  if(statsQuizDetail) statsQuizDetail.textContent = `${score} / ${total} bonnes réponses`;
+  if(statsQuizScore) statsQuizScore.textContent = score;
+  if(statsQuizScoreTotal) statsQuizScoreTotal.textContent = `/ ${total}`;
+  if(statsQuizPercent) statsQuizPercent.textContent = `${percent}% de réussite`;
+
+  if(statsQuizMessage){
+    if(percent >= 80){
+      statsQuizMessage.textContent = "Très bon niveau général. Les bases sont solides.";
+    }else if(percent >= 60){
+      statsQuizMessage.textContent = "Bonne base. Quelques points restent à consolider.";
+    }else{
+      statsQuizMessage.textContent = "À renforcer. Reprenez les notions générales avant les quiz par région.";
+    }
+  }
+
+  if(lastDate) lastDate.textContent = formatQuizDate(lastQuiz.date);
+  if(lastTitle) lastTitle.textContent = `Quiz général · ${score} / ${total}`;
+}
+
+document.addEventListener("DOMContentLoaded", updateQuizStats);
+
+/* On met aussi les stats à jour quand on revient sur la page Statistiques */
+const originalGoForQuizStats = typeof go === "function" ? go : null;
+if(originalGoForQuizStats && !window.__quizStatsGoPatched){
+  window.__quizStatsGoPatched = true;
+  go = function(id){
+    originalGoForQuizStats(id);
+    if(id === "progress") setTimeout(updateQuizStats, 50);
+  };
+}
+
+</script>
+
+<style>
+/* === STATS : bloc Quiz général connecté === */
+.stats-quiz-card{
+  margin:14px 0;
+  padding:18px;
+  border-radius:28px;
+  border:1px solid rgba(255,176,32,.26);
+  background:
+    radial-gradient(circle at 20% 12%, rgba(255,176,32,.16), transparent 34%),
+    radial-gradient(circle at 82% 76%, rgba(0,229,255,.10), transparent 30%),
+    linear-gradient(145deg, rgba(10,29,55,.80), rgba(5,15,31,.92));
+  box-shadow:0 18px 55px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.05);
+}
+
+.stats-quiz-body{
+  display:grid;
+  grid-template-columns:96px minmax(0,1fr);
+  gap:16px;
+  align-items:center;
+  margin-top:14px;
+}
+
+.stats-quiz-score{
+  width:96px;
+  height:96px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  align-content:center;
+  border:1px solid rgba(255,176,32,.45);
+  background:rgba(255,176,32,.08);
+  box-shadow:0 0 28px rgba(255,176,32,.16), inset 0 0 22px rgba(255,255,255,.035);
+}
+
+.stats-quiz-score strong{
+  font-size:40px;
+  line-height:.9;
+  font-weight:950;
+  color:#fff;
+}
+
+.stats-quiz-score small{
+  margin-top:5px;
+  color:#ffb020;
+  font-weight:900;
+  font-size:13px;
+}
+
+.stats-quiz-info span{
+  display:block;
+  color:#ffb020;
+  font-size:22px;
+  font-weight:950;
+  letter-spacing:-.035em;
+}
+
+.stats-quiz-info p{
+  margin:6px 0 0;
+  color:rgba(221,232,255,.76);
+  font-size:14px;
+  line-height:1.35;
+}
+
+.stats-quiz-button{
+  width:100%;
+  min-height:48px;
+  margin-top:16px;
+  padding:0 14px;
+  border-radius:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#fff;
+  font-weight:900;
+  border:1px solid rgba(255,176,32,.28);
+  background:rgba(255,176,32,.08);
+}
+
+.stats-quiz-button span{
+  color:#ffb020;
+  font-size:20px;
+}
+
+@media(max-width:430px){
+  .stats-quiz-body{
+    grid-template-columns:86px minmax(0,1fr);
+    gap:14px;
+  }
+
+  .stats-quiz-score{
+    width:86px;
+    height:86px;
+  }
+
+  .stats-quiz-score strong{
+    font-size:36px;
+  }
+
+  .stats-quiz-info span{
+    font-size:20px;
+  }
+}
+</style>
+
+<script>
+
+/* === STATS : progression par zone selon les techniques validées === */
+function getViewedTechniqueIdSet(){
+  try{
+    if(typeof readViewedTechniqueIds === "function"){
+      return new Set(readViewedTechniqueIds().map(Number));
+    }
+    const raw = localStorage.getItem("osteoPratikViewedTechniqueIds");
+    const ids = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(ids) ? ids.map(Number).filter(Boolean) : []);
+  }catch(e){
+    return new Set();
+  }
+}
+
+function getZoneStatsFromViewed(){
+  const zones = ["Rachis", "Membres supérieurs", "Membres inférieurs", "Bassin"];
+  const viewed = getViewedTechniqueIdSet();
+
+  const stats = {};
+  zones.forEach(zone=>{
+    const total = techniques.filter(t => t.zone === zone).length;
+    const seen = techniques.filter(t => t.zone === zone && viewed.has(Number(t.id))).length;
+    const percent = total ? Math.round((seen / total) * 100) : 0;
+    stats[zone] = {zone, total, seen, percent};
+  });
+
+  const totalTechniques = techniques.length || 0;
+  const seenTotal = techniques.filter(t => viewed.has(Number(t.id))).length;
+  const globalPercent = totalTechniques ? Math.round((seenTotal / totalTechniques) * 100) : 0;
+
+  return {stats, seenTotal, totalTechniques, globalPercent};
+}
+
+function setZoneStat(zoneKey, data){
+  const map = {
+    "Rachis": ["statsRachisBar", "statsRachisPct", "statsRachisCount"],
+    "Membres supérieurs": ["statsMSupBar", "statsMSupPct", "statsMSupCount"],
+    "Membres inférieurs": ["statsMInfBar", "statsMInfPct", "statsMInfCount"],
+    "Bassin": ["statsBassinBar", "statsBassinPct", "statsBassinCount"]
+  };
+
+  const ids = map[zoneKey];
+  if(!ids) return;
+
+  const bar = document.getElementById(ids[0]);
+  const pct = document.getElementById(ids[1]);
+  const count = document.getElementById(ids[2]);
+
+  if(bar) bar.style.width = `${data.percent}%`;
+  if(pct) pct.textContent = `${data.percent}%`;
+  if(count) count.textContent = `${data.seen}/${data.total}`;
+}
+
+function updateZoneStats(){
+  if(!Array.isArray(techniques)) return;
+
+  const {stats, seenTotal, totalTechniques, globalPercent} = getZoneStatsFromViewed();
+
+  setZoneStat("Rachis", stats["Rachis"]);
+  setZoneStat("Membres supérieurs", stats["Membres supérieurs"]);
+  setZoneStat("Membres inférieurs", stats["Membres inférieurs"]);
+  setZoneStat("Bassin", stats["Bassin"]);
+
+  const statsVideos = document.getElementById("statsVideos");
+  const statsVideosTotal = document.getElementById("statsVideosTotal");
+  const statsSheets = document.getElementById("statsSheets");
+  const statsSheetsTotal = document.getElementById("statsSheetsTotal");
+  const ring = document.getElementById("statsGlobalRing");
+  const globalPercentEl = document.getElementById("statsGlobalPercent");
+
+  if(statsVideos) statsVideos.textContent = seenTotal;
+  if(statsVideosTotal) statsVideosTotal.textContent = `/ ${totalTechniques}`;
+  if(statsSheets) statsSheets.textContent = seenTotal;
+  if(statsSheetsTotal) statsSheetsTotal.textContent = `/ ${totalTechniques}`;
+  if(ring) ring.style.setProperty("--value", globalPercent);
+  if(globalPercentEl) globalPercentEl.innerHTML = `${globalPercent}<span>%</span>`;
+
+  const ordered = Object.values(stats).sort((a,b)=>b.percent - a.percent || b.seen - a.seen || b.total - a.total);
+  const top = ordered[0];
+
+  const topName = document.getElementById("statsTopZoneName");
+  const topPercent = document.getElementById("statsTopZonePercent");
+  const topDetail = document.getElementById("statsTopZoneDetail");
+
+  if(top && top.seen > 0){
+    if(topName) topName.textContent = top.zone;
+    if(topPercent) topPercent.innerHTML = `${top.percent}<span>%</span>`;
+    if(topDetail) topDetail.textContent = `${top.seen} technique${top.seen > 1 ? "s" : ""} vue${top.seen > 1 ? "s" : ""} sur ${top.total}`;
+  }else{
+    if(topName) topName.textContent = "Aucune zone";
+    if(topPercent) topPercent.innerHTML = `0<span>%</span>`;
+    if(topDetail) topDetail.textContent = "Commencez par regarder une vidéo";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", updateZoneStats);
+
+/* Mise à jour automatique quand on revient sur Statistiques */
+const originalGoForZoneStats = typeof go === "function" ? go : null;
+if(originalGoForZoneStats && !window.__zoneStatsGoPatched){
+  window.__zoneStatsGoPatched = true;
+  go = function(id){
+    originalGoForZoneStats(id);
+    if(id === "progress") setTimeout(()=>{
+      updateZoneStats();
+      if(typeof updateQuizStats === "function") updateQuizStats();
+    }, 50);
+  };
+}
+
+</script>
+
+<style>
+/* === STATS : compteurs progression par zone === */
+.stats-zone-bars p span{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+}
+
+.stats-zone-bars p span em{
+  font-style:normal;
+  font-size:11px;
+  font-weight:900;
+  color:rgba(221,232,255,.58);
+  padding:2px 7px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.045);
+}
+
+#statsGlobalRing{
+  background:
+    conic-gradient(from 180deg, rgba(0,229,255,.92) calc(var(--value) * 1%), rgba(255,255,255,.08) 0),
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,.10), transparent 58%);
+}
+</style>
+
+<script src="https://player.vimeo.com/api/player.js"></script>
+<script>
+
+/* === VALIDATION VIDÉO : une technique est comptée seulement si la vidéo est presque entièrement vue === */
+const VIDEO_COMPLETION_THRESHOLD = 0.90;
+let currentVimeoCompletionPlayer = null;
+
+function markTechniqueVideoCompleted(id, source){
+  if(!id) return;
+
+  if(typeof saveViewedTechniqueId === "function"){
+    saveViewedTechniqueId(id);
+  }
+
+  try{
+    const detailKey = "osteoPratikCompletedTechniqueDetails";
+    const raw = localStorage.getItem(detailKey);
+    const details = raw ? JSON.parse(raw) : {};
+    details[String(id)] = {
+      id:Number(id),
+      source:source || "video",
+      completedAt:new Date().toISOString()
+    };
+    localStorage.setItem(detailKey, JSON.stringify(details));
+  }catch(e){}
+
+  if(typeof updateZoneStats === "function"){
+    updateZoneStats();
+  }
+
+  toast("Technique validée : vidéo vue");
+}
+
+function setupHtmlVideoCompletion(video){
+  if(!video) return;
+
+  video.onended = function(){
+    if(currentPlayerTechniqueId){
+      markTechniqueVideoCompleted(currentPlayerTechniqueId, "html-ended");
+    }
+  };
+
+  video.ontimeupdate = function(){
+    if(!currentPlayerTechniqueId || !video.duration || !isFinite(video.duration)) return;
+    const ratio = video.currentTime / video.duration;
+    if(ratio >= VIDEO_COMPLETION_THRESHOLD){
+      markTechniqueVideoCompleted(currentPlayerTechniqueId, "html-90-percent");
+      video.ontimeupdate = null;
+    }
+  };
+}
+
+function setupVimeoCompletion(iframe){
+  if(!iframe || !currentPlayerTechniqueId) return;
+
+  if(typeof Vimeo === "undefined" || !Vimeo.Player){
+    /* L'API Vimeo n'est pas encore chargée : on réessaie juste après. */
+    setTimeout(()=>setupVimeoCompletion(iframe), 500);
+    return;
+  }
+
+  try{
+    if(currentVimeoCompletionPlayer && typeof currentVimeoCompletionPlayer.unload === "function"){
+      currentVimeoCompletionPlayer.unload().catch(()=>{});
+    }
+  }catch(e){}
+
+  try{
+    const player = new Vimeo.Player(iframe);
+    currentVimeoCompletionPlayer = player;
+
+    player.off && player.off("timeupdate");
+    player.off && player.off("ended");
+
+    player.on("timeupdate", function(data){
+      if(!currentPlayerTechniqueId || !data || !data.duration) return;
+      const ratio = data.seconds / data.duration;
+      if(ratio >= VIDEO_COMPLETION_THRESHOLD){
+        markTechniqueVideoCompleted(currentPlayerTechniqueId, "vimeo-90-percent");
+        try{ player.off("timeupdate"); }catch(e){}
+      }
+    });
+
+    player.on("ended", function(){
+      if(currentPlayerTechniqueId){
+        markTechniqueVideoCompleted(currentPlayerTechniqueId, "vimeo-ended");
+      }
+    });
+  }catch(e){
+    console.warn("Vimeo completion tracking indisponible", e);
+  }
+}
+
+/* Patch du lecteur : on branche les événements après l'ouverture de la technique. */
+const originalOpenTechniqueForCompletion = typeof openTechnique === "function" ? openTechnique : null;
+if(originalOpenTechniqueForCompletion && !window.__completionOpenTechniquePatched){
+  window.__completionOpenTechniquePatched = true;
+
+  openTechnique = function(id){
+    originalOpenTechniqueForCompletion(id);
+
+    setTimeout(()=>{
+      const video = document.getElementById("video");
+      const vimeo = document.getElementById("vimeoPlayer");
+      const technique = Array.isArray(techniques) ? techniques.find(t => Number(t.id) === Number(id)) : null;
+
+      if(technique && technique.videoProvider === "vimeo"){
+        setupVimeoCompletion(vimeo);
+      }else{
+        setupHtmlVideoCompletion(video);
+      }
+    }, 300);
+  };
+}
+
+</script>
+
+<script>
+/* === TITRES HOMOGÈNES : style Statistiques + rond logo à droite === */
+const OSTEO_TITLE_LOGOS = [
+  {screen:"videoMap", file:"icon-videos.webp", fallback:"▶"},
+  {screen:"techniqueDetail", file:"icon-fiches.webp", fallback:"F"},
+  {screen:"revision", file:"icon-revision.webp", fallback:"↻"},
+  {screen:"revisionWheel", file:"icon-revision.webp", fallback:"↻"},
+  {screen:"revisionCard", file:"icon-revision.webp", fallback:"↻"},
+  {screen:"seenCollections", file:"icon-mes-acquis.webp", fallback:"✓"},
+  {screen:"seenCards", file:"icon-mes-acquis.webp", fallback:"✓"},
+  {screen:"quiz", file:"icon-mes-acquis.webp", fallback:"✓"},
+  {screen:"progress", file:"icon-statistiques.webp", fallback:"▥"},
+  {screen:"zones", file:"icon-catalogue.webp", fallback:"☰"},
+  {screen:"rachis", file:"icon-rachis.webp", fallback:"R"},
+  {screen:"rachisMenu", file:"icon-rachis.webp", fallback:"R"},
+  {screen:"bassinMenu", file:"icon-bassin.webp", fallback:"B"},
+  {screen:"msupMenu", file:"icon-membres-superieurs.webp", fallback:"MS"},
+  {screen:"minfMenu", file:"icon-membres-inferieurs.webp", fallback:"MI"},
+  {screen:"player", file:"icon-lecteur.webp", fallback:"▶"},
+  {screen:"favorites", file:"icon-favoris.webp", fallback:"♡"},
+  {screen:"profile", file:"icon-reglages.webp", fallback:"⚙"}
+];
+
+function normalizeTitleBlock(block){
+  if(!block || block.dataset.logoReady === "1") return;
+  block.dataset.logoReady = "1";
+
+  const screen = block.closest(".screen");
+  const config = OSTEO_TITLE_LOGOS.find(item => screen && item.screen === screen.id) || {
+    file:"icon-osteo-pratik.webp",
+    fallback:"OP"
+  };
+
+  /* On remplace les anciens éléments visuels par un rond logo unique. */
+  block.querySelectorAll(".stats-title-visual,.catalogue-title-visual,.quiz-title-visual,.revision-title-visual,.page-title-visual").forEach(el=>el.remove());
+
+  let contentWrapper = block.querySelector(":scope > div:first-child");
+  const directHeading = block.querySelector(":scope > h1");
+
+  if(!contentWrapper && directHeading){
+    contentWrapper = document.createElement("div");
+    const nodes = Array.from(block.childNodes).filter(node => {
+      return !(node.nodeType === 1 && node.classList && node.classList.contains("page-title-logo"));
+    });
+    nodes.forEach(node => contentWrapper.appendChild(node));
+    block.appendChild(contentWrapper);
+    block.insertBefore(contentWrapper, block.firstChild);
+  }
+
+  if(block.querySelector(":scope > .page-title-logo")) return;
+
+  const logo = document.createElement("span");
+  logo.className = "page-title-logo";
+  logo.dataset.fallback = config.fallback || "OP";
+
+  const img = document.createElement("img");
+  img.src = "assets/images/icons/" + config.file;
+  img.alt = "";
+  img.loading = "lazy";
+  img.onerror = function(){
+    logo.classList.add("logo-missing");
+  };
+
+  logo.appendChild(img);
+  block.appendChild(logo);
+}
+
+function initHomogeneousTitles(){
+  const blocks = document.querySelectorAll(
+    ".stats-page-title, .catalogue-hero-title, .quiz-general-title, .revision-title, .page-title, .zone-page-title, .library-page-title, .detail-page-title"
+  );
+  blocks.forEach(normalizeTitleBlock);
+}
+
+document.addEventListener("DOMContentLoaded", initHomogeneousTitles);
+
+const originalGoForHomogeneousTitles = typeof go === "function" ? go : null;
+if(originalGoForHomogeneousTitles && !window.__homogeneousTitlesGoPatched){
+  window.__homogeneousTitlesGoPatched = true;
+  go = function(id){
+    originalGoForHomogeneousTitles(id);
+    setTimeout(initHomogeneousTitles, 40);
+  };
+}
+</script>
+
+
+<style>
+/* === TITRES HOMOGÈNES + ROND LOGO === */
+:root{
+  --page-title-logo-size:58px;
+}
+
+.stats-page-title,
+.catalogue-hero-title,
+.quiz-general-title,
+.revision-title,
+.page-title,
+.zone-page-title,
+.library-page-title,
+.detail-page-title{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) var(--page-title-logo-size) !important;
+  align-items:center !important;
+  gap:14px !important;
+  margin:12px 0 14px !important;
+  padding:16px !important;
+  border-radius:26px !important;
+  border:1px solid rgba(0,229,255,.24) !important;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(0,229,255,.12), transparent 34%),
+    radial-gradient(circle at 88% 70%, rgba(168,85,255,.10), transparent 32%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92)) !important;
+  box-shadow:0 18px 55px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  text-align:left !important;
+  overflow:hidden !important;
+}
+
+.stats-page-title > div:first-child,
+.catalogue-hero-title > div:first-child,
+.quiz-general-title > div:first-child,
+.revision-title > div:first-child,
+.page-title > div:first-child,
+.zone-page-title > div:first-child,
+.library-page-title > div:first-child,
+.detail-page-title > div:first-child{
+  min-width:0 !important;
+}
+
+.stats-page-title h1,
+.catalogue-hero-title h1,
+.quiz-general-title h1,
+.revision-title h1,
+.page-title h1,
+.zone-page-title h1,
+.library-page-title h1,
+.detail-page-title h1{
+  margin:0 !important;
+  color:#fff !important;
+  font-size:34px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+}
+
+.stats-page-title p,
+.catalogue-hero-title p,
+.quiz-general-title p,
+.revision-title p,
+.page-title p,
+.zone-page-title p,
+.library-page-title p,
+.detail-page-title p{
+  margin:7px 0 0 !important;
+  color:rgba(221,232,255,.76) !important;
+  font-size:15px !important;
+  font-weight:750 !important;
+  line-height:1.25 !important;
+}
+
+.page-title-logo{
+  width:var(--page-title-logo-size);
+  height:var(--page-title-logo-size);
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  justify-self:end;
+  border:1px solid rgba(0,229,255,.42);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(0,229,255,.22), transparent 62%),
+    rgba(0,229,255,.06);
+  box-shadow:0 0 24px rgba(0,229,255,.18), inset 0 0 18px rgba(255,255,255,.04);
+  color:#42dfff;
+  font-size:18px;
+  font-weight:950;
+  overflow:hidden;
+  flex:0 0 auto;
+}
+
+.page-title-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:9px;
+  display:block;
+}
+
+.page-title-logo.logo-missing img{
+  display:none;
+}
+
+.page-title-logo.logo-missing::after{
+  content:attr(data-fallback);
+  font-size:16px;
+  color:#42dfff;
+}
+
+@media(max-width:430px){
+  :root{
+    --page-title-logo-size:52px;
+  }
+
+  .stats-page-title,
+  .catalogue-hero-title,
+  .quiz-general-title,
+  .revision-title,
+  .page-title,
+  .zone-page-title,
+  .library-page-title,
+  .detail-page-title{
+    padding:14px !important;
+    gap:12px !important;
+  }
+
+  .stats-page-title h1,
+  .catalogue-hero-title h1,
+  .quiz-general-title h1,
+  .revision-title h1,
+  .page-title h1,
+  .zone-page-title h1,
+  .library-page-title h1,
+  .detail-page-title h1{
+    font-size:30px !important;
   }
 }
 </style>
