@@ -7073,15 +7073,15 @@ assets/images/icons/icon-fiches.webp
 assets/images/icons/icon-revision.webp
 assets/images/icons/icon-mes-acquis.webp
 assets/images/icons/icon-statistiques.webp
-assets/images/icons/icon-catalogue.webp
+assets/images/icons/icon-fiches.webp
 assets/images/icons/icon-zones.webp
 assets/images/icons/icon-rachis.webp
-assets/images/icons/icon-bassin.webp
-assets/images/icons/icon-membres-superieurs.webp
-assets/images/icons/icon-membres-inferieurs.webp
-assets/images/icons/icon-lecteur.webp
+assets/images/icons/icon-corps.webp
+assets/images/icons/icon-corps.webp
+assets/images/icons/icon-corps.webp
+assets/images/icons/icon-videos.webp
 assets/images/icons/icon-favoris.webp
-assets/images/icons/icon-reglages.webp
+assets/images/icons/icon-profil.webp
 -->
 
 <main class="app">
@@ -7263,7 +7263,7 @@ assets/images/icons/icon-reglages.webp
     <div class="video-link link-minf"></div>
 
     <button class="video-zone-card card-rachis" onclick="openRachisMenu()">
-      <div class="zone-card-icon">⌇</div>
+      <div class="zone-card-icon"><img src="assets/images/icons/icon-rachis.webp" alt=""></div>
       <div>
         <strong>Rachis</strong>
         <small>Cervicales · Dorsales · Lombaires</small>
@@ -7272,7 +7272,7 @@ assets/images/icons/icon-reglages.webp
     </button>
 
     <button class="video-zone-card card-msup" onclick="openMSupMenu()">
-      <div class="zone-card-icon">◜</div>
+      <div class="zone-card-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <div>
         <strong>Membres supérieurs</strong>
         <small>Épaule · Coude · Poignet · Main</small>
@@ -7281,7 +7281,7 @@ assets/images/icons/icon-reglages.webp
     </button>
 
     <button class="video-zone-card card-bassin" onclick="openBassinMenu()">
-      <div class="zone-card-icon">◡</div>
+      <div class="zone-card-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <div>
         <strong>Bassin</strong>
         <small>Sacro-iliaques · Sacrum · Symphyse</small>
@@ -7290,7 +7290,7 @@ assets/images/icons/icon-reglages.webp
     </button>
 
     <button class="video-zone-card card-minf" onclick="openMInfMenu()">
-      <div class="zone-card-icon">◟</div>
+      <div class="zone-card-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <div>
         <strong>Membres inférieurs</strong>
         <small>Hanche · Genou · Cheville · Pied</small>
@@ -7461,28 +7461,28 @@ assets/images/icons/icon-reglages.webp
 
   <section class="catalogue-zone-row">
     <button class="catalogue-zone-mini rachis" onclick="openZoneAll('Rachis')">
-      <div class="mini-zone-icon">⌇</div>
+      <div class="mini-zone-icon"><img src="assets/images/icons/icon-rachis.webp" alt=""></div>
       <strong>Rachis</strong>
       <small><b id="countRachis">60</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini msup" onclick="openZoneAll('Membres supérieurs')">
-      <div class="mini-zone-icon">◜</div>
+      <div class="mini-zone-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <strong>Membres<br>supérieurs</strong>
       <small><b id="countMSup">17</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini minf" onclick="openZoneAll('Membres inférieurs')">
-      <div class="mini-zone-icon">◟</div>
+      <div class="mini-zone-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <strong>Membres<br>inférieurs</strong>
       <small><b id="countMInf">31</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini bassin" onclick="openZoneAll('Bassin')">
-      <div class="mini-zone-icon">◡</div>
+      <div class="mini-zone-icon"><img src="assets/images/icons/icon-corps.webp" alt=""></div>
       <strong>Bassin</strong>
       <small><b id="countBassin">20</b> techniques</small>
       <span>→</span>
@@ -16604,15 +16604,15 @@ const OSTEO_TITLE_LOGOS = [
   {screen:"seenCards", file:"icon-mes-acquis.webp", fallback:"✓"},
   {screen:"quiz", file:"icon-mes-acquis.webp", fallback:"✓"},
   {screen:"progress", file:"icon-statistiques.webp", fallback:"▥"},
-  {screen:"zones", file:"icon-catalogue.webp", fallback:"☰"},
+  {screen:"zones", file:"icon-fiches.webp", fallback:"☰"},
   {screen:"rachis", file:"icon-rachis.webp", fallback:"R"},
   {screen:"rachisMenu", file:"icon-rachis.webp", fallback:"R"},
-  {screen:"bassinMenu", file:"icon-bassin.webp", fallback:"B"},
-  {screen:"msupMenu", file:"icon-membres-superieurs.webp", fallback:"MS"},
-  {screen:"minfMenu", file:"icon-membres-inferieurs.webp", fallback:"MI"},
-  {screen:"player", file:"icon-lecteur.webp", fallback:"▶"},
+  {screen:"bassinMenu", file:"icon-corps.webp", fallback:"B"},
+  {screen:"msupMenu", file:"icon-corps.webp", fallback:"MS"},
+  {screen:"minfMenu", file:"icon-corps.webp", fallback:"MI"},
+  {screen:"player", file:"icon-videos.webp", fallback:"▶"},
   {screen:"favorites", file:"icon-favoris.webp", fallback:"♡"},
-  {screen:"profile", file:"icon-reglages.webp", fallback:"⚙"}
+  {screen:"profile", file:"icon-profil.webp", fallback:"⚙"}
 ];
 
 function normalizeTitleBlock(block){
@@ -16621,7 +16621,7 @@ function normalizeTitleBlock(block){
 
   const screen = block.closest(".screen");
   const config = OSTEO_TITLE_LOGOS.find(item => screen && item.screen === screen.id) || {
-    file:"icon-osteo-pratik.webp",
+    file:"icon-corps.webp",
     fallback:"OP"
   };
 
@@ -16835,6 +16835,153 @@ if(originalGoForHomogeneousTitles && !window.__homogeneousTitlesGoPatched){
 @media(max-width:430px){
   .wheel-knowledge-title h1{
     font-size:27px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === CORRECTION ICÔNES : affichage des vrais fichiers WebP dans Catalogue === */
+.mini-zone-icon img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:8px;
+  display:block;
+  filter:drop-shadow(0 0 10px currentColor);
+}
+
+.page-title-logo img{
+  opacity:1 !important;
+}
+</style>
+
+
+<script>
+/* === TITRES HOMOGÈNES V2 : on inclut aussi Vidéo, Rachis, Révision, Collections === */
+function initHomogeneousTitlesV2(){
+  if(typeof normalizeTitleBlock !== "function") return;
+
+  const blocks = document.querySelectorAll(
+    ".stats-page-title, .catalogue-hero-title, .quiz-general-title, .revision-page-title, .revision-title, .page-title, .video-page-title, .rachis-menu-title, .module-menu-title, .seen-album-title, .zone-page-title, .library-page-title, .detail-page-title"
+  );
+
+  blocks.forEach(normalizeTitleBlock);
+}
+
+document.addEventListener("DOMContentLoaded", initHomogeneousTitlesV2);
+
+const originalGoForHomogeneousTitlesV2 = typeof go === "function" ? go : null;
+if(originalGoForHomogeneousTitlesV2 && !window.__homogeneousTitlesV2GoPatched){
+  window.__homogeneousTitlesV2GoPatched = true;
+  go = function(id){
+    originalGoForHomogeneousTitlesV2(id);
+    setTimeout(initHomogeneousTitlesV2, 40);
+  };
+}
+</script>
+
+
+<style>
+/* === TITRES HOMOGÈNES V2 : mêmes encadrements sur toutes les pages === */
+.video-page-title,
+.rachis-menu-title,
+.module-menu-title,
+.revision-page-title,
+.seen-album-title,
+.stats-page-title,
+.catalogue-hero-title,
+.quiz-general-title,
+.revision-title,
+.page-title,
+.zone-page-title,
+.library-page-title,
+.detail-page-title{
+  position:relative !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) var(--page-title-logo-size,58px) !important;
+  align-items:center !important;
+  gap:14px !important;
+  margin:12px 0 14px !important;
+  padding:16px !important;
+  border-radius:26px !important;
+  border:1px solid rgba(0,229,255,.24) !important;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(0,229,255,.12), transparent 34%),
+    radial-gradient(circle at 88% 70%, rgba(168,85,255,.10), transparent 32%),
+    linear-gradient(145deg, rgba(10,29,55,.78), rgba(5,15,31,.92)) !important;
+  box-shadow:0 18px 55px rgba(0,0,0,.30), inset 0 1px 0 rgba(255,255,255,.05) !important;
+  text-align:left !important;
+  overflow:hidden !important;
+}
+
+.video-page-title h1,
+.rachis-menu-title h1,
+.module-menu-title h1,
+.revision-page-title h1,
+.seen-album-title h1,
+.stats-page-title h1,
+.catalogue-hero-title h1,
+.quiz-general-title h1,
+.revision-title h1,
+.page-title h1,
+.zone-page-title h1,
+.library-page-title h1,
+.detail-page-title h1{
+  margin:0 !important;
+  color:#fff !important;
+  font-size:34px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+  text-align:left !important;
+}
+
+.video-page-title p,
+.rachis-menu-title p,
+.module-menu-title p,
+.revision-page-title p,
+.seen-album-title p,
+.stats-page-title p,
+.catalogue-hero-title p,
+.quiz-general-title p,
+.revision-title p,
+.page-title p,
+.zone-page-title p,
+.library-page-title p,
+.detail-page-title p{
+  margin:7px 0 0 !important;
+  color:rgba(221,232,255,.76) !important;
+  font-size:15px !important;
+  font-weight:750 !important;
+  line-height:1.25 !important;
+  text-align:left !important;
+}
+
+.zone-card-icon img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  padding:7px;
+  display:block;
+  filter:drop-shadow(0 0 10px currentColor);
+}
+
+@media(max-width:430px){
+  .video-page-title h1,
+  .rachis-menu-title h1,
+  .module-menu-title h1,
+  .revision-page-title h1,
+  .seen-album-title h1,
+  .stats-page-title h1,
+  .catalogue-hero-title h1,
+  .quiz-general-title h1,
+  .revision-title h1,
+  .page-title h1,
+  .zone-page-title h1,
+  .library-page-title h1,
+  .detail-page-title h1{
+    font-size:30px !important;
   }
 }
 </style>
