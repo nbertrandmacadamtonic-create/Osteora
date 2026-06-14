@@ -7655,6 +7655,13 @@ assets/images/icons/icon-reglages.webp
     <button class="icon" onclick="toast('La roue ne tire que les techniques visionnées')">?</button>
   </header>
 
+  <div class="page-title wheel-knowledge-title">
+    <div>
+      <h1>La roue de la connaissance</h1>
+      <p>Tirez une technique déjà validée et testez vos acquis.</p>
+    </div>
+  </div>
+
   <section class="revision-wheel-panel">
     <div class="wheel-count" id="wheelCount">0 technique débloquée</div>
 
@@ -16809,6 +16816,25 @@ if(originalGoForHomogeneousTitles && !window.__homogeneousTitlesGoPatched){
   .library-page-title h1,
   .detail-page-title h1{
     font-size:30px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === ROUE DE LA CONNAISSANCE : titre encadré homogène === */
+.wheel-knowledge-title h1{
+  font-size:30px !important;
+  letter-spacing:-.055em !important;
+}
+
+.wheel-knowledge-title p{
+  max-width:250px;
+}
+
+@media(max-width:430px){
+  .wheel-knowledge-title h1{
+    font-size:27px !important;
   }
 }
 </style>
