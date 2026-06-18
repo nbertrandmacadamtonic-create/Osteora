@@ -6,12 +6,12 @@
   <title>Test Vimeo — Ostéo RA</title>
   <style>
     :root{
-      --bg:#07111f;
+      --bg:#06101f;
       --card:rgba(255,255,255,.08);
       --line:rgba(255,255,255,.18);
-      --text:#f5f7fb;
-      --muted:#a8b3c7;
-      --accent:#5ee7ff;
+      --text:#f6f8ff;
+      --muted:#aeb8cc;
+      --accent:#66eaff;
     }
     *{box-sizing:border-box}
     body{
@@ -19,23 +19,21 @@
       min-height:100vh;
       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
       background:
-        radial-gradient(circle at 20% 10%, rgba(94,231,255,.22), transparent 30%),
-        radial-gradient(circle at 80% 30%, rgba(125,92,255,.18), transparent 32%),
+        radial-gradient(circle at 15% 10%, rgba(102,234,255,.22), transparent 30%),
+        radial-gradient(circle at 88% 24%, rgba(135,92,255,.16), transparent 34%),
         linear-gradient(135deg,#050812,#0b1728 55%,#02040a);
       color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
+      padding:22px;
     }
     .wrap{
       width:min(980px,100%);
+      margin:0 auto;
     }
-    .hero{
+    .card{
       border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.04));
+      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
       border-radius:28px;
-      padding:22px;
+      padding:20px;
       box-shadow:0 24px 80px rgba(0,0,0,.40);
       backdrop-filter:blur(18px);
     }
@@ -49,8 +47,8 @@
       width:44px;
       height:44px;
       border-radius:16px;
-      background:radial-gradient(circle at 35% 30%, #fff, var(--accent) 35%, #214bff 100%);
-      box-shadow:0 0 28px rgba(94,231,255,.55);
+      background:radial-gradient(circle at 35% 30%, #fff, var(--accent) 35%, #224dff 100%);
+      box-shadow:0 0 28px rgba(102,234,255,.55);
       flex:0 0 auto;
     }
     h1{
@@ -63,6 +61,34 @@
       color:var(--muted);
       line-height:1.45;
     }
+    .buttons{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:10px;
+      margin:18px 0;
+    }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.08);
+      color:var(--text);
+      border-radius:18px;
+      padding:14px 15px;
+      cursor:pointer;
+      text-align:left;
+      font-weight:700;
+    }
+    button span{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      font-weight:500;
+      font-size:13px;
+    }
+    button.active{
+      border-color:rgba(102,234,255,.75);
+      box-shadow:0 0 0 3px rgba(102,234,255,.12), 0 0 30px rgba(102,234,255,.18);
+    }
     .videoBox{
       position:relative;
       width:100%;
@@ -71,7 +97,7 @@
       overflow:hidden;
       background:#000;
       border:1px solid rgba(255,255,255,.14);
-      margin-top:22px;
+      margin-top:14px;
     }
     iframe{
       position:absolute;
@@ -80,8 +106,8 @@
       height:100%;
       border:0;
     }
-    .status{
-      margin-top:18px;
+    .info{
+      margin-top:16px;
       display:grid;
       gap:10px;
       grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
@@ -99,55 +125,72 @@
       color:var(--text);
       margin-bottom:4px;
     }
-    .note{
-      margin-top:16px;
-      font-size:13px;
-      color:#c4ccda;
-    }
-    code{
-      color:#d9fbff;
-    }
+    code{color:#d9fbff}
   </style>
 </head>
 <body>
   <main class="wrap">
-    <section class="hero">
+    <section class="card">
       <div class="top">
         <div class="orb"></div>
         <div>
           <h1>Test Vimeo — Ostéo RA</h1>
-          <p>Page de contrôle pour vérifier que Vimeo autorise bien la lecture depuis le domaine GitHub Pages.</p>
+          <p>Choisis une vidéo Vimeo à tester depuis le domaine GitHub Pages autorisé.</p>
         </div>
+      </div>
+
+      <div class="buttons">
+        <button class="active" data-src="https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0&badge=0">
+          Vidéo 1 protégée
+          <span>ID 540123060 — hash eed12a4a77</span>
+        </button>
+        <button data-src="https://player.vimeo.com/video/540021907?title=0&byline=0&portrait=0&badge=0">
+          Vidéo 2
+          <span>ID 540021907</span>
+        </button>
+        <button data-src="https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0&badge=0">
+          Vidéo test précédente
+          <span>ID 1198534346</span>
+        </button>
       </div>
 
       <div class="videoBox">
         <iframe
-          src="https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0&badge=0"
+          id="vimeoPlayer"
+          src="https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0&badge=0"
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
 
-      <div class="status">
+      <div class="info">
         <div class="pill">
-          <strong>Vidéo test</strong>
-          ID Vimeo : <code>1198534346</code>
+          <strong>Domaine Vimeo à autoriser</strong>
+          <code>nbertrandmacadamtonic-create.github.io</code>
         </div>
         <div class="pill">
-          <strong>Domaine attendu</strong>
-          <code>nicolasbertrand.github.io</code>
+          <strong>Réglage Vimeo attendu</strong>
+          Non répertorié + seulement les sites de mon choix.
         </div>
         <div class="pill">
-          <strong>Résultat attendu</strong>
-          La vidéo doit se lire sans message de confidentialité.
+          <strong>Test</strong>
+          Si une vidéo bloque, son réglage individuel n’a peut-être pas reçu le réglage global.
         </div>
       </div>
-
-      <p class="note">
-        Si la vidéo affiche encore une erreur de confidentialité, vérifier dans Vimeo que le domaine
-        <code>nicolasbertrand.github.io</code> est bien autorisé et que le réglage a été appliqué aux vidéos existantes.
-      </p>
     </section>
   </main>
+
+  <script>
+    const iframe = document.getElementById("vimeoPlayer");
+    const buttons = document.querySelectorAll("button[data-src]");
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        buttons.forEach((b) => b.classList.remove("active"));
+        button.classList.add("active");
+        iframe.src = button.dataset.src;
+      });
+    });
+  </script>
 </body>
 </html>
