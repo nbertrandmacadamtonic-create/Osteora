@@ -4,160 +4,129 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Test Vimeo — Ostéo RA</title>
+
   <style>
-    :root{
-      --bg:#06101f;
-      --card:rgba(255,255,255,.08);
-      --line:rgba(255,255,255,.18);
-      --text:#f6f8ff;
-      --muted:#aeb8cc;
-      --accent:#66eaff;
+    * {
+      box-sizing: border-box;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      min-height:100vh;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
       background:
-        radial-gradient(circle at 15% 10%, rgba(102,234,255,.22), transparent 30%),
-        radial-gradient(circle at 88% 24%, rgba(135,92,255,.16), transparent 34%),
-        linear-gradient(135deg,#050812,#0b1728 55%,#02040a);
-      color:var(--text);
-      padding:22px;
+        radial-gradient(circle at 20% 10%, rgba(91, 220, 255, 0.22), transparent 34%),
+        radial-gradient(circle at 85% 25%, rgba(120, 90, 255, 0.18), transparent 34%),
+        linear-gradient(135deg, #050814, #0b1728 55%, #02040a);
+      color: #f7f9ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
     }
-    .wrap{
-      width:min(980px,100%);
-      margin:0 auto;
+
+    .page {
+      width: min(980px, 100%);
     }
-    .card{
-      border:1px solid var(--line);
-      background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.045));
-      border-radius:28px;
-      padding:20px;
-      box-shadow:0 24px 80px rgba(0,0,0,.40);
-      backdrop-filter:blur(18px);
+
+    .card {
+      border: 1px solid rgba(255,255,255,0.18);
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.045));
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+      backdrop-filter: blur(18px);
     }
-    .top{
-      display:flex;
-      gap:14px;
-      align-items:center;
-      margin-bottom:18px;
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
     }
-    .orb{
-      width:44px;
-      height:44px;
-      border-radius:16px;
-      background:radial-gradient(circle at 35% 30%, #fff, var(--accent) 35%, #224dff 100%);
-      box-shadow:0 0 28px rgba(102,234,255,.55);
-      flex:0 0 auto;
+
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 35% 30%, #ffffff, #66eaff 35%, #2450ff 100%);
+      box-shadow: 0 0 30px rgba(102,234,255,0.5);
+      flex: 0 0 auto;
     }
-    h1{
-      font-size:clamp(24px,4vw,38px);
-      margin:0;
-      letter-spacing:-.04em;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 38px);
+      letter-spacing: -0.04em;
     }
-    p{
-      margin:6px 0 0;
-      color:var(--muted);
-      line-height:1.45;
+
+    p {
+      margin: 6px 0 0;
+      color: #aeb8cc;
+      line-height: 1.45;
     }
-    .buttons{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
-      gap:10px;
-      margin:18px 0;
+
+    .video-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 22px;
+      background: #000;
+      border: 1px solid rgba(255,255,255,0.14);
+      margin-top: 20px;
     }
-    button{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.08);
-      color:var(--text);
-      border-radius:18px;
-      padding:14px 15px;
-      cursor:pointer;
-      text-align:left;
-      font-weight:700;
+
+    iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
-    button span{
-      display:block;
-      margin-top:4px;
-      color:var(--muted);
-      font-weight:500;
-      font-size:13px;
+
+    .info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
     }
-    button.active{
-      border-color:rgba(102,234,255,.75);
-      box-shadow:0 0 0 3px rgba(102,234,255,.12), 0 0 30px rgba(102,234,255,.18);
+
+    .pill {
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      border-radius: 18px;
+      padding: 14px;
+      color: #aeb8cc;
+      font-size: 14px;
     }
-    .videoBox{
-      position:relative;
-      width:100%;
-      aspect-ratio:16/9;
-      border-radius:22px;
-      overflow:hidden;
-      background:#000;
-      border:1px solid rgba(255,255,255,.14);
-      margin-top:14px;
+
+    .pill strong {
+      display: block;
+      color: #f7f9ff;
+      margin-bottom: 4px;
     }
-    iframe{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      border:0;
+
+    code {
+      color: #d9fbff;
     }
-    .info{
-      margin-top:16px;
-      display:grid;
-      gap:10px;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    }
-    .pill{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.06);
-      border-radius:18px;
-      padding:14px;
-      font-size:14px;
-      color:var(--muted);
-    }
-    .pill strong{
-      display:block;
-      color:var(--text);
-      margin-bottom:4px;
-    }
-    code{color:#d9fbff}
   </style>
 </head>
+
 <body>
-  <main class="wrap">
+  <main class="page">
     <section class="card">
-      <div class="top">
-        <div class="orb"></div>
+      <div class="header">
+        <div class="logo"></div>
         <div>
           <h1>Test Vimeo — Ostéo RA</h1>
-          <p>Choisis une vidéo Vimeo à tester depuis le domaine GitHub Pages autorisé.</p>
+          <p>Test de lecture depuis le Vimeo de la bibliothèque d’équipe.</p>
         </div>
       </div>
 
-      <div class="buttons">
-        <button class="active" data-src="https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0&badge=0">
-          Vidéo 1 protégée
-          <span>ID 540123060 — hash eed12a4a77</span>
-        </button>
-        <button data-src="https://player.vimeo.com/video/540021907?title=0&byline=0&portrait=0&badge=0">
-          Vidéo 2
-          <span>ID 540021907</span>
-        </button>
-        <button data-src="https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0&badge=0">
-          Vidéo test précédente
-          <span>ID 1198534346</span>
-        </button>
-      </div>
-
-      <div class="videoBox">
+      <div class="video-box">
         <iframe
-          id="vimeoPlayer"
-          src="https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0&badge=0"
+          src="https://player.vimeo.com/video/540020382?title=0&byline=0&portrait=0&badge=0"
           allow="autoplay; fullscreen; picture-in-picture"
           allowfullscreen>
         </iframe>
@@ -165,32 +134,21 @@
 
       <div class="info">
         <div class="pill">
-          <strong>Domaine Vimeo à autoriser</strong>
+          <strong>Vidéo utilisée</strong>
+          ID Vimeo : <code>540020382</code>
+        </div>
+
+        <div class="pill">
+          <strong>Domaine à autoriser dans Vimeo</strong>
           <code>nbertrandmacadamtonic-create.github.io</code>
         </div>
+
         <div class="pill">
-          <strong>Réglage Vimeo attendu</strong>
-          Non répertorié + seulement les sites de mon choix.
-        </div>
-        <div class="pill">
-          <strong>Test</strong>
-          Si une vidéo bloque, son réglage individuel n’a peut-être pas reçu le réglage global.
+          <strong>Résultat attendu</strong>
+          La vidéo doit se lire sans message de confidentialité.
         </div>
       </div>
     </section>
   </main>
-
-  <script>
-    const iframe = document.getElementById("vimeoPlayer");
-    const buttons = document.querySelectorAll("button[data-src]");
-
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        buttons.forEach((b) => b.classList.remove("active"));
-        button.classList.add("active");
-        iframe.src = button.dataset.src;
-      });
-    });
-  </script>
 </body>
 </html>
