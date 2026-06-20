@@ -7072,9 +7072,9 @@ assets/icons/icon-videos.webp
 assets/icons/icon-fiches.webp
 assets/icons/icon-revision.webp
 assets/icons/icon-mes-acquis.webp
-assets/icons/icon-statistique.webp
+assets/icons/icon-statistiques.webp
 assets/icons/icon-fiches.webp
-assets/icons/icon-zones.webp
+assets/icons/icon-fiches.webp
 assets/icons/icon-rachis.webp
 assets/icons/icon-corps.webp
 assets/icons/icon-corps.webp
@@ -7272,7 +7272,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-msup" onclick="openMSupMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="zone-card-icon"><img src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
       <div>
         <strong>Membres supérieurs</strong>
         <small>Épaule · Coude · Poignet · Main</small>
@@ -7281,7 +7281,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-bassin" onclick="openBassinMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="zone-card-icon"><img src="assets/icons/icon-bassin.webp" alt=""></div>
       <div>
         <strong>Bassin</strong>
         <small>Sacro-iliaques · Sacrum · Symphyse</small>
@@ -7290,7 +7290,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-minf" onclick="openMInfMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="zone-card-icon"><img src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
       <div>
         <strong>Membres inférieurs</strong>
         <small>Hanche · Genou · Cheville · Pied</small>
@@ -7468,21 +7468,21 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="catalogue-zone-mini msup" onclick="openZoneAll('Membres supérieurs')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="mini-zone-icon"><img src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
       <strong>Membres<br>supérieurs</strong>
       <small><b id="countMSup">17</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini minf" onclick="openZoneAll('Membres inférieurs')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="mini-zone-icon"><img src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
       <strong>Membres<br>inférieurs</strong>
       <small><b id="countMInf">31</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini bassin" onclick="openZoneAll('Bassin')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-corps.webp" alt=""></div>
+      <div class="mini-zone-icon"><img src="assets/icons/icon-bassin.webp" alt=""></div>
       <strong>Bassin</strong>
       <small><b id="countBassin">20</b> techniques</small>
       <span>→</span>
@@ -16603,13 +16603,13 @@ const OSTEO_TITLE_LOGOS = [
   {screen:"seenCollections", file:"icon-mes-acquis.webp", fallback:"✓"},
   {screen:"seenCards", file:"icon-mes-acquis.webp", fallback:"✓"},
   {screen:"quiz", file:"icon-mes-acquis.webp", fallback:"✓"},
-  {screen:"progress", file:"icon-statistique.webp", fallback:"▥"},
+  {screen:"progress", file:"icon-statistiques.webp", fallback:"▥"},
   {screen:"zones", file:"icon-fiches.webp", fallback:"☰"},
   {screen:"rachis", file:"icon-rachis.webp", fallback:"R"},
   {screen:"rachisMenu", file:"icon-rachis.webp", fallback:"R"},
-  {screen:"bassinMenu", file:"icon-corps.webp", fallback:"B"},
-  {screen:"msupMenu", file:"icon-corps.webp", fallback:"MS"},
-  {screen:"minfMenu", file:"icon-corps.webp", fallback:"MI"},
+  {screen:"bassinMenu", file:"icon-bassin.webp", fallback:"B"},
+  {screen:"msupMenu", file:"icon-membres-superieurs.webp", fallback:"MS"},
+  {screen:"minfMenu", file:"icon-membres-inferieurs.webp", fallback:"MI"},
   {screen:"player", file:"icon-videos.webp", fallback:"▶"},
   {screen:"favorites", file:"icon-favoris.webp", fallback:"♡"},
   {screen:"profile", file:"icon-profil.webp", fallback:"⚙"}
@@ -16983,6 +16983,16 @@ if(originalGoForHomogeneousTitlesV2 && !window.__homogeneousTitlesV2GoPatched){
   .detail-page-title h1{
     font-size:30px !important;
   }
+}
+</style>
+
+
+<style>
+/* === Sécurité icônes GitHub === */
+.zone-card-icon img,
+.mini-zone-icon img,
+.page-title-logo img{
+  display:block;
 }
 </style>
 
