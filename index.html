@@ -7644,8 +7644,8 @@ assets/icons/icon-profil.webp
 
     <button class="revision-orbit-card revision-review" onclick="go('revisionCard')">
       <div class="revision-orbit-icon">↻</div>
-      <strong>À revoir</strong>
-      <small>techniques fragiles</small>
+      <strong>Audio</strong>
+      <small>réviser en écoutant</small>
     </button>
 
     <button class="revision-orbit-card revision-seen" onclick="openSeenCollections()">
@@ -7701,6 +7701,7 @@ assets/icons/icon-profil.webp
     <div class="wheel-actions wheel-actions-choice">
       <button class="primary wheel-spin-button" id="wheelSpinButton" onclick="spinRevisionWheel()">Lancer la roue</button>
       <button class="secondary wheel-card-button wheel-choice-button" id="wheelCardButton" onclick="openSelectedWheelCard()" disabled>Visionner la carte</button>
+      <button class="secondary wheel-voice-button wheel-choice-button" id="wheelVoiceButton" onclick="openSelectedWheelVoice()" disabled>Réviser par la voix</button>
       <button class="secondary wheel-video-button wheel-choice-button" id="wheelVideoButton" onclick="openSelectedWheelVideo()" disabled>Lancer la vidéo</button>
     </div>
 
@@ -7710,6 +7711,42 @@ assets/icons/icon-profil.webp
       <button class="primary" onclick="go('videoMap')">Voir les vidéos</button>
     </article>
   </section>
+</section>
+
+
+<section id="revisionVoice" class="screen revision-voice-screen">
+  <header class="top">
+    <button class="icon round" onclick="go('revisionWheel')">‹</button>
+    <div class="brand">
+      <h1 class="logo">Voix</h1>
+      <p class="subtitle">Révision audio</p>
+    </div>
+    <button class="icon" onclick="toast('Audio associé à la technique tirée')">♫</button>
+  </header>
+
+  <div class="page-title revision-voice-title">
+    <div>
+      <h1>Réviser par la voix</h1>
+      <p>Écoutez la technique tirée par la roue.</p>
+    </div>
+  </div>
+
+  <article class="revision-voice-card">
+    <small id="voiceTechniqueKicker">Technique sélectionnée</small>
+    <strong id="voiceTechniqueTitle">Lancez la roue pour choisir une technique.</strong>
+    <span id="voiceTechniqueMeta">Carte · Voix · Vidéo</span>
+
+    <audio id="voiceTechniqueAudio" controls preload="none"></audio>
+
+    <p id="voiceTechniqueHint">
+      Les fichiers audio seront déposés dans <b>assets/audio/</b>, par exemple <b>technique-163.mp3</b>.
+    </p>
+
+    <div class="voice-actions">
+      <button class="secondary" onclick="openSelectedWheelCard()">Voir la carte</button>
+      <button class="primary" onclick="openSelectedWheelVideo()">Lancer la vidéo</button>
+    </div>
+  </article>
 </section>
 
 <section id="revisionCard" class="screen"><header class="top"><button class="icon round" onclick="go('revision')">‹</button><div class="brand"><h1 class="logo">Carte</h1><p class="subtitle">Révision</p></div><button class="icon">☆</button></header><article class="intro"><div class="pill-icon">C</div><div><strong>Dysfonction cervicale</strong><p>Essayez de rappeler la position, les contacts et le geste.</p></div></article><button class="primary" onclick="openTechnique(1)">Revoir la vidéo</button></section>
@@ -8212,7 +8249,7 @@ assets/icons/icon-profil.webp
 </main>
 
 <script>
-const techniques = [{"id": 1,"title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, position assise, à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C7"},{"id": 2,"title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, en procubitus à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C7"},{"id": 3,"title": "Dysfonction de la région cervico-dorsale C7–D2, composantes multiples à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C/D"},{"id": 4,"title": "Dysfonction de l’occiput, en postériorité à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "O"},{"id": 5,"title": "Dysfonction de l’occiput, en translation à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "O"},{"id": 6,"title": "Dysfonction articulaire globale occiput-atlas-axis","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "OAA"},{"id": 7,"title": "Dysfonction de l’atlas, en postériorité à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 8,"title": "Dysfonction de l’atlas, en translation droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 9,"title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, variante","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "en cours","percent": 60,"icon": "C"},{"id": 10,"title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, prise mentonnière","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C"},{"id": 11,"title": "Dysfonction facettaire des cervicales C2–C6, en translation droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↔"},{"id": 12,"title": "Dysfonction cervicale C2–C6, assis","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "vue","percent": 100,"icon": "C2"},{"id": 13,"title": "Dysfonction des cervicales C2–C7, en ERdSd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "vue","percent": 100,"icon": "EM"},{"id": 14,"title": "Dysfonction des cervicales C2–C7, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "à revoir","percent": 0,"icon": "EM"},{"id": 15,"title": "Dysfonction atloïdo-axoïdienne, en rotation droite, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 16,"title": "Dysfonction occipito-atloïdienne, en ESgRd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "O"},{"id": 17,"title": "Dysfonction occipito-atloïdienne, en FSgRd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "O"},{"id": 101,"title": "Dysfonction facettaire des dorsales, en flexion, technique en double appui","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "vue","percent": 80,"icon": "D"},{"id": 102,"title": "Dysfonction facettaire des dorsales, en extension, technique en double appui","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "D"},{"id": 103,"title": "Dysfonction facettaire des dorsales, technique en simple appui","zone": "Rachis","sub": "Dorsales","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "D"},{"id": 104,"title": "Dysfonction facettaire des dorsales, avec les pisiformes croisés, postériorité à droite","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "✕"},{"id": 105,"title": "Dysfonction facettaire des dorsales, technique en pisiforme simple, postériorité à droite","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◈"},{"id": 106,"title": "Dysfonction facettaire des dorsales D9 à D12, assis, technique en pisiforme simple, postériorité à gauche","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "D12"},{"id": 107,"title": "Dysfonction facettaire des dorsales, technique en double Nelson","zone": "Rachis","sub": "Dorsales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "N"},{"id": 108,"title": "Dysfonction des vertèbres dorsales, technique en lift, composantes multiples, assis","zone": "Rachis","sub": "Dorsales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↟"},{"id": 109,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 110,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en ERdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 111,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 112,"title": "Dysfonction d’une vertèbre dorsale D4–D8, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 113,"title": "Dysfonction d’une vertèbre dorsale D4–D8, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 114,"title": "Dysfonction d’une vertèbre dorsale D1–D4, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 115,"title": "Dysfonction d’une vertèbre dorsale D1–D3, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 151,"title": "Dysfonction costo-transversaire de la 1ère côte en élévation en structurel","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1","videoProvider": "vimeo","videoUrl": "https://player.vimeo.com/video/540084811?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1","directVimeo": "https://vimeo.com/540084811?share=copy&fl=sv&fe=ci"},{"id": 152,"title": "Dysfonction costo-transversaire antéro-médiane, technique structurelle","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↘"},{"id": 153,"title": "Dysfonction costo-transversaire postéro-latérale, technique structurelle","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↖"},{"id": 154,"title": "Dysfonction costo-transversaire, composantes multiples, technique structurelle, assis","zone": "Rachis","sub": "Côtes","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C"},{"id": 155,"title": "Dysfonction costo-transversaire antéro-médiane, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 156,"title": "Dysfonction costo-transversaire postéro-latérale, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 157,"title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1"},{"id": 158,"title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1"},{"id": 159,"title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "6"},{"id": 160,"title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "6"},{"id": 161,"title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 162,"title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 163,"title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "2"},{"id": 164,"title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "2"},{"id": 165,"title": "Dysfonction des 3e–10e côtes, en abaissement dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 166,"title": "Dysfonction des 11e–12e côtes, en élévation, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "12"},{"id": 167,"title": "Dysfonction des 11e–12e côtes, en abaissement, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "12"},{"id": 201,"title": "Dysfonction facettaire des lombaires, en NSR à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "à revoir","percent": 45,"icon": "L"},{"id": 202,"title": "Dysfonction facettaire des lombaires, en ERS à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 203,"title": "Dysfonction facettaire des lombaires, en FRS à droite, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 204,"title": "Dysfonction facettaire des lombaires, assis, à gauche","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 205,"title": "Dysfonction des lombaires, en NSR à gauche, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 206,"title": "Dysfonction des lombaires, en ERS à gauche, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 207,"title": "Dysfonction des lombaires, en FRS à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 208,"title": "Dysfonction de la charnière D12/L1, technique en double appui","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "D/L"},{"id": 209,"title": "Dysfonction de la charnière D12/L1, technique indirecte à droite en Lumbar Roll","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↻"},{"id": 210,"title": "Dysfonction de L3, technique semi-directe à gauche en Lumbar Roll","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↻"},{"id": 211,"title": "Charnière D12/L1, technique en Lift, postériorité à gauche","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↟"},{"id": 301,"title": "Dysfonction de l’ilium, en antériorité à gauche","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 302,"title": "Dysfonction de l’ilium, en antériorité à gauche, variante sujet laxe","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 303,"title": "Dysfonction de l’ilium, en postériorité à droite","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◝"},{"id": 304,"title": "Dysfonction de l’ilium, en postériorité à droite, variante sujet laxe","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◝"},{"id": 305,"title": "Dysfonction de l’ilium, en supériorité à droite","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↥"},{"id": 306,"title": "Dysfonction de l’ilium, en antériorité à gauche, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 307,"title": "Dysfonction de l’ilium, en postériorité à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 308,"title": "Dysfonction de l’ilium, en postériorité à droite en procubitus, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 309,"title": "Dysfonction de l’ilium, en fermeture à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 310,"title": "Dysfonction de l’ilium, en ouverture à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 351,"title": "Dysfonction du sacrum, en torsion postérieure avec le pisiforme direct, à gauche","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "S"},{"id": 352,"title": "Dysfonction du sacrum, en flexion unilatérale sur axe horizontal, à gauche","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 353,"title": "Dysfonction du sacrum, en torsion postérieure gauche sur axe oblique droit","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "S"},{"id": 354,"title": "Dysfonction du sacrum, en torsion antérieure droite sur axe droit, énergie musculaire","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "EM"},{"id": 355,"title": "Dysfonction du sacrum, en torsion postérieure droite sur un axe droit, énergie musculaire","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "EM"},{"id": 356,"title": "Dysfonction du sacrum, en antériorité unilatérale, manœuvre avec le pisiforme direct","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 357,"title": "Dysfonction du sacrum, en extension unilatérale sur axe horizontal, à droite","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 381,"title": "Dysfonction de la symphyse pubienne, en supériorité à droite, énergie musculaire","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "SP"},{"id": 382,"title": "Dysfonction de la symphyse pubienne, en infériorité à gauche, énergie musculaire","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "SP"},{"id": 383,"title": "Dysfonction combinée de la symphyse pubienne, en supériorité et infériorité","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "SP"},{"id": 401,"title": "Dysfonction pré-sternale de la clavicule, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◜"},{"id": 402,"title": "Dysfonction sus-sternale de la clavicule, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◜"},{"id": 403,"title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 404,"title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à gauche","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 405,"title": "Dysfonction acromio-claviculaire, en rotation antérieure, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 406,"title": "Dysfonction acromio-claviculaire, en rotation postérieure, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 407,"title": "Dysfonction gléno-humérale, en antériorité, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↻"},{"id": 408,"title": "Dysfonction huméro-ulnaire, en abduction, à gauche","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 409,"title": "Dysfonction huméro-ulnaire, en adduction, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 410,"title": "Dysfonction huméro-radiale, en antériorité, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 411,"title": "Dysfonction huméro-radiale, en postériorité, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 412,"title": "Dysfonction huméro-radiale, en postériorité, variante","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 413,"title": "Dysfonction radio-carpienne du scaphoïde ou du lunatum, en postériorité, à gauche","zone": "Membres supérieurs","sub": "Poignet","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "▧"},{"id": 414,"title": "Dysfonction radio-carpienne, en abduction, à gauche","zone": "Membres supérieurs","sub": "Poignet","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "▧"},{"id": 415,"title": "Dysfonction articulaire globale des médio-carpiennes, à droite","zone": "Membres supérieurs","sub": "Main","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "✋"},{"id": 416,"title": "Dysfonction articulaire globale des inter-carpiennes, à gauche","zone": "Membres supérieurs","sub": "Main","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "✋"},{"id": 417,"title": "Dysfonction articulaire globale de la trapézo-métacarpienne, à droite","zone": "Membres supérieurs","sub": "Main","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "✋"},{"id": 501,"title": "Dysfonction de la coxo-fémorale, en rotation interne, à gauche","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 502,"title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 503,"title": "Dysfonction de la coxo-fémorale, en abduction, à gauche","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 504,"title": "Dysfonction de la coxo-fémorale, en adduction, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 505,"title": "Dysfonction de la coxo-fémorale, en flexion, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 506,"title": "Dysfonction de la coxo-fémorale, en antériorité classique, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◉"},{"id": 507,"title": "Dysfonction de la coxo-fémorale, en postériorité, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◉"},{"id": 508,"title": "Dysfonction de la coxo-fémorale articulaire globale dans un axe transversal, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◎"},{"id": 509,"title": "Dysfonction de la fémoro-tibiale, en abduction, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 510,"title": "Dysfonction de la fémoro-tibiale, en adduction, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 511,"title": "Dysfonction de la fémoro-tibiale, en antériorité, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 512,"title": "Dysfonction de la fémoro-tibiale, en postériorité, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 513,"title": "Dysfonction de la fémoro-tibiale, en rotation interne, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "⟳"},{"id": 514,"title": "Dysfonction de la fémoro-tibiale, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "⟳"},{"id": 515,"title": "Dysfonction du ménisque médial, en postériorité et en extension, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "M"},{"id": 516,"title": "Dysfonction du ménisque médial en postériorité, en flexion, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "M"},{"id": 551,"title": "Dysfonction de la fibulo-tibiale supérieure, en postériorité, à gauche","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 552,"title": "Dysfonction de la fibulo-tibiale inférieure, en antériorité, à gauche","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 553,"title": "Dysfonction de la fibulo-tibiale inférieure, en postériorité, à droite","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 554,"title": "Dysfonction de la tibio-tarsienne articulaire globale, en décubitus ventral, à gauche","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 555,"title": "Entorse tibio-tarsienne externe, à droite","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "!"},{"id": 556,"title": "Décoaptation de la tibio-tarsienne globale, à gauche","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "↧"},{"id": 557,"title": "Dysfonction de la tibio-tarsienne, en antériorité, à droite","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 558,"title": "Dysfonction de la sous-astragalienne antéro-interne, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 559,"title": "Dysfonction de la sous-astragalienne postéro-externe, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 560,"title": "Dysfonction de la sous-talienne, calcanéus en valgus, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 561,"title": "Dysfonction de la sous-talienne, calcanéus en valgus, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟","detailId": "sousTalienneValgusDroite","videoProvider": "vimeo","videoUrl": "https://player.vimeo.com/video/1199647853?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1","directVimeo": "https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci"},{"id": 562,"title": "Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟","videoUrl": "https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0","videoProvider": "vimeo"},{"id": 563,"title": "Dysfonction talo-naviculaire, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 564,"title": "Dysfonction de la naviculo-cuboïdienne articulaire globale, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 565,"title": "Dysfonction de la métatarso-phalangienne de la 1re phalange, en flexion dorsale, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◟"},{"id": 999,"title": "TEST VIDÉO VIMEO — Épaule","zone": "Membres supérieurs","sub": "Épaule","level": "Test vidéo","status": "non vue","percent": 0,"icon": "◜","videoUrl": "https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0","videoProvider": "vimeo"}];
+const techniques = [{"id": 1,"title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, position assise, à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C7"},{"id": 2,"title": "Dysfonction facettaire de la région cervico-dorsale C7–D2, en procubitus à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C7"},{"id": 3,"title": "Dysfonction de la région cervico-dorsale C7–D2, composantes multiples à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C/D"},{"id": 4,"title": "Dysfonction de l’occiput, en postériorité à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "O"},{"id": 5,"title": "Dysfonction de l’occiput, en translation à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "O"},{"id": 6,"title": "Dysfonction articulaire globale occiput-atlas-axis","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "OAA"},{"id": 7,"title": "Dysfonction de l’atlas, en postériorité à droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 8,"title": "Dysfonction de l’atlas, en translation droite","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 9,"title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, variante","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "en cours","percent": 60,"icon": "C"},{"id": 10,"title": "Dysfonction facettaire des cervicales C2–C6, en postériorité à droite, prise mentonnière","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "C"},{"id": 11,"title": "Dysfonction facettaire des cervicales C2–C6, en translation droite","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↔"},{"id": 12,"title": "Dysfonction cervicale C2–C6, assis","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "vue","percent": 100,"icon": "C2"},{"id": 13,"title": "Dysfonction des cervicales C2–C7, en ERdSd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "vue","percent": 100,"icon": "EM"},{"id": 14,"title": "Dysfonction des cervicales C2–C7, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau intermédiaire","status": "à revoir","percent": 0,"icon": "EM"},{"id": 15,"title": "Dysfonction atloïdo-axoïdienne, en rotation droite, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C1"},{"id": 16,"title": "Dysfonction occipito-atloïdienne, en ESgRd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "O"},{"id": 17,"title": "Dysfonction occipito-atloïdienne, en FSgRd, énergie musculaire","zone": "Rachis","sub": "Cervicales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "O"},{"id": 101,"title": "Dysfonction facettaire des dorsales, en flexion, technique en double appui","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "vue","percent": 80,"icon": "D"},{"id": 102,"title": "Dysfonction facettaire des dorsales, en extension, technique en double appui","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "D"},{"id": 103,"title": "Dysfonction facettaire des dorsales, technique en simple appui","zone": "Rachis","sub": "Dorsales","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "D"},{"id": 104,"title": "Dysfonction facettaire des dorsales, avec les pisiformes croisés, postériorité à droite","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "✕"},{"id": 105,"title": "Dysfonction facettaire des dorsales, technique en pisiforme simple, postériorité à droite","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◈"},{"id": 106,"title": "Dysfonction facettaire des dorsales D9 à D12, assis, technique en pisiforme simple, postériorité à gauche","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "D12"},{"id": 107,"title": "Dysfonction facettaire des dorsales, technique en double Nelson","zone": "Rachis","sub": "Dorsales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "N"},{"id": 108,"title": "Dysfonction des vertèbres dorsales, technique en lift, composantes multiples, assis","zone": "Rachis","sub": "Dorsales","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↟"},{"id": 109,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 110,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en ERdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 111,"title": "Dysfonction d’une vertèbre dorsale D8–D12, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 112,"title": "Dysfonction d’une vertèbre dorsale D4–D8, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 113,"title": "Dysfonction d’une vertèbre dorsale D4–D8, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 114,"title": "Dysfonction d’une vertèbre dorsale D1–D4, en NSgRd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 115,"title": "Dysfonction d’une vertèbre dorsale D1–D3, en FRdSd, énergie musculaire","zone": "Rachis","sub": "Dorsales","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 151,"title": "Dysfonction costo-transversaire de la 1ère côte en élévation en structurel","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1"},{"id": 152,"title": "Dysfonction costo-transversaire antéro-médiane, technique structurelle","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↘"},{"id": 153,"title": "Dysfonction costo-transversaire postéro-latérale, technique structurelle","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↖"},{"id": 154,"title": "Dysfonction costo-transversaire, composantes multiples, technique structurelle, assis","zone": "Rachis","sub": "Côtes","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "C"},{"id": 155,"title": "Dysfonction costo-transversaire antéro-médiane, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 156,"title": "Dysfonction costo-transversaire postéro-latérale, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 157,"title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1"},{"id": 158,"title": "Dysfonction respiratoire de la 1re côte, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "1"},{"id": 159,"title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "6"},{"id": 160,"title": "Dysfonction respiratoire des 1re–6e côtes, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "6"},{"id": 161,"title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan sagittal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 162,"title": "Dysfonction respiratoire des 7e–10e côtes, en élévation dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 163,"title": "Dysfonction des 1re–2e côtes, en abaissement, plan sagittal (EM)","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "2","videoProvider": "vimeo","videoUrl": "https://player.vimeo.com/video/540084811?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1","directVimeo": "https://vimeo.com/540084811?share=copy&fl=sv&fe=ci"},{"id": 164,"title": "Dysfonction des 1re–2e côtes, en abaissement dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "2"},{"id": 165,"title": "Dysfonction des 3e–10e côtes, en abaissement dans le plan frontal, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "10"},{"id": 166,"title": "Dysfonction des 11e–12e côtes, en élévation, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "12"},{"id": 167,"title": "Dysfonction des 11e–12e côtes, en abaissement, énergie musculaire","zone": "Rachis","sub": "Côtes","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "12"},{"id": 201,"title": "Dysfonction facettaire des lombaires, en NSR à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "à revoir","percent": 45,"icon": "L"},{"id": 202,"title": "Dysfonction facettaire des lombaires, en ERS à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 203,"title": "Dysfonction facettaire des lombaires, en FRS à droite, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 204,"title": "Dysfonction facettaire des lombaires, assis, à gauche","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 205,"title": "Dysfonction des lombaires, en NSR à gauche, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 206,"title": "Dysfonction des lombaires, en ERS à gauche, énergie musculaire","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 207,"title": "Dysfonction des lombaires, en FRS à droite","zone": "Rachis","sub": "Lombaires","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "L"},{"id": 208,"title": "Dysfonction de la charnière D12/L1, technique en double appui","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "D/L"},{"id": 209,"title": "Dysfonction de la charnière D12/L1, technique indirecte à droite en Lumbar Roll","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↻"},{"id": 210,"title": "Dysfonction de L3, technique semi-directe à gauche en Lumbar Roll","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↻"},{"id": 211,"title": "Charnière D12/L1, technique en Lift, postériorité à gauche","zone": "Rachis","sub": "Lombaires","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "↟"},{"id": 301,"title": "Dysfonction de l’ilium, en antériorité à gauche","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 302,"title": "Dysfonction de l’ilium, en antériorité à gauche, variante sujet laxe","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 303,"title": "Dysfonction de l’ilium, en postériorité à droite","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◝"},{"id": 304,"title": "Dysfonction de l’ilium, en postériorité à droite, variante sujet laxe","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◝"},{"id": 305,"title": "Dysfonction de l’ilium, en supériorité à droite","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↥"},{"id": 306,"title": "Dysfonction de l’ilium, en antériorité à gauche, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 307,"title": "Dysfonction de l’ilium, en postériorité à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 308,"title": "Dysfonction de l’ilium, en postériorité à droite en procubitus, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 309,"title": "Dysfonction de l’ilium, en fermeture à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 310,"title": "Dysfonction de l’ilium, en ouverture à droite, énergie musculaire","zone": "Bassin","sub": "Ilium","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 351,"title": "Dysfonction du sacrum, en torsion postérieure avec le pisiforme direct, à gauche","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "S"},{"id": 352,"title": "Dysfonction du sacrum, en flexion unilatérale sur axe horizontal, à gauche","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 353,"title": "Dysfonction du sacrum, en torsion postérieure gauche sur axe oblique droit","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "S"},{"id": 354,"title": "Dysfonction du sacrum, en torsion antérieure droite sur axe droit, énergie musculaire","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "EM"},{"id": 355,"title": "Dysfonction du sacrum, en torsion postérieure droite sur un axe droit, énergie musculaire","zone": "Bassin","sub": "Sacrum","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "EM"},{"id": 356,"title": "Dysfonction du sacrum, en antériorité unilatérale, manœuvre avec le pisiforme direct","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 357,"title": "Dysfonction du sacrum, en extension unilatérale sur axe horizontal, à droite","zone": "Bassin","sub": "Sacrum","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "S"},{"id": 381,"title": "Dysfonction de la symphyse pubienne, en supériorité à droite, énergie musculaire","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "SP"},{"id": 382,"title": "Dysfonction de la symphyse pubienne, en infériorité à gauche, énergie musculaire","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "SP"},{"id": 383,"title": "Dysfonction combinée de la symphyse pubienne, en supériorité et infériorité","zone": "Bassin","sub": "Symphyse pubienne","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "SP"},{"id": 401,"title": "Dysfonction pré-sternale de la clavicule, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◜"},{"id": 402,"title": "Dysfonction sus-sternale de la clavicule, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◜"},{"id": 403,"title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à droite","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 404,"title": "Dysfonction sus-sternale de la clavicule, énergie musculaire, à gauche","zone": "Membres supérieurs","sub": "Clavicule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "EM"},{"id": 405,"title": "Dysfonction acromio-claviculaire, en rotation antérieure, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 406,"title": "Dysfonction acromio-claviculaire, en rotation postérieure, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◜"},{"id": 407,"title": "Dysfonction gléno-humérale, en antériorité, à gauche","zone": "Membres supérieurs","sub": "Épaule","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "↻"},{"id": 408,"title": "Dysfonction huméro-ulnaire, en abduction, à gauche","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 409,"title": "Dysfonction huméro-ulnaire, en adduction, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 410,"title": "Dysfonction huméro-radiale, en antériorité, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 411,"title": "Dysfonction huméro-radiale, en postériorité, à droite","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 412,"title": "Dysfonction huméro-radiale, en postériorité, variante","zone": "Membres supérieurs","sub": "Coude","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 413,"title": "Dysfonction radio-carpienne du scaphoïde ou du lunatum, en postériorité, à gauche","zone": "Membres supérieurs","sub": "Poignet","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "▧"},{"id": 414,"title": "Dysfonction radio-carpienne, en abduction, à gauche","zone": "Membres supérieurs","sub": "Poignet","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "▧"},{"id": 415,"title": "Dysfonction articulaire globale des médio-carpiennes, à droite","zone": "Membres supérieurs","sub": "Main","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "✋"},{"id": 416,"title": "Dysfonction articulaire globale des inter-carpiennes, à gauche","zone": "Membres supérieurs","sub": "Main","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "✋"},{"id": 417,"title": "Dysfonction articulaire globale de la trapézo-métacarpienne, à droite","zone": "Membres supérieurs","sub": "Main","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "✋"},{"id": 501,"title": "Dysfonction de la coxo-fémorale, en rotation interne, à gauche","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 502,"title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 503,"title": "Dysfonction de la coxo-fémorale, en abduction, à gauche","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 504,"title": "Dysfonction de la coxo-fémorale, en adduction, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 505,"title": "Dysfonction de la coxo-fémorale, en flexion, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 506,"title": "Dysfonction de la coxo-fémorale, en antériorité classique, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◉"},{"id": 507,"title": "Dysfonction de la coxo-fémorale, en postériorité, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◉"},{"id": 508,"title": "Dysfonction de la coxo-fémorale articulaire globale dans un axe transversal, à droite","zone": "Membres inférieurs","sub": "Hanche","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "◎"},{"id": 509,"title": "Dysfonction de la fémoro-tibiale, en abduction, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 510,"title": "Dysfonction de la fémoro-tibiale, en adduction, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 511,"title": "Dysfonction de la fémoro-tibiale, en antériorité, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 512,"title": "Dysfonction de la fémoro-tibiale, en postériorité, à gauche","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◉"},{"id": 513,"title": "Dysfonction de la fémoro-tibiale, en rotation interne, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "⟳"},{"id": 514,"title": "Dysfonction de la fémoro-tibiale, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "⟳"},{"id": 515,"title": "Dysfonction du ménisque médial, en postériorité et en extension, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "M"},{"id": 516,"title": "Dysfonction du ménisque médial en postériorité, en flexion, à droite","zone": "Membres inférieurs","sub": "Genou","level": "Niveau avancé","status": "non vue","percent": 0,"icon": "M"},{"id": 551,"title": "Dysfonction de la fibulo-tibiale supérieure, en postériorité, à gauche","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 552,"title": "Dysfonction de la fibulo-tibiale inférieure, en antériorité, à gauche","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 553,"title": "Dysfonction de la fibulo-tibiale inférieure, en postériorité, à droite","zone": "Membres inférieurs","sub": "Tibia-fibula","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "TF"},{"id": 554,"title": "Dysfonction de la tibio-tarsienne articulaire globale, en décubitus ventral, à gauche","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 555,"title": "Entorse tibio-tarsienne externe, à droite","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "!"},{"id": 556,"title": "Décoaptation de la tibio-tarsienne globale, à gauche","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "↧"},{"id": 557,"title": "Dysfonction de la tibio-tarsienne, en antériorité, à droite","zone": "Membres inférieurs","sub": "Cheville","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◌"},{"id": 558,"title": "Dysfonction de la sous-astragalienne antéro-interne, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 559,"title": "Dysfonction de la sous-astragalienne postéro-externe, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 560,"title": "Dysfonction de la sous-talienne, calcanéus en valgus, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 561,"title": "Dysfonction de la sous-talienne, calcanéus en valgus, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟","detailId": "sousTalienneValgusDroite","videoProvider": "vimeo","videoUrl": "https://player.vimeo.com/video/1199647853?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1","directVimeo": "https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci"},{"id": 562,"title": "Dysfonction de la calcanéo-cuboïdienne, en rotation interne, à gauche","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟","videoUrl": "https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0","videoProvider": "vimeo"},{"id": 563,"title": "Dysfonction talo-naviculaire, en rotation externe, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 564,"title": "Dysfonction de la naviculo-cuboïdienne articulaire globale, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau intermédiaire","status": "non vue","percent": 0,"icon": "◟"},{"id": 565,"title": "Dysfonction de la métatarso-phalangienne de la 1re phalange, en flexion dorsale, à droite","zone": "Membres inférieurs","sub": "Pied","level": "Niveau débutant","status": "non vue","percent": 0,"icon": "◟"},{"id": 999,"title": "TEST VIDÉO VIMEO — Épaule","zone": "Membres supérieurs","sub": "Épaule","level": "Test vidéo","status": "non vue","percent": 0,"icon": "◜","videoUrl": "https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0","videoProvider": "vimeo"}];
 
 const zoneSubzones = {
   "Rachis": [
@@ -9360,6 +9397,7 @@ function renderRevisionWheel(){
   const resultKicker = document.getElementById("wheelResultKicker");
   const resultMeta = document.getElementById("wheelResultMeta");
   const cardBtn = document.getElementById("wheelCardButton");
+  const voiceBtn = document.getElementById("wheelVoiceButton");
   const videoBtn = document.getElementById("wheelVideoButton");
   const disc = document.getElementById("revisionWheelDisc");
 
@@ -9376,7 +9414,7 @@ function renderRevisionWheel(){
   if(!list.length){
     if(disc) disc.classList.remove("selected");
     if(ticker) ticker.textContent = "Vide";
-    [cardBtn, videoBtn].forEach(btn => {
+    [cardBtn, voiceBtn, videoBtn].forEach(btn => {
     if(btn){
       btn.disabled = true;
       btn.classList.remove("ready");
@@ -9390,7 +9428,7 @@ function renderRevisionWheel(){
   if(resultKicker) resultKicker.textContent = "Tirage aléatoire";
   if(resultTitle) resultTitle.textContent = "Lancez la roue pour choisir une carte débloquée.";
   if(resultMeta) resultMeta.textContent = "Seules les cartes à jouer déjà débloquées entrent dans le tirage.";
-  [cardBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
+  [cardBtn, voiceBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
   if(disc) disc.classList.remove("spinning", "selected");
 }
 
@@ -9483,13 +9521,14 @@ function spinRevisionWheel(){
   const resultKicker = document.getElementById("wheelResultKicker");
   const resultMeta = document.getElementById("wheelResultMeta");
   const cardBtn = document.getElementById("wheelCardButton");
+  const voiceBtn = document.getElementById("wheelVoiceButton");
   const videoBtn = document.getElementById("wheelVideoButton");
 
   const selected = list[Math.floor(Math.random() * list.length)];
   selectedWheelTechniqueId = selected.id;
   startWheelSound();
 
-  [cardBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
+  [cardBtn, voiceBtn, videoBtn].forEach(btn => { if(btn) btn.disabled = true; });
   if(spinBtn) spinBtn.disabled = true;
   if(resultKicker) resultKicker.textContent = "La roue tourne";
   if(resultTitle) resultTitle.textContent = "Sélection en cours…";
@@ -9520,7 +9559,7 @@ function spinRevisionWheel(){
     if(resultKicker) resultKicker.textContent = selected.zone + " · " + selected.sub;
     if(resultTitle) resultTitle.textContent = selected.title;
     if(resultMeta) resultMeta.textContent = selected.level + " · Carte débloquée";
-    [cardBtn, videoBtn].forEach(btn => {
+    [cardBtn, voiceBtn, videoBtn].forEach(btn => {
       if(btn){
         btn.disabled = false;
         btn.classList.add("ready");
@@ -9555,6 +9594,49 @@ function openSelectedWheelCard(){
   }
 
   go("seenCards");
+}
+
+
+function resolveTechniqueAudioUrl(t){
+  if(!t) return "";
+  return t.audioUrl || t.audio || t.voiceUrl || t.voixUrl || ("assets/audio/technique-" + Number(t.id) + ".mp3");
+}
+
+function openSelectedWheelVoice(){
+  const t = getSelectedWheelTechnique();
+  if(!t){
+    toast("Lancez d’abord la roue");
+    return;
+  }
+
+  const kicker = document.getElementById("voiceTechniqueKicker");
+  const title = document.getElementById("voiceTechniqueTitle");
+  const meta = document.getElementById("voiceTechniqueMeta");
+  const audio = document.getElementById("voiceTechniqueAudio");
+  const hint = document.getElementById("voiceTechniqueHint");
+
+  const audioUrl = resolveTechniqueAudioUrl(t);
+
+  if(kicker) kicker.textContent = t.zone + " · " + t.sub;
+  if(title) title.textContent = t.title;
+  if(meta) meta.textContent = t.level + " · Révision par la voix";
+  if(hint){
+    hint.innerHTML = "Fichier attendu : <b>" + audioUrl + "</b>";
+  }
+
+  if(audio){
+    audio.pause();
+    audio.src = audioUrl;
+    audio.load();
+    audio.onerror = function(){
+      toast("Audio non encore déposé pour cette technique");
+      if(hint){
+        hint.innerHTML = "Audio non trouvé. Déposez le fichier dans <b>assets/audio/</b> avec le nom <b>technique-" + Number(t.id) + ".mp3</b>.";
+      }
+    };
+  }
+
+  go("revisionVoice");
 }
 
 function openSelectedWheelVideo(){
@@ -17041,6 +17123,257 @@ if(originalGoForHomogeneousTitlesV2 && !window.__homogeneousTitlesV2GoPatched){
   #rachisMenu .rachis-region-card.cotes{ top:276px !important; }
   #rachisMenu .rachis-region-card.lombaires{ top:402px !important; }
   #rachisMenu .rachis-region-card.cotes::after{ left:-28px !important; }
+}
+</style>
+
+
+<style>
+/* === ROUE ALÉATOIRE : choix Carte / Voix / Vidéo === */
+.wheel-voice-button.ready{
+  border-color:rgba(0,229,255,.46) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.18), transparent 45%),
+    linear-gradient(145deg, rgba(0,229,255,.16), rgba(5,15,31,.84)) !important;
+  box-shadow:
+    0 0 22px rgba(0,229,255,.20),
+    inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+.wheel-voice-button.ready::after{
+  content:" ♫";
+}
+
+.revision-voice-card{
+  margin-top:14px;
+  padding:18px;
+  border-radius:26px;
+  border:1px solid rgba(0,229,255,.30);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(0,229,255,.15), transparent 36%),
+    linear-gradient(145deg, rgba(10,29,55,.72), rgba(5,15,31,.94));
+  box-shadow:0 20px 54px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.revision-voice-card small{
+  display:block;
+  color:#42dfff;
+  text-transform:uppercase;
+  letter-spacing:.13em;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:9px;
+}
+
+.revision-voice-card strong{
+  display:block;
+  color:#fff;
+  font-size:22px;
+  line-height:1.12;
+  font-weight:950;
+  letter-spacing:-.035em;
+}
+
+.revision-voice-card span{
+  display:block;
+  color:rgba(221,232,255,.72);
+  font-size:14px;
+  margin-top:10px;
+}
+
+.revision-voice-card audio{
+  width:100%;
+  margin-top:18px;
+  filter:drop-shadow(0 0 16px rgba(0,229,255,.12));
+}
+
+.revision-voice-card p{
+  margin:14px 0 0;
+  color:rgba(221,232,255,.68);
+  font-size:13px;
+  line-height:1.35;
+}
+
+.voice-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:16px;
+}
+</style>
+
+
+
+<style>
+/* === PATCH RACHIS : repositionnement anatomique des zones ===
+   Objectif : Cervicales en face du cou, Dorsales descendues à gauche,
+   Côtes à droite, Lombaires en bas à gauche. */
+
+#rachisMenu .rachis-region-layout{
+  height: 520px !important;
+  min-height: 520px !important;
+}
+
+#rachisMenu .rachis-side-image{
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: -8px !important;
+  width: 245px !important;
+  height: 512px !important;
+}
+
+#rachisMenu .rachis-region-card{
+  width: 190px !important;
+  min-height: 84px !important;
+  grid-template-columns: 46px minmax(0,1fr) 22px !important;
+  gap: 9px !important;
+  padding: 10px !important;
+  border-radius: 22px !important;
+}
+
+/* Cervicales : face au cou, plus bas que l’ancienne position */
+#rachisMenu .rachis-region-card.cervicales{
+  left: 0 !important;
+  right: auto !important;
+  top: 86px !important;
+}
+
+/* Dorsales : à gauche et descendues, face au rachis dorsal */
+#rachisMenu .rachis-region-card.dorsales{
+  left: 0 !important;
+  right: auto !important;
+  top: 218px !important;
+}
+
+/* Côtes : à droite, dans la zone thoracique/costo-transversaire */
+#rachisMenu .rachis-region-card.cotes{
+  right: 0 !important;
+  left: auto !important;
+  top: 246px !important;
+  color: rgba(238,246,255,.92) !important;
+}
+
+/* Lombaires : bas gauche, en face de L1-L5 */
+#rachisMenu .rachis-region-card.lombaires{
+  left: 0 !important;
+  right: auto !important;
+  top: 360px !important;
+}
+
+/* Boulettes : côté image, sans trait, placées au niveau anatomique */
+#rachisMenu .rachis-region-card::after{
+  display:none !important;
+  content:none !important;
+}
+
+#rachisMenu .rachis-region-card::before{
+  content:"" !important;
+  position:absolute !important;
+  width:12px !important;
+  height:12px !important;
+  border-radius:999px !important;
+  background:currentColor !important;
+  border:2px solid rgba(255,255,255,.76) !important;
+  box-shadow:
+    0 0 0 6px color-mix(in srgb,currentColor 16%, transparent),
+    0 0 18px currentColor,
+    0 0 34px color-mix(in srgb,currentColor 55%, transparent) !important;
+  z-index:9 !important;
+  opacity:.98 !important;
+}
+
+#rachisMenu .rachis-region-card.cervicales::before{
+  left:auto !important;
+  right:-17px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+
+#rachisMenu .rachis-region-card.dorsales::before{
+  left:auto !important;
+  right:-17px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+
+#rachisMenu .rachis-region-card.cotes::before{
+  left:-17px !important;
+  right:auto !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+
+#rachisMenu .rachis-region-card.lombaires::before{
+  left:auto !important;
+  right:-17px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+}
+
+/* Texte des Côtes : éviter que le libellé déborde */
+#rachisMenu .rachis-region-card.cotes strong{
+  font-size:18px !important;
+}
+#rachisMenu .rachis-region-card.cotes small{
+  font-size:12.5px !important;
+  line-height:1.06 !important;
+}
+
+@media(max-width:430px){
+  #rachisMenu .rachis-region-layout{
+    height: 510px !important;
+    min-height: 510px !important;
+  }
+
+  #rachisMenu .rachis-side-image{
+    width: 236px !important;
+    height: 504px !important;
+    bottom: -7px !important;
+  }
+
+  #rachisMenu .rachis-region-card{
+    width: 178px !important;
+    min-height: 78px !important;
+    grid-template-columns: 42px minmax(0,1fr) 20px !important;
+    padding: 9px !important;
+  }
+
+  #rachisMenu .rachis-region-card.cervicales{
+    left: 0 !important;
+    top: 78px !important;
+  }
+
+  #rachisMenu .rachis-region-card.dorsales{
+    left: 0 !important;
+    right: auto !important;
+    top: 208px !important;
+  }
+
+  #rachisMenu .rachis-region-card.cotes{
+    right: 0 !important;
+    left: auto !important;
+    top: 238px !important;
+    width: 172px !important;
+  }
+
+  #rachisMenu .rachis-region-card.lombaires{
+    left: 0 !important;
+    top: 352px !important;
+  }
+
+  #rachisMenu .rachis-region-card::before{
+    width:11px !important;
+    height:11px !important;
+  }
+
+  #rachisMenu .rachis-region-card.cervicales::before,
+  #rachisMenu .rachis-region-card.dorsales::before,
+  #rachisMenu .rachis-region-card.lombaires::before{
+    right:-15px !important;
+  }
+
+  #rachisMenu .rachis-region-card.cotes::before{
+    left:-15px !important;
+  }
 }
 </style>
 
