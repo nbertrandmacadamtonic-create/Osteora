@@ -7063,6 +7063,10 @@ button[data-tech-id="12"]{
 <link rel="apple-touch-icon" href="assets/images/icon-osteo-pratik.png">
 <meta name="theme-color" content="#07162E">
 
+<link rel="preload" as="image" href="assets/images/welcome-presentation.webp">
+<link rel="preload" as="image" href="assets/images/welcome-presentation-mobile.webp" media="(max-width: 520px)">
+
+
 </head>
 <body>
 
@@ -7089,7 +7093,7 @@ assets/icons/icon-profil.webp
 
 <section id="welcome" class="screen active welcome-screen">
   <div class="welcome-poster-page">
-    <img
+    <img decoding="async" fetchpriority="high"
       class="welcome-poster-img"
       src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/welcome-presentation.webp"
       data-fallback-src="assets/images/welcome-presentation.webp"
@@ -7097,7 +7101,7 @@ assets/icons/icon-profil.webp
       onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';document.querySelector('.welcome-poster-fallback').style.display='grid';}"
     >
     <div class="welcome-poster-fallback">
-      <img
+      <img decoding="async" fetchpriority="high"
         src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
         alt="Ostéo Pratik"
       >
@@ -7177,8 +7181,7 @@ assets/icons/icon-profil.webp
     <button class="icon home-side-icon home-settings" onclick="toast('Réglages')">⌬</button>
 
     <div class="brand home-brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -7205,7 +7208,7 @@ assets/icons/icon-profil.webp
   </header>
   <section class="home-orbit">
     <div class="body-center home-personnage">
-      <img src="assets/images/home-personnage.webp" alt="">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/home-personnage.webp" alt="">
     </div>
     <button class="orbit-card videos" onclick="go('videoMap')"><div class="orbit-icon home-icon-video">▶</div><strong><span class="main-word">Vidéos</span><span class="sub-word">des techniques</span></strong><em class="orbit-arrow">›</em></button>
     <button class="orbit-card revision" onclick="go('revision')"><div class="orbit-icon home-icon-revision">↻</div><strong><span class="main-word">Réviser</span></strong><em class="orbit-arrow">›</em></button>
@@ -7229,8 +7232,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -7249,7 +7251,7 @@ assets/icons/icon-profil.webp
 
   <section class="video-zone-layout">
     <div class="video-zone-person">
-      <img src="assets/images/video-zone-person.png" alt="">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/video-zone-person.png" alt="">
     </div>
 
     <div class="video-hotspot-dot dot-rachis"></div>
@@ -7263,7 +7265,7 @@ assets/icons/icon-profil.webp
     <div class="video-link link-minf"></div>
 
     <button class="video-zone-card card-rachis" onclick="openRachisMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-rachis.webp" alt=""></div>
+      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis.webp" alt=""></div>
       <div>
         <strong>Rachis</strong>
         <small>Cervicales · Dorsales · Lombaires</small>
@@ -7272,7 +7274,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-msup" onclick="openMSupMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
+      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
       <div>
         <strong>Membres supérieurs</strong>
         <small>Épaule · Coude · Poignet · Main</small>
@@ -7281,7 +7283,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-bassin" onclick="openBassinMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-bassin.webp" alt=""></div>
+      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-bassin.webp" alt=""></div>
       <div>
         <strong>Bassin</strong>
         <small>Sacro-iliaques · Sacrum · Symphyse</small>
@@ -7290,7 +7292,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="video-zone-card card-minf" onclick="openMInfMenu()">
-      <div class="zone-card-icon"><img src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
+      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
       <div>
         <strong>Membres inférieurs</strong>
         <small>Hanche · Genou · Cheville · Pied</small>
@@ -7336,8 +7338,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -7356,7 +7357,7 @@ assets/icons/icon-profil.webp
 
   <section class="rachis-region-layout">
     <div class="rachis-side-image">
-      <img src="assets/images/rachis-side.png" alt="">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-side.png" alt="">
     </div>
 
     <button class="rachis-region-card cervicales" onclick="openRachisRegion('Cervicales')">
@@ -7437,8 +7438,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img
-        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
         data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
         alt="Ostéo Pratik"
         class="brand-title-webp"
@@ -7466,8 +7466,7 @@ assets/icons/icon-profil.webp
   <section class="catalogue-book-visual" onclick="toast('Choisissez une zone ou recherchez une technique')" aria-label="Catalogue d’ostéopathie">
     <picture>
       <source srcset="assets/images/catalogue-osteopathie-3d-transparent.webp" media="(max-width:430px)">
-      <img
-        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/catalogue-osteopathie-3d-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/catalogue-osteopathie-3d-transparent.webp"
         data-fallback-src="assets/images/catalogue-osteopathie-3d-transparent.webp"
         alt="Catalogue d’ostéopathie"
         onerror="if(!this.dataset.tried){this.dataset.tried='1';this.src=this.dataset.fallbackSrc;}"
@@ -7477,28 +7476,28 @@ assets/icons/icon-profil.webp
 
   <section class="catalogue-zone-row">
     <button class="catalogue-zone-mini rachis" onclick="openZoneAll('Rachis')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-rachis.webp" alt=""></div>
+      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis.webp" alt=""></div>
       <strong>Rachis</strong>
       <small><b id="countRachis">60</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini msup" onclick="openZoneAll('Membres supérieurs')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
+      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-membres-superieurs.webp" alt=""></div>
       <strong>Membres<br>supérieurs</strong>
       <small><b id="countMSup">17</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini minf" onclick="openZoneAll('Membres inférieurs')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
+      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-membres-inferieurs.webp" alt=""></div>
       <strong>Membres<br>inférieurs</strong>
       <small><b id="countMInf">31</b> techniques</small>
       <span>→</span>
     </button>
 
     <button class="catalogue-zone-mini bassin" onclick="openZoneAll('Bassin')">
-      <div class="mini-zone-icon"><img src="assets/icons/icon-bassin.webp" alt=""></div>
+      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-bassin.webp" alt=""></div>
       <strong>Bassin</strong>
       <small><b id="countBassin">20</b> techniques</small>
       <span>→</span>
@@ -7510,15 +7509,15 @@ assets/icons/icon-profil.webp
   <header class="top"><button class="icon round" onclick="go('zones')">‹</button><div class="brand"><h1 class="logo">Rachis</h1><p class="subtitle">Choisissez une région</p></div><button class="icon">i</button></header>
   <section class="rachis-visual-card">
     <div class="rachis-body">
-      <img src="assets/images/rachis-side.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-side.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
       <div class="rachis-fallback" style="display:none">
         <div class="profile-head"></div><div class="profile-torso"></div><div class="profile-pelvis"></div><div class="profile-spine"></div>
       </div>
     </div>
     <div class="rachis-list">
-      <button class="rachis-choice violet" onclick="openSubzone('Cervicales')"><img class="mini-rachis" src="assets/images/rachis-cervicales.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">C</div><div><b>Cervicales</b><small>C1–C7</small></div><em>›</em></button>
-      <button class="rachis-choice cyan" onclick="openSubzone('Dorsales')"><img class="mini-rachis" src="assets/images/rachis-dorsales.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">D</div><div><b>Dorsales</b><small>T1–T12</small></div><em>›</em></button>
-      <button class="rachis-choice orange" onclick="openSubzone('Lombaires')"><img class="mini-rachis" src="assets/images/rachis-lombaires.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">L</div><div><b>Lombaires</b><small>L1–L5 · charnières</small></div><em>›</em></button>
+      <button class="rachis-choice violet" onclick="openSubzone('Cervicales')"><img decoding="async" loading="lazy" class="mini-rachis" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-cervicales.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">C</div><div><b>Cervicales</b><small>C1–C7</small></div><em>›</em></button>
+      <button class="rachis-choice cyan" onclick="openSubzone('Dorsales')"><img decoding="async" loading="lazy" class="mini-rachis" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-dorsales.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">D</div><div><b>Dorsales</b><small>T1–T12</small></div><em>›</em></button>
+      <button class="rachis-choice orange" onclick="openSubzone('Lombaires')"><img decoding="async" loading="lazy" class="mini-rachis" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-lombaires.webp" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid'"><div class="tech-icon" style="display:none">L</div><div><b>Lombaires</b><small>L1–L5 · charnières</small></div><em>›</em></button>
     </div>
   </section>
 </section>
@@ -7611,8 +7610,7 @@ assets/icons/icon-profil.webp
   <header class="top revision-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -7864,8 +7862,7 @@ assets/icons/icon-profil.webp
   <header class="top stats-top">
     <button class="icon round" onclick="go('home')">‹</button>
     <div class="brand">
-      <img
-        src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
         data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
         alt="Ostéo Pratik"
         class="brand-title-webp"
@@ -8058,8 +8055,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -8075,7 +8071,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image msup"><img src="assets/images/msup-side.png" alt="Membres supérieurs"/></div>
+    <div class="module-side-image msup"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/msup-side.png" alt="Membres supérieurs"/></div>
     <button class="module-region-card shoulder purple-card left" onclick="openMappedSubzone('msupMenu','Membres supérieurs','Épaule',['Clavicule','Épaule'])">
       <div class="region-icon">E</div><div><h3>Épaule</h3><small>Clavicule · Épaule</small></div><div class="arrow">›</div>
     </button>
@@ -8104,8 +8100,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -8121,7 +8116,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image minf"><img src="assets/images/minf-side.png" alt="Membres inférieurs"/></div>
+    <div class="module-side-image minf"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/minf-side.png" alt="Membres inférieurs"/></div>
     <button class="module-region-card hip purple-card left" onclick="openMappedSubzone('minfMenu','Membres inférieurs','Hanche',['Hanche'])">
       <div class="region-icon">H</div><div><h3>Hanche</h3><small>Coxo-fémorale</small></div><div class="arrow">›</div>
     </button>
@@ -8150,8 +8145,7 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('videoMap')">‹</button>
     <div class="brand">
-      <img
-  src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="https://nbertrandmacadamtonic-create.github.io/Osteora/assets/images/logo-osteo-pratik-title-transparent.webp"
   data-fallback-src="assets/images/logo-osteo-pratik-title-transparent.webp"
   alt="Ostéo Pratik"
   class="brand-title-webp"
@@ -8167,7 +8161,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image bassin"><img src="assets/images/bassin-side.png" alt="Bassin"/></div>
+    <div class="module-side-image bassin"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/bassin-side.png" alt="Bassin"/></div>
     <button class="module-region-card ilium purple-card left" onclick="openMappedSubzone('bassinMenu','Bassin','Sacro-iliaques',['Ilium'])">
       <div class="region-icon">SI</div><div><h3>Sacro-iliaques</h3><small>Antériorité · postériorité · ouverture · fermeture</small></div><div class="arrow">›</div>
     </button>
@@ -8334,9 +8328,7 @@ function openSubzone(subzone){
   setTitle(subzone, "Sélectionnez une technique");
   clearSearch(); renderTechniques();
 markCervicalTechniqueOrange();
-markCervicalTechniqueOrange();
 renderSeenCollections();
-markCervicalTechniqueOrange();
 markCervicalTechniqueOrange(); go("techniques");
 }
 
@@ -17374,6 +17366,57 @@ if(originalGoForHomogeneousTitlesV2 && !window.__homogeneousTitlesV2GoPatched){
   #rachisMenu .rachis-region-card.cotes::before{
     left:-15px !important;
   }
+}
+</style>
+
+
+<script>
+/* === LANCEMENT PROPRE : présentation conservée, images secondaires différées === */
+function lazyLoadScreenImages(screenId){
+  const screen = document.getElementById(screenId);
+  if(!screen) return;
+  screen.querySelectorAll("img[data-lazy-src]").forEach(img=>{
+    if(!img.dataset.loaded){
+      img.src = img.dataset.lazySrc;
+      img.dataset.loaded = "1";
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  lazyLoadScreenImages("welcome");
+});
+
+if(typeof go === "function" && !window.__lazyImagesGoPatched){
+  const originalGoLazyImages = go;
+  window.__lazyImagesGoPatched = true;
+  go = function(id){
+    originalGoLazyImages(id);
+    lazyLoadScreenImages(id);
+  };
+}
+</script>
+
+
+<style>
+/* === NETTOYAGE LANCEMENT : pas d’images parasites avant la présentation === */
+.screen:not(.active){
+  visibility:hidden;
+}
+
+.screen.active{
+  visibility:visible;
+}
+
+/* Les fonds lourds ne s’activent que lorsque l’écran concerné est ouvert */
+#home:not(.active) .home-hero,
+#revision:not(.active) .revision-orbit-backdrop,
+#revision:not(.active) .revision-study-visual,
+#videoMap:not(.active) .video-body-map,
+#videoMap:not(.active) .body-zone-panel,
+#catalogue:not(.active) .catalogue-book-visual,
+#progress:not(.active) .stats-visual{
+  background-image:none !important;
 }
 </style>
 
