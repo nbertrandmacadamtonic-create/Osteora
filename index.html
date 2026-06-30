@@ -7532,7 +7532,7 @@ assets/icons/icon-profil.webp
   <header class="top"><button class="icon round" onclick="backFromPlayer()">‹</button><div class="brand"><h1 class="logo">Lecteur</h1><p class="subtitle">Vidéo technique</p></div><button class="icon">♡</button></header>
 
   <section class="player-title-frame" aria-label="Titre de la technique">
-    <small id="playerTitleKicker">Technique sélectionnée</small>
+    <small id="playerTitleKicker">Nom de la technique</small>
     <h2 id="playerTitle" class="tech-title player-title-highlight">Technique</h2>
   </section>
 
@@ -21074,7 +21074,7 @@ if(!window.__osteoVimeoEventsPatched){
 }
 
 #player .player-title-frame::before{
-  content:"Technique";
+  content:"Nom de la technique";
   display:block;
   position:absolute;
   top:10px;
@@ -21100,6 +21100,44 @@ if(!window.__osteoVimeoEventsPatched){
     min-height:112px !important;
     padding:24px 14px 18px !important;
   }
+}
+</style>
+
+
+<style>
+/* === LISTES TECHNIQUES : lettres des petits cercles en orange premium === */
+.row.tech .tech-icon,
+.tech .tech-icon,
+.play-card .tech-icon,
+.list .tech-icon,
+#techList .tech-icon{
+  color:#ff9f1c !important;
+  border-color:rgba(255,159,28,.58) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,210,115,.26), transparent 38%),
+    linear-gradient(145deg, rgba(255,159,28,.18), rgba(10,18,35,.88)) !important;
+  box-shadow:
+    0 0 20px rgba(255,159,28,.34),
+    0 0 38px rgba(255,111,0,.14),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:
+    0 0 10px rgba(255,159,28,.72),
+    0 0 20px rgba(255,111,0,.36) !important;
+  font-weight:950 !important;
+}
+</style>
+
+
+<style>
+/* === LECTEUR : badge "Nom de la technique" mieux dimensionné === */
+#player .player-title-frame::before{
+  content:"Nom de la technique" !important;
+  white-space:nowrap !important;
+  padding:4px 13px !important;
+  max-width:calc(100% - 28px) !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  letter-spacing:.13em !important;
 }
 </style>
 
