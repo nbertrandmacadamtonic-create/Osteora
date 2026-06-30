@@ -7528,20 +7528,41 @@ assets/icons/icon-profil.webp
   <div id="techList" class="list"></div>
 </section>
 
-<section id="player" class="screen">
+<section id="player" class="screen player-premium-screen">
   <header class="top"><button class="icon round" onclick="backFromPlayer()">‹</button><div class="brand"><h1 class="logo">Lecteur</h1><p class="subtitle">Vidéo technique</p></div><button class="icon">♡</button></header>
-  <h2 id="playerTitle" class="tech-title">Technique</h2>
-  <div id="playerChips" class="chips"></div>
-  <div id="videoBox" class="video-box video-box-adaptive">
+
+  <section class="player-title-frame" aria-label="Titre de la technique">
+    <small id="playerTitleKicker">Technique sélectionnée</small>
+    <h2 id="playerTitle" class="tech-title player-title-highlight">Technique</h2>
+  </section>
+
+  <div id="playerChips" class="chips player-chips-premium"></div>
+
+  <div id="videoBox" class="video-box video-box-adaptive custom-video-box">
     <button id="closeFullscreenVideo" class="video-close-fullscreen" onclick="closeVideoFullscreen()" aria-label="Fermer le plein écran">×</button>
-    <video id="video" controls playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video>
-    <iframe id="vimeoPlayer" class="vimeo-player" src="" title="Vidéo Vimeo" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" allowfullscreen loading="lazy"></iframe>
+    <video id="video" playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video>
+    <iframe id="vimeoPlayer" class="vimeo-player custom-hidden-provider" src="" title="Vidéo technique" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe>
+
+    <div id="customVideoOverlay" class="custom-video-overlay">
+      <button id="customVideoPlayBig" class="custom-video-play-big" onclick="toggleCustomVideoPlayback()" aria-label="Lecture ou pause">▶</button>
+      <div class="custom-video-caption">
+        <strong id="customVideoState">Prêt à lire</strong>
+        <span id="customVideoHint">Lecteur Ostéo Pratik</span>
+      </div>
+    </div>
   </div>
+
+  <div class="custom-video-controls" aria-label="Commandes de lecture">
+    <button class="custom-control-btn" onclick="toggleCustomVideoPlayback()"><span id="customVideoPlayLabel">Lecture</span></button>
+    <button class="custom-control-btn" onclick="stopCustomVideoPlayback()">Stop</button>
+    <button class="custom-control-btn" onclick="toggleCustomVideoMute()"><span id="customVideoMuteLabel">Son</span></button>
+    <button class="custom-control-btn" onclick="openVideoFullscreen()">⛶ Plein écran</button>
+  </div>
+
   <div class="video-premium-actions">
     <button class="secondary" onclick="openTechniqueTextPage()">Texte de la technique</button>
     <button class="secondary" onclick="openTechniqueImagesPage()">Images associées</button>
-    <button class="secondary" onclick="openVideoFullscreen()">⛶ Plein écran</button>
-    <button id="openVimeoDirectButton" class="secondary" style="display:none" onclick="window.open('https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci','_blank')">Ouvrir sur Vimeo</button>
+    <button id="openVimeoDirectButton" class="secondary" style="display:none" onclick="return false">Source vidéo</button>
   </div>
   
   <section class="steps"><h3>Étapes</h3><ol><li>Position du praticien</li><li>Position du patient</li><li>Contact et évaluation</li><li>Mise en tension</li><li>Thrust / impulsion</li><li>Réévaluation</li></ol></section>
@@ -10788,20 +10809,91 @@ function getVideoCandidates(t){
 
   const autoPath = "assets/videos/" + String(t.id).padStart(3,"0") + "-" + slugify(t.title) + ".mp4";
   return [
+    t.mp4Url || t.videoMp4 || t.localVideo || t.videoFile || "",
     autoPath,
     "/Osteora/" + autoPath,
-    "https://raw.githubusercontent.com/nbetrandmacadamtonic-create/Osteora/main/" + autoPath
-  ];
+    "https://raw.githubusercontent.com/nbertrandmacadamtonic-create/Osteora/main/" + autoPath
+  ].filter(Boolean);
 }
 
 function setVideoDebug(text){
   // Supprimé : l'app ne montre plus l'item "Chemin vidéo".
 }
 
+function setCustomVideoUI(state, hint){
+  const stateEl = document.getElementById("customVideoState");
+  const hintEl = document.getElementById("customVideoHint");
+  if(stateEl) stateEl.textContent = state || "Prêt à lire";
+  if(hintEl) hintEl.textContent = hint || "Lecteur Ostéo Pratik";
+}
+
+function updateCustomPlayLabels(isPlaying){
+  const label = document.getElementById("customVideoPlayLabel");
+  const big = document.getElementById("customVideoPlayBig");
+  const box = document.getElementById("videoBox");
+  if(label) label.textContent = isPlaying ? "Pause" : "Lecture";
+  if(big) big.textContent = isPlaying ? "Ⅱ" : "▶";
+  if(box) box.classList.toggle("is-playing", !!isPlaying);
+  setCustomVideoUI(isPlaying ? "Lecture en cours" : "En pause", "Commandes Ostéo Pratik");
+}
+
+function postToVimeo(method, value){
+  const iframe = document.getElementById("vimeoPlayer");
+  if(!iframe || !iframe.contentWindow) return;
+  const payload = { method };
+  if(typeof value !== "undefined") payload.value = value;
+  iframe.contentWindow.postMessage(JSON.stringify(payload), "*");
+}
+
+
+function subscribeToVimeoEventsForCompletion(){
+  if(customVideoProvider !== "vimeo") return;
+  ["play", "pause", "ended", "finish", "timeupdate"].forEach(function(eventName){
+    postToVimeo("addEventListener", eventName);
+  });
+}
+
+function buildCustomVimeoUrl(url){
+  if(!url) return "";
+  try{
+    const u = new URL(url, window.location.href);
+    u.searchParams.set("api", "1");
+    u.searchParams.set("controls", "0");
+    u.searchParams.set("title", "0");
+    u.searchParams.set("byline", "0");
+    u.searchParams.set("portrait", "0");
+    u.searchParams.set("badge", "0");
+    u.searchParams.set("autopause", "0");
+    u.searchParams.set("dnt", "1");
+    u.searchParams.set("playsinline", "1");
+    u.searchParams.set("transparent", "0");
+    u.searchParams.set("background", "0");
+    u.searchParams.set("responsive", "1");
+    return u.toString();
+  }catch(e){
+    const sep = url.includes("?") ? "&" : "?";
+    return url + sep + "api=1&controls=0&title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&playsinline=1&transparent=0&background=0&responsive=1";
+  }
+}
+
+let customVideoProvider = "html5";
+let customVideoIsPlaying = false;
+let customVideoMuted = false;
+
+function resetCustomVideoState(provider){
+  customVideoProvider = provider || "html5";
+  customVideoIsPlaying = false;
+  customVideoMuted = false;
+  updateCustomPlayLabels(false);
+  const mute = document.getElementById("customVideoMuteLabel");
+  if(mute) mute.textContent = "Son";
+}
+
 function loadVideoCandidate(video, source, candidates, index){
   const src = candidates[index];
   if(!src){
     setVideoDebug("Vidéo introuvable : aucun chemin valide n’a répondu.");
+    setCustomVideoUI("Vidéo non trouvée", "Déposez le fichier MP4 dans assets/videos/");
     toast("Vidéo introuvable : vérifiez le chemin GitHub");
     return;
   }
@@ -10810,6 +10902,7 @@ function loadVideoCandidate(video, source, candidates, index){
   video.src = src;
   video.load();
   setVideoDebug("Chemin vidéo testé : " + src);
+  setCustomVideoUI("Vidéo chargée", "Lecteur Ostéo Pratik");
 
   video.onerror = function(){
     loadVideoCandidate(video, source, candidates, index + 1);
@@ -10817,6 +10910,16 @@ function loadVideoCandidate(video, source, candidates, index){
 
   video.onloadedmetadata = function(){
     setVideoDebug("Vidéo chargée : " + src);
+    setCustomVideoUI("Prêt à lire", "Lecteur Ostéo Pratik");
+  };
+
+  video.onplay = function(){ customVideoIsPlaying = true; updateCustomPlayLabels(true); };
+  video.onpause = function(){ customVideoIsPlaying = false; updateCustomPlayLabels(false); };
+  video.onended = function(){
+    customVideoIsPlaying = false;
+    updateCustomPlayLabels(false);
+    setCustomVideoUI("Lecture terminée", "Technique marquée comme vue");
+    markTechniqueViewedAfterComplete(currentPlayerTechniqueId);
   };
 }
 
@@ -10824,27 +10927,38 @@ function openTechnique(id){
   currentPlayerTechniqueId = id;
   const t = techniques.find(x => x.id === id) || techniques[0];
 
-  document.getElementById("playerTitle").textContent = t.title;
+  const title = document.getElementById("playerTitle");
+  if(title) title.textContent = t.title;
+
+  const kicker = document.getElementById("playerTitleKicker");
+  if(kicker) kicker.textContent = `${t.zone} · ${t.sub} · ${t.level || "Technique"}`;
 
   const chips = document.getElementById("playerChips");
-  chips.innerHTML = `<span>${t.zone}</span><span>${t.sub}</span><span>${t.level}</span>`;
+  if(chips) chips.innerHTML = `<span>${t.zone}</span><span>${t.sub}</span><span>${t.level}</span>`;
 
   const source = document.getElementById("videoSource");
   const video = document.getElementById("video");
   const vimeo = document.getElementById("vimeoPlayer");
 
+  resetCustomVideoState("html5");
+  setCustomVideoUI("Prêt à lire", "Lecteur Ostéo Pratik");
+
   if(video){
     video.pause();
     video.removeAttribute("poster");
+    video.removeAttribute("controls");
     video.onerror = null;
     video.onloadedmetadata = null;
+    video.onplay = null;
+    video.onpause = null;
+    video.onended = null;
     video.style.display = "block";
   }
 
   const openVimeoDirectButton = document.getElementById("openVimeoDirectButton");
   if(openVimeoDirectButton){
     openVimeoDirectButton.style.display = "none";
-    openVimeoDirectButton.onclick = function(){};
+    openVimeoDirectButton.onclick = function(){ return false; };
   }
 
   if(vimeo){
@@ -10853,6 +10967,7 @@ function openTechnique(id){
   }
 
   if(t.videoProvider === "vimeo" && t.videoUrl){
+    resetCustomVideoState("vimeo");
     if(video){
       video.pause();
       video.removeAttribute("src");
@@ -10862,19 +10977,25 @@ function openTechnique(id){
     }
 
     if(vimeo){
-      vimeo.src = t.videoUrl;
+      vimeo.src = "about:blank";
       vimeo.style.display = "block";
-    }
-
-    if(openVimeoDirectButton){
-      openVimeoDirectButton.style.display = "block";
-      openVimeoDirectButton.onclick = function(){
-        window.open(t.directVimeo || "https://vimeo.com/1199647853?share=copy&fl=sv&fe=ci", "_blank");
+      vimeo.onload = function(){
+        setCustomVideoUI("Prêt à lire", "Commandes Ostéo Pratik");
+        setTimeout(subscribeToVimeoEventsForCompletion, 350);
       };
     }
 
-    setVideoDebug("Vidéo Vimeo : " + t.title);
+    setVideoDebug("Flux Vimeo préparé : " + t.title);
+    setCustomVideoUI("Chargement vidéo", "Interface Ostéo Pratik");
     go("player");
+
+    requestAnimationFrame(function(){
+      const frame = document.getElementById("vimeoPlayer");
+      if(frame){
+        frame.src = buildCustomVimeoUrl(t.videoUrl);
+        setTimeout(subscribeToVimeoEventsForCompletion, 800);
+      }
+    });
     return;
   }
 
@@ -10884,13 +11005,69 @@ function openTechnique(id){
   go("player");
 }
 
+function toggleCustomVideoPlayback(){
+  const video = document.getElementById("video");
+
+  if(customVideoProvider === "vimeo"){
+    customVideoIsPlaying = !customVideoIsPlaying;
+    postToVimeo(customVideoIsPlaying ? "play" : "pause");
+    updateCustomPlayLabels(customVideoIsPlaying);
+    return;
+  }
+
+  if(!video) return;
+  if(video.paused){
+    video.play().then(()=>{
+      customVideoIsPlaying = true;
+      updateCustomPlayLabels(true);
+    }).catch(()=>toast("Touchez une fois la vidéo pour autoriser la lecture"));
+  }else{
+    video.pause();
+    customVideoIsPlaying = false;
+    updateCustomPlayLabels(false);
+  }
+}
+
+function stopCustomVideoPlayback(){
+  const video = document.getElementById("video");
+
+  if(customVideoProvider === "vimeo"){
+    postToVimeo("pause");
+    postToVimeo("setCurrentTime", 0);
+    customVideoIsPlaying = false;
+    updateCustomPlayLabels(false);
+    setCustomVideoUI("Arrêté", "Lecture remise au début");
+    return;
+  }
+
+  if(video){
+    video.pause();
+    try{ video.currentTime = 0; }catch(e){}
+  }
+  customVideoIsPlaying = false;
+  updateCustomPlayLabels(false);
+  setCustomVideoUI("Arrêté", "Lecture remise au début");
+}
+
+function toggleCustomVideoMute(){
+  const video = document.getElementById("video");
+  customVideoMuted = !customVideoMuted;
+
+  if(customVideoProvider === "vimeo"){
+    postToVimeo("setMuted", customVideoMuted);
+  }else if(video){
+    video.muted = customVideoMuted;
+  }
+
+  const mute = document.getElementById("customVideoMuteLabel");
+  if(mute) mute.textContent = customVideoMuted ? "Muet" : "Son";
+}
+
 
 /* === PLEIN ÉCRAN VIDÉO === */
 function openVideoFullscreen(){
   const box = document.getElementById("videoBox");
   const video = document.getElementById("video");
-  const vimeo = document.getElementById("vimeoPlayer");
-  const current = currentPlayerTechniqueId ? techniques.find(t => Number(t.id) === Number(currentPlayerTechniqueId)) : null;
 
   if(!box){
     toast("Lecteur vidéo introuvable");
@@ -10906,14 +11083,8 @@ function openVideoFullscreen(){
     box.webkitRequestFullscreen();
   }else if(video && video.webkitEnterFullscreen && video.style.display !== "none"){
     video.webkitEnterFullscreen();
-  }else if(current && current.directVimeo){
-    window.open(current.directVimeo, "_blank");
   }else{
     toast("Mode plein écran activé");
-  }
-
-  if(vimeo && vimeo.style.display !== "none"){
-    vimeo.focus();
   }
 }
 
@@ -11215,7 +11386,18 @@ function updateCatalogueCounts(){
 
 
 /* === DÉJÀ VUES : collections et cartes à retourner === */
-const unlockedTechniqueIds = new Set([12]);
+const unlockedTechniqueIds = new Set([
+  12,
+  ...(() => {
+    try{
+      const raw = localStorage.getItem("osteoPratikViewedTechniqueIds");
+      const ids = raw ? JSON.parse(raw) : [];
+      return Array.isArray(ids) ? ids.map(Number).filter(Boolean) : [];
+    }catch(e){
+      return [];
+    }
+  })()
+]);
 
 function collectionKey(zone, sub){
   return zone + "|" + sub;
@@ -11514,9 +11696,35 @@ function readViewedTechniqueIds(){
 
 function saveViewedTechniqueId(id){
   if(!id) return;
+  const numericId = Number(id);
+  if(!numericId) return;
+
+  unlockedTechniqueIds.add(numericId);
+
   const ids = new Set(readViewedTechniqueIds());
-  ids.add(Number(id));
+  ids.add(numericId);
   localStorage.setItem(VIEWED_TECHNIQUES_KEY, JSON.stringify(Array.from(ids)));
+
+  if(typeof renderSeenCollections === "function") renderSeenCollections();
+  if(typeof renderTechniques === "function") renderTechniques();
+  if(typeof renderRevisionWheel === "function" && document.getElementById("revisionWheel")?.classList.contains("active")) renderRevisionWheel();
+}
+
+const completedVideoMarkedIds = new Set();
+
+function markTechniqueViewedAfterComplete(id){
+  const numericId = Number(id || currentPlayerTechniqueId);
+  if(!numericId) return;
+
+  const wasAlreadyViewed = unlockedTechniqueIds.has(numericId);
+  saveViewedTechniqueId(numericId);
+
+  if(!completedVideoMarkedIds.has(numericId)){
+    completedVideoMarkedIds.add(numericId);
+    const t = techniques.find(x => Number(x.id) === numericId);
+    toast(wasAlreadyViewed ? "Technique déjà marquée comme vue" : "Technique vue : carte débloquée");
+    setVideoDebug("Technique vue en totalité : " + (t ? t.title : numericId));
+  }
 }
 
 function isTechniqueViewedForRevision(t){
@@ -20406,6 +20614,491 @@ if(typeof go === "function" && !window.__lazyImagesGoPatched){
 
   #zones .catalogue-zone-mini strong{
     font-size:10.3px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === LECTEUR VIDÉO OSTÉO PRATIK : interface propre + titre encadré === */
+#player.player-premium-screen .top{
+  margin-bottom:8px !important;
+}
+
+#player .player-title-frame{
+  margin:6px 0 12px !important;
+  padding:14px 16px 15px !important;
+  border-radius:24px !important;
+  border:1px solid rgba(0,229,255,.36) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.18), transparent 48%),
+    linear-gradient(145deg, rgba(9,29,58,.86), rgba(3,10,24,.96)) !important;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.34),
+    0 0 26px rgba(0,229,255,.13),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  text-align:center !important;
+}
+
+#player .player-title-frame small{
+  display:block !important;
+  margin:0 0 8px !important;
+  color:#42dfff !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  letter-spacing:.14em !important;
+  text-transform:uppercase !important;
+}
+
+#player .player-title-highlight{
+  margin:0 !important;
+  padding:0 !important;
+  color:#fff !important;
+  font-size:clamp(20px, 4.8vw, 30px) !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+  text-shadow:0 0 18px rgba(0,229,255,.28) !important;
+}
+
+#player .player-chips-premium{
+  justify-content:center !important;
+  margin:0 0 12px !important;
+}
+
+#player .custom-video-box{
+  position:relative !important;
+  min-height:230px !important;
+  border-radius:28px !important;
+  overflow:hidden !important;
+  background:#000 !important;
+  border:1px solid rgba(0,229,255,.24) !important;
+  box-shadow:
+    0 22px 64px rgba(0,0,0,.42),
+    0 0 30px rgba(0,229,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+
+#player .custom-video-box video,
+#player .custom-video-box iframe{
+  width:100% !important;
+  min-height:230px !important;
+  aspect-ratio:16/9 !important;
+  border:0 !important;
+  object-fit:contain !important;
+  background:#000 !important;
+  display:block;
+}
+
+#player .custom-hidden-provider{
+  pointer-events:none !important;
+}
+
+#player .custom-video-overlay{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:5 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:12px !important;
+  pointer-events:none !important;
+  background:linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.28)) !important;
+}
+
+#player .custom-video-play-big{
+  pointer-events:auto !important;
+  width:78px !important;
+  height:78px !important;
+  border-radius:50% !important;
+  display:grid !important;
+  place-items:center !important;
+  padding:0 0 0 4px !important;
+  color:#fff !important;
+  font-size:34px !important;
+  font-weight:950 !important;
+  background:linear-gradient(135deg, rgba(0,229,255,.94), rgba(45,140,255,.92)) !important;
+  border:1px solid rgba(255,255,255,.30) !important;
+  box-shadow:0 0 34px rgba(0,229,255,.36), 0 18px 40px rgba(0,0,0,.36) !important;
+}
+
+#player .custom-video-caption{
+  min-width:190px !important;
+  padding:9px 14px !important;
+  border-radius:999px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  color:#fff !important;
+  background:rgba(5,15,31,.62) !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  backdrop-filter:blur(12px) !important;
+  -webkit-backdrop-filter:blur(12px) !important;
+}
+
+#player .custom-video-caption strong{
+  font-size:13px !important;
+  line-height:1 !important;
+  font-weight:950 !important;
+}
+
+#player .custom-video-caption span{
+  margin-top:4px !important;
+  color:rgba(221,232,255,.74) !important;
+  font-size:11px !important;
+}
+
+#player .custom-video-controls{
+  display:grid !important;
+  grid-template-columns:repeat(4, minmax(0,1fr)) !important;
+  gap:8px !important;
+  margin:10px 0 12px !important;
+}
+
+#player .custom-control-btn{
+  min-height:44px !important;
+  border-radius:16px !important;
+  padding:8px 6px !important;
+  color:#eaf7ff !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  background:rgba(255,255,255,.055) !important;
+  border:1px solid rgba(0,229,255,.24) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+
+#player .video-premium-actions{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0,1fr)) !important;
+  gap:10px !important;
+  margin:0 0 12px !important;
+}
+
+#player #openVimeoDirectButton{
+  display:none !important;
+}
+
+.video-box.app-fullscreen-video .custom-video-overlay{
+  opacity:.96 !important;
+}
+
+.video-box.app-fullscreen-video .custom-video-controls{
+  position:fixed !important;
+  left:12px !important;
+  right:12px !important;
+  bottom:calc(14px + env(safe-area-inset-bottom,0px)) !important;
+  z-index:99999 !important;
+}
+
+@media(max-width:430px){
+  #player .player-title-frame{
+    padding:12px 13px 13px !important;
+    border-radius:22px !important;
+  }
+
+  #player .player-title-highlight{
+    font-size:20px !important;
+  }
+
+  #player .custom-video-box,
+  #player .custom-video-box video,
+  #player .custom-video-box iframe{
+    min-height:210px !important;
+  }
+
+  #player .custom-video-play-big{
+    width:68px !important;
+    height:68px !important;
+    font-size:30px !important;
+  }
+
+  #player .custom-video-controls{
+    gap:6px !important;
+  }
+
+  #player .custom-control-btn{
+    min-height:42px !important;
+    font-size:11px !important;
+    border-radius:14px !important;
+  }
+}
+</style>
+
+
+<style>
+/* === LECTURE VIDÉO : titre technique encadré centré === */
+.video-technique-title,
+.video-title-card,
+.video-title-card h1,
+.video-title-card h2,
+.video-title-card h3,
+.video-title-card strong,
+.video-player-title,
+.technique-video-title,
+.current-video-title,
+#videoTechniqueTitle,
+#currentVideoTitle,
+#videoTitle{
+  text-align:center !important;
+  justify-content:center !important;
+  align-items:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+.video-title-card,
+.video-technique-title,
+.technique-video-title,
+.current-video-title{
+  display:flex !important;
+  flex-direction:column !important;
+  width:100% !important;
+  max-width:100% !important;
+  padding-left:16px !important;
+  padding-right:16px !important;
+}
+
+.video-title-card h1,
+.video-title-card h2,
+.video-title-card h3,
+.video-technique-title h1,
+.video-technique-title h2,
+.video-technique-title h3{
+  width:100% !important;
+  text-align:center !important;
+}
+
+/* Sécurité : si le titre est dans un header ou un bloc technique */
+#videoPlayer .technique-title,
+#videoPlayer .technique-title *,
+#techniqueVideo .technique-title,
+#techniqueVideo .technique-title *,
+#videoDetail .technique-title,
+#videoDetail .technique-title *,
+#techniqueDetail .technique-title,
+#techniqueDetail .technique-title *{
+  text-align:center !important;
+  justify-content:center !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+}
+
+/* Encadré premium centré pour le titre visible de la technique */
+#videoPlayer .technique-title,
+#techniqueVideo .technique-title,
+#videoDetail .technique-title,
+#techniqueDetail .technique-title,
+.video-title-card{
+  border-radius:22px !important;
+  border:1px solid rgba(0,229,255,.32) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.16), transparent 46%),
+    linear-gradient(145deg, rgba(8,26,52,.86), rgba(3,10,24,.96)) !important;
+  box-shadow:
+    0 18px 46px rgba(0,0,0,.30),
+    0 0 22px rgba(0,229,255,.12),
+    inset 0 1px 0 rgba(255,255,255,.07) !important;
+}
+</style>
+
+
+<script>
+/* === SYNCHRONISATION LECTEUR PROPRE / FLUX VIMEO === */
+if(!window.__osteoVimeoEventsPatched){
+  window.__osteoVimeoEventsPatched = true;
+  window.addEventListener("message", function(event){
+    let data = event.data;
+    try{
+      if(typeof data === "string") data = JSON.parse(data);
+    }catch(e){}
+    if(!data || typeof data !== "object") return;
+
+    if(data.event === "play"){
+      customVideoIsPlaying = true;
+      updateCustomPlayLabels(true);
+    }
+
+    if(data.event === "pause"){
+      customVideoIsPlaying = false;
+      updateCustomPlayLabels(false);
+    }
+
+    if(data.event === "ended" || data.event === "finish"){
+      customVideoIsPlaying = false;
+      updateCustomPlayLabels(false);
+      setCustomVideoUI("Lecture terminée", "Technique marquée comme vue");
+      markTechniqueViewedAfterComplete(currentPlayerTechniqueId);
+    }
+  });
+}
+</script>
+
+
+<style>
+/* === CORRECTION VÉRIFIÉE : titre vidéo centré + flux vidéo visible === */
+
+/* Le bloc titre devient une vraie zone centrée */
+#player .player-title-frame{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  width:100% !important;
+  box-sizing:border-box !important;
+  padding:16px 16px 17px !important;
+  border-radius:26px !important;
+  border:1px solid rgba(0,229,255,.42) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(0,229,255,.20), transparent 48%),
+    linear-gradient(145deg, rgba(8,31,63,.90), rgba(3,10,24,.98)) !important;
+}
+
+#player #playerTitleKicker{
+  width:100% !important;
+  display:block !important;
+  text-align:center !important;
+  color:#39e8ff !important;
+  letter-spacing:.18em !important;
+}
+
+#player #playerTitle,
+#player .player-title-highlight,
+#player .player-title-frame .tech-title{
+  width:100% !important;
+  max-width:100% !important;
+  display:block !important;
+  margin:0 auto !important;
+  padding:0 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  justify-content:center !important;
+  align-items:center !important;
+  color:#f4feff !important;
+  font-size:clamp(19px, 4.6vw, 28px) !important;
+  line-height:1.12 !important;
+  font-weight:950 !important;
+  letter-spacing:-.045em !important;
+  text-wrap:balance !important;
+  text-shadow:
+    0 0 12px rgba(0,229,255,.34),
+    0 0 26px rgba(80,130,255,.18) !important;
+}
+
+/* Le flux vidéo est vraiment visible dans la zone noire */
+#player .custom-video-box{
+  position:relative !important;
+  background:#000 !important;
+}
+
+#player #vimeoPlayer,
+#player .custom-video-box iframe{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:1 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  background:#000 !important;
+  border:0 !important;
+}
+
+#player #video{
+  position:relative !important;
+  z-index:1 !important;
+}
+
+/* L’overlay est léger à l’arrêt, puis disparaît pendant la lecture */
+#player .custom-video-overlay{
+  z-index:4 !important;
+  background:
+    radial-gradient(circle at 50% 44%, rgba(0,229,255,.08), transparent 38%),
+    linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.22)) !important;
+  transition:opacity .22s ease !important;
+}
+
+#player .custom-video-box.is-playing .custom-video-overlay{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+#player .custom-video-box.is-playing .custom-video-play-big,
+#player .custom-video-box.is-playing .custom-video-caption{
+  pointer-events:none !important;
+}
+
+@media(max-width:430px){
+  #player .player-title-frame{
+    padding:14px 13px 15px !important;
+  }
+
+  #player #playerTitle,
+  #player .player-title-highlight{
+    font-size:20px !important;
+    line-height:1.10 !important;
+  }
+}
+</style>
+
+
+<style>
+/* === LECTEUR : titre seul + validation automatique fin de vidéo === */
+#player #playerTitleKicker,
+#player #playerChips{
+  display:none !important;
+}
+
+#player .player-title-frame{
+  padding:20px 18px !important;
+  min-height:106px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+}
+
+#player #playerTitle{
+  width:100% !important;
+  margin:0 auto !important;
+  text-align:center !important;
+  text-align-last:center !important;
+  color:#eaffff !important;
+  line-height:1.12 !important;
+  text-shadow:
+    0 0 14px rgba(0,229,255,.38),
+    0 0 34px rgba(75,120,255,.20) !important;
+}
+
+#player .player-title-frame::before{
+  content:"Technique";
+  display:block;
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:3px 10px;
+  border-radius:999px;
+  color:#42eaff;
+  background:rgba(0,229,255,.09);
+  border:1px solid rgba(0,229,255,.20);
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+#player .player-title-frame{
+  position:relative !important;
+}
+
+@media(max-width:430px){
+  #player .player-title-frame{
+    min-height:112px !important;
+    padding:24px 14px 18px !important;
   }
 }
 </style>
