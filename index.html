@@ -22913,5 +22913,144 @@ if(!window.__osteoVimeoEventsPatched){
 })();
 </script>
 
+
+<style>
+/* === PATCH FINAL : alignement logos/cartouches MSUP · MINF · Bassin === */
+/* Le Rachis n'est pas modifié. Les badges sont maintenant intégrés dans la case,
+   centrés verticalement, sans décalage visuel entre le cercle et le cartouche. */
+#msupMenu .module-region-card,
+#minfMenu .module-region-card,
+#bassinMenu .module-region-card{
+  display:grid !important;
+  grid-template-columns:38px minmax(0,1fr) !important;
+  align-items:center !important;
+  justify-content:stretch !important;
+  column-gap:10px !important;
+  width:166px !important;
+  min-height:58px !important;
+  padding:9px 12px !important;
+  text-align:center !important;
+  overflow:hidden !important;
+}
+
+#msupMenu .module-region-card .region-icon,
+#minfMenu .module-region-card .region-icon,
+#bassinMenu .module-region-card .region-icon{
+  position:relative !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+  transform:none !important;
+  grid-column:1 !important;
+  grid-row:1 !important;
+  justify-self:center !important;
+  align-self:center !important;
+  display:grid !important;
+  place-items:center !important;
+  width:36px !important;
+  height:36px !important;
+  min-width:36px !important;
+  flex:0 0 36px !important;
+  margin:0 !important;
+  border-radius:50% !important;
+  color:#fff !important;
+  border:1.4px solid color-mix(in srgb, var(--tech-circle-color, currentColor) 78%, transparent) !important;
+  background:
+    radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--tech-circle-color, currentColor) 32%, white 12%), transparent 42%),
+    linear-gradient(145deg, color-mix(in srgb, var(--tech-circle-color, currentColor) 20%, transparent), rgba(9,18,36,.92)) !important;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--tech-circle-color, currentColor) 38%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.14) !important;
+  font-size:15px !important;
+  font-weight:950 !important;
+  line-height:1 !important;
+  z-index:2 !important;
+}
+
+#msupMenu .module-region-card > div:nth-child(2),
+#minfMenu .module-region-card > div:nth-child(2),
+#bassinMenu .module-region-card > div:nth-child(2){
+  grid-column:2 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  width:100% !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+
+#msupMenu .module-region-card h3,
+#minfMenu .module-region-card h3,
+#bassinMenu .module-region-card h3{
+  width:100% !important;
+  margin:0 !important;
+  padding:0 !important;
+  text-align:center !important;
+  line-height:1.05 !important;
+  color:#fff !important;
+}
+
+#msupMenu .module-region-card small,
+#minfMenu .module-region-card small,
+#bassinMenu .module-region-card small,
+#msupMenu .module-region-card .arrow,
+#minfMenu .module-region-card .arrow,
+#bassinMenu .module-region-card .arrow{
+  display:none !important;
+}
+
+/* Recalage léger des cartes pour tenir compte du badge désormais intégré. */
+#msupMenu .module-region-card.shoulder{ left:104px !important; right:auto !important; }
+#msupMenu .module-region-card.elbow{ left:34px !important; right:auto !important; }
+#msupMenu .module-region-card.wrist{ left:10px !important; right:auto !important; }
+#msupMenu .module-region-card.hand{ right:10px !important; left:auto !important; }
+
+#minfMenu .module-region-card.hip{ left:66px !important; right:auto !important; }
+#minfMenu .module-region-card.knee{ left:22px !important; right:auto !important; }
+#minfMenu .module-region-card.ankle{ left:22px !important; right:auto !important; }
+#minfMenu .module-region-card.foot{ right:10px !important; left:auto !important; }
+
+#bassinMenu .module-region-card.ilium{ left:10px !important; right:auto !important; }
+#bassinMenu .module-region-card.sacrum{ right:10px !important; left:auto !important; }
+#bassinMenu .module-region-card.symphysis{ left:10px !important; right:auto !important; }
+
+@media(max-width:430px){
+  #msupMenu .module-region-card,
+  #minfMenu .module-region-card,
+  #bassinMenu .module-region-card{
+    grid-template-columns:34px minmax(0,1fr) !important;
+    column-gap:8px !important;
+    width:154px !important;
+    min-height:54px !important;
+    padding:8px 10px !important;
+  }
+
+  #msupMenu .module-region-card .region-icon,
+  #minfMenu .module-region-card .region-icon,
+  #bassinMenu .module-region-card .region-icon{
+    width:32px !important;
+    height:32px !important;
+    min-width:32px !important;
+    flex-basis:32px !important;
+    font-size:13px !important;
+  }
+
+  #msupMenu .module-region-card h3,
+  #minfMenu .module-region-card h3,
+  #bassinMenu .module-region-card h3{
+    font-size:13px !important;
+  }
+
+  #msupMenu .module-region-card.shoulder{ left:78px !important; }
+  #msupMenu .module-region-card.elbow{ left:26px !important; }
+  #minfMenu .module-region-card.hip{ left:50px !important; }
+  #minfMenu .module-region-card.knee{ left:14px !important; }
+  #minfMenu .module-region-card.ankle{ left:14px !important; }
+}
+</style>
+
 </body>
 </html>
