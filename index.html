@@ -10413,18 +10413,6 @@ const techniques = [
     "videoFile": "ra_C_52_metatarso-phalangiennes_1ere_phalange_flexion_dorsale.mp4",
     "videoName": "metatarso-phalangiennes_1ere_phalange_flexion_dorsale",
     "videoSourceRow": 136
-  },
-  {
-    "id": 999,
-    "title": "TEST VIDÉO VIMEO — Épaule",
-    "zone": "Membres supérieurs",
-    "sub": "Épaule",
-    "level": "Test vidéo",
-    "status": "non vue",
-    "percent": 0,
-    "icon": "◜",
-    "videoUrl": "https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0",
-    "videoProvider": "vimeo"
   }
 ];
 
@@ -12957,13 +12945,6 @@ Lien original fourni : https://vimeo.com/540123060/eed12a4a77?share=copy&fl=sv&f
 Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&byline=0&portrait=0
 -->
 
-
-<!-- ITEM TEST VIDÉO AJOUTÉ
-Technique test #999 : TEST VIDÉO VIMEO — Épaule
-Zone : Membres supérieurs > Épaule
-Lien original fourni : https://vimeo.com/1198534346?share=copy&fl=sv&fe=ci
-Embed utilisé : https://player.vimeo.com/video/1198534346?title=0&byline=0&portrait=0
--->
 
 
 <style>
@@ -23051,6 +23032,178 @@ if(!window.__osteoVimeoEventsPatched){
   #minfMenu .module-region-card.ankle{ left:14px !important; }
 }
 </style>
+
+
+<script>
+/* === PATCH FINAL : suppression test épaule + roue strictement limitée aux techniques réellement vues === */
+(function(){
+  if(window.__osteoStrictWheelViewedOnlyFix) return;
+  window.__osteoStrictWheelViewedOnlyFix = true;
+
+  var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
+  var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
+  var STARTER_ID = 12; // une seule technique débloquée au départ
+
+  function uniqueNumericIds(values){
+    var out = [];
+    var seen = new Set();
+    (Array.isArray(values) ? values : []).forEach(function(value){
+      var n = Number(value);
+      if(n && !seen.has(n)){
+        seen.add(n);
+        out.push(n);
+      }
+    });
+    return out;
+  }
+
+  function readStrictIdsRaw(){
+    try{
+      var raw = localStorage.getItem(STRICT_KEY);
+      if(raw){
+        return uniqueNumericIds(JSON.parse(raw));
+      }
+    }catch(e){}
+    return [STARTER_ID];
+  }
+
+  function writeStrictIds(ids){
+    var clean = uniqueNumericIds(ids);
+    if(clean.indexOf(STARTER_ID) === -1) clean.unshift(STARTER_ID);
+    try{ localStorage.setItem(STRICT_KEY, JSON.stringify(clean)); }catch(e){}
+    // On remet aussi l'ancienne clé au propre pour éviter qu'un ancien test CodePen/GitHub
+    // continue à alimenter la roue avec des vidéos jamais vues.
+    try{ localStorage.setItem(LEGACY_KEY, JSON.stringify(clean)); }catch(e){}
+    return clean;
+  }
+
+  function readStrictViewedTechniqueIds(){
+    return writeStrictIds(readStrictIdsRaw());
+  }
+
+  function isStrictViewedId(id){
+    var n = Number(id);
+    if(!n) return false;
+    return readStrictViewedTechniqueIds().indexOf(n) !== -1;
+  }
+
+  function getTechniqueById(id){
+    var n = Number(id);
+    try{
+      return (Array.isArray(techniques) ? techniques : []).find(function(t){ return Number(t.id) === n; }) || null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function saveStrictViewedTechniqueId(id){
+    var n = Number(id);
+    if(!n) return;
+    var ids = readStrictViewedTechniqueIds();
+    if(ids.indexOf(n) === -1) ids.push(n);
+    writeStrictIds(ids);
+
+    var t = getTechniqueById(n);
+    if(t){
+      t.status = 'vue';
+      t.percent = 100;
+    }
+
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+    try{ if(typeof updateHomeCount === 'function') updateHomeCount(); }catch(e){}
+  }
+
+  function strictIsTechniqueUnlocked(t){
+    return !!(t && isStrictViewedId(t.id));
+  }
+
+  function strictViewedTechniquesForWheel(){
+    try{
+      return (Array.isArray(techniques) ? techniques : [])
+        .filter(function(t){ return t && isStrictViewedId(t.id); })
+        .sort(function(a,b){
+          return String(a.zone).localeCompare(String(b.zone)) ||
+                 String(a.sub).localeCompare(String(b.sub)) ||
+                 Number(a.id) - Number(b.id);
+        });
+    }catch(e){
+      return [];
+    }
+  }
+
+  // Nettoyage immédiat : si l'ancien stockage a été pollué par la roue ou par un test,
+  // on repart sur la liste stricte. Les nouvelles fins de vidéo viendront s'ajouter ici.
+  writeStrictIds(readStrictIdsRaw());
+
+  // On neutralise l'ancien item de test épaule s'il existe encore en mémoire après un ancien collage.
+  try{
+    if(Array.isArray(techniques)){
+      for(var i = techniques.length - 1; i >= 0; i--){
+        if(Number(techniques[i].id) === 999 || /TEST\s+VID[ÉE]O\s+VIMEO/i.test(String(techniques[i].title || ''))){
+          techniques.splice(i, 1);
+        }
+      }
+    }
+  }catch(e){}
+
+  // Remplacement des fonctions utilisées par les cartes et par la roue.
+  try{ readViewedTechniqueIds = readStrictViewedTechniqueIds; }catch(e){ window.readViewedTechniqueIds = readStrictViewedTechniqueIds; }
+  try{ saveViewedTechniqueId = saveStrictViewedTechniqueId; }catch(e){ window.saveViewedTechniqueId = saveStrictViewedTechniqueId; }
+  try{ isTechniqueUnlocked = strictIsTechniqueUnlocked; }catch(e){ window.isTechniqueUnlocked = strictIsTechniqueUnlocked; }
+  try{ isTechniqueViewedForRevision = strictIsTechniqueUnlocked; }catch(e){ window.isTechniqueViewedForRevision = strictIsTechniqueUnlocked; }
+  try{ getViewedTechniquesForWheel = strictViewedTechniquesForWheel; }catch(e){ window.getViewedTechniquesForWheel = strictViewedTechniquesForWheel; }
+
+  var oldMark = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+  window.markTechniqueViewedAfterComplete = function(id){
+    var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+    if(!n) return;
+    saveStrictViewedTechniqueId(n);
+    if(oldMark){
+      try{ return oldMark.apply(this, arguments); }catch(e){}
+    }
+  };
+  try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+
+  window.openSelectedWheelVideo = function(){
+    var t = null;
+    try{ t = typeof getSelectedWheelTechnique === 'function' ? getSelectedWheelTechnique() : null; }catch(e){}
+    if(!t){
+      if(typeof toast === 'function') toast('Lancez d’abord la roue');
+      return;
+    }
+    if(!strictIsTechniqueUnlocked(t)){
+      if(typeof toast === 'function') toast('Vidéo verrouillée : visionnez-la d’abord dans le catalogue');
+      return;
+    }
+    if(typeof openTechnique === 'function') openTechnique(t.id);
+  };
+  try{ openSelectedWheelVideo = window.openSelectedWheelVideo; }catch(e){}
+
+  window.openSelectedWheelCard = function(){
+    var t = null;
+    try{ t = typeof getSelectedWheelTechnique === 'function' ? getSelectedWheelTechnique() : null; }catch(e){}
+    if(!t){
+      if(typeof toast === 'function') toast('Lancez d’abord la roue');
+      return;
+    }
+    if(!strictIsTechniqueUnlocked(t)){
+      if(typeof toast === 'function') toast('Carte non débloquée');
+      return;
+    }
+    if(typeof openFullCard === 'function') openFullCard(t.id);
+  };
+  try{ openSelectedWheelCard = window.openSelectedWheelCard; }catch(e){}
+
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ if(typeof updateCounts === 'function') updateCounts(); }catch(e){}
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+  });
+})();
+</script>
 
 </body>
 </html>
