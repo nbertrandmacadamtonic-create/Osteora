@@ -9850,7 +9850,7 @@ const techniques = [
     "level": "Niveau débutant",
     "status": "non vue",
     "percent": 0,
-    "icon": "✋",
+    "icon": "M",
     "videoProvider": "vimeo",
     "videoUrl": "https://player.vimeo.com/video/1204647953?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
     "directVimeo": "https://vimeo.com/1204647953?share=copy&fl=sv&fe=ci",
@@ -9867,7 +9867,7 @@ const techniques = [
     "level": "Niveau débutant",
     "status": "non vue",
     "percent": 0,
-    "icon": "✋",
+    "icon": "M",
     "videoProvider": "vimeo",
     "videoUrl": "https://player.vimeo.com/video/1204647954?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
     "directVimeo": "https://vimeo.com/1204647954?share=copy&fl=sv&fe=ci",
@@ -9884,7 +9884,7 @@ const techniques = [
     "level": "Niveau intermédiaire",
     "status": "non vue",
     "percent": 0,
-    "icon": "✋",
+    "icon": "M",
     "videoProvider": "vimeo",
     "videoUrl": "https://player.vimeo.com/video/1204647965?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
     "directVimeo": "https://vimeo.com/1204647965?share=copy&fl=sv&fe=ci",
@@ -10446,7 +10446,7 @@ const zoneSubzones = {
     { label: "Épaule", icon: "◜", detail: "Acromio-claviculaire et gléno-humérale" },
     { label: "Coude", icon: "◌", detail: "Huméro-ulnaire et huméro-radiale" },
     { label: "Poignet", icon: "▧", detail: "Radio-carpienne" },
-    { label: "Main", icon: "✋", detail: "Carpe, inter-carpiennes et trapézo-métacarpienne" }
+    { label: "Main", icon: "M", detail: "Carpe, inter-carpiennes et trapézo-métacarpienne" }
   ],
   "Membres inférieurs": [
     { label: "Hanche", icon: "◉", detail: "Coxo-fémorale" },
@@ -10649,6 +10649,51 @@ function catalogueSearchText(t){
   ].join(" "));
 }
 
+
+function getTechniqueColorKey(t){
+  const zone = String(t?.zone || "");
+  const sub = String(t?.sub || "");
+  const title = normalizeCatalogueText(t?.title || "");
+  const normalizedSub = normalizeCatalogueText(sub);
+  const full = normalizeCatalogueText([zone, sub, t?.title || ""].join(" "));
+
+  if(zone === "Rachis"){
+    if(normalizedSub.includes("cervical")) return "cervicales";
+    if(title.includes("cote") || title.includes("cotes") || title.includes("costo") || title.includes("respiratoire") || normalizedSub.includes("cote")) return "cotes";
+    if(normalizedSub.includes("dorsal")) return "dorsales";
+    if(normalizedSub.includes("lombair")) return "lombaires";
+    return "rachis";
+  }
+
+  /* Membres supérieurs : on reprend le code couleur initial des sous-zones */
+  if(zone === "Membres supérieurs"){
+    if(full.includes("clavicule") || full.includes("epaule") || full.includes("scapula")) return "msup-epaule";
+    if(full.includes("coude") || full.includes("radius") || full.includes("ulna") || full.includes("radio") || full.includes("ulnaire")) return "msup-coude";
+    if(full.includes("poignet") || full.includes("carpe")) return "msup-poignet";
+    if(full.includes("main") || full.includes("metacarp") || full.includes("phalange")) return "msup-main";
+    return "msup";
+  }
+
+  /* Membres inférieurs : même logique, par sous-zone anatomique */
+  if(zone === "Membres inférieurs"){
+    if(full.includes("hanche") || full.includes("femur") || full.includes("coxo")) return "minf-hanche";
+    if(full.includes("genou") || full.includes("tibia") || full.includes("fibula") || full.includes("perone")) return "minf-genou";
+    if(full.includes("cheville") || full.includes("talo") || full.includes("astrag") || full.includes("malleole")) return "minf-cheville";
+    if(full.includes("pied") || full.includes("calcan") || full.includes("naviculaire") || full.includes("cubo") || full.includes("metatars") || full.includes("subtal") || full.includes("sous tal")) return "minf-pied";
+    return "minf";
+  }
+
+  /* Bassin : les cercles suivent les trois zones déjà présentes dans le menu */
+  if(zone === "Bassin"){
+    if(full.includes("ilium") || full.includes("iliaque") || full.includes("sacro iliaque") || full.includes("sacro-iliaque")) return "bassin-iliaques";
+    if(full.includes("sacrum") || full.includes("sacre")) return "bassin-sacrum";
+    if(full.includes("symphyse") || full.includes("pubienne") || full.includes("pubis")) return "bassin-symphyse";
+    return "bassin";
+  }
+
+  return "default";
+}
+
 function renderCatalogueSearch(){
   const input = document.getElementById("catalogueSearchInput");
   const box = document.getElementById("catalogueSearchResults");
@@ -10683,8 +10728,8 @@ function renderCatalogueSearch(){
   box.innerHTML = `
     <div class="catalogue-result-count">${results.length} résultat${results.length > 1 ? "s" : ""}</div>
     ${results.map(t => `
-      <button class="row tech catalogue-result-row" onclick="openTechniqueFromCatalogue(${t.id})">
-        <div class="tech-icon">${t.icon || "OP"}</div>
+      <button class="row tech catalogue-result-row tech-color-${getTechniqueColorKey(t)}" onclick="openTechniqueFromCatalogue(${t.id})">
+        <div class="tech-icon tech-icon-${getTechniqueColorKey(t)}">${t.icon || "OP"}</div>
         <div>
           <h3>${t.title}</h3>
           <small>${t.zone} · ${t.sub} · ${t.level || ""}</small>
@@ -10732,7 +10777,7 @@ function renderTechniques(){
 
       return `
         <button class="row tech featured ${item.colorClass || ""}" onclick="${action}">
-          <div class="tech-icon">${item.icon}</div>
+          <div class="tech-icon tech-icon-${(item.colorClass || "").replace("sub-", "") || "default"}">${item.icon}</div>
           <div><h3>${item.label}</h3><small>${item.detail}</small></div>
           <div class="state"><span>ouvrir ›</span></div>
         </button>`;
@@ -10770,8 +10815,8 @@ function renderTechniques(){
   }
 
   list.innerHTML = items.map((t,i)=>`
-    <button class="row tech ${i===0?'featured':''}" onclick="openTechnique(${t.id})">
-      <div class="tech-icon">${t.icon}</div>
+    <button class="row tech ${i===0?'featured':''} tech-color-${getTechniqueColorKey(t)}" onclick="openTechnique(${t.id})">
+      <div class="tech-icon tech-icon-${getTechniqueColorKey(t)}">${t.icon}</div>
       <div><h3>${t.title}</h3><small>${(currentSubzone === "__ALL__" || currentSubzone === "__CÔTES__") ? t.sub + " · " + t.level : t.level}</small></div>
       <div class="state">${stateLabel(t)}</div>
     </button>`).join("");
@@ -11436,15 +11481,9 @@ function buildCollections(){
 }
 
 
-/* === MARQUAGE ORANGE AUTOMATIQUE : technique 12 === */
+/* === MARQUAGE ORANGE AUTOMATIQUE : technique 12 désactivé === */
 function markCervicalTechniqueOrange(){
-  document.querySelectorAll(".row.tech, .tech, .play-card").forEach(el=>{
-    const txt = (el.textContent || "").toLowerCase();
-    if(el.dataset.techId === "12" || (txt.includes("dysfonction cervicale") && txt.includes("c2") && txt.includes("c6"))){
-      el.dataset.techId = "12";
-      el.classList.add("orange-cervical-tech");
-    }
-  });
+  /* Désactivé : les petits cercles suivent maintenant le code couleur de leur zone. */
 }
 
 function openSeenCollections(){
@@ -11471,7 +11510,7 @@ function renderSeenCollections(){
     const icon = collectionIcon(c.zone, c.sub);
 
     return `
-      <button class="collection-card ${locked ? "locked" : ""}" onclick="openSeenCollection('${escapeAttr(c.zone)}','${escapeAttr(c.sub)}')">
+      <button class="collection-card collection-color-${getTechniqueColorKey({zone:c.zone, sub:c.sub})} ${locked ? "locked" : ""}" onclick="openSeenCollection('${escapeAttr(c.zone)}','${escapeAttr(c.sub)}')">
         <div class="collection-badge">${icon}</div>
         <div>
           <h3>${c.sub}</h3>
@@ -11527,13 +11566,13 @@ function renderPlayCard(t){
   const safeTitle = escapeHtml(t.title);
 
   return `
-    <article class="play-card ${unlocked ? "" : "locked"}" data-tech-id="${t.id}" ${unlocked ? `onclick="openFullCard(${t.id})"` : ""}>
+    <article class="play-card tech-color-${getTechniqueColorKey(t)} ${unlocked ? "" : "locked"}" data-tech-id="${t.id}" data-tech-color="${getTechniqueColorKey(t)}" ${unlocked ? `onclick="openFullCard(${t.id})"` : ""}>
       <div class="play-card-inner">
         <div class="play-card-face card-front">
           <div class="card-kicker"><span>${t.sub}</span><span>#${String(t.id).padStart(3,"0")}</span></div>
           <div class="card-image">
             ${unlocked ? `<img src="${poster}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="">` : ""}
-            <div class="card-fallback" style="${unlocked ? "display:none" : ""}">${t.icon || "◎"}</div>
+            <div class="card-fallback card-fallback-${getTechniqueColorKey(t)}" style="${unlocked ? "display:none" : ""}">${t.icon || "◎"}</div>
           </div>
           <div>
             <div class="card-title">${safeTitle}</div>
@@ -21105,24 +21144,25 @@ if(!window.__osteoVimeoEventsPatched){
 
 
 <style>
-/* === LISTES TECHNIQUES : lettres des petits cercles en orange premium === */
+/* === LISTES TECHNIQUES : base neutre des petits cercles === */
+/* Les couleurs ne sont plus forcées en orange : elles viennent des classes tech-color-* / data-tech-color. */
 .row.tech .tech-icon,
 .tech .tech-icon,
 .play-card .tech-icon,
 .list .tech-icon,
 #techList .tech-icon{
-  color:#ff9f1c !important;
-  border-color:rgba(255,159,28,.58) !important;
+  color:var(--tech-circle-color, var(--cyan)) !important;
+  border-color:color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 58%, transparent) !important;
   background:
-    radial-gradient(circle at 35% 25%, rgba(255,210,115,.26), transparent 38%),
-    linear-gradient(145deg, rgba(255,159,28,.18), rgba(10,18,35,.88)) !important;
+    radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 28%, white 10%), transparent 38%),
+    linear-gradient(145deg, color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 18%, transparent), rgba(10,18,35,.88)) !important;
   box-shadow:
-    0 0 20px rgba(255,159,28,.34),
-    0 0 38px rgba(255,111,0,.14),
+    0 0 20px color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 34%, transparent),
+    0 0 38px color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 14%, transparent),
     inset 0 1px 0 rgba(255,255,255,.12) !important;
   text-shadow:
-    0 0 10px rgba(255,159,28,.72),
-    0 0 20px rgba(255,111,0,.36) !important;
+    0 0 10px color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 72%, transparent),
+    0 0 20px color-mix(in srgb, var(--tech-circle-color, var(--cyan)) 36%, transparent) !important;
   font-weight:950 !important;
 }
 </style>
@@ -21466,6 +21506,1409 @@ if(!window.__osteoVimeoEventsPatched){
   document.addEventListener("DOMContentLoaded", function(){
     osteoPrepareVimeoIframe();
     if(osteoIsIOS()) document.documentElement.classList.add("is-ios-video");
+  });
+})();
+</script>
+
+
+
+<style>
+/* === CORRECTION LECTEUR RÉTABLI : iPhone + CodePen sans masquer les boutons === */
+/* On garde l'interface qui fonctionnait : lecteur visible + bouton central + commandes. */
+#player #videoBox.vimeo-native{
+  position:relative !important;
+  min-height:230px !important;
+  background:#000 !important;
+}
+
+#player #videoBox.vimeo-native #vimeoPlayer,
+#player #videoBox.vimeo-native #vimeoPlayer.custom-hidden-provider,
+#player #videoBox.vimeo-native iframe{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:2 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  border:0 !important;
+  background:#000 !important;
+  pointer-events:auto !important;
+  touch-action:manipulation !important;
+}
+
+/* La vidéo HTML5 ne doit pas recouvrir Vimeo quand la technique est Vimeo. */
+#player #videoBox.vimeo-native #video{
+  display:none !important;
+  pointer-events:none !important;
+}
+
+/* IMPORTANT : on rétablit l'overlay et le gros bouton Lecture. */
+#player #videoBox.vimeo-native .custom-video-overlay{
+  display:flex !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:none !important;
+  z-index:5 !important;
+  background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.18)) !important;
+}
+
+#player #videoBox.vimeo-native.is-playing .custom-video-overlay{
+  opacity:0 !important;
+}
+
+#player #videoBox.vimeo-native .custom-video-play-big{
+  display:grid !important;
+  pointer-events:auto !important;
+}
+
+/* Les commandes sous le lecteur restent toujours visibles, y compris sur iPhone. */
+#player.player-vimeo-native .custom-video-controls,
+#player .custom-video-controls{
+  display:grid !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+
+/* Bouton secours discret : utile si Vimeo refuse l'embed sur iPhone/CodePen. */
+#player.player-vimeo-native #openVimeoDirectButton{
+  display:block !important;
+  grid-column:1 / -1 !important;
+  min-height:44px !important;
+  border-radius:16px !important;
+  border:1px solid rgba(0,229,255,.30) !important;
+  background:rgba(0,229,255,.07) !important;
+  color:#eaf7ff !important;
+  font-weight:900 !important;
+}
+</style>
+
+<script>
+/* === CORRECTION LECTEUR RÉTABLI : Vimeo iPhone/CodePen sans supprimer l'interface === */
+(function(){
+  if(window.__osteoReaderRestoredIphoneCodepen) return;
+  window.__osteoReaderRestoredIphoneCodepen = true;
+
+  function getTechniques(){
+    try{
+      if(typeof techniques !== "undefined" && Array.isArray(techniques)) return techniques;
+    }catch(e){}
+    try{
+      if(Array.isArray(window.techniques)) return window.techniques;
+    }catch(e){}
+    return [];
+  }
+
+  function getCurrentId(){
+    try{
+      if(typeof currentPlayerTechniqueId !== "undefined") return currentPlayerTechniqueId;
+    }catch(e){}
+    return null;
+  }
+
+  function findTechnique(id){
+    const target = Number(id || getCurrentId());
+    return getTechniques().find(t => Number(t.id) === target) || null;
+  }
+
+  function extractVimeoInfo(value){
+    const info = {id:"", h:""};
+    if(!value) return info;
+    const raw = String(value).trim();
+
+    if(/^\d+$/.test(raw)){
+      info.id = raw;
+      return info;
+    }
+
+    try{
+      const u = new URL(raw, window.location.href);
+      info.h = u.searchParams.get("h") || "";
+
+      const parts = u.pathname.split("/").filter(Boolean);
+      const videoIndex = parts.indexOf("video");
+      if(videoIndex >= 0 && parts[videoIndex + 1]){
+        info.id = parts[videoIndex + 1];
+      }else{
+        const firstNumeric = parts.find(p => /^\d{6,}$/.test(p));
+        if(firstNumeric) info.id = firstNumeric;
+      }
+
+      /* Vimeo privé : https://vimeo.com/ID/HASH -> l'embed doit recevoir ?h=HASH */
+      if(!info.h && parts.length >= 2){
+        const idPos = parts.findIndex(p => p === info.id);
+        if(idPos >= 0 && parts[idPos + 1] && !/^\d+$/.test(parts[idPos + 1])){
+          info.h = parts[idPos + 1];
+        }
+      }
+    }catch(e){
+      const idMatch = raw.match(/(\d{6,})/);
+      if(idMatch) info.id = idMatch[1];
+      const hashMatch = raw.match(/vimeo\.com\/\d{6,}\/([a-zA-Z0-9]+)/);
+      if(hashMatch) info.h = hashMatch[1];
+    }
+
+    return info;
+  }
+
+  window.buildCustomVimeoUrl = function(url){
+    const raw = String(url || "").trim();
+    const info = extractVimeoInfo(raw);
+    const base = info.id ? `https://player.vimeo.com/video/${info.id}` : raw;
+    if(!base) return "";
+
+    try{
+      const u = new URL(base, window.location.href);
+      if(info.h) u.searchParams.set("h", info.h);
+      u.searchParams.set("api", "1");
+      u.searchParams.set("playsinline", "1");
+      u.searchParams.set("controls", "1");
+      u.searchParams.set("title", "0");
+      u.searchParams.set("byline", "0");
+      u.searchParams.set("portrait", "0");
+      u.searchParams.set("badge", "0");
+      u.searchParams.set("autopause", "0");
+      u.searchParams.set("dnt", "1");
+      u.searchParams.set("transparent", "0");
+      u.searchParams.set("background", "0");
+      u.searchParams.set("responsive", "1");
+      return u.toString();
+    }catch(e){
+      const sep = base.includes("?") ? "&" : "?";
+      return base + sep + "api=1&playsinline=1&controls=1&title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&transparent=0&background=0&responsive=1";
+    }
+  };
+
+  function directVimeoUrl(t){
+    if(!t) return "";
+    if(t.directVimeo) return String(t.directVimeo).trim();
+    const info = extractVimeoInfo(t.videoUrl || t.vimeoId || "");
+    if(info.id) return `https://vimeo.com/${info.id}${info.h ? `/${info.h}` : ""}`;
+    return "";
+  }
+
+  function restoreReaderForVimeo(id){
+    const t = findTechnique(id);
+    const isVimeo = !!(t && t.videoProvider === "vimeo" && (t.videoUrl || t.vimeoId));
+    const playerScreen = document.getElementById("player");
+    const box = document.getElementById("videoBox");
+    const iframe = document.getElementById("vimeoPlayer");
+    const video = document.getElementById("video");
+    const overlay = document.getElementById("customVideoOverlay");
+    const controls = document.querySelector("#player .custom-video-controls");
+    const directBtn = document.getElementById("openVimeoDirectButton");
+
+    if(playerScreen) playerScreen.classList.toggle("player-vimeo-native", isVimeo);
+    if(box) box.classList.toggle("vimeo-native", isVimeo);
+
+    if(!isVimeo){
+      if(directBtn){
+        directBtn.style.display = "none";
+        directBtn.onclick = function(){ return false; };
+      }
+      return;
+    }
+
+    if(video){
+      try{ video.pause(); }catch(e){}
+      video.style.setProperty("display", "none", "important");
+      video.style.setProperty("pointer-events", "none", "important");
+    }
+
+    if(iframe){
+      iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
+      iframe.setAttribute("allowfullscreen", "");
+      iframe.setAttribute("webkitallowfullscreen", "");
+      iframe.setAttribute("mozallowfullscreen", "");
+      iframe.setAttribute("playsinline", "");
+      iframe.setAttribute("frameborder", "0");
+      iframe.setAttribute("loading", "eager");
+      iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+      iframe.style.setProperty("display", "block", "important");
+      iframe.style.setProperty("visibility", "visible", "important");
+      iframe.style.setProperty("opacity", "1", "important");
+      iframe.style.setProperty("pointer-events", "auto", "important");
+
+      const currentSrc = iframe.getAttribute("src") || "";
+      const preferred = window.buildCustomVimeoUrl(t.videoUrl || t.vimeoId || currentSrc);
+      if(preferred && (!currentSrc || currentSrc === "about:blank" || currentSrc.indexOf("playsinline=1") === -1 || currentSrc.indexOf("controls=1") === -1)){
+        iframe.src = preferred;
+      }
+    }
+
+    if(overlay){
+      overlay.style.setProperty("display", "flex", "important");
+      overlay.style.setProperty("visibility", "visible", "important");
+      overlay.style.setProperty("opacity", "1", "important");
+      overlay.style.setProperty("pointer-events", "none", "important");
+    }
+
+    if(controls){
+      controls.style.setProperty("display", "grid", "important");
+      controls.style.setProperty("visibility", "visible", "important");
+      controls.style.setProperty("opacity", "1", "important");
+    }
+
+    if(directBtn){
+      const direct = directVimeoUrl(t);
+      directBtn.textContent = "Ouvrir la vidéo Vimeo";
+      directBtn.style.display = direct ? "block" : "none";
+      directBtn.onclick = function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        if(direct) window.open(direct, "_blank", "noopener,noreferrer");
+        return false;
+      };
+    }
+
+    try{ if(typeof setCustomVideoUI === "function") setCustomVideoUI("Prêt à lire", "Touchez Lecture ou la vidéo"); }catch(e){}
+  }
+
+  const oldToggle = typeof window.toggleCustomVideoPlayback === "function" ? window.toggleCustomVideoPlayback : null;
+  if(oldToggle){
+    window.toggleCustomVideoPlayback = function(){
+      const provider = (function(){ try{ return typeof customVideoProvider !== "undefined" ? customVideoProvider : "html5"; }catch(e){ return "html5"; } })();
+      const box = document.getElementById("videoBox");
+      if(provider === "vimeo"){
+        restoreReaderForVimeo(getCurrentId());
+        const nextState = !(box && box.classList.contains("is-playing"));
+        try{ if(typeof customVideoIsPlaying !== "undefined") customVideoIsPlaying = nextState; }catch(e){}
+        try{ if(typeof postToVimeo === "function") postToVimeo(nextState ? "play" : "pause"); }catch(e){}
+        try{ if(typeof updateCustomPlayLabels === "function") updateCustomPlayLabels(nextState); }catch(e){}
+        if(box) box.classList.toggle("is-playing", nextState);
+        return;
+      }
+      return oldToggle.apply(this, arguments);
+    };
+  }
+
+  const oldStop = typeof window.stopCustomVideoPlayback === "function" ? window.stopCustomVideoPlayback : null;
+  if(oldStop){
+    window.stopCustomVideoPlayback = function(){
+      const provider = (function(){ try{ return typeof customVideoProvider !== "undefined" ? customVideoProvider : "html5"; }catch(e){ return "html5"; } })();
+      const box = document.getElementById("videoBox");
+      if(provider === "vimeo"){
+        try{ if(typeof postToVimeo === "function") postToVimeo("pause"); }catch(e){}
+        try{ if(typeof postToVimeo === "function") postToVimeo("setCurrentTime", 0); }catch(e){}
+        try{ if(typeof customVideoIsPlaying !== "undefined") customVideoIsPlaying = false; }catch(e){}
+        try{ if(typeof updateCustomPlayLabels === "function") updateCustomPlayLabels(false); }catch(e){}
+        if(box) box.classList.remove("is-playing");
+        try{ if(typeof setCustomVideoUI === "function") setCustomVideoUI("Arrêté", "Lecture remise au début"); }catch(e){}
+        restoreReaderForVimeo(getCurrentId());
+        return;
+      }
+      return oldStop.apply(this, arguments);
+    };
+  }
+
+  const oldOpenTechnique = typeof window.openTechnique === "function" ? window.openTechnique : null;
+  if(oldOpenTechnique){
+    window.openTechnique = function(id){
+      const result = oldOpenTechnique.apply(this, arguments);
+      restoreReaderForVimeo(id);
+      setTimeout(()=>restoreReaderForVimeo(id), 80);
+      setTimeout(()=>restoreReaderForVimeo(id), 350);
+      setTimeout(()=>restoreReaderForVimeo(id), 900);
+      return result;
+    };
+  }
+
+  const oldGo = typeof window.go === "function" ? window.go : null;
+  if(oldGo){
+    window.go = function(id){
+      const result = oldGo.apply(this, arguments);
+      if(id === "player"){
+        restoreReaderForVimeo(getCurrentId());
+        setTimeout(()=>restoreReaderForVimeo(getCurrentId()), 150);
+      }
+      return result;
+    };
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    restoreReaderForVimeo(getCurrentId());
+  });
+})();
+</script>
+
+
+<style>
+/* === PATCH FINAL : nom de la vidéo au-dessus du titre, dans un cartouche intégré === */
+#player .player-title-frame::before{
+  content:none !important;
+  display:none !important;
+}
+
+#player .player-title-frame{
+  position:relative !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+  min-height:122px !important;
+  padding:18px 16px 18px !important;
+  text-align:center !important;
+}
+
+#player #playerTitleKicker{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:auto !important;
+  max-width:calc(100% - 8px) !important;
+  margin:0 auto !important;
+  padding:8px 14px !important;
+  border-radius:16px !important;
+  border:1px solid rgba(255,176,32,.38) !important;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,176,32,.20), transparent 65%),
+    linear-gradient(145deg, rgba(18,39,72,.95), rgba(7,15,34,.98)) !important;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.03) inset,
+    0 10px 24px rgba(0,0,0,.24),
+    0 0 18px rgba(255,176,32,.12) !important;
+  color:#ffd79a !important;
+  font-size:11px !important;
+  line-height:1.2 !important;
+  font-weight:900 !important;
+  letter-spacing:.035em !important;
+  text-transform:none !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+#player #playerTitle,
+#player .player-title-highlight,
+#player .player-title-frame .tech-title{
+  margin:0 !important;
+  text-align:center !important;
+  text-align-last:center !important;
+}
+
+@media(max-width:430px){
+  #player .player-title-frame{
+    min-height:128px !important;
+    padding:16px 12px 16px !important;
+    gap:9px !important;
+  }
+
+  #player #playerTitleKicker{
+    max-width:100% !important;
+    font-size:10px !important;
+    padding:8px 11px !important;
+  }
+}
+</style>
+
+<script>
+/* === PATCH FINAL : le cartouche affiche le vrai nom de la vidéo === */
+(function(){
+  function getTechniqueById(id){
+    try{
+      return (window.techniques || []).find(function(item){ return item && item.id === id; }) || null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function cleanVideoName(value){
+    if(!value) return 'Vidéo technique';
+    return String(value)
+      .replace(/\.[a-z0-9]{2,5}$/i, '')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim() || 'Vidéo technique';
+  }
+
+  function updatePlayerVideoCartouche(id){
+    var kicker = document.getElementById('playerTitleKicker');
+    if(!kicker) return;
+    var t = getTechniqueById(id);
+    var text = cleanVideoName(t && (t.videoName || t.videoTitle || t.title));
+    kicker.textContent = text;
+    kicker.setAttribute('title', text);
+  }
+
+  var oldOpenTechnique = typeof window.openTechnique === 'function' ? window.openTechnique : null;
+  if(oldOpenTechnique){
+    window.openTechnique = function(id){
+      var result = oldOpenTechnique.apply(this, arguments);
+      updatePlayerVideoCartouche(id);
+      setTimeout(function(){ updatePlayerVideoCartouche(id); }, 60);
+      return result;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ updatePlayerVideoCartouche(window.currentPlayerTechniqueId); }catch(e){}
+  });
+})();
+</script>
+
+
+<style>
+/* === PATCH FINAL : petits cercles des techniques selon le code couleur de la zone === */
+/* Ce patch annule le forçage orange global et rétablit la couleur pédagogique. */
+
+.row.tech.sub-cervicales .tech-icon,
+.row.tech.tech-color-cervicales .tech-icon,
+.catalogue-result-row.tech-color-cervicales .tech-icon{
+  color:var(--violet) !important;
+  border-color:rgba(168,85,255,.72) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(218,180,255,.28), transparent 38%),
+    linear-gradient(145deg, rgba(168,85,255,.20), rgba(10,18,35,.88)) !important;
+  box-shadow:
+    0 0 20px rgba(168,85,255,.38),
+    0 0 38px rgba(168,85,255,.16),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(168,85,255,.72) !important;
+}
+
+.row.tech.sub-dorsales .tech-icon,
+.row.tech.tech-color-dorsales .tech-icon,
+.catalogue-result-row.tech-color-dorsales .tech-icon{
+  color:var(--cyan) !important;
+  border-color:rgba(0,229,255,.72) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(180,245,255,.28), transparent 38%),
+    linear-gradient(145deg, rgba(0,229,255,.18), rgba(10,18,35,.88)) !important;
+  box-shadow:
+    0 0 20px rgba(0,229,255,.38),
+    0 0 38px rgba(45,140,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(0,229,255,.72) !important;
+}
+
+.row.tech.sub-cotes .tech-icon,
+.row.tech.tech-color-cotes .tech-icon,
+.catalogue-result-row.tech-color-cotes .tech-icon{
+  color:#f6fbff !important;
+  border-color:rgba(246,251,255,.76) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.26), transparent 38%),
+    linear-gradient(145deg, rgba(246,251,255,.12), rgba(10,18,35,.90)) !important;
+  box-shadow:
+    0 0 18px rgba(246,251,255,.30),
+    0 0 34px rgba(0,229,255,.10),
+    inset 0 1px 0 rgba(255,255,255,.16) !important;
+  text-shadow:0 0 10px rgba(246,251,255,.62) !important;
+}
+
+.row.tech.sub-lombaires .tech-icon,
+.row.tech.tech-color-lombaires .tech-icon,
+.catalogue-result-row.tech-color-lombaires .tech-icon{
+  color:var(--orange) !important;
+  border-color:rgba(255,176,32,.76) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,220,140,.30), transparent 38%),
+    linear-gradient(145deg, rgba(255,176,32,.20), rgba(10,18,35,.88)) !important;
+  box-shadow:
+    0 0 20px rgba(255,176,32,.38),
+    0 0 38px rgba(255,111,0,.16),
+    inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(255,176,32,.72) !important;
+}
+
+.row.tech.tech-color-bassin .tech-icon,
+.catalogue-result-row.tech-color-bassin .tech-icon{
+  color:var(--orange) !important;
+  border-color:rgba(255,176,32,.72) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,220,140,.28), transparent 38%),
+    linear-gradient(145deg, rgba(255,176,32,.18), rgba(10,18,35,.88)) !important;
+  box-shadow:0 0 20px rgba(255,176,32,.34), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(255,176,32,.70) !important;
+}
+
+.row.tech.tech-color-msup .tech-icon,
+.catalogue-result-row.tech-color-msup .tech-icon{
+  color:var(--violet) !important;
+  border-color:rgba(168,85,255,.72) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(218,180,255,.28), transparent 38%),
+    linear-gradient(145deg, rgba(168,85,255,.18), rgba(10,18,35,.88)) !important;
+  box-shadow:0 0 20px rgba(168,85,255,.34), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(168,85,255,.70) !important;
+}
+
+.row.tech.tech-color-minf .tech-icon,
+.catalogue-result-row.tech-color-minf .tech-icon{
+  color:var(--green) !important;
+  border-color:rgba(0,230,167,.72) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(165,255,225,.26), transparent 38%),
+    linear-gradient(145deg, rgba(0,230,167,.18), rgba(10,18,35,.88)) !important;
+  box-shadow:0 0 20px rgba(0,230,167,.34), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(0,230,167,.70) !important;
+}
+
+.row.tech.sub-all .tech-icon,
+.row.tech.tech-color-default .tech-icon,
+.row.tech.tech-color-rachis .tech-icon{
+  color:#dff8ff !important;
+  border-color:rgba(223,248,255,.48) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.20), transparent 38%),
+    linear-gradient(145deg, rgba(223,248,255,.10), rgba(10,18,35,.90)) !important;
+  box-shadow:0 0 18px rgba(223,248,255,.18), inset 0 1px 0 rgba(255,255,255,.12) !important;
+  text-shadow:0 0 10px rgba(223,248,255,.42) !important;
+}
+</style>
+
+
+<style>
+/* === CORRECTION VÉRIFIÉE : petits cercles selon le code couleur initial === */
+/* Ce bloc est volontairement placé tout à la fin pour battre les anciens patchs orange. */
+.row.tech.tech-color-cervicales,
+.row.tech[data-tech-color="cervicales"],
+.play-card.tech-color-cervicales,
+.collection-card.collection-color-cervicales{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+
+.row.tech.tech-color-dorsales,
+.row.tech[data-tech-color="dorsales"],
+.play-card.tech-color-dorsales,
+.collection-card.collection-color-dorsales{ --tech-circle-color:var(--cyan); color:var(--cyan) !important; }
+
+.row.tech.tech-color-cotes,
+.row.tech[data-tech-color="cotes"],
+.play-card.tech-color-cotes,
+.collection-card.collection-color-cotes{ --tech-circle-color:#f6fbff; color:#f6fbff !important; }
+
+.row.tech.tech-color-lombaires,
+.row.tech[data-tech-color="lombaires"],
+.play-card.tech-color-lombaires,
+.collection-card.collection-color-lombaires{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+
+.row.tech.tech-color-bassin,
+.row.tech[data-tech-color="bassin"],
+.play-card.tech-color-bassin,
+.collection-card.collection-color-bassin{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+
+.row.tech.tech-color-msup,
+.row.tech[data-tech-color="msup"],
+.play-card.tech-color-msup,
+.collection-card.collection-color-msup{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+
+.row.tech.tech-color-minf,
+.row.tech[data-tech-color="minf"],
+.play-card.tech-color-minf,
+.collection-card.collection-color-minf{ --tech-circle-color:var(--green); color:var(--green) !important; }
+
+.row.tech.tech-color-rachis,
+.row.tech.tech-color-default,
+.row.tech[data-tech-color="rachis"],
+.row.tech[data-tech-color="default"]{ --tech-circle-color:#dff8ff; color:#dff8ff !important; }
+
+/* Sous-menus déjà codés en sub-* */
+.row.tech.sub-cervicales{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+.row.tech.sub-dorsales{ --tech-circle-color:var(--cyan); color:var(--cyan) !important; }
+.row.tech.sub-cotes{ --tech-circle-color:#f6fbff; color:#f6fbff !important; }
+.row.tech.sub-lombaires{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+.row.tech.sub-all{ --tech-circle-color:#dff8ff; color:#dff8ff !important; }
+
+/* Les icônes elles-mêmes : très spécifique pour empêcher le retour de l'orange global. */
+#techList .row.tech .tech-icon,
+#catalogueSearchResults .row.tech .tech-icon,
+.row.tech .tech-icon,
+.tech-icon.tech-icon-cervicales,
+.tech-icon.tech-icon-dorsales,
+.tech-icon.tech-icon-cotes,
+.tech-icon.tech-icon-lombaires,
+.tech-icon.tech-icon-bassin,
+.tech-icon.tech-icon-msup,
+.tech-icon.tech-icon-minf,
+.tech-icon.tech-icon-rachis,
+.tech-icon.tech-icon-default{
+  color:var(--tech-circle-color, currentColor) !important;
+  border-color:color-mix(in srgb, var(--tech-circle-color, currentColor) 72%, transparent) !important;
+  background:
+    radial-gradient(circle at 34% 24%, color-mix(in srgb, var(--tech-circle-color, currentColor) 30%, white 12%), transparent 40%),
+    linear-gradient(145deg, color-mix(in srgb, var(--tech-circle-color, currentColor) 20%, transparent), rgba(9,18,36,.90)) !important;
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--tech-circle-color, currentColor) 38%, transparent),
+    0 0 42px color-mix(in srgb, var(--tech-circle-color, currentColor) 16%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.14) !important;
+  text-shadow:0 0 11px color-mix(in srgb, var(--tech-circle-color, currentColor) 76%, transparent) !important;
+}
+
+/* Cartes à jouer : la couleur vient aussi de la zone. */
+.play-card.tech-color-cervicales .play-card-face{ color:var(--violet) !important; border-color:rgba(168,85,255,.82) !important; }
+.play-card.tech-color-dorsales .play-card-face{ color:var(--cyan) !important; border-color:rgba(0,229,255,.82) !important; }
+.play-card.tech-color-cotes .play-card-face{ color:#f6fbff !important; border-color:rgba(246,251,255,.82) !important; }
+.play-card.tech-color-lombaires .play-card-face,
+.play-card.tech-color-bassin .play-card-face{ color:var(--orange) !important; border-color:rgba(255,176,32,.82) !important; }
+.play-card.tech-color-msup .play-card-face{ color:var(--violet) !important; border-color:rgba(168,85,255,.82) !important; }
+.play-card.tech-color-minf .play-card-face{ color:var(--green) !important; border-color:rgba(0,230,167,.82) !important; }
+
+.card-fallback-cervicales{ color:var(--violet) !important; }
+.card-fallback-dorsales{ color:var(--cyan) !important; }
+.card-fallback-cotes{ color:#f6fbff !important; }
+.card-fallback-lombaires,.card-fallback-bassin{ color:var(--orange) !important; }
+.card-fallback-msup{ color:var(--violet) !important; }
+.card-fallback-minf{ color:var(--green) !important; }
+</style>
+
+<script>
+/* === Sécurité runtime : applique les couleurs après chaque rendu dynamique === */
+(function(){
+  function normalizeText(value){
+    return String(value || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function keyFromText(text){
+    var s = normalizeText(text);
+    if(s.includes('cervical') || /\bc[0-9]/.test(s) || s.includes('occiput') || s.includes('atlas') || s.includes('axis')) return 'cervicales';
+    if(s.includes('cote') || s.includes('costo') || s.includes('respiratoire')) return 'cotes';
+    if(s.includes('dorsal') || s.includes('dorsale') || /\bd[0-9]/.test(s) || /\bt[0-9]/.test(s)) return 'dorsales';
+    if(s.includes('lombair') || /\bl[0-9]/.test(s)) return 'lombaires';
+    if(s.includes('bassin') || s.includes('sacrum') || s.includes('iliaque') || s.includes('symphyse')) return 'bassin';
+    if(s.includes('epaule') || s.includes('coude') || s.includes('poignet') || s.includes('main') || s.includes('membre superieur')) return 'msup';
+    if(s.includes('hanche') || s.includes('genou') || s.includes('cheville') || s.includes('pied') || s.includes('membre inferieur')) return 'minf';
+    return 'default';
+  }
+
+  function colorClassFromExisting(el){
+    if(!el || !el.classList) return '';
+    var known = ['cervicales','dorsales','cotes','lombaires','bassin','msup','minf','rachis','default'];
+    for(var i=0;i<known.length;i++){
+      if(el.classList.contains('tech-color-' + known[i])) return known[i];
+    }
+    if(el.classList.contains('sub-cervicales')) return 'cervicales';
+    if(el.classList.contains('sub-dorsales')) return 'dorsales';
+    if(el.classList.contains('sub-cotes')) return 'cotes';
+    if(el.classList.contains('sub-lombaires')) return 'lombaires';
+    return '';
+  }
+
+  function applyTechniqueCircleColors(root){
+    root = root || document;
+    var rows = root.querySelectorAll('.row.tech');
+    rows.forEach(function(row){
+      var key = colorClassFromExisting(row) || keyFromText(row.textContent || '');
+      row.classList.remove('orange-cervical-tech');
+      row.classList.add('tech-color-' + key);
+      row.setAttribute('data-tech-color', key);
+      row.style.setProperty('--tech-circle-color', getComputedColorForKey(key));
+      var icon = row.querySelector('.tech-icon');
+      if(icon){
+        icon.classList.add('tech-icon-' + key);
+      }
+    });
+
+    root.querySelectorAll('.play-card').forEach(function(card){
+      var key = colorClassFromExisting(card) || card.getAttribute('data-tech-color') || keyFromText(card.textContent || '');
+      card.classList.remove('orange-cervical-tech');
+      card.classList.add('tech-color-' + key);
+      card.setAttribute('data-tech-color', key);
+      card.style.setProperty('--tech-circle-color', getComputedColorForKey(key));
+    });
+  }
+
+  function getComputedColorForKey(key){
+    switch(key){
+      case 'cervicales': return 'var(--violet)';
+      case 'dorsales': return 'var(--cyan)';
+      case 'cotes': return '#f6fbff';
+      case 'lombaires': return 'var(--orange)';
+      case 'bassin': return 'var(--orange)';
+      case 'msup': return 'var(--violet)';
+      case 'minf': return 'var(--green)';
+      default: return '#dff8ff';
+    }
+  }
+
+  window.markCervicalTechniqueOrange = function(){
+    applyTechniqueCircleColors(document);
+  };
+
+  ['renderTechniques','renderCatalogueSearch','renderSeenCards','renderSeenCollections'].forEach(function(fnName){
+    var oldFn = window[fnName];
+    if(typeof oldFn === 'function'){
+      window[fnName] = function(){
+        var result = oldFn.apply(this, arguments);
+        applyTechniqueCircleColors(document);
+        setTimeout(function(){ applyTechniqueCircleColors(document); }, 30);
+        return result;
+      };
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    applyTechniqueCircleColors(document);
+  });
+})();
+</script>
+
+
+<style>
+/* === PATCH FINAL : mêmes codes couleur pour Membres supérieurs / inférieurs / Bassin === */
+/* Membres supérieurs */
+.row.tech.tech-color-msup-epaule,
+.row.tech[data-tech-color="msup-epaule"],
+.play-card.tech-color-msup-epaule,
+.module-region-card.shoulder{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+
+.row.tech.tech-color-msup-coude,
+.row.tech[data-tech-color="msup-coude"],
+.play-card.tech-color-msup-coude,
+.module-region-card.elbow{ --tech-circle-color:var(--cyan); color:var(--cyan) !important; }
+
+.row.tech.tech-color-msup-poignet,
+.row.tech[data-tech-color="msup-poignet"],
+.play-card.tech-color-msup-poignet,
+.module-region-card.wrist{ --tech-circle-color:var(--green); color:var(--green) !important; }
+
+.row.tech.tech-color-msup-main,
+.row.tech[data-tech-color="msup-main"],
+.play-card.tech-color-msup-main,
+.module-region-card.hand{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+
+/* Membres inférieurs */
+.row.tech.tech-color-minf-hanche,
+.row.tech[data-tech-color="minf-hanche"],
+.play-card.tech-color-minf-hanche,
+.module-region-card.hip{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+
+.row.tech.tech-color-minf-genou,
+.row.tech[data-tech-color="minf-genou"],
+.play-card.tech-color-minf-genou,
+.module-region-card.knee{ --tech-circle-color:var(--cyan); color:var(--cyan) !important; }
+
+.row.tech.tech-color-minf-cheville,
+.row.tech[data-tech-color="minf-cheville"],
+.play-card.tech-color-minf-cheville,
+.module-region-card.ankle{ --tech-circle-color:var(--green); color:var(--green) !important; }
+
+.row.tech.tech-color-minf-pied,
+.row.tech[data-tech-color="minf-pied"],
+.play-card.tech-color-minf-pied,
+.module-region-card.foot{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+
+/* Bassin */
+.row.tech.tech-color-bassin-iliaques,
+.row.tech[data-tech-color="bassin-iliaques"],
+.play-card.tech-color-bassin-iliaques,
+.module-region-card.ilium{ --tech-circle-color:var(--violet); color:var(--violet) !important; }
+
+.row.tech.tech-color-bassin-sacrum,
+.row.tech[data-tech-color="bassin-sacrum"],
+.play-card.tech-color-bassin-sacrum,
+.module-region-card.sacrum{ --tech-circle-color:var(--cyan); color:var(--cyan) !important; }
+
+.row.tech.tech-color-bassin-symphyse,
+.row.tech[data-tech-color="bassin-symphyse"],
+.play-card.tech-color-bassin-symphyse,
+.module-region-card.symphysis{ --tech-circle-color:var(--orange); color:var(--orange) !important; }
+
+/* Les petits cercles des menus Membres/Bassin étaient masqués : on les réactive comme badges premium. */
+#msupMenu .module-region-card,
+#minfMenu .module-region-card,
+#bassinMenu .module-region-card{
+  position:absolute !important;
+  overflow:visible !important;
+  padding-left:38px !important;
+  color:var(--tech-circle-color, currentColor) !important;
+  border-color:color-mix(in srgb, var(--tech-circle-color, currentColor) 78%, transparent) !important;
+}
+
+#msupMenu .module-region-card .region-icon,
+#minfMenu .module-region-card .region-icon,
+#bassinMenu .module-region-card .region-icon{
+  position:absolute !important;
+  left:-10px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  display:grid !important;
+  place-items:center !important;
+  width:38px !important;
+  height:38px !important;
+  min-width:38px !important;
+  flex:0 0 38px !important;
+  border-radius:50% !important;
+  color:var(--tech-circle-color, currentColor) !important;
+  border:1.4px solid color-mix(in srgb, var(--tech-circle-color, currentColor) 78%, transparent) !important;
+  background:
+    radial-gradient(circle at 35% 25%, color-mix(in srgb, var(--tech-circle-color, currentColor) 30%, white 12%), transparent 42%),
+    linear-gradient(145deg, color-mix(in srgb, var(--tech-circle-color, currentColor) 20%, transparent), rgba(9,18,36,.92)) !important;
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--tech-circle-color, currentColor) 38%, transparent),
+    0 0 36px color-mix(in srgb, var(--tech-circle-color, currentColor) 16%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.14) !important;
+  text-shadow:0 0 10px color-mix(in srgb, var(--tech-circle-color, currentColor) 76%, transparent) !important;
+  font-size:16px !important;
+  font-weight:950 !important;
+  z-index:8 !important;
+}
+
+/* Les cercles des listes dynamiques acceptent aussi les nouvelles clés détaillées. */
+#techList .row.tech[class*="tech-color-msup-"] .tech-icon,
+#techList .row.tech[class*="tech-color-minf-"] .tech-icon,
+#techList .row.tech[class*="tech-color-bassin-"] .tech-icon,
+#catalogueSearchResults .row.tech[class*="tech-color-msup-"] .tech-icon,
+#catalogueSearchResults .row.tech[class*="tech-color-minf-"] .tech-icon,
+#catalogueSearchResults .row.tech[class*="tech-color-bassin-"] .tech-icon{
+  color:var(--tech-circle-color, currentColor) !important;
+  border-color:color-mix(in srgb, var(--tech-circle-color, currentColor) 72%, transparent) !important;
+  background:
+    radial-gradient(circle at 34% 24%, color-mix(in srgb, var(--tech-circle-color, currentColor) 30%, white 12%), transparent 40%),
+    linear-gradient(145deg, color-mix(in srgb, var(--tech-circle-color, currentColor) 20%, transparent), rgba(9,18,36,.90)) !important;
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--tech-circle-color, currentColor) 38%, transparent),
+    0 0 42px color-mix(in srgb, var(--tech-circle-color, currentColor) 16%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.14) !important;
+  text-shadow:0 0 11px color-mix(in srgb, var(--tech-circle-color, currentColor) 76%, transparent) !important;
+}
+
+@media(max-width:430px){
+  #msupMenu .module-region-card,
+  #minfMenu .module-region-card,
+  #bassinMenu .module-region-card{
+    padding-left:34px !important;
+  }
+
+  #msupMenu .module-region-card .region-icon,
+  #minfMenu .module-region-card .region-icon,
+  #bassinMenu .module-region-card .region-icon{
+    left:-8px !important;
+    width:34px !important;
+    height:34px !important;
+    min-width:34px !important;
+    flex-basis:34px !important;
+    font-size:14px !important;
+  }
+}
+</style>
+
+<script>
+/* === Runtime : recalcule les couleurs détaillées pour MSUP / MINF / Bassin après rendu === */
+(function(){
+  function normalize(value){
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function keyFromRowText(row){
+    const text = normalize(row ? row.textContent : '');
+    if(text.includes('epaule') || text.includes('clavicule') || text.includes('scapula')) return 'msup-epaule';
+    if(text.includes('coude') || text.includes('radius') || text.includes('ulna') || text.includes('radio')) return 'msup-coude';
+    if(text.includes('poignet') || text.includes('carpe')) return 'msup-poignet';
+    if(text.includes('main') || text.includes('metacarp') || text.includes('phalange')) return 'msup-main';
+    if(text.includes('hanche') || text.includes('femur') || text.includes('coxo')) return 'minf-hanche';
+    if(text.includes('genou') || text.includes('tibia') || text.includes('fibula') || text.includes('perone')) return 'minf-genou';
+    if(text.includes('cheville') || text.includes('talo') || text.includes('astrag') || text.includes('malleole')) return 'minf-cheville';
+    if(text.includes('pied') || text.includes('calcan') || text.includes('naviculaire') || text.includes('cubo') || text.includes('metatars') || text.includes('subtal') || text.includes('sous tal')) return 'minf-pied';
+    if(text.includes('ilium') || text.includes('iliaque') || text.includes('sacro iliaque') || text.includes('sacro-iliaque')) return 'bassin-iliaques';
+    if(text.includes('sacrum') || text.includes('sacre')) return 'bassin-sacrum';
+    if(text.includes('symphyse') || text.includes('pubienne') || text.includes('pubis')) return 'bassin-symphyse';
+    return '';
+  }
+
+  function colorValue(key){
+    if(key === 'msup-epaule' || key === 'minf-hanche' || key === 'bassin-iliaques') return 'var(--violet)';
+    if(key === 'msup-coude' || key === 'minf-genou' || key === 'bassin-sacrum') return 'var(--cyan)';
+    if(key === 'msup-poignet' || key === 'minf-cheville') return 'var(--green)';
+    if(key === 'msup-main' || key === 'minf-pied' || key === 'bassin-symphyse') return 'var(--orange)';
+    return '';
+  }
+
+  function applyDetailedModuleColors(root){
+    root = root || document;
+
+    root.querySelectorAll('#techList .row.tech, #catalogueSearchResults .row.tech').forEach(function(row){
+      var key = keyFromRowText(row);
+      if(!key) return;
+      Array.from(row.classList).forEach(function(cls){
+        if(/^tech-color-(msup|minf|bassin)(-|$)/.test(cls)) row.classList.remove(cls);
+      });
+      row.classList.add('tech-color-' + key);
+      row.setAttribute('data-tech-color', key);
+      row.style.setProperty('--tech-circle-color', colorValue(key));
+      var icon = row.querySelector('.tech-icon');
+      if(icon) icon.classList.add('tech-icon-' + key);
+    });
+
+    var menuMap = [
+      ['#msupMenu .module-region-card.shoulder','msup-epaule'],
+      ['#msupMenu .module-region-card.elbow','msup-coude'],
+      ['#msupMenu .module-region-card.wrist','msup-poignet'],
+      ['#msupMenu .module-region-card.hand','msup-main'],
+      ['#minfMenu .module-region-card.hip','minf-hanche'],
+      ['#minfMenu .module-region-card.knee','minf-genou'],
+      ['#minfMenu .module-region-card.ankle','minf-cheville'],
+      ['#minfMenu .module-region-card.foot','minf-pied'],
+      ['#bassinMenu .module-region-card.ilium','bassin-iliaques'],
+      ['#bassinMenu .module-region-card.sacrum','bassin-sacrum'],
+      ['#bassinMenu .module-region-card.symphysis','bassin-symphyse']
+    ];
+    menuMap.forEach(function(item){
+      root.querySelectorAll(item[0]).forEach(function(card){
+        card.classList.add('tech-color-' + item[1]);
+        card.setAttribute('data-tech-color', item[1]);
+        card.style.setProperty('--tech-circle-color', colorValue(item[1]));
+      });
+    });
+  }
+
+  ['renderTechniques','renderCatalogueSearch'].forEach(function(fnName){
+    var old = window[fnName];
+    if(typeof old === 'function'){
+      window[fnName] = function(){
+        var result = old.apply(this, arguments);
+        applyDetailedModuleColors(document);
+        setTimeout(function(){ applyDetailedModuleColors(document); }, 40);
+        return result;
+      };
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    applyDetailedModuleColors(document);
+  });
+})();
+</script>
+
+
+<style>
+/* === PATCH FINAL : icône Main = M + textes des techniques en blanc === */
+/* On garde le code couleur sur les cercles/bordures, mais le texte redevient lisible en blanc. */
+#techList .row.tech h3,
+#catalogueSearchResults .row.tech h3,
+.row.tech h3,
+.collection-card h3,
+.play-card .card-title,
+.card-back h3,
+#msupMenu .module-region-card h3,
+#minfMenu .module-region-card h3,
+#bassinMenu .module-region-card h3{
+  color:#ffffff !important;
+  text-shadow:0 2px 12px rgba(0,0,0,.45) !important;
+}
+
+#techList .row.tech p,
+#techList .row.tech small,
+#catalogueSearchResults .row.tech p,
+#catalogueSearchResults .row.tech small,
+.row.tech p,
+.row.tech small,
+.collection-card p,
+.play-card .card-status,
+.card-back li,
+#msupMenu .module-region-card small,
+#minfMenu .module-region-card small,
+#bassinMenu .module-region-card small{
+  color:rgba(255,255,255,.86) !important;
+}
+
+#techList .row.tech .state,
+#techList .row.tech .state span,
+#techList .row.tech .state b,
+#catalogueSearchResults .row.tech .state,
+#catalogueSearchResults .row.tech .state span,
+#catalogueSearchResults .row.tech .state b,
+.row.tech .state,
+.row.tech .state span,
+.row.tech .state b{
+  color:#ffffff !important;
+}
+
+/* La lettre dans le petit cercle reste blanche pour être premium/lisible,
+   tandis que le cercle conserve sa couleur anatomique via --tech-circle-color. */
+#techList .row.tech .tech-icon,
+#catalogueSearchResults .row.tech .tech-icon,
+.row.tech .tech-icon,
+#msupMenu .module-region-card .region-icon,
+#minfMenu .module-region-card .region-icon,
+#bassinMenu .module-region-card .region-icon{
+  color:#ffffff !important;
+  font-weight:950 !important;
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--tech-circle-color, currentColor) 80%, transparent),
+    0 1px 5px rgba(0,0,0,.45) !important;
+}
+
+/* Sécurité spécifique : aucune icône main emoji ne doit réapparaître dans les cercles. */
+#techList .row.tech .tech-icon,
+#catalogueSearchResults .row.tech .tech-icon,
+.row.tech .tech-icon{
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif !important;
+}
+</style>
+
+<script>
+/* === Runtime : remplace toute main emoji par M dans les petits cercles === */
+(function(){
+  function replaceHandIcons(root){
+    root = root || document;
+    root.querySelectorAll('.tech-icon, .region-icon, .collection-badge, .card-fallback').forEach(function(el){
+      if((el.textContent || '').trim() === '✋') el.textContent = 'M';
+    });
+  }
+
+  ['renderTechniques','renderCatalogueSearch','renderSeenCards','renderSeenCollections'].forEach(function(fnName){
+    var old = window[fnName];
+    if(typeof old === 'function'){
+      window[fnName] = function(){
+        var result = old.apply(this, arguments);
+        replaceHandIcons(document);
+        setTimeout(function(){ replaceHandIcons(document); }, 40);
+        return result;
+      };
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    replaceHandIcons(document);
+  });
+})();
+</script>
+
+
+<style>
+/* === PATCH FINAL LECTEUR : suppression immédiate du bouton central pendant la lecture === */
+#player #videoBox.is-playing .custom-video-overlay,
+#player #videoBox.vimeo-native.is-playing .custom-video-overlay,
+#player #videoBox.app-fullscreen-video.is-playing .custom-video-overlay,
+#player #videoBox.is-playing #customVideoOverlay,
+#player #videoBox.vimeo-native.is-playing #customVideoOverlay,
+#player #videoBox.app-fullscreen-video.is-playing #customVideoOverlay{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+#player #videoBox.is-playing .custom-video-play-big,
+#player #videoBox.is-playing .custom-video-caption,
+#player #videoBox.vimeo-native.is-playing .custom-video-play-big,
+#player #videoBox.vimeo-native.is-playing .custom-video-caption,
+#player #videoBox.app-fullscreen-video.is-playing .custom-video-play-big,
+#player #videoBox.app-fullscreen-video.is-playing .custom-video-caption{
+  display:none !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+/* En pause ou avant lecture, on garde un bouton de lancement propre. */
+#player #videoBox:not(.is-playing) .custom-video-overlay{
+  display:flex;
+}
+</style>
+
+<script>
+/* === PATCH FINAL : overlay qui disparaît vraiment + validation fiable vidéo vue === */
+(function(){
+  if(window.__osteoOverlayAndViewedFinalFix) return;
+  window.__osteoOverlayAndViewedFinalFix = true;
+
+  var vimeoPlayerInstance = null;
+  var vimeoPlayerKey = '';
+  var markedByWatcher = new Set();
+  var overlayGuardTimer = null;
+
+  function getCurrentTechniqueId(){
+    try{
+      if(typeof currentPlayerTechniqueId !== 'undefined') return currentPlayerTechniqueId;
+    }catch(e){}
+    return null;
+  }
+
+  function getTechnique(id){
+    var n = Number(id || getCurrentTechniqueId());
+    try{
+      if(Array.isArray(techniques)) return techniques.find(function(t){ return Number(t.id) === n; }) || null;
+    }catch(e){}
+    try{
+      if(Array.isArray(window.techniques)) return window.techniques.find(function(t){ return Number(t.id) === n; }) || null;
+    }catch(e){}
+    return null;
+  }
+
+  function forceOverlayState(isPlaying){
+    var box = document.getElementById('videoBox');
+    var overlay = document.getElementById('customVideoOverlay');
+    var big = document.getElementById('customVideoPlayBig');
+    var caption = overlay ? overlay.querySelector('.custom-video-caption') : null;
+
+    if(box) box.classList.toggle('is-playing', !!isPlaying);
+
+    if(isPlaying){
+      if(overlay){
+        overlay.style.setProperty('display', 'none', 'important');
+        overlay.style.setProperty('opacity', '0', 'important');
+        overlay.style.setProperty('visibility', 'hidden', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+      }
+      [big, caption].forEach(function(el){
+        if(!el) return;
+        el.style.setProperty('display', 'none', 'important');
+        el.style.setProperty('opacity', '0', 'important');
+        el.style.setProperty('visibility', 'hidden', 'important');
+        el.style.setProperty('pointer-events', 'none', 'important');
+      });
+    }else{
+      if(overlay){
+        overlay.style.setProperty('display', 'flex', 'important');
+        overlay.style.setProperty('opacity', '1', 'important');
+        overlay.style.setProperty('visibility', 'visible', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
+      }
+      if(big){
+        big.style.setProperty('display', 'grid', 'important');
+        big.style.setProperty('opacity', '1', 'important');
+        big.style.setProperty('visibility', 'visible', 'important');
+        big.style.setProperty('pointer-events', 'auto', 'important');
+      }
+      if(caption){
+        caption.style.setProperty('display', '', 'important');
+        caption.style.setProperty('opacity', '1', 'important');
+        caption.style.setProperty('visibility', 'visible', 'important');
+      }
+    }
+  }
+
+  function startOverlayGuard(){
+    if(overlayGuardTimer) clearInterval(overlayGuardTimer);
+    var count = 0;
+    overlayGuardTimer = setInterval(function(){
+      count += 1;
+      var isPlaying = false;
+      try{ isPlaying = !!customVideoIsPlaying; }catch(e){}
+      var box = document.getElementById('videoBox');
+      if(box && box.classList.contains('is-playing')) isPlaying = true;
+      if(isPlaying) forceOverlayState(true);
+      if(count > 80){
+        clearInterval(overlayGuardTimer);
+        overlayGuardTimer = null;
+      }
+    }, 250);
+  }
+
+  function markViewedReliably(id, reason){
+    var n = Number(id || getCurrentTechniqueId());
+    if(!n) return;
+
+    var t = getTechnique(n);
+    if(t){
+      t.status = 'vue';
+      t.percent = 100;
+    }
+
+    try{
+      if(typeof markTechniqueViewedAfterComplete === 'function'){
+        markTechniqueViewedAfterComplete(n);
+      }else if(typeof saveViewedTechniqueId === 'function'){
+        saveViewedTechniqueId(n);
+      }else{
+        var key = 'osteoPratikViewedTechniqueIds';
+        var raw = localStorage.getItem(key);
+        var ids = raw ? JSON.parse(raw) : [];
+        if(!Array.isArray(ids)) ids = [];
+        if(ids.map(Number).indexOf(n) === -1) ids.push(n);
+        localStorage.setItem(key, JSON.stringify(ids));
+      }
+    }catch(e){}
+
+    try{ if(typeof unlockedTechniqueIds !== 'undefined') unlockedTechniqueIds.add(n); }catch(e){}
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+    try{ if(typeof setCustomVideoUI === 'function') setCustomVideoUI('Lecture terminée', 'Technique marquée comme vue'); }catch(e){}
+    markedByWatcher.add(n);
+  }
+
+  var oldMark = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+  if(oldMark){
+    window.markTechniqueViewedAfterComplete = function(id){
+      var n = Number(id || getCurrentTechniqueId());
+      var t = getTechnique(n);
+      if(t){
+        t.status = 'vue';
+        t.percent = 100;
+      }
+      var result = oldMark.apply(this, arguments);
+      try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+      return result;
+    };
+  }
+
+  var oldUpdate = typeof window.updateCustomPlayLabels === 'function' ? window.updateCustomPlayLabels : null;
+  if(oldUpdate){
+    window.updateCustomPlayLabels = function(isPlaying){
+      var result = oldUpdate.apply(this, arguments);
+      forceOverlayState(!!isPlaying);
+      if(isPlaying) startOverlayGuard();
+      return result;
+    };
+  }
+
+  function parseVimeoMessage(event){
+    var data = event.data;
+    try{ if(typeof data === 'string') data = JSON.parse(data); }catch(e){}
+    if(!data || typeof data !== 'object') return;
+
+    var eventName = data.event || data.method || '';
+    var payload = data.data || data.value || data;
+
+    if(eventName === 'play'){
+      try{ customVideoIsPlaying = true; }catch(e){}
+      if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(true);
+      forceOverlayState(true);
+      return;
+    }
+
+    if(eventName === 'pause'){
+      try{ customVideoIsPlaying = false; }catch(e){}
+      if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(false);
+      forceOverlayState(false);
+      return;
+    }
+
+    if(eventName === 'ended' || eventName === 'finish'){
+      try{ customVideoIsPlaying = false; }catch(e){}
+      if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(false);
+      markViewedReliably(getCurrentTechniqueId(), 'vimeo-ended-message');
+      return;
+    }
+
+    if(eventName === 'timeupdate' || eventName === 'playProgress' || eventName === 'progress'){
+      var percent = Number(payload && payload.percent);
+      var seconds = Number(payload && (payload.seconds || payload.currentTime));
+      var duration = Number(payload && payload.duration);
+      if((percent && percent >= 0.98) || (duration && seconds && seconds >= duration - 1.25)){
+        markViewedReliably(getCurrentTechniqueId(), 'vimeo-near-end-message');
+      }
+    }
+  }
+
+  window.addEventListener('message', parseVimeoMessage, false);
+
+  function subscribeLegacyVimeoEvents(){
+    try{
+      ['play','pause','finish','ended','timeupdate','playProgress','progress'].forEach(function(name){
+        if(typeof postToVimeo === 'function') postToVimeo('addEventListener', name);
+      });
+    }catch(e){}
+  }
+
+  function ensureVimeoApi(callback){
+    if(window.Vimeo && window.Vimeo.Player){ callback(); return; }
+    var existing = document.querySelector('script[data-osteo-vimeo-api="1"]');
+    if(existing){ existing.addEventListener('load', callback, {once:true}); return; }
+    var s = document.createElement('script');
+    s.src = 'https://player.vimeo.com/api/player.js';
+    s.async = true;
+    s.dataset.osteoVimeoApi = '1';
+    s.onload = callback;
+    document.head.appendChild(s);
+  }
+
+  function setupVimeoCompletionWatcher(){
+    var iframe = document.getElementById('vimeoPlayer');
+    if(!iframe) return;
+    var src = iframe.getAttribute('src') || '';
+    if(!src || src === 'about:blank' || src.indexOf('vimeo') === -1) return;
+
+    subscribeLegacyVimeoEvents();
+
+    ensureVimeoApi(function(){
+      try{
+        var key = src + '|' + getCurrentTechniqueId();
+        if(vimeoPlayerInstance && vimeoPlayerKey === key) return;
+        vimeoPlayerKey = key;
+        vimeoPlayerInstance = new Vimeo.Player(iframe);
+
+        vimeoPlayerInstance.on('play', function(){
+          try{ customVideoIsPlaying = true; }catch(e){}
+          if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(true);
+          forceOverlayState(true);
+        });
+
+        vimeoPlayerInstance.on('pause', function(){
+          try{ customVideoIsPlaying = false; }catch(e){}
+          if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(false);
+          forceOverlayState(false);
+        });
+
+        vimeoPlayerInstance.on('ended', function(){
+          try{ customVideoIsPlaying = false; }catch(e){}
+          if(typeof updateCustomPlayLabels === 'function') updateCustomPlayLabels(false);
+          markViewedReliably(getCurrentTechniqueId(), 'vimeo-playerjs-ended');
+        });
+
+        vimeoPlayerInstance.on('timeupdate', function(data){
+          var percent = Number(data && data.percent);
+          var seconds = Number(data && data.seconds);
+          var duration = Number(data && data.duration);
+          if((percent && percent >= 0.98) || (duration && seconds && seconds >= duration - 1.25)){
+            markViewedReliably(getCurrentTechniqueId(), 'vimeo-playerjs-near-end');
+          }
+        });
+      }catch(e){}
+    });
+  }
+
+  var oldOpen = typeof window.openTechnique === 'function' ? window.openTechnique : null;
+  if(oldOpen){
+    window.openTechnique = function(id){
+      var result = oldOpen.apply(this, arguments);
+      markedByWatcher.delete(Number(id));
+      setTimeout(setupVimeoCompletionWatcher, 250);
+      setTimeout(setupVimeoCompletionWatcher, 900);
+      setTimeout(setupVimeoCompletionWatcher, 1800);
+      forceOverlayState(false);
+      return result;
+    };
+  }
+
+  var oldToggle = typeof window.toggleCustomVideoPlayback === 'function' ? window.toggleCustomVideoPlayback : null;
+  if(oldToggle){
+    window.toggleCustomVideoPlayback = function(){
+      var result = oldToggle.apply(this, arguments);
+      setTimeout(setupVimeoCompletionWatcher, 120);
+      var playing = false;
+      try{ playing = !!customVideoIsPlaying; }catch(e){}
+      if(playing){
+        forceOverlayState(true);
+        startOverlayGuard();
+      }
+      return result;
+    };
+  }
+
+  var oldGo = typeof window.go === 'function' ? window.go : null;
+  if(oldGo){
+    window.go = function(id){
+      var result = oldGo.apply(this, arguments);
+      if(id === 'player'){
+        setTimeout(setupVimeoCompletionWatcher, 350);
+      }else{
+        forceOverlayState(false);
+      }
+      return result;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var box = document.getElementById('videoBox');
+    var overlay = document.getElementById('customVideoOverlay');
+    if(window.MutationObserver && box){
+      var observer = new MutationObserver(function(){
+        var playing = box.classList.contains('is-playing');
+        try{ if(customVideoIsPlaying) playing = true; }catch(e){}
+        if(playing) forceOverlayState(true);
+      });
+      observer.observe(box, {attributes:true, attributeFilter:['class','style']});
+      if(overlay) observer.observe(overlay, {attributes:true, attributeFilter:['style','class']});
+    }
+    setTimeout(setupVimeoCompletionWatcher, 800);
   });
 })();
 </script>
