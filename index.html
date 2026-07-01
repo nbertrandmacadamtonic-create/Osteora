@@ -7541,7 +7541,7 @@ assets/icons/icon-profil.webp
   <div id="videoBox" class="video-box video-box-adaptive custom-video-box">
     <button id="closeFullscreenVideo" class="video-close-fullscreen" onclick="closeVideoFullscreen()" aria-label="Fermer le plein écran">×</button>
     <video id="video" playsinline preload="metadata"><source id="videoSource" src="" type="video/mp4"></video>
-    <iframe id="vimeoPlayer" class="vimeo-player custom-hidden-provider" src="" title="Vidéo technique" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen loading="lazy"></iframe>
+    <iframe id="vimeoPlayer" class="vimeo-player custom-hidden-provider" src="about:blank" title="Vidéo technique" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen webkitallowfullscreen mozallowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 
     <div id="customVideoOverlay" class="custom-video-overlay">
       <button id="customVideoPlayBig" class="custom-video-play-big" onclick="toggleCustomVideoPlayback()" aria-label="Lecture ou pause">▶</button>
@@ -10858,7 +10858,7 @@ function buildCustomVimeoUrl(url){
   try{
     const u = new URL(url, window.location.href);
     u.searchParams.set("api", "1");
-    u.searchParams.set("controls", "0");
+    u.searchParams.set("controls", "1");
     u.searchParams.set("title", "0");
     u.searchParams.set("byline", "0");
     u.searchParams.set("portrait", "0");
@@ -10872,7 +10872,7 @@ function buildCustomVimeoUrl(url){
     return u.toString();
   }catch(e){
     const sep = url.includes("?") ? "&" : "?";
-    return url + sep + "api=1&controls=0&title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&playsinline=1&transparent=0&background=0&responsive=1";
+    return url + sep + "api=1&controls=1&title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&playsinline=1&transparent=0&background=0&responsive=1";
   }
 }
 
@@ -21140,6 +21140,335 @@ if(!window.__osteoVimeoEventsPatched){
   letter-spacing:.13em !important;
 }
 </style>
+
+
+<style>
+/* === PATCH IPHONE / VIMEO : lecture fiable + arrêt automatique === */
+#player #videoBox.vimeo-native{
+  background:#000 !important;
+}
+
+#player #videoBox.vimeo-native #vimeoPlayer,
+#player #videoBox.vimeo-native iframe{
+  position:absolute !important;
+  inset:0 !important;
+  z-index:3 !important;
+  display:block !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:100% !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  border:0 !important;
+  background:#000 !important;
+}
+
+/* Sur iPhone, on laisse l'étudiant toucher directement le lecteur Vimeo natif. */
+#player #videoBox.vimeo-native .custom-video-overlay{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+
+/* On garde les contrôles bas de page, mais le lecteur Vimeo reste prioritaire. */
+#player #videoBox.vimeo-native + .custom-video-controls{
+  position:relative !important;
+  z-index:5 !important;
+}
+</style>
+
+<script>
+/* === PATCH IPHONE / VIMEO : lecture fiable + arrêt automatique hors vidéo === */
+(function(){
+  if(window.__osteoIphoneVimeoStopPatchApplied) return;
+  window.__osteoIphoneVimeoStopPatchApplied = true;
+
+  function osteoIsIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+
+  function osteoGetCurrentProvider(){
+    try{
+      if(typeof customVideoProvider !== "undefined") return customVideoProvider;
+    }catch(e){}
+    return "html5";
+  }
+
+  function osteoSetPlaying(value){
+    try{
+      if(typeof customVideoIsPlaying !== "undefined") customVideoIsPlaying = !!value;
+    }catch(e){}
+  }
+
+  function osteoGetCurrentTechniqueId(){
+    try{
+      if(typeof currentPlayerTechniqueId !== "undefined") return currentPlayerTechniqueId;
+    }catch(e){}
+    return null;
+  }
+
+  function osteoGetTechniques(){
+    try{
+      if(typeof techniques !== "undefined" && Array.isArray(techniques)) return techniques;
+    }catch(e){}
+    return [];
+  }
+
+  function osteoExtractVimeoId(value){
+    if(!value) return "";
+    const raw = String(value).trim();
+    if(/^\d+$/.test(raw)) return raw;
+
+    const patterns = [
+      /player\.vimeo\.com\/video\/(\d+)/,
+      /vimeo\.com\/(?:video\/)?(\d+)/,
+      /vimeo\.com\/.*?\/(\d+)/
+    ];
+
+    for(const pattern of patterns){
+      const match = raw.match(pattern);
+      if(match && match[1]) return match[1];
+    }
+
+    return "";
+  }
+
+  window.buildCustomVimeoUrl = function(url){
+    const id = osteoExtractVimeoId(url);
+    const base = id ? `https://player.vimeo.com/video/${id}` : String(url || "");
+    if(!base) return "";
+
+    try{
+      const u = new URL(base, window.location.href);
+
+      /* Important iPhone/Safari : lecteur créé dans l'iframe Vimeo avec lecture inline. */
+      u.searchParams.set("api", "1");
+      u.searchParams.set("playsinline", "1");
+      u.searchParams.set("controls", "1");
+      u.searchParams.set("title", "0");
+      u.searchParams.set("byline", "0");
+      u.searchParams.set("portrait", "0");
+      u.searchParams.set("badge", "0");
+      u.searchParams.set("autopause", "0");
+      u.searchParams.set("dnt", "1");
+      u.searchParams.set("transparent", "0");
+      u.searchParams.set("background", "0");
+      u.searchParams.set("responsive", "1");
+
+      return u.toString();
+    }catch(e){
+      const sep = base.includes("?") ? "&" : "?";
+      return base + sep + "api=1&playsinline=1&controls=1&title=0&byline=0&portrait=0&badge=0&autopause=0&dnt=1&transparent=0&background=0&responsive=1";
+    }
+  };
+
+  function osteoPrepareVimeoIframe(){
+    const iframe = document.getElementById("vimeoPlayer");
+    if(!iframe) return;
+
+    iframe.setAttribute("allow", "autoplay; fullscreen; picture-in-picture; encrypted-media");
+    iframe.setAttribute("allowfullscreen", "");
+    iframe.setAttribute("webkitallowfullscreen", "");
+    iframe.setAttribute("mozallowfullscreen", "");
+    iframe.setAttribute("referrerpolicy", "strict-origin-when-cross-origin");
+    iframe.setAttribute("loading", "eager");
+    if(osteoGetCurrentProvider() === "vimeo") iframe.style.display = "block";
+  }
+
+  function osteoRefreshVimeoSrcIfNeeded(){
+    const iframe = document.getElementById("vimeoPlayer");
+    if(!iframe || osteoGetCurrentProvider() !== "vimeo") return;
+
+    const src = iframe.getAttribute("src") || "";
+    if(!src || src === "about:blank") return;
+
+    try{
+      const u = new URL(src, window.location.href);
+      const mustPatch =
+        u.searchParams.get("playsinline") !== "1" ||
+        u.searchParams.get("controls") !== "1" ||
+        u.searchParams.get("api") !== "1";
+
+      if(mustPatch){
+        const patched = window.buildCustomVimeoUrl(src);
+        if(patched && patched !== src) iframe.src = patched;
+      }
+    }catch(e){}
+  }
+
+  function osteoSetPlayerNativeMode(id){
+    const box = document.getElementById("videoBox");
+    const allTechniques = osteoGetTechniques();
+    const targetId = id || osteoGetCurrentTechniqueId();
+    const technique = allTechniques.find(t => Number(t.id) === Number(targetId));
+    const isVimeo = technique && technique.videoProvider === "vimeo";
+
+    if(box) box.classList.toggle("vimeo-native", !!isVimeo);
+
+    if(isVimeo){
+      osteoPrepareVimeoIframe();
+      setTimeout(osteoPrepareVimeoIframe, 80);
+      setTimeout(osteoRefreshVimeoSrcIfNeeded, 220);
+      setTimeout(osteoRefreshVimeoSrcIfNeeded, 700);
+    }
+  }
+
+  window.osteoStopActiveVideo = function(reason){
+    const video = document.getElementById("video");
+    const source = document.getElementById("videoSource");
+    const iframe = document.getElementById("vimeoPlayer");
+    const box = document.getElementById("videoBox");
+
+    try{
+      if(typeof closeVideoFullscreen === "function") closeVideoFullscreen();
+    }catch(e){}
+
+    if(video){
+      try{ video.pause(); }catch(e){}
+      try{ video.currentTime = 0; }catch(e){}
+      video.removeAttribute("src");
+      video.onerror = null;
+      video.onloadedmetadata = null;
+      video.onplay = null;
+      video.onpause = null;
+      video.onended = null;
+      try{ video.load(); }catch(e){}
+    }
+
+    if(source){
+      source.removeAttribute("src");
+      source.src = "";
+    }
+
+    if(iframe){
+      try{
+        if(iframe.contentWindow){
+          iframe.contentWindow.postMessage(JSON.stringify({ method:"pause" }), "*");
+          iframe.contentWindow.postMessage(JSON.stringify({ method:"setCurrentTime", value:0 }), "*");
+        }
+      }catch(e){}
+
+      /* Le moyen le plus sûr sur iPhone : on décharge l'iframe Vimeo. */
+      iframe.onload = null;
+      iframe.src = "about:blank";
+      iframe.style.display = "none";
+    }
+
+    try{
+      if(typeof currentVimeoCompletionPlayer !== "undefined" && currentVimeoCompletionPlayer && typeof currentVimeoCompletionPlayer.unload === "function"){
+        currentVimeoCompletionPlayer.unload().catch(()=>{});
+      }
+    }catch(e){}
+
+    try{
+      if(typeof currentVimeoCompletionPlayer !== "undefined") currentVimeoCompletionPlayer = null;
+    }catch(e){}
+
+    osteoSetPlaying(false);
+    if(box){
+      box.classList.remove("is-playing");
+      box.classList.remove("vimeo-native");
+      box.classList.remove("app-fullscreen-video");
+    }
+    document.body.classList.remove("video-fullscreen-open");
+
+    if(typeof updateCustomPlayLabels === "function") updateCustomPlayLabels(false);
+    if(typeof setCustomVideoUI === "function") setCustomVideoUI("Vidéo arrêtée", "Lecture stoppée");
+  };
+
+  const originalTogglePlayback = typeof window.toggleCustomVideoPlayback === "function" ? window.toggleCustomVideoPlayback : null;
+  if(originalTogglePlayback){
+    window.toggleCustomVideoPlayback = function(){
+      if(osteoGetCurrentProvider() === "vimeo"){
+        /* On tente l'API, mais le lecteur natif reste cliquable sur iPhone. */
+        let nextState = true;
+        try{
+          if(typeof customVideoIsPlaying !== "undefined") nextState = !customVideoIsPlaying;
+        }catch(e){}
+
+        osteoSetPlaying(nextState);
+        if(typeof postToVimeo === "function") postToVimeo(nextState ? "play" : "pause");
+        if(typeof updateCustomPlayLabels === "function") updateCustomPlayLabels(nextState);
+        setTimeout(osteoRefreshVimeoSrcIfNeeded, 80);
+        return;
+      }
+      return originalTogglePlayback.apply(this, arguments);
+    };
+  }
+
+  const originalStopPlayback = typeof window.stopCustomVideoPlayback === "function" ? window.stopCustomVideoPlayback : null;
+  if(originalStopPlayback){
+    window.stopCustomVideoPlayback = function(){
+      if(osteoGetCurrentProvider() === "vimeo"){
+        window.osteoStopActiveVideo("manual-stop");
+        return;
+      }
+      return originalStopPlayback.apply(this, arguments);
+    };
+  }
+
+  const originalOpenTechnique = typeof window.openTechnique === "function" ? window.openTechnique : null;
+  if(originalOpenTechnique){
+    window.openTechnique = function(id){
+      const result = originalOpenTechnique.apply(this, arguments);
+      osteoSetPlayerNativeMode(id);
+      setTimeout(()=>osteoSetPlayerNativeMode(id), 120);
+      setTimeout(()=>osteoSetPlayerNativeMode(id), 600);
+      return result;
+    };
+  }
+
+  const originalGo = typeof window.go === "function" ? window.go : null;
+  if(originalGo){
+    window.go = function(id){
+      const player = document.getElementById("player");
+      const leavingPlayer = player && player.classList.contains("active") && id !== "player";
+
+      if(leavingPlayer){
+        window.osteoStopActiveVideo("leave-player");
+      }
+
+      const result = originalGo.apply(this, arguments);
+
+      /* Sécurité : si une navigation sort du lecteur par un autre chemin, on coupe aussi. */
+      if(id !== "player"){
+        const iframe = document.getElementById("vimeoPlayer");
+        const video = document.getElementById("video");
+        const iframeActive = iframe && iframe.src && iframe.src !== "about:blank";
+        const htmlActive = video && !video.paused && !video.ended;
+        if(iframeActive || htmlActive){
+          window.osteoStopActiveVideo("leave-video-section");
+        }
+      }
+
+      return result;
+    };
+  }
+
+  const originalBackFromPlayer = typeof window.backFromPlayer === "function" ? window.backFromPlayer : null;
+  if(originalBackFromPlayer){
+    window.backFromPlayer = function(){
+      window.osteoStopActiveVideo("back-button");
+      return originalBackFromPlayer.apply(this, arguments);
+    };
+  }
+
+  document.addEventListener("visibilitychange", function(){
+    if(document.hidden){
+      window.osteoStopActiveVideo("page-hidden");
+    }
+  });
+
+  window.addEventListener("pagehide", function(){
+    window.osteoStopActiveVideo("pagehide");
+  });
+
+  document.addEventListener("DOMContentLoaded", function(){
+    osteoPrepareVimeoIframe();
+    if(osteoIsIOS()) document.documentElement.classList.add("is-ios-video");
+  });
+})();
+</script>
 
 </body>
 </html>
