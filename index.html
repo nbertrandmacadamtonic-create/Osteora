@@ -7079,7 +7079,7 @@ assets/icons/icon-mes-acquis.webp
 assets/icons/icon-statistiques.webp
 assets/icons/icon-fiches.webp
 assets/icons/icon-fiches.webp
-assets/icons/icon-rachis.webp
+assets/icons/icon-rachis-v2.webp?v=2
 assets/icons/icon-corps.webp
 assets/icons/icon-corps.webp
 assets/icons/icon-corps.webp
@@ -7265,7 +7265,7 @@ assets/icons/icon-profil.webp
     <div class="video-link link-minf"></div>
 
     <button class="video-zone-card card-rachis" onclick="openRachisMenu()">
-      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis.webp" alt=""></div>
+      <div class="zone-card-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis-v2.webp?v=2" alt=""></div>
       <div>
         <strong>Rachis</strong>
         <small>Cervicales · Dorsales · Lombaires</small>
@@ -7476,7 +7476,7 @@ assets/icons/icon-profil.webp
 
   <section class="catalogue-zone-row">
     <button class="catalogue-zone-mini rachis" onclick="openZoneAll('Rachis')">
-      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis.webp" alt=""></div>
+      <div class="mini-zone-icon"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/icons/icon-rachis-v2.webp?v=2" alt=""></div>
       <strong>Rachis</strong>
       <small><b id="countRachis">60</b> techniques</small>
       <span>→</span>
@@ -23201,6 +23201,832 @@ if(!window.__osteoVimeoEventsPatched){
     try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
     try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
     try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+  });
+})();
+</script>
+
+
+<script>
+/* === PATCH FINAL : statistiques synchronisées avec les techniques réellement vues === */
+(function(){
+  if(window.__osteoStatsViewedProgressFixV3) return;
+  window.__osteoStatsViewedProgressFixV3 = true;
+
+  var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
+  var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
+  var STARTER_ID = 12;
+
+  function toNumber(value){
+    var n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function allTechniques(){
+    try{
+      return (Array.isArray(techniques) ? techniques : [])
+        .filter(function(t){
+          if(!t) return false;
+          if(Number(t.id) === 999) return false;
+          return !/TEST\s+VID[ÉE]O\s+VIMEO/i.test(String(t.title || ''));
+        });
+    }catch(e){
+      return [];
+    }
+  }
+
+  function validTechniqueIdSet(){
+    var set = new Set();
+    allTechniques().forEach(function(t){
+      var n = toNumber(t.id);
+      if(n) set.add(n);
+    });
+    return set;
+  }
+
+  function uniqueIds(values, validSet){
+    var out = [];
+    var seen = new Set();
+    (Array.isArray(values) ? values : []).forEach(function(value){
+      var n = toNumber(value);
+      if(!n) return;
+      if(validSet && !validSet.has(n)) return;
+      if(!seen.has(n)){
+        seen.add(n);
+        out.push(n);
+      }
+    });
+    return out;
+  }
+
+  function readJsonArray(key){
+    try{
+      var raw = localStorage.getItem(key);
+      if(!raw) return null;
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function readCanonicalViewedIds(){
+    var valid = validTechniqueIdSet();
+    var strict = readJsonArray(STRICT_KEY);
+    var legacy = readJsonArray(LEGACY_KEY);
+    var ids = strict || legacy || [];
+
+    // Si aucun stockage n’existe encore, on garde la logique pédagogique actuelle :
+    // une seule technique initiale débloquée pour amorcer la roue.
+    if(!strict && !legacy && valid.has(STARTER_ID)) ids = [STARTER_ID];
+
+    var clean = uniqueIds(ids, valid);
+
+    try{ localStorage.setItem(STRICT_KEY, JSON.stringify(clean)); }catch(e){}
+    try{ localStorage.setItem(LEGACY_KEY, JSON.stringify(clean)); }catch(e){}
+
+    return clean;
+  }
+
+  function viewedSet(){
+    return new Set(readCanonicalViewedIds());
+  }
+
+  function syncTechniqueStatusWithViewed(){
+    var viewed = viewedSet();
+    allTechniques().forEach(function(t){
+      var id = toNumber(t.id);
+      if(viewed.has(id)){
+        t.status = 'vue';
+        t.percent = 100;
+      }else{
+        t.status = 'non vue';
+        t.percent = 0;
+      }
+    });
+    try{
+      if(typeof unlockedTechniqueIds !== 'undefined' && unlockedTechniqueIds && typeof unlockedTechniqueIds.clear === 'function'){
+        unlockedTechniqueIds.clear();
+        viewed.forEach(function(id){ unlockedTechniqueIds.add(id); });
+      }
+    }catch(e){}
+  }
+
+  function pct(seen, total){
+    return total ? Math.round((seen / total) * 100) : 0;
+  }
+
+  function byZone(zone, viewed){
+    var list = allTechniques().filter(function(t){ return t.zone === zone; });
+    var seen = list.filter(function(t){ return viewed.has(toNumber(t.id)); }).length;
+    return { zone:zone, seen:seen, total:list.length, percent:pct(seen, list.length) };
+  }
+
+  function setText(id, value){
+    var el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
+
+  function setHtml(id, value){
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = value;
+  }
+
+  function setBar(barId, pctValue){
+    var el = document.getElementById(barId);
+    if(el) el.style.width = pctValue + '%';
+  }
+
+  function setZone(zone, prefix, viewed){
+    var data = byZone(zone, viewed);
+    setText(prefix + 'Count', data.seen + '/' + data.total);
+    setText(prefix + 'Pct', data.percent + '%');
+    setBar(prefix + 'Bar', data.percent);
+    return data;
+  }
+
+  function updateStatsFromViewedTechniques(){
+    syncTechniqueStatusWithViewed();
+
+    var viewed = viewedSet();
+    var total = allTechniques().length;
+    var seen = allTechniques().filter(function(t){ return viewed.has(toNumber(t.id)); }).length;
+    var global = pct(seen, total);
+
+    setText('statsVideos', seen);
+    setText('statsVideosTotal', '/ ' + total);
+    setText('statsSheets', seen);
+    setText('statsSheetsTotal', '/ ' + total);
+    setHtml('statsGlobalPercent', global + '<span>%</span>');
+
+    var ring = document.getElementById('statsGlobalRing');
+    if(ring) ring.style.setProperty('--value', global);
+
+    var zones = [
+      setZone('Rachis', 'statsRachis', viewed),
+      setZone('Membres supérieurs', 'statsMSup', viewed),
+      setZone('Membres inférieurs', 'statsMInf', viewed),
+      setZone('Bassin', 'statsBassin', viewed)
+    ];
+
+    var top = zones.slice().sort(function(a,b){
+      return b.seen - a.seen || b.percent - a.percent || b.total - a.total;
+    })[0];
+
+    if(top && top.seen > 0){
+      setText('statsTopZoneName', top.zone);
+      setHtml('statsTopZonePercent', top.percent + '<span>%</span>');
+      setText('statsTopZoneDetail', top.seen + ' technique' + (top.seen > 1 ? 's' : '') + ' vue' + (top.seen > 1 ? 's' : '') + ' sur ' + top.total);
+    }else{
+      setText('statsTopZoneName', 'Aucune zone');
+      setHtml('statsTopZonePercent', '0<span>%</span>');
+      setText('statsTopZoneDetail', 'Commencez par regarder une vidéo');
+    }
+  }
+
+  // Source unique pour les cartes, la roue et les statistiques.
+  window.readViewedTechniqueIds = readCanonicalViewedIds;
+  try{ readViewedTechniqueIds = readCanonicalViewedIds; }catch(e){}
+
+  window.isTechniqueUnlocked = function(t){
+    return !!(t && viewedSet().has(toNumber(t.id)));
+  };
+  try{ isTechniqueUnlocked = window.isTechniqueUnlocked; }catch(e){}
+
+  window.isTechniqueViewedForRevision = window.isTechniqueUnlocked;
+  try{ isTechniqueViewedForRevision = window.isTechniqueUnlocked; }catch(e){}
+
+  window.getViewedTechniquesForWheel = function(){
+    var viewed = viewedSet();
+    return allTechniques()
+      .filter(function(t){ return viewed.has(toNumber(t.id)); })
+      .sort(function(a,b){
+        return String(a.zone).localeCompare(String(b.zone)) ||
+               String(a.sub).localeCompare(String(b.sub)) ||
+               toNumber(a.id) - toNumber(b.id);
+      });
+  };
+  try{ getViewedTechniquesForWheel = window.getViewedTechniquesForWheel; }catch(e){}
+
+  window.stateLabel = function(t){
+    if(window.isTechniqueUnlocked(t)) return '<span class="seen">vue ✓</span>';
+    return '<span>non vue ○</span>';
+  };
+  try{ stateLabel = window.stateLabel; }catch(e){}
+
+  var oldMark = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+  window.markTechniqueViewedAfterComplete = function(id){
+    var n = toNumber(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+    if(!n) return;
+
+    var ids = readCanonicalViewedIds();
+    if(ids.indexOf(n) === -1) ids.push(n);
+    ids = uniqueIds(ids, validTechniqueIdSet());
+    try{ localStorage.setItem(STRICT_KEY, JSON.stringify(ids)); }catch(e){}
+    try{ localStorage.setItem(LEGACY_KEY, JSON.stringify(ids)); }catch(e){}
+
+    if(oldMark){
+      try{ oldMark.apply(this, arguments); }catch(e){}
+    }
+
+    syncTechniqueStatusWithViewed();
+    updateStatsFromViewedTechniques();
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+  };
+  try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+
+  // On remplace la fonction de stats précédente par la version stricte.
+  window.updateZoneStats = updateStatsFromViewedTechniques;
+  try{ updateZoneStats = updateStatsFromViewedTechniques; }catch(e){}
+
+  var oldGo = typeof window.go === 'function' ? window.go : null;
+  if(oldGo){
+    window.go = function(id){
+      var result = oldGo.apply(this, arguments);
+      if(id === 'progress'){
+        setTimeout(updateStatsFromViewedTechniques, 40);
+        setTimeout(updateStatsFromViewedTechniques, 250);
+      }
+      return result;
+    };
+    try{ go = window.go; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    syncTechniqueStatusWithViewed();
+    updateStatsFromViewedTechniques();
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+  });
+})();
+</script>
+
+
+<script>
+/* === PATCH FINAL : vérification complète de toutes les zones statistiques === */
+(function(){
+  if(window.__osteoStatsAllZonesVerifiedV4) return;
+  window.__osteoStatsAllZonesVerifiedV4 = true;
+
+  var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
+  var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
+  var STARTER_ID = 12;
+
+  var ZONES = [
+    { name:'Rachis', prefix:'statsRachis', countId:'countRachis', total:60 },
+    { name:'Membres supérieurs', prefix:'statsMSup', countId:'countMSup', total:17 },
+    { name:'Membres inférieurs', prefix:'statsMInf', countId:'countMInf', total:31 },
+    { name:'Bassin', prefix:'statsBassin', countId:'countBassin', total:20 }
+  ];
+
+  var SUBZONES = [
+    { id:'rachisCountCervicales', zone:'Rachis', subs:['Cervicales'] },
+    { id:'rachisCountDorsales', zone:'Rachis', subs:['Dorsales'] },
+    { id:'rachisCountLombaires', zone:'Rachis', subs:['Lombaires'] },
+    { id:'rachisCountCotes', zone:'Rachis', subs:['Côtes'] },
+
+    { id:'msupCountShoulder', zone:'Membres supérieurs', subs:['Clavicule','Épaule'] },
+    { id:'msupCountElbow', zone:'Membres supérieurs', subs:['Coude'] },
+    { id:'msupCountWrist', zone:'Membres supérieurs', subs:['Poignet'] },
+    { id:'msupCountHand', zone:'Membres supérieurs', subs:['Main'] },
+
+    { id:'minfCountHip', zone:'Membres inférieurs', subs:['Hanche'] },
+    { id:'minfCountKnee', zone:'Membres inférieurs', subs:['Genou','Tibia-fibula'] },
+    { id:'minfCountAnkle', zone:'Membres inférieurs', subs:['Cheville'] },
+    { id:'minfCountFoot', zone:'Membres inférieurs', subs:['Pied'] },
+
+    { id:'bassinCountIlium', zone:'Bassin', subs:['Ilium'] },
+    { id:'bassinCountSacrum', zone:'Bassin', subs:['Sacrum'] },
+    { id:'bassinCountSymphyse', zone:'Bassin', subs:['Symphyse pubienne'] }
+  ];
+
+  function toNumber(value){
+    var n = Number(value);
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  }
+
+  function listTechniques(){
+    try{
+      var source = (typeof techniques !== 'undefined' && Array.isArray(techniques)) ? techniques : (Array.isArray(window.techniques) ? window.techniques : []);
+      return source.filter(function(t){
+        if(!t) return false;
+        if(Number(t.id) === 999) return false;
+        return !/TEST\s+VID[ÉE]O\s+VIMEO/i.test(String(t.title || ''));
+      });
+    }catch(e){
+      return [];
+    }
+  }
+
+  function readJsonArray(key){
+    try{
+      var raw = localStorage.getItem(key);
+      if(!raw) return null;
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : null;
+    }catch(e){
+      return null;
+    }
+  }
+
+  function validIds(){
+    var set = new Set();
+    listTechniques().forEach(function(t){
+      var id = toNumber(t.id);
+      if(id) set.add(id);
+    });
+    return set;
+  }
+
+  function uniqueValidIds(values){
+    var valid = validIds();
+    var out = [];
+    var seen = new Set();
+    (Array.isArray(values) ? values : []).forEach(function(value){
+      var id = toNumber(value);
+      if(!id || !valid.has(id) || seen.has(id)) return;
+      seen.add(id);
+      out.push(id);
+    });
+    return out;
+  }
+
+  function readViewedIds(){
+    var strict = readJsonArray(STRICT_KEY);
+    var legacy = readJsonArray(LEGACY_KEY);
+    var source = strict || legacy || [];
+
+    if(!strict && !legacy && validIds().has(STARTER_ID)){
+      source = [STARTER_ID];
+    }
+
+    var clean = uniqueValidIds(source);
+    try{ localStorage.setItem(STRICT_KEY, JSON.stringify(clean)); }catch(e){}
+    try{ localStorage.setItem(LEGACY_KEY, JSON.stringify(clean)); }catch(e){}
+    return clean;
+  }
+
+  function viewedSet(){
+    return new Set(readViewedIds());
+  }
+
+  function percent(seen, total){
+    return total ? Math.round((seen / total) * 100) : 0;
+  }
+
+  function zoneData(zoneName, viewed){
+    var list = listTechniques().filter(function(t){ return String(t.zone) === zoneName; });
+    var seen = list.filter(function(t){ return viewed.has(toNumber(t.id)); }).length;
+    return { zone:zoneName, seen:seen, total:list.length, percent:percent(seen, list.length) };
+  }
+
+  function subzoneData(zoneName, subs, viewed){
+    var list = listTechniques().filter(function(t){
+      return String(t.zone) === zoneName && subs.indexOf(String(t.sub)) !== -1;
+    });
+    var seen = list.filter(function(t){ return viewed.has(toNumber(t.id)); }).length;
+    return { seen:seen, total:list.length, percent:percent(seen, list.length) };
+  }
+
+  function setText(id, value){
+    var el = document.getElementById(id);
+    if(el) el.textContent = value;
+  }
+
+  function setHtml(id, value){
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = value;
+  }
+
+  function setBar(id, value){
+    var el = document.getElementById(id);
+    if(el) el.style.width = value + '%';
+  }
+
+  function updateCatalogueAndVolumeCounts(viewed){
+    var totals = {};
+    ZONES.forEach(function(z){ totals[z.name] = zoneData(z.name, viewed).total; });
+
+    setText('countRachis', totals['Rachis']);
+    setText('countMSup', totals['Membres supérieurs']);
+    setText('countMInf', totals['Membres inférieurs']);
+    setText('countBassin', totals['Bassin']);
+
+    // Les anciennes cartes de statistiques de la page Vidéos n’ont pas toutes un id : on les met aussi à jour par position.
+    var pills = document.querySelectorAll('.video-stats-grid .stat-pill .stat-num');
+    if(pills && pills.length >= 4){
+      pills[0].textContent = totals['Rachis'];
+      pills[1].textContent = totals['Membres supérieurs'];
+      pills[2].textContent = totals['Bassin'];
+      pills[3].textContent = totals['Membres inférieurs'];
+    }
+  }
+
+  function updateSubzoneVolumeCounts(viewed){
+    SUBZONES.forEach(function(item){
+      var data = subzoneData(item.zone, item.subs, viewed);
+      var el = document.getElementById(item.id);
+      if(el){
+        el.textContent = data.total;
+        el.setAttribute('title', data.seen + '/' + data.total + ' vue' + (data.seen > 1 ? 's' : ''));
+        var parent = el.closest ? el.closest('.module-count-pill, .rachis-stat-pill, .stat-pill') : null;
+        if(parent){
+          parent.setAttribute('title', data.seen + '/' + data.total + ' technique' + (data.total > 1 ? 's' : '') + ' vue' + (data.seen > 1 ? 's' : ''));
+          parent.setAttribute('data-seen', data.seen);
+          parent.setAttribute('data-total', data.total);
+          parent.setAttribute('data-percent', data.percent);
+        }
+      }
+    });
+  }
+
+  function updateProgressZoneStats(){
+    var viewed = viewedSet();
+    var all = listTechniques();
+    var seenTotal = all.filter(function(t){ return viewed.has(toNumber(t.id)); }).length;
+    var total = all.length;
+    var global = percent(seenTotal, total);
+
+    setText('statsVideos', seenTotal);
+    setText('statsVideosTotal', '/ ' + total);
+    setText('statsSheets', seenTotal);
+    setText('statsSheetsTotal', '/ ' + total);
+    setHtml('statsGlobalPercent', global + '<span>%</span>');
+
+    var ring = document.getElementById('statsGlobalRing');
+    if(ring) ring.style.setProperty('--value', global);
+
+    var zoneResults = ZONES.map(function(z){
+      var data = zoneData(z.name, viewed);
+      setText(z.prefix + 'Count', data.seen + '/' + data.total);
+      setText(z.prefix + 'Pct', data.percent + '%');
+      setBar(z.prefix + 'Bar', data.percent);
+      return data;
+    });
+
+    var top = zoneResults.slice().sort(function(a,b){
+      return b.seen - a.seen || b.percent - a.percent || b.total - a.total;
+    })[0];
+
+    if(top && top.seen > 0){
+      setText('statsTopZoneName', top.zone);
+      setHtml('statsTopZonePercent', top.percent + '<span>%</span>');
+      setText('statsTopZoneDetail', top.seen + ' technique' + (top.seen > 1 ? 's' : '') + ' vue' + (top.seen > 1 ? 's' : '') + ' sur ' + top.total);
+    }else{
+      setText('statsTopZoneName', 'Aucune zone');
+      setHtml('statsTopZonePercent', '0<span>%</span>');
+      setText('statsTopZoneDetail', 'Commencez par regarder une vidéo');
+    }
+
+    updateCatalogueAndVolumeCounts(viewed);
+    updateSubzoneVolumeCounts(viewed);
+  }
+
+  function syncStatuses(){
+    var viewed = viewedSet();
+    listTechniques().forEach(function(t){
+      if(viewed.has(toNumber(t.id))){
+        t.status = 'vue';
+        t.percent = 100;
+      }else{
+        t.status = 'non vue';
+        t.percent = 0;
+      }
+    });
+  }
+
+  window.readViewedTechniqueIds = readViewedIds;
+  try{ readViewedTechniqueIds = readViewedIds; }catch(e){}
+
+  window.updateZoneStats = function(){
+    syncStatuses();
+    updateProgressZoneStats();
+  };
+  try{ updateZoneStats = window.updateZoneStats; }catch(e){}
+
+  // Les anciens compteurs des menus utilisent maintenant la même source vérifiée.
+  window.updateRachisRegionCounts = function(){ updateSubzoneVolumeCounts(viewedSet()); };
+  window.updateMSupRegionCounts = function(){ updateSubzoneVolumeCounts(viewedSet()); };
+  window.updateMInfRegionCounts = function(){ updateSubzoneVolumeCounts(viewedSet()); };
+  window.updateBassinRegionCounts = function(){ updateSubzoneVolumeCounts(viewedSet()); };
+  window.updateCatalogueCounts = function(){ updateCatalogueAndVolumeCounts(viewedSet()); };
+
+  try{ updateRachisRegionCounts = window.updateRachisRegionCounts; }catch(e){}
+  try{ updateMSupRegionCounts = window.updateMSupRegionCounts; }catch(e){}
+  try{ updateMInfRegionCounts = window.updateMInfRegionCounts; }catch(e){}
+  try{ updateBassinRegionCounts = window.updateBassinRegionCounts; }catch(e){}
+  try{ updateCatalogueCounts = window.updateCatalogueCounts; }catch(e){}
+
+  var oldMark = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+  window.markTechniqueViewedAfterComplete = function(id){
+    var n = toNumber(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+    if(n){
+      var ids = readViewedIds();
+      if(ids.indexOf(n) === -1){
+        ids.push(n);
+        ids = uniqueValidIds(ids);
+        try{ localStorage.setItem(STRICT_KEY, JSON.stringify(ids)); }catch(e){}
+        try{ localStorage.setItem(LEGACY_KEY, JSON.stringify(ids)); }catch(e){}
+      }
+    }
+    if(oldMark){ try{ oldMark.apply(this, arguments); }catch(e){} }
+    syncStatuses();
+    updateProgressZoneStats();
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(e){}
+  };
+  try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+
+  var oldGo = typeof window.go === 'function' ? window.go : null;
+  if(oldGo){
+    window.go = function(id){
+      var result = oldGo.apply(this, arguments);
+      if(id === 'progress' || id === 'videoMap' || id === 'rachisMenu' || id === 'msupMenu' || id === 'minfMenu' || id === 'bassinMenu'){
+        setTimeout(function(){ syncStatuses(); updateProgressZoneStats(); }, 40);
+        setTimeout(function(){ syncStatuses(); updateProgressZoneStats(); }, 250);
+      }
+      return result;
+    };
+    try{ go = window.go; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    syncStatuses();
+    updateProgressZoneStats();
+  });
+})();
+</script>
+
+
+<script>
+/* === PATCH FINAL : quiz + progression globale synchronisés === */
+(function(){
+  var QUIZ_RESULT_KEY = 'osteoPratikLastQuiz';
+  var QUIZ_PROGRESS_KEY = 'osteoPratikQuizProgress';
+  var LAST_VIDEO_KEY = 'osteoPratikLastViewedTechnique';
+  var SUCCESS_THRESHOLD = 60;
+
+  function byId(id){ return document.getElementById(id); }
+  function setText(id, value){ var el = byId(id); if(el) el.textContent = value; }
+  function setHtml(id, value){ var el = byId(id); if(el) el.innerHTML = value; }
+  function readJson(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    }catch(e){ return fallback; }
+  }
+  function writeJson(key, value){
+    try{ localStorage.setItem(key, JSON.stringify(value)); }catch(e){}
+  }
+  function pct(score, total){
+    score = Number(score || 0);
+    total = Number(total || 0);
+    return total ? Math.round((score / total) * 100) : 0;
+  }
+  function formatDate(iso){
+    if(!iso) return 'Aucune activité récente';
+    try{
+      var d = new Date(iso);
+      return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'}) +
+        ' · ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    }catch(e){
+      return 'Aucune activité récente';
+    }
+  }
+  function getTechnique(id){
+    try{
+      id = Number(id);
+      return (window.techniques || techniques || []).find(function(t){ return Number(t.id) === id; }) || null;
+    }catch(e){ return null; }
+  }
+  function setQuizProgressBar(){
+    var bar = byId('quizProgressBar');
+    if(!bar) return;
+    try{
+      var total = generalQuizQuestions.length || 15;
+      var index = Number(generalQuizIndex || 0);
+      var answered = !!generalQuizAnswered;
+      var value = Math.round(((index + (answered ? 1 : 0)) / total) * 100);
+      bar.style.width = Math.max(0, Math.min(100, value)) + '%';
+    }catch(e){}
+  }
+  function latestActivity(){
+    var quiz = readJson(QUIZ_RESULT_KEY, null);
+    var video = readJson(LAST_VIDEO_KEY, null);
+    var quizDate = quiz && quiz.date ? new Date(quiz.date).getTime() : 0;
+    var videoDate = video && video.date ? new Date(video.date).getTime() : 0;
+    return videoDate >= quizDate ? {type:'video', data:video} : {type:'quiz', data:quiz};
+  }
+  function updateLastActivityBlock(){
+    var activity = latestActivity();
+    var card = document.querySelector('#progress .stats-last-practice');
+    var dateEl = byId('statsLastActivityDate');
+    var titleEl = byId('statsLastActivityTitle');
+
+    if(activity.type === 'video' && activity.data){
+      var t = getTechnique(activity.data.id);
+      var title = (t && t.title) || activity.data.title || 'Vidéo terminée';
+      if(dateEl) dateEl.textContent = formatDate(activity.data.date);
+      if(titleEl) titleEl.textContent = title;
+      if(card){
+        var small = card.querySelector('small');
+        var span = card.querySelector('span');
+        var bar = card.querySelector('.bar i');
+        if(small) small.textContent = 'Dernière vidéo vue';
+        if(span) span.textContent = (t && (t.sub || t.zone)) || 'Technique vue';
+        if(bar) bar.style.width = '100%';
+      }
+      return;
+    }
+
+    if(activity.type === 'quiz' && activity.data){
+      var q = activity.data;
+      if(dateEl) dateEl.textContent = formatDate(q.date);
+      if(titleEl) titleEl.textContent = 'Quiz général · ' + Number(q.score || 0) + ' / ' + Number(q.total || 15);
+      if(card){
+        var small2 = card.querySelector('small');
+        var span2 = card.querySelector('span');
+        var bar2 = card.querySelector('.bar i');
+        if(small2) small2.textContent = 'Dernier quiz terminé';
+        if(span2) span2.textContent = pct(q.score, q.total) + '% de réussite';
+        if(bar2) bar2.style.width = pct(q.score, q.total) + '%';
+      }
+      return;
+    }
+
+    if(dateEl) dateEl.textContent = 'Aucune activité récente';
+    if(titleEl) titleEl.textContent = 'Lancez une vidéo ou un quiz';
+  }
+  function updateQuizPerformanceCard(lastQuiz){
+    var blocks = document.querySelectorAll('#progress .stats-quiz-card .stats-quiz-layout .stats-quiz-score');
+    blocks.forEach(function(block){
+      var strong = block.querySelector('strong');
+      if(strong && strong.id === 'statsQuizScore') return;
+      var p = block.querySelector('p');
+      var em = block.querySelector('em');
+      if(!strong) return;
+      if(!lastQuiz){
+        strong.innerHTML = '—';
+        if(p) p.textContent = 'aucun quiz terminé';
+        if(em) em.innerHTML = 'Commencez<small>par le quiz général</small>';
+        return;
+      }
+      var percent = pct(lastQuiz.score, lastQuiz.total);
+      strong.innerHTML = percent + '<span>%</span>';
+      if(p) p.textContent = 'dernier score au quiz général';
+      if(em){
+        if(percent >= 80) em.innerHTML = '↥ Très bon<small>bases solides</small>';
+        else if(percent >= 60) em.innerHTML = '→ Correct<small>à consolider</small>';
+        else em.innerHTML = '↧ À revoir<small>reprendre les bases</small>';
+      }
+    });
+  }
+
+  window.updateQuizStats = function(){
+    var lastQuiz = readJson(QUIZ_RESULT_KEY, null);
+
+    if(!lastQuiz){
+      setText('statsQuiz', '—');
+      setText('statsQuizDetail', 'Aucun quiz terminé');
+      setText('statsQuizScore', '—');
+      setText('statsQuizScoreTotal', '/ 15');
+      setText('statsQuizPercent', 'Aucun score');
+      setText('statsQuizMessage', 'Terminez le quiz général pour afficher votre résultat ici.');
+      updateQuizPerformanceCard(null);
+      updateLastActivityBlock();
+      return;
+    }
+
+    var score = Number(lastQuiz.score || 0);
+    var total = Number(lastQuiz.total || 15);
+    var percent = Number(lastQuiz.percent || pct(score, total));
+    var success = percent >= SUCCESS_THRESHOLD;
+
+    // KPI « Quiz réussis » : vrai compteur de réussite, et non plus une valeur ambiguë.
+    setText('statsQuiz', success ? '1/1' : '0/1');
+    setText('statsQuizDetail', score + ' / ' + total + ' · ' + percent + '%');
+
+    setText('statsQuizScore', score);
+    setText('statsQuizScoreTotal', '/ ' + total);
+    setText('statsQuizPercent', percent + '% de réussite');
+
+    if(percent >= 80){
+      setText('statsQuizMessage', 'Très bon niveau général. Les bases sont solides.');
+    }else if(percent >= 60){
+      setText('statsQuizMessage', 'Bonne base. Quelques points restent à consolider.');
+    }else{
+      setText('statsQuizMessage', 'À renforcer. Reprenez les notions générales avant les quiz par région.');
+    }
+
+    updateQuizPerformanceCard(lastQuiz);
+    updateLastActivityBlock();
+  };
+
+  window.updateAllProgressStats = function(){
+    try{ if(typeof window.updateZoneStats === 'function') window.updateZoneStats(); }catch(e){}
+    try{ if(typeof updateZoneStats === 'function') updateZoneStats(); }catch(e){}
+    try{ window.updateQuizStats(); }catch(e){}
+  };
+
+  var oldFinish = typeof window.finishGeneralQuiz === 'function' ? window.finishGeneralQuiz : (typeof finishGeneralQuiz === 'function' ? finishGeneralQuiz : null);
+  if(oldFinish && !window.__finalQuizFinishPatched){
+    window.__finalQuizFinishPatched = true;
+    window.finishGeneralQuiz = function(){
+      var result = oldFinish.apply(this, arguments);
+      try{
+        var total = generalQuizQuestions.length || 15;
+        var score = Number(generalQuizScore || 0);
+        writeJson(QUIZ_RESULT_KEY, {
+          category:'general',
+          score:score,
+          total:total,
+          percent:pct(score, total),
+          completed:true,
+          date:new Date().toISOString()
+        });
+        localStorage.removeItem(QUIZ_PROGRESS_KEY);
+      }catch(e){}
+      try{ window.updateAllProgressStats(); }catch(e){}
+      return result;
+    };
+    try{ finishGeneralQuiz = window.finishGeneralQuiz; }catch(e){}
+  }
+
+  var oldAnswer = typeof window.answerGeneralQuiz === 'function' ? window.answerGeneralQuiz : (typeof answerGeneralQuiz === 'function' ? answerGeneralQuiz : null);
+  if(oldAnswer && !window.__finalQuizAnswerPatched){
+    window.__finalQuizAnswerPatched = true;
+    window.answerGeneralQuiz = function(index){
+      var result = oldAnswer.apply(this, arguments);
+      setQuizProgressBar();
+      return result;
+    };
+    try{ answerGeneralQuiz = window.answerGeneralQuiz; }catch(e){}
+  }
+
+  var oldNext = typeof window.nextGeneralQuiz === 'function' ? window.nextGeneralQuiz : (typeof nextGeneralQuiz === 'function' ? nextGeneralQuiz : null);
+  if(oldNext && !window.__finalQuizNextPatched){
+    window.__finalQuizNextPatched = true;
+    window.nextGeneralQuiz = function(){
+      var result = oldNext.apply(this, arguments);
+      setTimeout(setQuizProgressBar, 20);
+      return result;
+    };
+    try{ nextGeneralQuiz = window.nextGeneralQuiz; }catch(e){}
+  }
+
+  var oldRender = typeof window.renderGeneralQuiz === 'function' ? window.renderGeneralQuiz : (typeof renderGeneralQuiz === 'function' ? renderGeneralQuiz : null);
+  if(oldRender && !window.__finalQuizRenderPatched){
+    window.__finalQuizRenderPatched = true;
+    window.renderGeneralQuiz = function(){
+      var result = oldRender.apply(this, arguments);
+      setQuizProgressBar();
+      return result;
+    };
+    try{ renderGeneralQuiz = window.renderGeneralQuiz; }catch(e){}
+  }
+
+  var oldMark = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+  if(oldMark && !window.__finalViewedStatsPatched){
+    window.__finalViewedStatsPatched = true;
+    window.markTechniqueViewedAfterComplete = function(id){
+      var result = oldMark.apply(this, arguments);
+      try{
+        var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+        var t = getTechnique(n);
+        if(n){
+          writeJson(LAST_VIDEO_KEY, {
+            id:n,
+            title:(t && t.title) || '',
+            zone:(t && t.zone) || '',
+            sub:(t && t.sub) || '',
+            date:new Date().toISOString()
+          });
+        }
+      }catch(e){}
+      try{ window.updateAllProgressStats(); }catch(e){}
+      return result;
+    };
+    try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+  }
+
+  var oldGo = typeof window.go === 'function' ? window.go : (typeof go === 'function' ? go : null);
+  if(oldGo && !window.__finalAllStatsGoPatched){
+    window.__finalAllStatsGoPatched = true;
+    window.go = function(id){
+      var result = oldGo.apply(this, arguments);
+      if(id === 'progress' || id === 'quiz'){
+        setTimeout(window.updateAllProgressStats, 40);
+        setTimeout(window.updateAllProgressStats, 250);
+      }
+      return result;
+    };
+    try{ go = window.go; }catch(e){}
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setQuizProgressBar();
+    window.updateAllProgressStats();
   });
 })();
 </script>
