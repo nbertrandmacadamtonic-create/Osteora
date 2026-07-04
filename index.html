@@ -24209,59 +24209,5 @@ if(!window.__osteoVimeoEventsPatched){
 })();
 </script>
 
-
-<style>
-/* === PATCH ICÔNES TRANSPARENTES : Réviser / Par zone / Mes stats / Vidéo === */
-.orbit-icon,
-.revision-orbit-icon,
-.zone-card-icon,
-.mini-zone-icon,
-.pill-icon,
-.stats-head-icon,
-.catalogue-icon,
-.stats-title-visual{
-  background: transparent !important;
-  background-color: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow:
-    0 0 18px color-mix(in srgb,currentColor 22%, transparent),
-    inset 0 0 0 rgba(255,255,255,0) !important;
-}
-
-.zone-card-icon,
-.mini-zone-icon,
-.orbit-icon,
-.revision-orbit-icon,
-.pill-icon,
-.stats-head-icon,
-.catalogue-icon{
-  border-color: currentColor !important;
-}
-
-.zone-card-icon::after,
-.mini-zone-icon::after{
-  opacity: .88 !important;
-}
-
-.zone-card-icon img,
-.mini-zone-icon img{
-  display: block !important;
-  background: transparent !important;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 10px currentColor) !important;
-}
-
-#videoMap .video-zone-card,
-#revision .revision-orbit-card,
-#home .orbit-card{
-  background-color: transparent !important;
-}
-
-#progress .stats-title-visual{
-  border: 1px solid rgba(0,229,255,.28) !important;
-}
-</style>
-
 </body>
 </html>
