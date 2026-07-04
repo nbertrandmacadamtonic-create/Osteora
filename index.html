@@ -24031,5 +24031,237 @@ if(!window.__osteoVimeoEventsPatched){
 })();
 </script>
 
+
+<style>
+/* === PATCH : recherche vocale dans les barres de recherche === */
+.search.voice-search-ready{
+  grid-template-columns:30px minmax(0,1fr) 36px !important;
+}
+
+.search.voice-search-ready.has-clear{
+  grid-template-columns:30px minmax(0,1fr) 36px 34px !important;
+}
+
+.search .voice-search-btn{
+  width:32px !important;
+  height:32px !important;
+  min-width:32px !important;
+  border-radius:50% !important;
+  display:grid !important;
+  place-items:center !important;
+  color:#ffffff !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(0,229,255,.22), transparent 46%),
+    rgba(0,229,255,.08) !important;
+  border:1px solid rgba(0,229,255,.32) !important;
+  box-shadow:
+    0 0 14px rgba(0,229,255,.18),
+    inset 0 1px 0 rgba(255,255,255,.08) !important;
+  font-size:16px !important;
+  line-height:1 !important;
+  padding:0 !important;
+}
+
+.search .voice-search-btn.listening{
+  color:#03111f !important;
+  background:linear-gradient(135deg, var(--cyan), var(--blue)) !important;
+  border-color:rgba(255,255,255,.70) !important;
+  box-shadow:
+    0 0 22px rgba(0,229,255,.55),
+    0 0 38px rgba(45,140,255,.28) !important;
+  animation:voicePulse 1s ease-in-out infinite;
+}
+
+@keyframes voicePulse{
+  0%,100%{ transform:scale(1); }
+  50%{ transform:scale(1.08); }
+}
+
+.voice-search-hint{
+  margin:8px 0 0;
+  color:rgba(220,235,255,.68);
+  font-size:11px;
+  line-height:1.25;
+  text-align:center;
+}
+</style>
+
+<script>
+/* === PATCH : recherche vocale Catalogue + liste techniques === */
+(function(){
+  let activeVoiceRecognition = null;
+
+  function getSpeechRecognitionConstructor(){
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+  }
+
+  function setInputAndRender(inputId, textValue, renderFnName){
+    const input = document.getElementById(inputId);
+    if(!input) return;
+    input.value = String(textValue || '').trim();
+    input.dispatchEvent(new Event('input', { bubbles:true }));
+    if(renderFnName && typeof window[renderFnName] === 'function'){
+      window[renderFnName]();
+    }
+  }
+
+  function stopExistingRecognition(){
+    if(activeVoiceRecognition){
+      try{ activeVoiceRecognition.stop(); }catch(e){}
+      activeVoiceRecognition = null;
+    }
+    document.querySelectorAll('.voice-search-btn.listening').forEach(btn => btn.classList.remove('listening'));
+  }
+
+  window.startVoiceSearch = function(inputId, renderFnName, button){
+    const SpeechRecognition = getSpeechRecognitionConstructor();
+    if(!SpeechRecognition){
+      if(typeof toast === 'function') toast('Recherche vocale non disponible sur ce navigateur');
+      return;
+    }
+
+    const input = document.getElementById(inputId);
+    if(!input) return;
+
+    stopExistingRecognition();
+
+    const recognition = new SpeechRecognition();
+    activeVoiceRecognition = recognition;
+    recognition.lang = 'fr-FR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    if(button) button.classList.add('listening');
+    if(typeof toast === 'function') toast('Parlez maintenant…');
+
+    recognition.onresult = function(event){
+      const transcript = event && event.results && event.results[0] && event.results[0][0]
+        ? event.results[0][0].transcript
+        : '';
+      if(transcript){
+        setInputAndRender(inputId, transcript, renderFnName);
+        if(typeof toast === 'function') toast('Recherche : ' + transcript);
+      }
+    };
+
+    recognition.onerror = function(){
+      if(typeof toast === 'function') toast('Recherche vocale interrompue');
+    };
+
+    recognition.onend = function(){
+      if(button) button.classList.remove('listening');
+      if(activeVoiceRecognition === recognition) activeVoiceRecognition = null;
+    };
+
+    try{
+      recognition.start();
+    }catch(e){
+      if(button) button.classList.remove('listening');
+      if(typeof toast === 'function') toast('Touchez à nouveau le micro');
+    }
+  };
+
+  function installVoiceButton(inputId, renderFnName, label){
+    const input = document.getElementById(inputId);
+    if(!input || input.dataset.voiceReady === '1') return;
+
+    const container = input.closest('.search');
+    if(!container) return;
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'voice-search-btn';
+    button.setAttribute('aria-label', label || 'Recherche vocale');
+    button.setAttribute('title', label || 'Recherche vocale');
+    button.textContent = '🎙';
+    button.addEventListener('click', function(event){
+      event.preventDefault();
+      event.stopPropagation();
+      window.startVoiceSearch(inputId, renderFnName, button);
+    });
+
+    const clearButton = Array.from(container.querySelectorAll('button')).find(btn => btn !== button);
+    if(clearButton){
+      container.insertBefore(button, clearButton);
+      container.classList.add('has-clear');
+    }else{
+      container.appendChild(button);
+    }
+
+    container.classList.add('voice-search-ready');
+    input.dataset.voiceReady = '1';
+  }
+
+  function installVoiceSearch(){
+    installVoiceButton('catalogueSearchInput', 'renderCatalogueSearch', 'Rechercher à la voix dans le catalogue');
+    installVoiceButton('searchInput', 'renderTechniques', 'Rechercher à la voix dans les techniques');
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', installVoiceSearch);
+  }else{
+    installVoiceSearch();
+  }
+
+  setTimeout(installVoiceSearch, 250);
+  setTimeout(installVoiceSearch, 1000);
+})();
+</script>
+
+
+<style>
+/* === PATCH ICÔNES TRANSPARENTES : Réviser / Par zone / Mes stats / Vidéo === */
+.orbit-icon,
+.revision-orbit-icon,
+.zone-card-icon,
+.mini-zone-icon,
+.pill-icon,
+.stats-head-icon,
+.catalogue-icon,
+.stats-title-visual{
+  background: transparent !important;
+  background-color: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow:
+    0 0 18px color-mix(in srgb,currentColor 22%, transparent),
+    inset 0 0 0 rgba(255,255,255,0) !important;
+}
+
+.zone-card-icon,
+.mini-zone-icon,
+.orbit-icon,
+.revision-orbit-icon,
+.pill-icon,
+.stats-head-icon,
+.catalogue-icon{
+  border-color: currentColor !important;
+}
+
+.zone-card-icon::after,
+.mini-zone-icon::after{
+  opacity: .88 !important;
+}
+
+.zone-card-icon img,
+.mini-zone-icon img{
+  display: block !important;
+  background: transparent !important;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 10px currentColor) !important;
+}
+
+#videoMap .video-zone-card,
+#revision .revision-orbit-card,
+#home .orbit-card{
+  background-color: transparent !important;
+}
+
+#progress .stats-title-visual{
+  border: 1px solid rgba(0,229,255,.28) !important;
+}
+</style>
+
 </body>
 </html>
