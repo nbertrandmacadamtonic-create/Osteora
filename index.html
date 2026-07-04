@@ -24911,5 +24911,198 @@ if(!window.__osteoVimeoEventsPatched){
 })();
 </script>
 
+
+<style id="stats-performance-bug-display-fix">
+/* === STATS : correction affichage Performance aux quiz === */
+#progress .stats-quiz-card .stats-quiz-layout{
+  align-items:stretch !important;
+}
+
+#progress .stats-quiz-card.performance-empty .stats-quiz-layout{
+  display:block !important;
+}
+
+#progress .stats-quiz-card.performance-empty #statsPerformanceScore{
+  display:none !important;
+}
+
+#progress .stats-quiz-card.performance-empty #statsPerformanceChart{
+  min-height:300px !important;
+}
+
+#progress .stats-quiz-card.performance-empty .stats-chart-empty{
+  position:relative !important;
+  min-height:300px !important;
+  inset:auto !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:28px 22px !important;
+  border-radius:22px !important;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(53,230,167,.10), transparent 34%),
+    radial-gradient(circle at 76% 82%, rgba(0,229,255,.08), transparent 38%) !important;
+}
+
+#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy{
+  max-width:330px !important;
+}
+
+#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy strong{
+  font-size:24px !important;
+  line-height:1.1 !important;
+}
+
+#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy span{
+  font-size:16px !important;
+  line-height:1.35 !important;
+}
+
+/* Masque de secours si un ancien bloc reste encore injecté */
+#progress .stats-quiz-card.performance-empty .stats-quiz-score:not(#statsQuizScore){
+  display:none !important;
+}
+
+@media(max-width:430px){
+  #progress .stats-quiz-card.performance-empty #statsPerformanceChart,
+  #progress .stats-quiz-card.performance-empty .stats-chart-empty{
+    min-height:260px !important;
+  }
+
+  #progress .stats-quiz-card.performance-empty .stats-chart-empty{
+    padding:24px 18px !important;
+  }
+
+  #progress .stats-quiz-card.performance-empty .stats-chart-empty-copy strong{
+    font-size:22px !important;
+  }
+
+  #progress .stats-quiz-card.performance-empty .stats-chart-empty-copy span{
+    font-size:15px !important;
+  }
+}
+</style>
+
+
+<script id="stats-performance-bug-display-script">
+/* === STATS : état vide propre pour la performance aux quiz === */
+(function(){
+  function readLastQuiz(){
+    try{ return JSON.parse(localStorage.getItem('osteoPratikLastQuiz') || 'null'); }
+    catch(e){ return null; }
+  }
+
+  function applyStatsPerformanceEmptyState(){
+    var card = document.querySelector('#progress .stats-quiz-card:has(#statsPerformanceChart)');
+    var chart = document.getElementById('statsPerformanceChart');
+    var score = document.getElementById('statsPerformanceScore');
+    var lastQuiz = readLastQuiz();
+
+    if(!card || !chart) return;
+
+    if(!lastQuiz){
+      card.classList.add('performance-empty');
+      chart.classList.add('is-empty');
+      if(score) score.style.setProperty('display','none','important');
+    }else{
+      card.classList.remove('performance-empty');
+      chart.classList.remove('is-empty');
+      if(score) score.style.removeProperty('display');
+    }
+
+    var lastPractice = document.querySelector('#progress .stats-last-practice');
+    if(lastPractice) lastPractice.remove();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', applyStatsPerformanceEmptyState);
+  }else{
+    applyStatsPerformanceEmptyState();
+  }
+
+  [80, 250, 700, 1500].forEach(function(delay){
+    setTimeout(applyStatsPerformanceEmptyState, delay);
+  });
+
+  var oldGo = typeof go === 'function' ? go : null;
+  if(oldGo && !window.__statsPerformanceDisplayBugPatched){
+    window.__statsPerformanceDisplayBugPatched = true;
+    go = function(id){
+      var r = oldGo.apply(this, arguments);
+      if(id === 'progress'){
+        setTimeout(applyStatsPerformanceEmptyState, 40);
+        setTimeout(applyStatsPerformanceEmptyState, 250);
+      }
+      return r;
+    };
+  }
+})();
+</script>
+
+
+<style id="revision-background-visible-final-fix">
+/* === RÉVISER : image de fond beaucoup plus visible === */
+#revision .revision-orbit-nav{
+  filter:none !important;
+}
+
+#revision .revision-orbit-nav::before{
+  display:none !important;
+  content:none !important;
+}
+
+#revision .revision-orbit-backdrop{
+  inset:-18px 0 -12px !important;
+  opacity:1 !important;
+  mix-blend-mode:normal !important;
+  filter:
+    drop-shadow(0 0 26px rgba(0,229,255,.40))
+    drop-shadow(0 0 48px rgba(45,140,255,.18)) !important;
+  background:
+    url("assets/images/revision-bg.webp") center 52% / 92% auto no-repeat !important;
+  z-index:1 !important;
+}
+
+/* Cartouches plus transparents pour ne plus masquer l'image */
+#revision .revision-orbit-card{
+  background:
+    radial-gradient(circle at 38% 26%, color-mix(in srgb,currentColor 10%, transparent), transparent 48%),
+    linear-gradient(145deg, rgba(5,15,31,.36), rgba(5,15,31,.58)) !important;
+  box-shadow:
+    0 0 14px color-mix(in srgb,currentColor 14%, transparent),
+    inset 0 0 12px rgba(255,255,255,.018) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Suppression des voiles/halos qui cachaient le visuel */
+#revision .revision-orbit-card::before,
+#revision .revision-orbit-card::after{
+  display:none !important;
+  content:none !important;
+}
+
+#revision .revision-orbit-center{
+  background:rgba(5,15,31,.34) !important;
+  box-shadow:
+    0 0 14px rgba(0,229,255,.18),
+    inset 0 0 12px rgba(0,229,255,.06) !important;
+}
+
+@media(max-width:430px){
+  #revision .revision-orbit-backdrop{
+    inset:-10px -8px -8px !important;
+    background-size:104% auto !important;
+    background-position:center 53% !important;
+  }
+
+  #revision .revision-orbit-card{
+    background:
+      radial-gradient(circle at 38% 26%, color-mix(in srgb,currentColor 9%, transparent), transparent 48%),
+      linear-gradient(145deg, rgba(5,15,31,.32), rgba(5,15,31,.52)) !important;
+  }
+}
+</style>
+
 </body>
 </html>
