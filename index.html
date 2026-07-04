@@ -21733,13 +21733,11 @@ if(!window.__osteoVimeoEventsPatched){
     }
 
     if(directBtn){
-      const direct = directVimeoUrl(t);
-      directBtn.textContent = "Ouvrir la vidéo Vimeo";
-      directBtn.style.display = direct ? "block" : "none";
+      directBtn.textContent = "";
+      directBtn.style.setProperty("display", "none", "important");
       directBtn.onclick = function(event){
         event.preventDefault();
         event.stopPropagation();
-        if(direct) window.open(direct, "_blank", "noopener,noreferrer");
         return false;
       };
     }
@@ -24509,73 +24507,7 @@ if(!window.__osteoVimeoEventsPatched){
 </style>
 
 
-<style id="vimeo-branding-mask-fix">
-/* === VIMEO : suppression visuelle du bouton "ouvrir avec Vimeo" + cache du V Vimeo === */
-#videoBox,
-.video-box{
-  position:relative !important;
-}
 
-/* Cache en haut à droite : masque la petite icône "ouvrir avec Vimeo" */
-#videoBox::before,
-.video-box::before{
-  content:"" !important;
-  position:absolute !important;
-  top:8px !important;
-  right:8px !important;
-  width:52px !important;
-  height:52px !important;
-  border-radius:16px !important;
-  background:linear-gradient(145deg, rgba(3,8,22,.96), rgba(5,16,32,.92)) !important;
-  box-shadow:0 0 18px rgba(0,0,0,.35) !important;
-  z-index:12 !important;
-  pointer-events:none !important;
-}
-
-/* Cache en bas à droite : masque le V/logo Vimeo */
-#videoBox::after,
-.video-box::after{
-  content:"" !important;
-  position:absolute !important;
-  right:8px !important;
-  bottom:8px !important;
-  width:64px !important;
-  height:34px !important;
-  border-radius:14px !important;
-  background:linear-gradient(145deg, rgba(3,8,22,.98), rgba(5,16,32,.94)) !important;
-  box-shadow:0 0 18px rgba(0,0,0,.38) !important;
-  z-index:12 !important;
-  pointer-events:none !important;
-}
-
-/* Si les contrôles custom sont affichés, on laisse leurs boutons au-dessus si nécessaire */
-.custom-video-overlay,
-.custom-video-controls,
-#closeFullscreenVideo{
-  position:relative;
-  z-index:20;
-}
-
-@media(max-width:430px){
-  #videoBox::before,
-  .video-box::before{
-    top:6px !important;
-    right:6px !important;
-    width:46px !important;
-    height:46px !important;
-    border-radius:14px !important;
-  }
-
-  #videoBox::after,
-  .video-box::after{
-    right:6px !important;
-    bottom:6px !important;
-    width:58px !important;
-    height:32px !important;
-    border-radius:13px !important;
-  }
-}
-</style>
 
 
 <script id="vimeo-url-clean-params-fix">
@@ -24639,6 +24571,145 @@ if(!window.__osteoVimeoEventsPatched){
   setTimeout(patchVimeoIframe, 1200);
 })();
 </script>
+
+
+<style id="vimeo-branding-mask-fix-v2">
+/* === VIMEO : cache repositionné + suppression du bouton "ouvrir Vimeo" === */
+#videoBox,
+.video-box,
+.custom-video-box{
+  position:relative !important;
+  overflow:hidden !important;
+}
+
+/* Cache haut droit : masque le menu/ouvrir avec Vimeo */
+#videoBox::before,
+.video-box::before,
+.custom-video-box::before{
+  content:"" !important;
+  position:absolute !important;
+  top:4px !important;
+  right:4px !important;
+  width:58px !important;
+  height:64px !important;
+  border-radius:9px !important;
+  background:#050b16 !important;
+  box-shadow:0 0 14px rgba(0,0,0,.30) !important;
+  z-index:30 !important;
+  pointer-events:none !important;
+}
+
+/* Cache bas droit : masque seulement le V Vimeo */
+#videoBox::after,
+.video-box::after,
+.custom-video-box::after{
+  content:"" !important;
+  position:absolute !important;
+  right:5px !important;
+  bottom:5px !important;
+  width:70px !important;
+  height:34px !important;
+  border-radius:7px !important;
+  background:#050b16 !important;
+  box-shadow:0 0 12px rgba(0,0,0,.30) !important;
+  z-index:30 !important;
+  pointer-events:none !important;
+}
+
+/* Supprime le bouton/lien externe Vimeo côté app */
+#directVimeoButton,
+#openVimeoButton,
+#openVimeo,
+.vimeo-open,
+.open-vimeo,
+button[onclick*="Vimeo"],
+button[onclick*="vimeo"],
+a[href*="vimeo.com"]{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
+/* Les contrôles de l'app restent utilisables */
+.custom-video-controls,
+.custom-video-overlay,
+#closeFullscreenVideo{
+  position:relative;
+  z-index:35;
+}
+
+@media(max-width:430px){
+  #videoBox::before,
+  .video-box::before,
+  .custom-video-box::before{
+    top:4px !important;
+    right:4px !important;
+    width:56px !important;
+    height:62px !important;
+  }
+
+  #videoBox::after,
+  .video-box::after,
+  .custom-video-box::after{
+    right:4px !important;
+    bottom:4px !important;
+    width:68px !important;
+    height:32px !important;
+  }
+}
+</style>
+
+
+<script id="remove-open-vimeo-button-fix">
+/* === Supprime définitivement le bouton externe Vimeo === */
+(function(){
+  function hideOpenVimeoButtons(){
+    document.querySelectorAll('button, a').forEach(function(el){
+      var txt = (el.textContent || '').trim().toLowerCase();
+      var href = (el.getAttribute && el.getAttribute('href')) || '';
+      var id = (el.id || '').toLowerCase();
+      var cls = (el.className || '').toString().toLowerCase();
+      if(
+        txt === 'ouvrir la vidéo vimeo' ||
+        txt === 'ouvrir la video vimeo' ||
+        id.indexOf('vimeo') !== -1 ||
+        cls.indexOf('vimeo') !== -1 ||
+        href.indexOf('vimeo.com') !== -1
+      ){
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
+        el.style.setProperty('pointer-events','none','important');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', hideOpenVimeoButtons);
+  setInterval(hideOpenVimeoButtons, 800);
+
+  var oldOpenTechnique = window.openTechnique || (typeof openTechnique === 'function' ? openTechnique : null);
+  if(oldOpenTechnique && !window.__hideOpenVimeoOpenTechniquePatched){
+    window.__hideOpenVimeoOpenTechniquePatched = true;
+    window.openTechnique = function(){
+      var result = oldOpenTechnique.apply(this, arguments);
+      setTimeout(hideOpenVimeoButtons, 40);
+      setTimeout(hideOpenVimeoButtons, 400);
+      return result;
+    };
+    try{ openTechnique = window.openTechnique; }catch(e){}
+  }
+})();
+</script>
+
+
+<style id="vimeo-top-cache-white-fix">
+/* === VIMEO : cache haut droit blanc, cache bas droit inchangé === */
+#videoBox::before,
+.video-box::before,
+.custom-video-box::before{
+  background:#ffffff !important;
+  box-shadow:0 0 10px rgba(255,255,255,.35) !important;
+}
+</style>
 
 </body>
 </html>
