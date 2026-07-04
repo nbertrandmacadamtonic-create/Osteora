@@ -7781,22 +7781,22 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('revision')">‹</button>
     <div class="brand">
-      <h1 class="logo">Déjà <span>vues</span></h1>
-      <p class="subtitle">Album de cartes</p>
+      <h1 class="logo">Collection</h1>
+      <p class="subtitle">Cartes débloquées</p>
     </div>
     <button class="icon" onclick="toast('Collections par zone')">▤</button>
   </header>
 
   <div class="seen-album-title">
     <h1>Collections</h1>
-    <p>Chaque zone devient une famille de cartes. Les techniques non vues restent grisées.</p>
+    <p>Seules les techniques vues entièrement apparaissent dans votre collection.</p>
   </div>
 
   <article class="collection-summary">
     <div class="pill-icon">★</div>
     <div>
       <strong id="seenAlbumSummary">Album en préparation</strong>
-      <p>Pour ce modèle, une seule carte est débloquée : Dysfonction cervicale C2–C6, assis. Toutes les autres cartes restent grisées.</p>
+      <p>Terminez une vidéo pour débloquer automatiquement sa carte à jouer.</p>
     </div>
   </article>
 
@@ -25103,6 +25103,375 @@ if(!window.__osteoVimeoEventsPatched){
   }
 }
 </style>
+
+
+<style id="collection-vues-seulement-final-fix">
+/* === COLLECTION : uniquement les techniques vues entièrement === */
+#seenCollections .quick-cervical-orange{
+  display:none !important;
+}
+
+#seenCollections .seen-album-title p,
+#seenCards .seen-album-title p{
+  max-width:360px !important;
+}
+
+#seenCollections .collection-grid{
+  display:grid !important;
+  gap:14px !important;
+}
+
+#seenCollections .collection-card{
+  opacity:1 !important;
+  filter:none !important;
+}
+
+#seenCollections .collection-card.collection-zone-empty{
+  display:none !important;
+}
+
+#seenCollections .collection-card .collection-progress{
+  min-width:62px !important;
+  text-align:center !important;
+}
+
+.collection-empty-premium{
+  display:grid;
+  gap:10px;
+  padding:22px 18px;
+  border-radius:24px;
+  border:1px solid rgba(0,229,255,.18);
+  background:
+    radial-gradient(circle at 20% 18%, rgba(0,229,255,.10), transparent 36%),
+    linear-gradient(145deg, rgba(10,29,55,.68), rgba(5,15,31,.82));
+  box-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  color:#dbe8f6;
+}
+
+.collection-empty-premium strong{
+  color:#ffffff;
+  font-size:19px;
+  line-height:1.18;
+}
+
+.collection-empty-premium p{
+  margin:0;
+  color:rgba(221,232,255,.72);
+  font-size:14px;
+  line-height:1.35;
+}
+
+#seenCards .card-grid.only-unlocked .play-card.locked{
+  display:none !important;
+}
+
+#seenCards .album-toolbar .album-chip.active{
+  color:#03111f !important;
+  background:linear-gradient(135deg, var(--cyan), var(--blue)) !important;
+  border-color:rgba(255,255,255,.55) !important;
+}
+
+/* Les cartes affichées dans Collection sont toujours actives */
+#seenCards .play-card.collection-unlocked{
+  cursor:pointer !important;
+  opacity:1 !important;
+  filter:none !important;
+}
+</style>
+
+
+<script id="collection-vues-seulement-final-script">
+/* === COLLECTION : zones et cartes uniquement si vidéo vue entièrement === */
+(function(){
+  var COMPLETED_DETAIL_KEY = 'osteoPratikCompletedTechniqueDetails';
+  var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
+
+  function uniqueNumbers(values){
+    var out = [];
+    var seen = {};
+    (Array.isArray(values) ? values : []).forEach(function(value){
+      var n = Number(value);
+      if(n && !seen[n]){
+        seen[n] = true;
+        out.push(n);
+      }
+    });
+    return out;
+  }
+
+  function readCompletedDetailIds(){
+    try{
+      var raw = localStorage.getItem(COMPLETED_DETAIL_KEY);
+      var details = raw ? JSON.parse(raw) : {};
+      if(details && typeof details === 'object'){
+        return uniqueNumbers(Object.keys(details));
+      }
+    }catch(e){}
+    return [];
+  }
+
+  function readStrictIds(){
+    try{
+      var raw = localStorage.getItem(STRICT_KEY);
+      var ids = raw ? JSON.parse(raw) : [];
+      return uniqueNumbers(ids);
+    }catch(e){}
+    return [];
+  }
+
+  function writeCompletedDetail(id, source){
+    var n = Number(id);
+    if(!n) return;
+    try{
+      var raw = localStorage.getItem(COMPLETED_DETAIL_KEY);
+      var details = raw ? JSON.parse(raw) : {};
+      if(!details || typeof details !== 'object') details = {};
+      details[String(n)] = {
+        id:n,
+        source:source || 'video-complete',
+        completedAt:new Date().toISOString()
+      };
+      localStorage.setItem(COMPLETED_DETAIL_KEY, JSON.stringify(details));
+    }catch(e){}
+  }
+
+  function syncCompletedIdsIntoUnlocked(ids){
+    ids = uniqueNumbers(ids);
+    try{
+      if(typeof unlockedTechniqueIds !== 'undefined' && unlockedTechniqueIds && typeof unlockedTechniqueIds.add === 'function'){
+        ids.forEach(function(id){ unlockedTechniqueIds.add(Number(id)); });
+      }
+    }catch(e){}
+
+    try{
+      var strict = readStrictIds();
+      ids.forEach(function(id){
+        if(strict.indexOf(id) === -1) strict.push(id);
+      });
+      localStorage.setItem(STRICT_KEY, JSON.stringify(uniqueNumbers(strict)));
+      localStorage.setItem('osteoPratikViewedTechniqueIds', JSON.stringify(uniqueNumbers(strict)));
+    }catch(e){}
+  }
+
+  function getCollectionCompletedIds(){
+    var ids = readCompletedDetailIds();
+
+    /*
+      Sécurité de migration :
+      si l'ancien code n'a jamais créé la clé de détail, on reprend les IDs stricts existants.
+      Dès qu'une nouvelle vidéo est terminée, la collection utilisera en priorité la clé complète.
+    */
+    if(!ids.length){
+      ids = readStrictIds();
+    }
+
+    syncCompletedIdsIntoUnlocked(ids);
+    return ids;
+  }
+
+  window.isTechniqueCompletedForCollection = function(tOrId){
+    var id = typeof tOrId === 'object' && tOrId ? tOrId.id : tOrId;
+    return getCollectionCompletedIds().indexOf(Number(id)) !== -1;
+  };
+
+  function zoneColorKey(zone){
+    if(zone === 'Rachis') return 'cervicales';
+    if(zone === 'Membres supérieurs') return 'msup';
+    if(zone === 'Membres inférieurs') return 'minf';
+    if(zone === 'Bassin') return 'bassin';
+    return 'cervicales';
+  }
+
+  function zoneIcon(zone){
+    if(zone === 'Rachis') return 'R';
+    if(zone === 'Membres supérieurs') return 'MS';
+    if(zone === 'Membres inférieurs') return 'MI';
+    if(zone === 'Bassin') return 'B';
+    return '◎';
+  }
+
+  function zoneOrderIndex(zone){
+    var order = ['Rachis', 'Membres supérieurs', 'Membres inférieurs', 'Bassin'];
+    var i = order.indexOf(zone);
+    return i === -1 ? 99 : i;
+  }
+
+  function escapeJsAttr(value){
+    return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  }
+
+  function completedItemsByZone(){
+    var completedIds = getCollectionCompletedIds();
+    var map = new Map();
+
+    (Array.isArray(techniques) ? techniques : []).forEach(function(t){
+      if(!t || completedIds.indexOf(Number(t.id)) === -1) return;
+      if(!map.has(t.zone)) map.set(t.zone, []);
+      map.get(t.zone).push(t);
+    });
+
+    return Array.from(map.entries())
+      .map(function(entry){ return {zone:entry[0], items:entry[1]}; })
+      .sort(function(a,b){ return zoneOrderIndex(a.zone) - zoneOrderIndex(b.zone); });
+  }
+
+  window.openSeenCollections = function(){
+    renderSeenCollections();
+    go('seenCollections');
+  };
+
+  window.renderSeenCollections = function(){
+    var grid = document.getElementById('collectionGrid');
+    if(!grid) return;
+
+    var groups = completedItemsByZone();
+    var completedCount = groups.reduce(function(sum, g){ return sum + g.items.length; }, 0);
+    var total = Array.isArray(techniques) ? techniques.length : 0;
+
+    var headerLogo = document.querySelector('#seenCollections .brand .logo');
+    var headerSub = document.querySelector('#seenCollections .brand .subtitle');
+    var intro = document.querySelector('#seenCollections .seen-album-title p');
+    var summary = document.getElementById('seenAlbumSummary');
+    var summaryText = document.querySelector('#seenCollections .collection-summary p');
+
+    if(headerLogo) headerLogo.innerHTML = 'Collection';
+    if(headerSub) headerSub.textContent = 'Cartes débloquées';
+    if(intro) intro.textContent = 'Seules les techniques vues entièrement apparaissent dans votre collection.';
+    if(summary) summary.textContent = completedCount + ' / ' + total + ' cartes débloquées';
+    if(summaryText){
+      summaryText.textContent = completedCount
+        ? 'Touchez une zone colorée pour afficher uniquement les cartes que vous avez déjà débloquées.'
+        : 'Terminez une vidéo jusqu’au bout pour faire apparaître sa carte dans votre collection.';
+    }
+
+    var fixedButton = document.querySelector('#seenCollections .quick-cervical-orange');
+    if(fixedButton) fixedButton.style.setProperty('display', 'none', 'important');
+
+    if(!completedCount){
+      grid.innerHTML = '<article class="collection-empty-premium"><strong>Aucune carte débloquée pour le moment</strong><p>Visionnez une technique en entier. Dès qu’elle est validée, sa carte apparaîtra ici.</p></article>';
+      return;
+    }
+
+    grid.innerHTML = groups.map(function(group){
+      var zone = group.zone;
+      var unlocked = group.items.length;
+      var zoneTotal = (Array.isArray(techniques) ? techniques : []).filter(function(t){ return t.zone === zone; }).length || unlocked;
+      var percent = Math.round((unlocked / Math.max(zoneTotal, 1)) * 100);
+
+      return '<button class="collection-card collection-zone-card collection-color-' + zoneColorKey(zone) + '" onclick="openSeenCollectionZone(\'' + escapeJsAttr(zone) + '\')">' +
+        '<div class="collection-badge">' + zoneIcon(zone) + '</div>' +
+        '<div>' +
+          '<h3>' + zone + '</h3>' +
+          '<p>' + unlocked + ' carte' + (unlocked > 1 ? 's' : '') + ' débloquée' + (unlocked > 1 ? 's' : '') + '</p>' +
+        '</div>' +
+        '<div class="collection-progress">' + unlocked + '/' + zoneTotal + '</div>' +
+        '<div class="collection-bar"><i style="width:' + percent + '%"></i></div>' +
+      '</button>';
+    }).join('');
+  };
+
+  window.openSeenCollectionZone = function(zone){
+    window.currentSeenZone = zone;
+    window.currentSeenSub = '__ALL_UNLOCKED__';
+    renderSeenCards(zone, '__ALL_UNLOCKED__');
+    go('seenCards');
+  };
+
+  window.openSeenCollection = function(zone, sub){
+    window.currentSeenZone = zone;
+    window.currentSeenSub = sub || '__ALL_UNLOCKED__';
+    renderSeenCards(zone, sub || '__ALL_UNLOCKED__');
+    go('seenCards');
+  };
+
+  function renderUnlockedCollectionCard(t){
+    var poster = 'assets/images/' + String(t.id).padStart(3,'0') + '-' + slugify(t.title) + '.webp';
+    var colorKey = typeof getTechniqueColorKey === 'function' ? getTechniqueColorKey(t) : 'cervicales';
+    var safeTitle = typeof escapeHtml === 'function' ? escapeHtml(t.title) : String(t.title || '');
+
+    return '<article class="play-card collection-unlocked tech-color-' + colorKey + '" data-tech-id="' + t.id + '" data-tech-color="' + colorKey + '" onclick="openFullCard(' + Number(t.id) + ')">' +
+      '<div class="play-card-inner">' +
+        '<div class="play-card-face card-front">' +
+          '<div class="card-kicker"><span>' + t.sub + '</span><span>#' + String(t.id).padStart(3,'0') + '</span></div>' +
+          '<div class="card-image">' +
+            '<img src="' + poster + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\';" alt="">' +
+            '<div class="card-fallback card-fallback-' + colorKey + '" style="display:none">' + (t.icon || '◎') + '</div>' +
+          '</div>' +
+          '<div>' +
+            '<div class="card-title">' + safeTitle + '</div>' +
+            '<span class="card-status">carte débloquée · toucher pour agrandir</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  window.renderSeenCards = function(zone, sub){
+    var grid = document.getElementById('seenCardGrid');
+    if(!grid) return;
+
+    var completedIds = getCollectionCompletedIds();
+    var items = (Array.isArray(techniques) ? techniques : []).filter(function(t){
+      if(!t || completedIds.indexOf(Number(t.id)) === -1) return false;
+      if(zone && t.zone !== zone) return false;
+      if(sub && sub !== '__ALL_UNLOCKED__' && t.sub !== sub) return false;
+      return true;
+    }).sort(function(a,b){
+      return String(a.sub).localeCompare(String(b.sub)) || Number(a.id) - Number(b.id);
+    });
+
+    syncCompletedIdsIntoUnlocked(items.map(function(t){ return t.id; }));
+
+    var title = document.getElementById('seenCardsTitle');
+    var subtitle = document.getElementById('seenCardsSubtitle');
+    var heading = document.getElementById('seenCollectionHeading');
+    var intro = document.getElementById('seenCollectionIntro');
+    var count = document.getElementById('seenCollectionCount');
+
+    if(title) title.innerHTML = 'Collection';
+    if(subtitle) subtitle.textContent = zone || 'Cartes débloquées';
+    if(heading) heading.textContent = zone || 'Cartes débloquées';
+    if(intro) intro.textContent = 'Cartes des techniques vues entièrement. Touchez une carte pour l’ouvrir en plein écran.';
+    if(count) count.textContent = items.length + ' carte' + (items.length > 1 ? 's' : '') + ' débloquée' + (items.length > 1 ? 's' : '');
+
+    grid.classList.add('only-unlocked');
+
+    if(!items.length){
+      grid.innerHTML = '<article class="collection-empty-premium"><strong>Aucune carte débloquée dans cette zone</strong><p>Terminez une vidéo de cette zone pour faire apparaître sa carte ici.</p></article>';
+      return;
+    }
+
+    grid.innerHTML = items.map(renderUnlockedCollectionCard).join('');
+  };
+
+  // On marque aussi la clé complète lorsqu'une vidéo est validée après cette correction.
+  var oldMarkComplete = window.markTechniqueViewedAfterComplete || (typeof markTechniqueViewedAfterComplete === 'function' ? markTechniqueViewedAfterComplete : null);
+  window.markTechniqueViewedAfterComplete = function(id){
+    var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+    if(n) writeCompletedDetail(n, 'markTechniqueViewedAfterComplete');
+    if(oldMarkComplete){
+      try{ oldMarkComplete.apply(this, arguments); }catch(e){}
+    }
+    try{ renderSeenCollections(); }catch(e){}
+  };
+  try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+
+  var oldVideoCompleted = window.markTechniqueVideoCompleted || (typeof markTechniqueVideoCompleted === 'function' ? markTechniqueVideoCompleted : null);
+  window.markTechniqueVideoCompleted = function(id, source){
+    var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
+    if(n) writeCompletedDetail(n, source || 'markTechniqueVideoCompleted');
+    if(oldVideoCompleted){
+      try{ oldVideoCompleted.apply(this, arguments); }catch(e){}
+    }
+    try{ renderSeenCollections(); }catch(e){}
+  };
+  try{ markTechniqueVideoCompleted = window.markTechniqueVideoCompleted; }catch(e){}
+
+  document.addEventListener('DOMContentLoaded', function(){
+    try{ renderSeenCollections(); }catch(e){}
+  });
+})();
+</script>
 
 </body>
 </html>
