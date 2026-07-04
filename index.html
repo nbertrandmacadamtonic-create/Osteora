@@ -7303,7 +7303,7 @@ assets/icons/icon-profil.webp
 
   <article class="video-helper-card video-stats-card">
     <div class="video-stats-head">
-      <div class="pill-icon">#</div>
+      <div class="pill-icon video-zones-icon"><img src="assets/icons/icon-zones.webp?v=1" alt="Techniques par zone"></div>
       <div>
         <strong>Techniques par zone</strong>
         <small>Accès rapide au volume de contenu</small>
@@ -7662,7 +7662,7 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="revision-orbit-card revision-review" onclick="go('revisionCard')">
-      <div class="revision-orbit-icon">↻</div>
+      <div class="revision-orbit-icon revision-audio-icon"><img src="assets/icons/icon-audio.webp?v=1" alt="Audio"></div>
       <strong>Audio</strong>
       <small>réviser en écoutant</small>
     </button>
@@ -24032,49 +24032,110 @@ if(!window.__osteoVimeoEventsPatched){
 </script>
 
 
+
 <style>
 /* === PATCH : recherche vocale dans les barres de recherche === */
 .search.voice-search-ready{
-  grid-template-columns:30px minmax(0,1fr) 36px !important;
+  position:relative !important;
+  grid-template-columns:30px minmax(0,1fr) 40px !important;
+  align-items:center !important;
 }
 
 .search.voice-search-ready.has-clear{
-  grid-template-columns:30px minmax(0,1fr) 36px 34px !important;
+  grid-template-columns:30px minmax(0,1fr) 40px 34px !important;
 }
 
 .search .voice-search-btn{
-  width:32px !important;
-  height:32px !important;
-  min-width:32px !important;
+  width:36px !important;
+  height:36px !important;
+  min-width:36px !important;
   border-radius:50% !important;
   display:grid !important;
   place-items:center !important;
-  color:#ffffff !important;
+  color:#9fefff !important;
   background:
-    radial-gradient(circle at 35% 25%, rgba(0,229,255,.22), transparent 46%),
-    rgba(0,229,255,.08) !important;
-  border:1px solid rgba(0,229,255,.32) !important;
+    radial-gradient(circle at 35% 25%, rgba(0,229,255,.28), transparent 46%),
+    linear-gradient(180deg, rgba(10,27,45,.98), rgba(8,22,38,.96)) !important;
+  border:1px solid rgba(0,229,255,.42) !important;
   box-shadow:
-    0 0 14px rgba(0,229,255,.18),
+    0 0 16px rgba(0,229,255,.20),
     inset 0 1px 0 rgba(255,255,255,.08) !important;
-  font-size:16px !important;
   line-height:1 !important;
   padding:0 !important;
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease !important;
+}
+
+.search .voice-search-btn svg{
+  width:20px !important;
+  height:20px !important;
+  display:block !important;
+  stroke:currentColor !important;
+  fill:none !important;
+  stroke-width:2.2 !important;
+  stroke-linecap:round !important;
+  stroke-linejoin:round !important;
+}
+
+.search .voice-search-btn:active{
+  transform:scale(.96) !important;
 }
 
 .search .voice-search-btn.listening{
   color:#03111f !important;
   background:linear-gradient(135deg, var(--cyan), var(--blue)) !important;
-  border-color:rgba(255,255,255,.70) !important;
+  border-color:rgba(255,255,255,.78) !important;
   box-shadow:
     0 0 22px rgba(0,229,255,.55),
     0 0 38px rgba(45,140,255,.28) !important;
   animation:voicePulse 1s ease-in-out infinite;
 }
 
+.search.voice-search-ready.voice-listening{
+  border-color:rgba(130,240,255,.95) !important;
+  box-shadow:
+    0 0 0 1px rgba(120,235,255,.38),
+    0 0 24px rgba(0,229,255,.26),
+    inset 0 0 22px rgba(0,229,255,.09) !important;
+  animation:voiceSelectionBlink .95s ease-in-out infinite;
+}
+
+.search.voice-search-ready.voice-listening input{
+  color:#ffffff !important;
+}
+
+.search.voice-search-ready.voice-listening::after{
+  content:'Écoute en cours…';
+  position:absolute;
+  left:50%;
+  bottom:-18px;
+  transform:translateX(-50%);
+  font-size:10px;
+  line-height:1;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:rgba(170,240,255,.92);
+  text-shadow:0 0 12px rgba(0,229,255,.40);
+  pointer-events:none;
+}
+
 @keyframes voicePulse{
   0%,100%{ transform:scale(1); }
   50%{ transform:scale(1.08); }
+}
+
+@keyframes voiceSelectionBlink{
+  0%,100%{
+    box-shadow:
+      0 0 0 1px rgba(120,235,255,.30),
+      0 0 16px rgba(0,229,255,.18),
+      inset 0 0 12px rgba(0,229,255,.04);
+  }
+  50%{
+    box-shadow:
+      0 0 0 1px rgba(160,245,255,.62),
+      0 0 30px rgba(0,229,255,.42),
+      inset 0 0 26px rgba(0,229,255,.13);
+  }
 }
 
 .voice-search-hint{
@@ -24085,6 +24146,8 @@ if(!window.__osteoVimeoEventsPatched){
   text-align:center;
 }
 </style>
+
+
 
 <script>
 /* === PATCH : recherche vocale Catalogue + liste techniques === */
@@ -24105,12 +24168,33 @@ if(!window.__osteoVimeoEventsPatched){
     }
   }
 
+  function setListeningVisualState(input, button, isListening){
+    if(!input) return;
+    const container = input.closest('.search');
+    if(button) button.classList.toggle('listening', !!isListening);
+    if(container) container.classList.toggle('voice-listening', !!isListening);
+
+    if(isListening){
+      if(!input.dataset.originalPlaceholder){
+        input.dataset.originalPlaceholder = input.getAttribute('placeholder') || '';
+      }
+      input.setAttribute('placeholder', 'Parlez maintenant…');
+      try{ input.focus({preventScroll:true}); }catch(e){ try{ input.focus(); }catch(e2){} }
+    }else if(input.dataset.originalPlaceholder){
+      input.setAttribute('placeholder', input.dataset.originalPlaceholder);
+    }
+  }
+
   function stopExistingRecognition(){
     if(activeVoiceRecognition){
       try{ activeVoiceRecognition.stop(); }catch(e){}
       activeVoiceRecognition = null;
     }
     document.querySelectorAll('.voice-search-btn.listening').forEach(btn => btn.classList.remove('listening'));
+    document.querySelectorAll('.search.voice-listening').forEach(box => box.classList.remove('voice-listening'));
+    document.querySelectorAll('input[data-original-placeholder]').forEach(input => {
+      input.setAttribute('placeholder', input.dataset.originalPlaceholder || '');
+    });
   }
 
   window.startVoiceSearch = function(inputId, renderFnName, button){
@@ -24132,7 +24216,7 @@ if(!window.__osteoVimeoEventsPatched){
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    if(button) button.classList.add('listening');
+    setListeningVisualState(input, button, true);
     if(typeof toast === 'function') toast('Parlez maintenant…');
 
     recognition.onresult = function(event){
@@ -24146,18 +24230,19 @@ if(!window.__osteoVimeoEventsPatched){
     };
 
     recognition.onerror = function(){
+      setListeningVisualState(input, button, false);
       if(typeof toast === 'function') toast('Recherche vocale interrompue');
     };
 
     recognition.onend = function(){
-      if(button) button.classList.remove('listening');
+      setListeningVisualState(input, button, false);
       if(activeVoiceRecognition === recognition) activeVoiceRecognition = null;
     };
 
     try{
       recognition.start();
     }catch(e){
-      if(button) button.classList.remove('listening');
+      setListeningVisualState(input, button, false);
       if(typeof toast === 'function') toast('Touchez à nouveau le micro');
     }
   };
@@ -24174,7 +24259,7 @@ if(!window.__osteoVimeoEventsPatched){
     button.className = 'voice-search-btn';
     button.setAttribute('aria-label', label || 'Recherche vocale');
     button.setAttribute('title', label || 'Recherche vocale');
-    button.textContent = '🎙';
+    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"></rect><path d="M6 11.5a6 6 0 0 0 12 0"></path><path d="M12 17.5v3"></path><path d="M9 20.5h6"></path></svg>';
     button.addEventListener('click', function(event){
       event.preventDefault();
       event.stopPropagation();
@@ -24208,6 +24293,7 @@ if(!window.__osteoVimeoEventsPatched){
   setTimeout(installVoiceSearch, 1000);
 })();
 </script>
+
 
 
 <style id="catalogue-zone-cards-upsize-fix">
@@ -24392,6 +24478,167 @@ if(!window.__osteoVimeoEventsPatched){
   }
 }
 </style>
+
+
+<style id="audio-zones-icons-webp-fix">
+/* === ICÔNES WEBP TRANSPARENTES : Audio + Techniques par zone dans Vidéo === */
+#revision .revision-audio-icon,
+#videoMap .video-zones-icon{
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: visible !important;
+}
+
+#revision .revision-audio-icon img,
+#videoMap .video-zones-icon img{
+  width: 150% !important;
+  height: 150% !important;
+  object-fit: contain !important;
+  display: block !important;
+  padding: 0 !important;
+  transform: scale(1.08) !important;
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 12px currentColor);
+}
+
+#videoMap .video-zones-icon{
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 18px !important;
+}
+</style>
+
+
+<style id="vimeo-branding-mask-fix">
+/* === VIMEO : suppression visuelle du bouton "ouvrir avec Vimeo" + cache du V Vimeo === */
+#videoBox,
+.video-box{
+  position:relative !important;
+}
+
+/* Cache en haut à droite : masque la petite icône "ouvrir avec Vimeo" */
+#videoBox::before,
+.video-box::before{
+  content:"" !important;
+  position:absolute !important;
+  top:8px !important;
+  right:8px !important;
+  width:52px !important;
+  height:52px !important;
+  border-radius:16px !important;
+  background:linear-gradient(145deg, rgba(3,8,22,.96), rgba(5,16,32,.92)) !important;
+  box-shadow:0 0 18px rgba(0,0,0,.35) !important;
+  z-index:12 !important;
+  pointer-events:none !important;
+}
+
+/* Cache en bas à droite : masque le V/logo Vimeo */
+#videoBox::after,
+.video-box::after{
+  content:"" !important;
+  position:absolute !important;
+  right:8px !important;
+  bottom:8px !important;
+  width:64px !important;
+  height:34px !important;
+  border-radius:14px !important;
+  background:linear-gradient(145deg, rgba(3,8,22,.98), rgba(5,16,32,.94)) !important;
+  box-shadow:0 0 18px rgba(0,0,0,.38) !important;
+  z-index:12 !important;
+  pointer-events:none !important;
+}
+
+/* Si les contrôles custom sont affichés, on laisse leurs boutons au-dessus si nécessaire */
+.custom-video-overlay,
+.custom-video-controls,
+#closeFullscreenVideo{
+  position:relative;
+  z-index:20;
+}
+
+@media(max-width:430px){
+  #videoBox::before,
+  .video-box::before{
+    top:6px !important;
+    right:6px !important;
+    width:46px !important;
+    height:46px !important;
+    border-radius:14px !important;
+  }
+
+  #videoBox::after,
+  .video-box::after{
+    right:6px !important;
+    bottom:6px !important;
+    width:58px !important;
+    height:32px !important;
+    border-radius:13px !important;
+  }
+}
+</style>
+
+
+<script id="vimeo-url-clean-params-fix">
+/* === VIMEO : paramètres propres + cache visuel === */
+(function(){
+  function cleanVimeoUrl(url){
+    if(!url || String(url).indexOf('vimeo.com') === -1) return url;
+    try{
+      var u = new URL(String(url), window.location.href);
+      u.searchParams.set('dnt','1');
+      u.searchParams.set('title','0');
+      u.searchParams.set('byline','0');
+      u.searchParams.set('portrait','0');
+      u.searchParams.set('badge','0');
+      u.searchParams.set('transparent','0');
+      return u.toString();
+    }catch(e){
+      var sep = String(url).indexOf('?') === -1 ? '?' : '&';
+      return String(url) + sep + 'dnt=1&title=0&byline=0&portrait=0&badge=0&transparent=0';
+    }
+  }
+
+  function patchVimeoIframe(){
+    var iframe = document.getElementById('vimeoPlayer');
+    if(!iframe || iframe.__vimeoCleanPatched) return;
+    iframe.__vimeoCleanPatched = true;
+
+    var lastSrc = iframe.getAttribute('src') || '';
+    try{
+      var descriptor = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
+      if(descriptor && descriptor.set && descriptor.get){
+        Object.defineProperty(iframe, 'src', {
+          get:function(){ return descriptor.get.call(this); },
+          set:function(value){
+            descriptor.set.call(this, cleanVimeoUrl(value));
+          }
+        });
+      }
+    }catch(e){}
+
+    var observer = new MutationObserver(function(){
+      var src = iframe.getAttribute('src') || '';
+      if(src && src !== lastSrc && src.indexOf('vimeo.com') !== -1){
+        lastSrc = cleanVimeoUrl(src);
+        if(src !== lastSrc) iframe.setAttribute('src', lastSrc);
+      }
+    });
+    observer.observe(iframe, {attributes:true, attributeFilter:['src']});
+
+    if(lastSrc && lastSrc.indexOf('vimeo.com') !== -1){
+      iframe.setAttribute('src', cleanVimeoUrl(lastSrc));
+    }
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', patchVimeoIframe);
+  }else{
+    patchVimeoIframe();
+  }
+  setTimeout(patchVimeoIframe, 300);
+  setTimeout(patchVimeoIframe, 1200);
+})();
+</script>
 
 </body>
 </html>
