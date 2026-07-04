@@ -8033,8 +8033,15 @@ assets/icons/icon-profil.webp
     </div>
 
     <div class="stats-quiz-layout">
-      <div class="stats-chart" aria-hidden="true">
-        <svg viewBox="0 0 320 150" preserveAspectRatio="none">
+      <div class="stats-chart is-empty" id="statsPerformanceChart" aria-hidden="true">
+        <div class="stats-chart-empty" id="statsChartEmpty">
+          <div class="stats-chart-empty-icon">◎</div>
+          <div class="stats-chart-empty-copy">
+            <strong>Aucun quiz terminé</strong>
+            <span>Le graphique de performance s'affichera après votre premier quiz général.</span>
+          </div>
+        </div>
+        <svg id="statsPerformanceSvg" viewBox="0 0 320 150" preserveAspectRatio="none">
           <defs>
             <linearGradient id="statsLineGradient" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stop-color="#42dfff"/>
@@ -8045,37 +8052,25 @@ assets/icons/icon-profil.webp
           <line x1="0" y1="65" x2="320" y2="65"></line>
           <line x1="0" y1="100" x2="320" y2="100"></line>
           <line x1="0" y1="135" x2="320" y2="135"></line>
-          <polyline points="10,108 60,92 110,28 160,104 210,56 260,92 310,62"></polyline>
-          <circle cx="10" cy="108" r="5"></circle>
-          <circle cx="60" cy="92" r="5"></circle>
-          <circle cx="110" cy="28" r="5"></circle>
-          <circle cx="160" cy="104" r="5"></circle>
-          <circle cx="210" cy="56" r="5"></circle>
-          <circle cx="260" cy="92" r="5"></circle>
-          <circle cx="310" cy="62" r="5"></circle>
+          <polyline id="statsPerformancePolyline" points="10,135 60,135 110,135 160,135 210,135 260,135 310,135"></polyline>
+          <circle cx="10" cy="135" r="4"></circle>
+          <circle cx="60" cy="135" r="4"></circle>
+          <circle cx="110" cy="135" r="4"></circle>
+          <circle cx="160" cy="135" r="4"></circle>
+          <circle cx="210" cy="135" r="4"></circle>
+          <circle cx="260" cy="135" r="4"></circle>
+          <circle cx="310" cy="135" r="6"></circle>
         </svg>
-        <div class="stats-chart-labels"><span>04/06</span><span>05/06</span><span>06/06</span><span>07/06</span><span>08/06</span><span>09/06</span><span>10/06</span></div>
+        <div class="stats-chart-labels" id="statsChartLabels"><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span></div>
       </div>
 
-      <div class="stats-quiz-score">
-        <strong>76<span>%</span></strong>
-        <p>taux de réussite moyen</p>
-        <em>↥ +12%<small>vs semaine précédente</small></em>
+      <div class="stats-quiz-score" id="statsPerformanceScore">
+        <strong>—</strong>
+        <p>aucun quiz terminé</p>
+        <em>Commencez<small>par le quiz général</small></em>
       </div>
     </div>
   </section>
-
-  <article class="stats-last-practice">
-    <div class="pill-icon">↺</div>
-    <div>
-      <small>Votre dernière pratique</small>
-      <strong>Dysfonction facettaire des dorsales</strong>
-      <span>Rachis</span>
-      <div class="bar"><i style="width:58%"></i></div>
-    </div>
-    <b>128<small>points</small></b>
-    <button onclick="go('revision')">›</button>
-  </article>
 </section>
 
 
@@ -24717,6 +24712,204 @@ if(!window.__osteoVimeoEventsPatched){
     inset 0 0 18px rgba(0,229,255,.07) !important;
 }
 </style>
+
+
+<style id="stats-performance-final-patch">
+/* === STATS : carte Performance aux quiz nettoyée + suppression de la dernière pratique === */
+#progress .stats-chart{
+  position:relative;
+  min-height:220px;
+}
+#progress .stats-chart.is-empty svg,
+#progress .stats-chart.is-empty .stats-chart-labels{
+  opacity:0;
+  visibility:hidden;
+}
+#progress .stats-chart-empty{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:18px;
+  text-align:left;
+  border-radius:18px;
+  background:radial-gradient(circle at 20% 20%, rgba(53,230,167,.08), transparent 32%);
+}
+#progress .stats-chart-empty-icon{
+  width:54px;
+  height:54px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  font-weight:900;
+  color:#70ffd4;
+  border:1px solid rgba(112,255,212,.35);
+  background:rgba(112,255,212,.08);
+  box-shadow:0 0 18px rgba(112,255,212,.12);
+  flex:0 0 auto;
+}
+#progress .stats-chart-empty-copy strong{
+  display:block;
+  color:#ffffff;
+  font-size:18px;
+  line-height:1.15;
+  margin-bottom:6px;
+}
+#progress .stats-chart-empty-copy span{
+  display:block;
+  color:rgba(221,232,255,.72);
+  font-size:13px;
+  line-height:1.35;
+}
+#progress .stats-quiz-score{
+  min-width:0;
+}
+#progress .stats-quiz-score em{
+  line-height:1.2;
+}
+#progress .stats-quiz-score p{
+  margin:8px 0 12px;
+}
+@media(max-width:430px){
+  #progress .stats-chart{
+    min-height:210px;
+  }
+  #progress .stats-chart-empty{
+    padding:16px;
+    gap:12px;
+  }
+  #progress .stats-chart-empty-icon{
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    font-size:22px;
+  }
+  #progress .stats-chart-empty-copy strong{
+    font-size:17px;
+  }
+  #progress .stats-chart-empty-copy span{
+    font-size:12px;
+  }
+}
+</style>
+
+<script id="stats-performance-final-script">
+(function(){
+  function formatShortDate(d){
+    try{
+      return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
+    }catch(e){ return '—'; }
+  }
+
+  function buildLast7Labels(iso){
+    var base = iso ? new Date(iso) : new Date();
+    if(isNaN(base.getTime())) base = new Date();
+    var labels = [];
+    for(var i=6; i>=0; i--){
+      var d = new Date(base);
+      d.setDate(base.getDate() - i);
+      labels.push(formatShortDate(d));
+    }
+    return labels;
+  }
+
+  function renderPerformanceChart(lastQuiz){
+    var chart = document.getElementById('statsPerformanceChart');
+    var empty = document.getElementById('statsChartEmpty');
+    var svg = document.getElementById('statsPerformanceSvg');
+    var polyline = document.getElementById('statsPerformancePolyline');
+    var labelsWrap = document.getElementById('statsChartLabels');
+    var scoreWrap = document.getElementById('statsPerformanceScore');
+    if(!chart || !empty || !svg || !polyline || !labelsWrap || !scoreWrap) return;
+
+    var strong = scoreWrap.querySelector('strong');
+    var p = scoreWrap.querySelector('p');
+    var em = scoreWrap.querySelector('em');
+    var circles = svg.querySelectorAll('circle');
+    var xs = [10, 60, 110, 160, 210, 260, 310];
+
+    if(!lastQuiz){
+      chart.classList.add('is-empty');
+      empty.hidden = false;
+      if(strong) strong.innerHTML = '—';
+      if(p) p.textContent = 'aucun quiz terminé';
+      if(em) em.innerHTML = 'Commencez<small>par le quiz général</small>';
+      polyline.setAttribute('points', '10,135 60,135 110,135 160,135 210,135 260,135 310,135');
+      circles.forEach(function(c, idx){
+        c.setAttribute('cy', '135');
+        c.setAttribute('r', idx === circles.length - 1 ? '6' : '4');
+        c.style.opacity = idx === circles.length - 1 ? '.42' : '.18';
+      });
+      labelsWrap.innerHTML = '<span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span>';
+      return;
+    }
+
+    var score = Number(lastQuiz.score || 0);
+    var total = Number(lastQuiz.total || 15);
+    var percent = Number(lastQuiz.percent || Math.round((score / Math.max(total,1)) * 100));
+    percent = Math.max(0, Math.min(100, percent));
+    var y = Math.round(135 - (percent / 100) * 105);
+    var points = xs.map(function(x, idx){ return x + ',' + (idx < xs.length - 1 ? 135 : y); }).join(' ');
+    polyline.setAttribute('points', points);
+
+    circles.forEach(function(c, idx){
+      c.setAttribute('cx', String(xs[idx]));
+      c.setAttribute('cy', String(idx < xs.length - 1 ? 135 : y));
+      c.setAttribute('r', idx === xs.length - 1 ? '6' : '4');
+      c.style.opacity = idx === xs.length - 1 ? '1' : '.24';
+    });
+
+    var labels = buildLast7Labels(lastQuiz.date);
+    labelsWrap.innerHTML = labels.map(function(label){ return '<span>' + label + '</span>'; }).join('');
+
+    chart.classList.remove('is-empty');
+    empty.hidden = true;
+    if(strong) strong.innerHTML = percent + '<span>%</span>';
+    if(p) p.textContent = 'dernier score au quiz général';
+    if(em){
+      if(percent >= 80) em.innerHTML = '↥ Très bon<small>bases solides</small>';
+      else if(percent >= 60) em.innerHTML = '→ Correct<small>à consolider</small>';
+      else em.innerHTML = '↧ À revoir<small>reprendre les bases</small>';
+    }
+  }
+
+  function runStatsPatch(){
+    var lastQuiz = null;
+    try{ lastQuiz = JSON.parse(localStorage.getItem('osteoPratikLastQuiz') || 'null'); }catch(e){ lastQuiz = null; }
+
+    var lastPractice = document.querySelector('#progress .stats-last-practice');
+    if(lastPractice) lastPractice.remove();
+
+    renderPerformanceChart(lastQuiz);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    runStatsPatch();
+    setTimeout(runStatsPatch, 80);
+    setTimeout(runStatsPatch, 300);
+  });
+
+  var _origGoStatsPatch = typeof go === 'function' ? go : null;
+  if(_origGoStatsPatch && !window.__statsPerformancePatched){
+    window.__statsPerformancePatched = true;
+    go = function(id){
+      _origGoStatsPatch(id);
+      if(id === 'progress'){
+        setTimeout(runStatsPatch, 40);
+        setTimeout(runStatsPatch, 220);
+      }
+    };
+  }
+
+  window.updateQuizPerformanceCard = function(lastQuiz){
+    renderPerformanceChart(lastQuiz || null);
+  };
+  window.refreshStatsPerformanceCard = runStatsPatch;
+})();
+</script>
 
 </body>
 </html>
