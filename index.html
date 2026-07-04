@@ -7662,7 +7662,14 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="revision-orbit-card revision-review" onclick="go('revisionCard')">
-      <div class="revision-orbit-icon revision-audio-icon"><img src="assets/icons/icon-audio.webp?v=1" alt="Audio"></div>
+      <div class="revision-orbit-icon revision-audio-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Audio">
+          <rect x="9" y="3.5" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.9"></rect>
+          <path d="M6 11.5C6 14.8137 8.68629 17.5 12 17.5C15.3137 17.5 18 14.8137 18 11.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+          <path d="M12 17.5V20.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+          <path d="M9 20.5H15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
+        </svg>
+      </div>
       <strong>Audio</strong>
       <small>réviser en écoutant</small>
     </button>
@@ -24710,6 +24717,186 @@ a[href*="vimeo.com"]{
   box-shadow:0 0 10px rgba(255,255,255,.35) !important;
 }
 </style>
+
+
+<style id="revision-audio-and-vimeo-final-fix">
+/* === CARTE RÉVISION AUDIO : vrai pictogramme + sous-titre mieux contenu === */
+#revision .revision-review .revision-audio-icon{
+  display:grid !important;
+  place-items:center !important;
+  padding:0 !important;
+  overflow:hidden !important;
+}
+
+#revision .revision-review .revision-audio-icon img{
+  display:none !important;
+}
+
+#revision .revision-review .revision-audio-icon svg{
+  width:28px !important;
+  height:28px !important;
+  display:block !important;
+  color:currentColor !important;
+  filter:drop-shadow(0 0 8px color-mix(in srgb, currentColor 38%, transparent));
+}
+
+#revision .revision-review strong{
+  left:30px !important;
+  top:122px !important;
+  max-width:132px !important;
+}
+
+#revision .revision-review small{
+  left:30px !important;
+  top:154px !important;
+  max-width:120px !important;
+  padding-right:10px !important;
+  line-height:1.16 !important;
+}
+
+@media(max-width:430px){
+  #revision .revision-review strong{
+    max-width:128px !important;
+  }
+  #revision .revision-review small{
+    max-width:114px !important;
+    padding-right:12px !important;
+  }
+}
+
+/* === VIMEO iPHONE : vrais caches HTML au-dessus de l'iframe === */
+#videoBox.vimeo-brand-masked::before,
+#videoBox.vimeo-brand-masked::after,
+.video-box.vimeo-brand-masked::before,
+.video-box.vimeo-brand-masked::after,
+.custom-video-box.vimeo-brand-masked::before,
+.custom-video-box.vimeo-brand-masked::after{
+  content:none !important;
+}
+
+.vimeo-brand-mask-layer{
+  position:absolute !important;
+  z-index:2147483646 !important;
+  pointer-events:none !important;
+  display:block !important;
+  border-radius:10px !important;
+}
+
+.vimeo-brand-mask-layer.top-right{
+  top:6px !important;
+  right:6px !important;
+  width:64px !important;
+  height:64px !important;
+  background:#ffffff !important;
+  box-shadow:0 0 10px rgba(255,255,255,.42) !important;
+}
+
+.vimeo-brand-mask-layer.bottom-right{
+  right:6px !important;
+  bottom:6px !important;
+  width:72px !important;
+  height:34px !important;
+  border-radius:8px !important;
+  background:#050b16 !important;
+  box-shadow:0 0 12px rgba(0,0,0,.30) !important;
+}
+
+@media(max-width:430px){
+  .vimeo-brand-mask-layer.top-right{
+    top:6px !important;
+    right:6px !important;
+    width:62px !important;
+    height:62px !important;
+  }
+  .vimeo-brand-mask-layer.bottom-right{
+    right:5px !important;
+    bottom:5px !important;
+    width:68px !important;
+    height:32px !important;
+  }
+}
+</style>
+
+<script id="vimeo-branding-mask-final-fix">
+/* === VIMEO iPHONE : masque fiable du menu + du V Vimeo === */
+(function(){
+  function hideOpenVimeoButtons(){
+    document.querySelectorAll('button, a').forEach(function(el){
+      var txt = (el.textContent || '').trim().toLowerCase();
+      var href = (el.getAttribute && el.getAttribute('href')) || '';
+      var id = (el.id || '').toLowerCase();
+      var cls = (el.className || '').toString().toLowerCase();
+      if(
+        txt === 'ouvrir la vidéo vimeo' ||
+        txt === 'ouvrir la video vimeo' ||
+        id.indexOf('vimeo') !== -1 ||
+        cls.indexOf('vimeo') !== -1 ||
+        href.indexOf('vimeo.com') !== -1
+      ){
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('visibility','hidden','important');
+        el.style.setProperty('pointer-events','none','important');
+      }
+    });
+  }
+
+  function applyMask(box){
+    if(!box) return;
+    var iframe = box.querySelector('iframe');
+    if(!iframe || String(iframe.src || '').indexOf('vimeo.com') === -1) return;
+
+    box.classList.add('vimeo-brand-masked');
+    box.style.setProperty('position','relative','important');
+    box.style.setProperty('overflow','hidden','important');
+
+    box.querySelectorAll('.vimeo-brand-mask-layer').forEach(function(el){ el.remove(); });
+
+    var top = document.createElement('span');
+    top.className = 'vimeo-brand-mask-layer top-right';
+    top.setAttribute('aria-hidden','true');
+
+    var bottom = document.createElement('span');
+    bottom.className = 'vimeo-brand-mask-layer bottom-right';
+    bottom.setAttribute('aria-hidden','true');
+
+    box.appendChild(top);
+    box.appendChild(bottom);
+  }
+
+  function runVimeoFix(){
+    var boxes = [];
+    var mainBox = document.getElementById('videoBox');
+    if(mainBox) boxes.push(mainBox);
+    document.querySelectorAll('.video-box, .custom-video-box').forEach(function(el){
+      if(boxes.indexOf(el) === -1) boxes.push(el);
+    });
+    boxes.forEach(applyMask);
+    hideOpenVimeoButtons();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', runVimeoFix);
+  }else{
+    runVimeoFix();
+  }
+
+  [60, 180, 350, 700, 1200, 2000, 3500].forEach(function(delay){
+    setTimeout(runVimeoFix, delay);
+  });
+  setInterval(runVimeoFix, 1500);
+
+  var oldOpenTechnique = window.openTechnique || (typeof openTechnique === 'function' ? openTechnique : null);
+  if(oldOpenTechnique && !window.__vimeoBrandingFinalFixPatched){
+    window.__vimeoBrandingFinalFixPatched = true;
+    window.openTechnique = function(){
+      var result = oldOpenTechnique.apply(this, arguments);
+      [40, 180, 500, 1200].forEach(function(delay){ setTimeout(runVimeoFix, delay); });
+      return result;
+    };
+    try{ openTechnique = window.openTechnique; }catch(e){}
+  }
+})();
+</script>
 
 </body>
 </html>
