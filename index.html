@@ -7067,6 +7067,85 @@ button[data-tech-id="12"]{
 <link rel="preload" as="image" href="assets/images/welcome-presentation-mobile.webp" media="(max-width: 520px)">
 
 
+
+<style>
+/* === PATCH CARTES À JOUER : recto/verso WebP technique 401 === */
+.play-card.has-custom-card-art .card-front{
+  padding:10px !important;
+}
+.play-card.has-custom-card-art .card-image{
+  height:138px !important;
+  border-radius:20px !important;
+  background:rgba(2,7,20,.64) !important;
+  border-color:rgba(168,85,255,.28) !important;
+}
+.play-card.has-custom-card-art .card-image img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  opacity:1 !important;
+  mix-blend-mode:normal !important;
+  filter:drop-shadow(0 0 16px rgba(168,85,255,.22));
+}
+.play-card.has-custom-card-art .card-title{
+  font-size:12px !important;
+  -webkit-line-clamp:2 !important;
+}
+.play-card.has-custom-card-art .card-status{
+  margin-top:6px !important;
+  font-size:10px !important;
+}
+.play-card.has-custom-card-art .card-back-custom-art{
+  padding:0 !important;
+  background:#020714 !important;
+}
+.play-card.has-custom-card-art .card-back-art{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+}
+.play-card.has-custom-card-art .card-back-custom-art .card-back-content{
+  display:none !important;
+}
+.play-card[data-tech-id="401"] .play-card-face{
+  color:var(--violet) !important;
+  border-color:rgba(168,85,255,.86) !important;
+  box-shadow:0 0 28px rgba(168,85,255,.34), inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+.play-card[data-tech-id="401"]{
+  animation: unlockedGlow401 2.2s ease-in-out infinite alternate;
+}
+@keyframes unlockedGlow401{
+  from{ filter:drop-shadow(0 0 7px rgba(168,85,255,.25)); }
+  to{ filter:drop-shadow(0 0 22px rgba(168,85,255,.58)); }
+}
+.full-card-face-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
+  z-index:3;
+  background:#020714;
+}
+.full-card-face.custom-card-face{
+  padding:0 !important;
+  background:#020714 !important;
+  border-color:rgba(168,85,255,.88) !important;
+  box-shadow:0 0 44px rgba(168,85,255,.42), 0 26px 80px rgba(0,0,0,.58) !important;
+}
+.full-card-face.custom-card-face > :not(.full-card-face-art){
+  display:none !important;
+}
+.full-card-face.custom-card-face .full-card-face-art{
+  display:block !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -7303,7 +7382,7 @@ assets/icons/icon-profil.webp
 
   <article class="video-helper-card video-stats-card">
     <div class="video-stats-head">
-      <div class="pill-icon video-zones-icon"><img src="assets/icons/icon-zones.webp?v=1" alt="Techniques par zone"></div>
+      <div class="pill-icon">#</div>
       <div>
         <strong>Techniques par zone</strong>
         <small>Accès rapide au volume de contenu</small>
@@ -7644,7 +7723,7 @@ assets/icons/icon-profil.webp
 
   <div class="revision-page-title">
     <h1>Réviser</h1>
-    <p>Choisissez un mode de révision</p>
+    <p>Choisissez un mode</p>
   </div>
 
   <div class="revision-orbit-nav">
@@ -7662,22 +7741,15 @@ assets/icons/icon-profil.webp
     </button>
 
     <button class="revision-orbit-card revision-review" onclick="go('revisionCard')">
-      <div class="revision-orbit-icon revision-audio-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Audio">
-          <rect x="9" y="3.5" width="6" height="11" rx="3" stroke="currentColor" stroke-width="1.9"></rect>
-          <path d="M6 11.5C6 14.8137 8.68629 17.5 12 17.5C15.3137 17.5 18 14.8137 18 11.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
-          <path d="M12 17.5V20.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
-          <path d="M9 20.5H15" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path>
-        </svg>
-      </div>
+      <div class="revision-orbit-icon">↻</div>
       <strong>Audio</strong>
       <small>réviser en écoutant</small>
     </button>
 
     <button class="revision-orbit-card revision-seen" onclick="openSeenCollections()">
       <div class="revision-orbit-icon">◎</div>
-      <strong>Collection</strong>
-      <small>cartes validées</small>
+      <strong>Déjà vues</strong>
+      <small>toutes les cartes</small>
     </button>
 
     <div class="revision-orbit-center">▱</div>
@@ -7692,7 +7764,7 @@ assets/icons/icon-profil.webp
     <button class="icon round" onclick="go('revision')">‹</button>
     <div class="brand">
       <h1 class="logo">Roue</h1>
-      <p class="subtitle">Techniques collection</p>
+      <p class="subtitle">Techniques déjà vues</p>
     </div>
     <button class="icon" onclick="toast('La roue ne tire que les techniques visionnées')">?</button>
   </header>
@@ -7781,22 +7853,22 @@ assets/icons/icon-profil.webp
   <header class="top">
     <button class="icon round" onclick="go('revision')">‹</button>
     <div class="brand">
-      <h1 class="logo">Collection</h1>
-      <p class="subtitle">Cartes débloquées</p>
+      <h1 class="logo">Déjà <span>vues</span></h1>
+      <p class="subtitle">Album de cartes</p>
     </div>
     <button class="icon" onclick="toast('Collections par zone')">▤</button>
   </header>
 
   <div class="seen-album-title">
     <h1>Collections</h1>
-    <p>Seules les techniques vues entièrement apparaissent dans votre collection.</p>
+    <p>Chaque zone devient une famille de cartes. Les techniques non vues restent grisées.</p>
   </div>
 
   <article class="collection-summary">
     <div class="pill-icon">★</div>
     <div>
       <strong id="seenAlbumSummary">Album en préparation</strong>
-      <p>Terminez une vidéo pour débloquer automatiquement sa carte à jouer.</p>
+      <p>Pour ce modèle, une seule carte est débloquée : Dysfonction cervicale C2–C6, assis. Toutes les autres cartes restent grisées.</p>
     </div>
   </article>
 
@@ -8033,15 +8105,8 @@ assets/icons/icon-profil.webp
     </div>
 
     <div class="stats-quiz-layout">
-      <div class="stats-chart is-empty" id="statsPerformanceChart" aria-hidden="true">
-        <div class="stats-chart-empty" id="statsChartEmpty">
-          <div class="stats-chart-empty-icon">◎</div>
-          <div class="stats-chart-empty-copy">
-            <strong>Aucun quiz terminé</strong>
-            <span>Le graphique de performance s'affichera après votre premier quiz général.</span>
-          </div>
-        </div>
-        <svg id="statsPerformanceSvg" viewBox="0 0 320 150" preserveAspectRatio="none">
+      <div class="stats-chart" aria-hidden="true">
+        <svg viewBox="0 0 320 150" preserveAspectRatio="none">
           <defs>
             <linearGradient id="statsLineGradient" x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stop-color="#42dfff"/>
@@ -8052,25 +8117,37 @@ assets/icons/icon-profil.webp
           <line x1="0" y1="65" x2="320" y2="65"></line>
           <line x1="0" y1="100" x2="320" y2="100"></line>
           <line x1="0" y1="135" x2="320" y2="135"></line>
-          <polyline id="statsPerformancePolyline" points="10,135 60,135 110,135 160,135 210,135 260,135 310,135"></polyline>
-          <circle cx="10" cy="135" r="4"></circle>
-          <circle cx="60" cy="135" r="4"></circle>
-          <circle cx="110" cy="135" r="4"></circle>
-          <circle cx="160" cy="135" r="4"></circle>
-          <circle cx="210" cy="135" r="4"></circle>
-          <circle cx="260" cy="135" r="4"></circle>
-          <circle cx="310" cy="135" r="6"></circle>
+          <polyline points="10,108 60,92 110,28 160,104 210,56 260,92 310,62"></polyline>
+          <circle cx="10" cy="108" r="5"></circle>
+          <circle cx="60" cy="92" r="5"></circle>
+          <circle cx="110" cy="28" r="5"></circle>
+          <circle cx="160" cy="104" r="5"></circle>
+          <circle cx="210" cy="56" r="5"></circle>
+          <circle cx="260" cy="92" r="5"></circle>
+          <circle cx="310" cy="62" r="5"></circle>
         </svg>
-        <div class="stats-chart-labels" id="statsChartLabels"><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span></div>
+        <div class="stats-chart-labels"><span>04/06</span><span>05/06</span><span>06/06</span><span>07/06</span><span>08/06</span><span>09/06</span><span>10/06</span></div>
       </div>
 
-      <div class="stats-quiz-score" id="statsPerformanceScore">
-        <strong>—</strong>
-        <p>aucun quiz terminé</p>
-        <em>Commencez<small>par le quiz général</small></em>
+      <div class="stats-quiz-score">
+        <strong>76<span>%</span></strong>
+        <p>taux de réussite moyen</p>
+        <em>↥ +12%<small>vs semaine précédente</small></em>
       </div>
     </div>
   </section>
+
+  <article class="stats-last-practice">
+    <div class="pill-icon">↺</div>
+    <div>
+      <small>Votre dernière pratique</small>
+      <strong>Dysfonction facettaire des dorsales</strong>
+      <span>Rachis</span>
+      <div class="bar"><i style="width:58%"></i></div>
+    </div>
+    <b>128<small>points</small></b>
+    <button onclick="go('revision')">›</button>
+  </article>
 </section>
 
 
@@ -8209,13 +8286,14 @@ assets/icons/icon-profil.webp
 <section id="profile" class="screen"><header class="top"><button class="icon round" onclick="go('home')">‹</button><div class="brand"><h1 class="logo">Profil</h1><p class="subtitle">Compte étudiant</p></div><button class="icon">⚙</button></header><article class="profile"><div>RA</div><h2>Étudiant Ostéo Pratik</h2><p>Parcours structurel et énergie musculaire</p></article></section>
 
 
-<!-- === Overlay carte plein écran : collection collection === -->
+<!-- === Overlay carte plein écran : collection déjà vues === -->
 <div id="cardFullscreenOverlay" class="card-fullscreen-overlay" aria-hidden="true">
   <div class="card-fullscreen-wrap">
     <button class="full-close" onclick="closeFullCard()" aria-label="Fermer">×</button>
 
     <article id="cardFullscreen" class="card-fullscreen" onclick="flipFullCard()">
       <section class="full-card-face full-card-front">
+        <img id="fullCardFrontArt" class="full-card-face-art" src="" alt="Recto de la carte" style="display:none">
         <div class="full-card-kicker">
           <span id="fullCardZone">Rachis · Cervicales</span>
           <span id="fullCardNumber">#012</span>
@@ -8231,6 +8309,7 @@ assets/icons/icon-profil.webp
       </section>
 
       <section class="full-card-face full-card-back">
+        <img id="fullCardBackArt" class="full-card-face-art" src="" alt="Verso de la carte" style="display:none">
         <div class="full-card-kicker">
           <span>Verso · explications</span>
           <span id="fullCardLevel">Niveau intermédiaire</span>
@@ -9615,6 +9694,10 @@ const techniques = [
     "status": "non vue",
     "percent": 0,
     "icon": "◜",
+    "cardRecto": "assets/images/dysfonction_pre_sternale_clavicule_droite_recto.webp",
+    "cardVerso": "assets/images/dysfonction_pre_sternale_clavicule_droite_verso.webp",
+    "cardType": "Technique structurelle",
+    "cardMode": "Thrust",
     "videoProvider": "vimeo",
     "videoUrl": "https://player.vimeo.com/video/1204647417?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
     "directVimeo": "https://vimeo.com/1204647417?share=copy&fl=sv&fe=ci",
@@ -11423,6 +11506,7 @@ function updateCatalogueCounts(){
 /* === DÉJÀ VUES : collections et cartes à retourner === */
 const unlockedTechniqueIds = new Set([
   12,
+  401,
   ...(() => {
     try{
       const raw = localStorage.getItem("osteoPratikViewedTechniqueIds");
@@ -11550,18 +11634,36 @@ function renderSeenCards(zone, sub){
   markCervicalTechniqueOrange();
 }
 
+
+function getTechniqueCardRecto(t){
+  if(t && t.cardRecto) return t.cardRecto;
+  return "assets/images/" + String(t.id).padStart(3,"0") + "-" + slugify(t.title) + ".webp";
+}
+
+function getTechniqueCardVerso(t){
+  return (t && t.cardVerso) ? t.cardVerso : "";
+}
+
+function hasCustomPlayingCard(t){
+  return !!(t && (t.cardRecto || t.cardVerso));
+}
+
 function renderPlayCard(t){
   const unlocked = isTechniqueUnlocked(t);
-  const poster = "assets/images/" + String(t.id).padStart(3,"0") + "-" + slugify(t.title) + ".webp";
+  const poster = getTechniqueCardRecto(t);
+  const verso = getTechniqueCardVerso(t);
+  const customCard = hasCustomPlayingCard(t);
   const safeTitle = escapeHtml(t.title);
+  const safePoster = escapeAttr(poster);
+  const safeVerso = escapeAttr(verso);
 
   return `
-    <article class="play-card tech-color-${getTechniqueColorKey(t)} ${unlocked ? "" : "locked"}" data-tech-id="${t.id}" data-tech-color="${getTechniqueColorKey(t)}" ${unlocked ? `onclick="openFullCard(${t.id})"` : ""}>
+    <article class="play-card tech-color-${getTechniqueColorKey(t)} ${customCard ? "has-custom-card-art" : ""} ${unlocked ? "" : "locked"}" data-tech-id="${t.id}" data-tech-color="${getTechniqueColorKey(t)}" ${unlocked ? `onclick="openFullCard(${t.id})"` : ""}>
       <div class="play-card-inner">
         <div class="play-card-face card-front">
           <div class="card-kicker"><span>${t.sub}</span><span>#${String(t.id).padStart(3,"0")}</span></div>
           <div class="card-image">
-            ${unlocked ? `<img src="${poster}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="">` : ""}
+            ${unlocked ? `<img src="${safePoster}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="Recto de la carte">` : ""}
             <div class="card-fallback card-fallback-${getTechniqueColorKey(t)}" style="${unlocked ? "display:none" : ""}">${t.icon || "◎"}</div>
           </div>
           <div>
@@ -11570,16 +11672,19 @@ function renderPlayCard(t){
           </div>
         </div>
 
-        <div class="play-card-face card-back">
-          <h3>${safeTitle}</h3>
-          <ul>
-            <li><strong>Zone :</strong> ${t.zone} · ${t.sub}</li>
-            <li><strong>Niveau :</strong> ${t.level}</li>
-            <li><strong>Objectif :</strong> identifier la dysfonction, régler les contacts, puis appliquer le geste adapté.</li>
-            <li><strong>Repères :</strong> position du patient, mise en tension, contrôle du confort et de la sécurité.</li>
-          </ul>
-          <div class="card-actions">
-            <button onclick="event.stopPropagation(); openTechnique(${t.id})">Revoir la technique</button>
+        <div class="play-card-face card-back ${customCard && verso ? "card-back-custom-art" : ""}">
+          ${customCard && verso && unlocked ? `<img class="card-back-art" src="${safeVerso}" alt="Verso de la carte" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ""}
+          <div class="card-back-content">
+            <h3>${safeTitle}</h3>
+            <ul>
+              <li><strong>Zone :</strong> ${t.zone} · ${t.sub}</li>
+              <li><strong>Niveau :</strong> ${t.level}</li>
+              <li><strong>Objectif :</strong> identifier la dysfonction, régler les contacts, puis appliquer le geste adapté.</li>
+              <li><strong>Repères :</strong> position du patient, mise en tension, contrôle du confort et de la sécurité.</li>
+            </ul>
+            <div class="card-actions">
+              <button onclick="event.stopPropagation(); openTechnique(${t.id})">Revoir la technique</button>
+            </div>
           </div>
         </div>
       </div>
@@ -11601,6 +11706,15 @@ function getRevisionCardDetails(t){
         ["Mise en tension", "installation progressive dans la barrière motrice, sans douleur."],
         ["Geste", "impulsion courte, contrôlée et spécifique si l’indication est retenue."],
         ["Vigilance", "confort, sécurité, absence de résistance excessive et contrôle post-technique."]
+      ]
+    },
+    401: {
+      intro: "Dysfonction pré-sternale de la clavicule droite : repères de position, contacts, barrière motrice et thrust.",
+      details: [
+        ["Position", "Sujet en décubitus dorsal, tête légèrement tournée du côté opposé à la dysfonction. Praticien debout à la hauteur du thorax, du côté de la dysfonction."],
+        ["Position des mains", "La main céphalique prend en berceau le membre supérieur homolatéral. La main caudale contacte par l’éminence hypothénar le bord antérieur de l’extrémité interne de la clavicule."],
+        ["Barrière motrice", "Amener le membre supérieur dans l’axe longitudinal de la clavicule, exercer une légère traction et porter le moignon de l’épaule vers le plafond."],
+        ["Normalisation", "Porter le thrust dans l’axe de la clavicule et en direction de la table en fin de mouvement."]
       ]
     }
   };
@@ -11636,7 +11750,38 @@ function openFullCard(id){
   document.getElementById("fullCardLevel").textContent = t.level;
   document.getElementById("fullCardBackIntro").textContent = meta.intro;
 
-  const poster = "assets/images/" + String(t.id).padStart(3,"0") + "-" + slugify(t.title) + ".webp";
+  const poster = getTechniqueCardRecto(t);
+  const verso = getTechniqueCardVerso(t);
+  const frontFace = card ? card.querySelector(".full-card-front") : null;
+  const backFace = card ? card.querySelector(".full-card-back") : null;
+  const frontArt = document.getElementById("fullCardFrontArt");
+  const backArt = document.getElementById("fullCardBackArt");
+
+  if(frontFace) frontFace.classList.toggle("custom-card-face", !!t.cardRecto);
+  if(backFace) backFace.classList.toggle("custom-card-face", !!verso);
+
+  if(frontArt){
+    if(t.cardRecto){
+      frontArt.src = poster;
+      frontArt.style.display = "block";
+      frontArt.onerror = function(){ this.style.display = "none"; if(frontFace) frontFace.classList.remove("custom-card-face"); };
+    }else{
+      frontArt.removeAttribute("src");
+      frontArt.style.display = "none";
+    }
+  }
+
+  if(backArt){
+    if(verso){
+      backArt.src = verso;
+      backArt.style.display = "block";
+      backArt.onerror = function(){ this.style.display = "none"; if(backFace) backFace.classList.remove("custom-card-face"); };
+    }else{
+      backArt.removeAttribute("src");
+      backArt.style.display = "none";
+    }
+  }
+
   img.style.display = "block";
   fallback.style.display = "none";
   fallback.textContent = t.icon || "◎";
@@ -21735,11 +21880,13 @@ if(!window.__osteoVimeoEventsPatched){
     }
 
     if(directBtn){
-      directBtn.textContent = "";
-      directBtn.style.setProperty("display", "none", "important");
+      const direct = directVimeoUrl(t);
+      directBtn.textContent = "Ouvrir la vidéo Vimeo";
+      directBtn.style.display = direct ? "block" : "none";
       directBtn.onclick = function(event){
         event.preventDefault();
         event.stopPropagation();
+        if(direct) window.open(direct, "_blank", "noopener,noreferrer");
         return false;
       };
     }
@@ -23042,7 +23189,8 @@ if(!window.__osteoVimeoEventsPatched){
 
   var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
   var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
-  var STARTER_ID = 12; // une seule technique débloquée au départ
+  var STARTER_ID = 12;
+  var DEMO_CARD_IDS = [12, 401]; // techniques débloquées au départ pour tester les cartes
 
   function uniqueNumericIds(values){
     var out = [];
@@ -23064,12 +23212,14 @@ if(!window.__osteoVimeoEventsPatched){
         return uniqueNumericIds(JSON.parse(raw));
       }
     }catch(e){}
-    return [STARTER_ID];
+    return DEMO_CARD_IDS.slice();
   }
 
   function writeStrictIds(ids){
     var clean = uniqueNumericIds(ids);
-    if(clean.indexOf(STARTER_ID) === -1) clean.unshift(STARTER_ID);
+    DEMO_CARD_IDS.slice().reverse().forEach(function(id){
+      if(clean.indexOf(id) === -1) clean.unshift(id);
+    });
     try{ localStorage.setItem(STRICT_KEY, JSON.stringify(clean)); }catch(e){}
     // On remet aussi l'ancienne clé au propre pour éviter qu'un ancien test CodePen/GitHub
     // continue à alimenter la roue avec des vidéos jamais vues.
@@ -23215,6 +23365,7 @@ if(!window.__osteoVimeoEventsPatched){
   var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
   var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
   var STARTER_ID = 12;
+  var DEMO_CARD_IDS = [12, 401];
 
   function toNumber(value){
     var n = Number(value);
@@ -23275,9 +23426,15 @@ if(!window.__osteoVimeoEventsPatched){
     var legacy = readJsonArray(LEGACY_KEY);
     var ids = strict || legacy || [];
 
-    // Si aucun stockage n’existe encore, on garde la logique pédagogique actuelle :
-    // une seule technique initiale débloquée pour amorcer la roue.
-    if(!strict && !legacy && valid.has(STARTER_ID)) ids = [STARTER_ID];
+    // Si aucun stockage n’existe encore, on garde la logique pédagogique actuelle.
+    // La technique 401 est aussi débloquée pour tester la nouvelle carte recto/verso.
+    if(!strict && !legacy){
+      ids = DEMO_CARD_IDS.filter(function(id){ return valid.has(id); });
+    }else{
+      DEMO_CARD_IDS.forEach(function(id){
+        if(valid.has(id) && ids.map(Number).indexOf(id) === -1) ids.push(id);
+      });
+    }
 
     var clean = uniqueIds(ids, valid);
 
@@ -23471,6 +23628,7 @@ if(!window.__osteoVimeoEventsPatched){
   var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
   var LEGACY_KEY = 'osteoPratikViewedTechniqueIds';
   var STARTER_ID = 12;
+  var DEMO_CARD_IDS = [12, 401];
 
   var ZONES = [
     { name:'Rachis', prefix:'statsRachis', countId:'countRachis', total:60 },
@@ -23556,8 +23714,14 @@ if(!window.__osteoVimeoEventsPatched){
     var legacy = readJsonArray(LEGACY_KEY);
     var source = strict || legacy || [];
 
-    if(!strict && !legacy && validIds().has(STARTER_ID)){
-      source = [STARTER_ID];
+    if(!strict && !legacy){
+      var valid = validIds();
+      source = DEMO_CARD_IDS.filter(function(id){ return valid.has(id); });
+    }else{
+      var valid = validIds();
+      DEMO_CARD_IDS.forEach(function(id){
+        if(valid.has(id) && source.map(Number).indexOf(id) === -1) source.push(id);
+      });
     }
 
     var clean = uniqueValidIds(source);
@@ -24030,2301 +24194,6 @@ if(!window.__osteoVimeoEventsPatched){
   });
 })();
 </script>
-
-
-
-<style>
-/* === PATCH : recherche vocale dans les barres de recherche === */
-.search.voice-search-ready{
-  position:relative !important;
-  grid-template-columns:30px minmax(0,1fr) 40px !important;
-  align-items:center !important;
-}
-
-.search.voice-search-ready.has-clear{
-  grid-template-columns:30px minmax(0,1fr) 40px 34px !important;
-}
-
-.search .voice-search-btn{
-  width:36px !important;
-  height:36px !important;
-  min-width:36px !important;
-  border-radius:50% !important;
-  display:grid !important;
-  place-items:center !important;
-  color:#9fefff !important;
-  background:
-    radial-gradient(circle at 35% 25%, rgba(0,229,255,.28), transparent 46%),
-    linear-gradient(180deg, rgba(10,27,45,.98), rgba(8,22,38,.96)) !important;
-  border:1px solid rgba(0,229,255,.42) !important;
-  box-shadow:
-    0 0 16px rgba(0,229,255,.20),
-    inset 0 1px 0 rgba(255,255,255,.08) !important;
-  line-height:1 !important;
-  padding:0 !important;
-  transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease !important;
-}
-
-.search .voice-search-btn svg{
-  width:20px !important;
-  height:20px !important;
-  display:block !important;
-  stroke:currentColor !important;
-  fill:none !important;
-  stroke-width:2.2 !important;
-  stroke-linecap:round !important;
-  stroke-linejoin:round !important;
-}
-
-.search .voice-search-btn:active{
-  transform:scale(.96) !important;
-}
-
-.search .voice-search-btn.listening{
-  color:#03111f !important;
-  background:linear-gradient(135deg, var(--cyan), var(--blue)) !important;
-  border-color:rgba(255,255,255,.78) !important;
-  box-shadow:
-    0 0 22px rgba(0,229,255,.55),
-    0 0 38px rgba(45,140,255,.28) !important;
-  animation:voicePulse 1s ease-in-out infinite;
-}
-
-.search.voice-search-ready.voice-listening{
-  border-color:rgba(130,240,255,.95) !important;
-  box-shadow:
-    0 0 0 1px rgba(120,235,255,.38),
-    0 0 24px rgba(0,229,255,.26),
-    inset 0 0 22px rgba(0,229,255,.09) !important;
-  animation:voiceSelectionBlink .95s ease-in-out infinite;
-}
-
-.search.voice-search-ready.voice-listening input{
-  color:#ffffff !important;
-}
-
-.search.voice-search-ready.voice-listening::after{
-  content:'Écoute en cours…';
-  position:absolute;
-  left:50%;
-  bottom:-18px;
-  transform:translateX(-50%);
-  font-size:10px;
-  line-height:1;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:rgba(170,240,255,.92);
-  text-shadow:0 0 12px rgba(0,229,255,.40);
-  pointer-events:none;
-}
-
-@keyframes voicePulse{
-  0%,100%{ transform:scale(1); }
-  50%{ transform:scale(1.08); }
-}
-
-@keyframes voiceSelectionBlink{
-  0%,100%{
-    box-shadow:
-      0 0 0 1px rgba(120,235,255,.30),
-      0 0 16px rgba(0,229,255,.18),
-      inset 0 0 12px rgba(0,229,255,.04);
-  }
-  50%{
-    box-shadow:
-      0 0 0 1px rgba(160,245,255,.62),
-      0 0 30px rgba(0,229,255,.42),
-      inset 0 0 26px rgba(0,229,255,.13);
-  }
-}
-
-.voice-search-hint{
-  margin:8px 0 0;
-  color:rgba(220,235,255,.68);
-  font-size:11px;
-  line-height:1.25;
-  text-align:center;
-}
-</style>
-
-
-
-<script>
-/* === PATCH : recherche vocale Catalogue + liste techniques === */
-(function(){
-  let activeVoiceRecognition = null;
-
-  function getSpeechRecognitionConstructor(){
-    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-  }
-
-  function setInputAndRender(inputId, textValue, renderFnName){
-    const input = document.getElementById(inputId);
-    if(!input) return;
-    input.value = String(textValue || '').trim();
-    input.dispatchEvent(new Event('input', { bubbles:true }));
-    if(renderFnName && typeof window[renderFnName] === 'function'){
-      window[renderFnName]();
-    }
-  }
-
-  function setListeningVisualState(input, button, isListening){
-    if(!input) return;
-    const container = input.closest('.search');
-    if(button) button.classList.toggle('listening', !!isListening);
-    if(container) container.classList.toggle('voice-listening', !!isListening);
-
-    if(isListening){
-      if(!input.dataset.originalPlaceholder){
-        input.dataset.originalPlaceholder = input.getAttribute('placeholder') || '';
-      }
-      input.setAttribute('placeholder', 'Parlez maintenant…');
-      try{ input.focus({preventScroll:true}); }catch(e){ try{ input.focus(); }catch(e2){} }
-    }else if(input.dataset.originalPlaceholder){
-      input.setAttribute('placeholder', input.dataset.originalPlaceholder);
-    }
-  }
-
-  function stopExistingRecognition(){
-    if(activeVoiceRecognition){
-      try{ activeVoiceRecognition.stop(); }catch(e){}
-      activeVoiceRecognition = null;
-    }
-    document.querySelectorAll('.voice-search-btn.listening').forEach(btn => btn.classList.remove('listening'));
-    document.querySelectorAll('.search.voice-listening').forEach(box => box.classList.remove('voice-listening'));
-    document.querySelectorAll('input[data-original-placeholder]').forEach(input => {
-      input.setAttribute('placeholder', input.dataset.originalPlaceholder || '');
-    });
-  }
-
-  window.startVoiceSearch = function(inputId, renderFnName, button){
-    const SpeechRecognition = getSpeechRecognitionConstructor();
-    if(!SpeechRecognition){
-      if(typeof toast === 'function') toast('Recherche vocale non disponible sur ce navigateur');
-      return;
-    }
-
-    const input = document.getElementById(inputId);
-    if(!input) return;
-
-    stopExistingRecognition();
-
-    const recognition = new SpeechRecognition();
-    activeVoiceRecognition = recognition;
-    recognition.lang = 'fr-FR';
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    setListeningVisualState(input, button, true);
-    if(typeof toast === 'function') toast('Parlez maintenant…');
-
-    recognition.onresult = function(event){
-      const transcript = event && event.results && event.results[0] && event.results[0][0]
-        ? event.results[0][0].transcript
-        : '';
-      if(transcript){
-        setInputAndRender(inputId, transcript, renderFnName);
-        if(typeof toast === 'function') toast('Recherche : ' + transcript);
-      }
-    };
-
-    recognition.onerror = function(){
-      setListeningVisualState(input, button, false);
-      if(typeof toast === 'function') toast('Recherche vocale interrompue');
-    };
-
-    recognition.onend = function(){
-      setListeningVisualState(input, button, false);
-      if(activeVoiceRecognition === recognition) activeVoiceRecognition = null;
-    };
-
-    try{
-      recognition.start();
-    }catch(e){
-      setListeningVisualState(input, button, false);
-      if(typeof toast === 'function') toast('Touchez à nouveau le micro');
-    }
-  };
-
-  function installVoiceButton(inputId, renderFnName, label){
-    const input = document.getElementById(inputId);
-    if(!input || input.dataset.voiceReady === '1') return;
-
-    const container = input.closest('.search');
-    if(!container) return;
-
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'voice-search-btn';
-    button.setAttribute('aria-label', label || 'Recherche vocale');
-    button.setAttribute('title', label || 'Recherche vocale');
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"></rect><path d="M6 11.5a6 6 0 0 0 12 0"></path><path d="M12 17.5v3"></path><path d="M9 20.5h6"></path></svg>';
-    button.addEventListener('click', function(event){
-      event.preventDefault();
-      event.stopPropagation();
-      window.startVoiceSearch(inputId, renderFnName, button);
-    });
-
-    const clearButton = Array.from(container.querySelectorAll('button')).find(btn => btn !== button);
-    if(clearButton){
-      container.insertBefore(button, clearButton);
-      container.classList.add('has-clear');
-    }else{
-      container.appendChild(button);
-    }
-
-    container.classList.add('voice-search-ready');
-    input.dataset.voiceReady = '1';
-  }
-
-  function installVoiceSearch(){
-    installVoiceButton('catalogueSearchInput', 'renderCatalogueSearch', 'Rechercher à la voix dans le catalogue');
-    installVoiceButton('searchInput', 'renderTechniques', 'Rechercher à la voix dans les techniques');
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', installVoiceSearch);
-  }else{
-    installVoiceSearch();
-  }
-
-  setTimeout(installVoiceSearch, 250);
-  setTimeout(installVoiceSearch, 1000);
-})();
-</script>
-
-
-
-<style id="catalogue-zone-cards-upsize-fix">
-/* === CORRECTION CATALOGUE : cartouches plus grands pour accueillir les icônes et améliorer la lisibilité === */
-#zones .catalogue-zone-row{
-  display:grid !important;
-  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
-  gap:16px !important;
-  margin:14px 0 28px !important;
-  align-items:stretch !important;
-}
-
-#zones .catalogue-zone-mini{
-  min-width:0 !important;
-  min-height:214px !important;
-  height:100% !important;
-  border-radius:28px !important;
-  padding:18px 12px 16px !important;
-  display:grid !important;
-  grid-template-rows:82px minmax(52px, auto) minmax(34px, auto) 38px !important;
-  align-items:center !important;
-  justify-items:center !important;
-  justify-content:center !important;
-  gap:10px !important;
-  text-align:center !important;
-}
-
-#zones .mini-zone-icon{
-  width:82px !important;
-  height:82px !important;
-  border-radius:24px !important;
-  margin:0 !important;
-}
-
-#zones .mini-zone-icon img{
-  width:138% !important;
-  height:138% !important;
-  padding:0 !important;
-  object-fit:contain !important;
-  transform:scale(1.08) !important;
-}
-
-#zones .catalogue-zone-mini strong{
-  width:100% !important;
-  min-height:52px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  color:#fff !important;
-  font-size:18px !important;
-  line-height:1.06 !important;
-  font-weight:950 !important;
-  letter-spacing:-.03em !important;
-  text-align:center !important;
-  white-space:normal !important;
-  overflow-wrap:anywhere !important;
-  word-break:normal !important;
-  hyphens:none !important;
-  padding:0 2px !important;
-}
-
-#zones .catalogue-zone-mini small{
-  width:100% !important;
-  min-height:34px !important;
-  padding:7px 10px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:4px !important;
-  border-radius:999px !important;
-  font-size:12px !important;
-  line-height:1.1 !important;
-  white-space:nowrap !important;
-}
-
-#zones .catalogue-zone-mini small b{
-  font-size:18px !important;
-  line-height:1 !important;
-  font-weight:950 !important;
-}
-
-#zones .catalogue-zone-mini span{
-  width:34px !important;
-  height:34px !important;
-  display:grid !important;
-  place-items:center !important;
-  align-self:center !important;
-  font-size:21px !important;
-  margin:0 !important;
-}
-
-@media (min-width:900px){
-  #zones .catalogue-zone-row{
-    grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
-    gap:12px !important;
-  }
-
-  #zones .catalogue-zone-mini{
-    min-height:174px !important;
-    border-radius:24px !important;
-    padding:14px 8px 12px !important;
-    grid-template-rows:60px 44px 30px 30px !important;
-    gap:7px !important;
-  }
-
-  #zones .mini-zone-icon{
-    width:60px !important;
-    height:60px !important;
-    border-radius:18px !important;
-  }
-
-  #zones .catalogue-zone-mini strong{
-    min-height:42px !important;
-    font-size:13px !important;
-  }
-
-  #zones .catalogue-zone-mini small{
-    min-height:28px !important;
-    padding:5px 6px !important;
-    font-size:9.8px !important;
-  }
-
-  #zones .catalogue-zone-mini small b{
-    font-size:14px !important;
-  }
-
-  #zones .catalogue-zone-mini span{
-    width:28px !important;
-    height:28px !important;
-    font-size:18px !important;
-  }
-}
-
-@media (max-width:430px){
-  #zones .catalogue-zone-row{
-    gap:14px !important;
-  }
-
-  #zones .catalogue-zone-mini{
-    min-height:205px !important;
-    padding:16px 10px 14px !important;
-    grid-template-rows:74px minmax(48px, auto) minmax(32px, auto) 34px !important;
-    gap:8px !important;
-  }
-
-  #zones .mini-zone-icon{
-    width:74px !important;
-    height:74px !important;
-    border-radius:22px !important;
-  }
-
-  #zones .catalogue-zone-mini strong{
-    min-height:48px !important;
-    font-size:16.5px !important;
-    line-height:1.05 !important;
-  }
-
-  #zones .catalogue-zone-mini small{
-    min-height:32px !important;
-    padding:6px 8px !important;
-    font-size:11px !important;
-  }
-
-  #zones .catalogue-zone-mini small b{
-    font-size:16px !important;
-  }
-
-  #zones .catalogue-zone-mini span{
-    width:32px !important;
-    height:32px !important;
-    font-size:20px !important;
-  }
-}
-
-@media (max-width:380px){
-  #zones .catalogue-zone-mini strong{
-    font-size:15px !important;
-  }
-
-  #zones .catalogue-zone-mini small{
-    font-size:10px !important;
-  }
-}
-</style>
-
-
-<style id="audio-zones-icons-webp-fix">
-/* === ICÔNES WEBP TRANSPARENTES : Audio + Techniques par zone dans Vidéo === */
-#revision .revision-audio-icon,
-#videoMap .video-zones-icon{
-  background: transparent !important;
-  background-color: transparent !important;
-  overflow: visible !important;
-}
-
-#revision .revision-audio-icon img,
-#videoMap .video-zones-icon img{
-  width: 150% !important;
-  height: 150% !important;
-  object-fit: contain !important;
-  display: block !important;
-  padding: 0 !important;
-  transform: scale(1.08) !important;
-  mix-blend-mode: screen;
-  filter: drop-shadow(0 0 12px currentColor);
-}
-
-#videoMap .video-zones-icon{
-  width: 48px !important;
-  height: 48px !important;
-  border-radius: 18px !important;
-}
-</style>
-
-
-
-
-
-<script id="vimeo-url-clean-params-fix">
-/* === VIMEO : paramètres propres + cache visuel === */
-(function(){
-  function cleanVimeoUrl(url){
-    if(!url || String(url).indexOf('vimeo.com') === -1) return url;
-    try{
-      var u = new URL(String(url), window.location.href);
-      u.searchParams.set('dnt','1');
-      u.searchParams.set('title','0');
-      u.searchParams.set('byline','0');
-      u.searchParams.set('portrait','0');
-      u.searchParams.set('badge','0');
-      u.searchParams.set('transparent','0');
-      return u.toString();
-    }catch(e){
-      var sep = String(url).indexOf('?') === -1 ? '?' : '&';
-      return String(url) + sep + 'dnt=1&title=0&byline=0&portrait=0&badge=0&transparent=0';
-    }
-  }
-
-  function patchVimeoIframe(){
-    var iframe = document.getElementById('vimeoPlayer');
-    if(!iframe || iframe.__vimeoCleanPatched) return;
-    iframe.__vimeoCleanPatched = true;
-
-    var lastSrc = iframe.getAttribute('src') || '';
-    try{
-      var descriptor = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
-      if(descriptor && descriptor.set && descriptor.get){
-        Object.defineProperty(iframe, 'src', {
-          get:function(){ return descriptor.get.call(this); },
-          set:function(value){
-            descriptor.set.call(this, cleanVimeoUrl(value));
-          }
-        });
-      }
-    }catch(e){}
-
-    var observer = new MutationObserver(function(){
-      var src = iframe.getAttribute('src') || '';
-      if(src && src !== lastSrc && src.indexOf('vimeo.com') !== -1){
-        lastSrc = cleanVimeoUrl(src);
-        if(src !== lastSrc) iframe.setAttribute('src', lastSrc);
-      }
-    });
-    observer.observe(iframe, {attributes:true, attributeFilter:['src']});
-
-    if(lastSrc && lastSrc.indexOf('vimeo.com') !== -1){
-      iframe.setAttribute('src', cleanVimeoUrl(lastSrc));
-    }
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', patchVimeoIframe);
-  }else{
-    patchVimeoIframe();
-  }
-  setTimeout(patchVimeoIframe, 300);
-  setTimeout(patchVimeoIframe, 1200);
-})();
-</script>
-
-
-
-
-<script id="remove-open-vimeo-button-fix">
-/* === Supprime définitivement le bouton externe Vimeo === */
-(function(){
-  function hideOpenVimeoButtons(){
-    document.querySelectorAll('button, a').forEach(function(el){
-      var txt = (el.textContent || '').trim().toLowerCase();
-      var href = (el.getAttribute && el.getAttribute('href')) || '';
-      var id = (el.id || '').toLowerCase();
-      var cls = (el.className || '').toString().toLowerCase();
-      if(
-        txt === 'ouvrir la vidéo vimeo' ||
-        txt === 'ouvrir la video vimeo' ||
-        id.indexOf('vimeo') !== -1 ||
-        cls.indexOf('vimeo') !== -1 ||
-        href.indexOf('vimeo.com') !== -1
-      ){
-        el.style.setProperty('display','none','important');
-        el.style.setProperty('visibility','hidden','important');
-        el.style.setProperty('pointer-events','none','important');
-      }
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', hideOpenVimeoButtons);
-  setInterval(hideOpenVimeoButtons, 800);
-
-  var oldOpenTechnique = window.openTechnique || (typeof openTechnique === 'function' ? openTechnique : null);
-  if(oldOpenTechnique && !window.__hideOpenVimeoOpenTechniquePatched){
-    window.__hideOpenVimeoOpenTechniquePatched = true;
-    window.openTechnique = function(){
-      var result = oldOpenTechnique.apply(this, arguments);
-      setTimeout(hideOpenVimeoButtons, 40);
-      setTimeout(hideOpenVimeoButtons, 400);
-      return result;
-    };
-    try{ openTechnique = window.openTechnique; }catch(e){}
-  }
-})();
-</script>
-
-
-
-
-
-
-
-<style id="revision-audio-only-fix">
-/* === RÉVISION AUDIO : pictogramme micro dans le cercle, sans cache Vimeo === */
-#revision .revision-review .revision-audio-icon{
-  display:grid !important;
-  place-items:center !important;
-  padding:0 !important;
-  overflow:hidden !important;
-}
-
-#revision .revision-review .revision-audio-icon img{
-  display:none !important;
-}
-
-#revision .revision-review .revision-audio-icon svg{
-  width:28px !important;
-  height:28px !important;
-  display:block !important;
-  color:currentColor !important;
-  filter:drop-shadow(0 0 8px color-mix(in srgb, currentColor 38%, transparent));
-}
-
-#revision .revision-review strong{
-  left:30px !important;
-  top:122px !important;
-  max-width:132px !important;
-}
-
-#revision .revision-review small{
-  left:30px !important;
-  top:154px !important;
-  max-width:120px !important;
-  padding-right:10px !important;
-  line-height:1.16 !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-review strong{
-    max-width:128px !important;
-  }
-
-  #revision .revision-review small{
-    max-width:114px !important;
-    padding-right:12px !important;
-  }
-}
-</style>
-
-
-<style id="revision-sans-halo-fond-visible">
-/* === RÉVISER : suppression des halos pour mieux voir l'image de fond === */
-#revision .revision-orbit-nav::before{
-  display:none !important;
-  content:none !important;
-}
-
-#revision .revision-orbit-card::before,
-#revision .revision-orbit-card::after{
-  display:none !important;
-  content:none !important;
-  opacity:0 !important;
-}
-
-/* Image de fond plus visible, sans voile/halo sombre par-dessus */
-#revision .revision-orbit-backdrop{
-  opacity:.72 !important;
-  filter:none !important;
-  mix-blend-mode:screen !important;
-  background:
-    url("assets/images/revision-bg.webp") center 58% / contain no-repeat !important;
-}
-
-/* Cartouches un peu plus transparents pour laisser respirer le visuel */
-#revision .revision-orbit-card{
-  background:linear-gradient(145deg, rgba(5,15,31,.56), rgba(5,15,31,.74)) !important;
-  box-shadow:
-    0 0 18px color-mix(in srgb,currentColor 18%, transparent),
-    inset 0 0 18px rgba(255,255,255,.025) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-
-/* Centre plus discret */
-#revision .revision-orbit-center{
-  background:rgba(5,15,31,.62) !important;
-  box-shadow:
-    0 0 18px rgba(0,229,255,.18),
-    inset 0 0 18px rgba(0,229,255,.07) !important;
-}
-</style>
-
-
-<style id="stats-performance-final-patch">
-/* === STATS : carte Performance aux quiz nettoyée + suppression de la dernière pratique === */
-#progress .stats-chart{
-  position:relative;
-  min-height:220px;
-}
-#progress .stats-chart.is-empty svg,
-#progress .stats-chart.is-empty .stats-chart-labels{
-  opacity:0;
-  visibility:hidden;
-}
-#progress .stats-chart-empty{
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  padding:18px;
-  text-align:left;
-  border-radius:18px;
-  background:radial-gradient(circle at 20% 20%, rgba(53,230,167,.08), transparent 32%);
-}
-#progress .stats-chart-empty-icon{
-  width:54px;
-  height:54px;
-  border-radius:16px;
-  display:grid;
-  place-items:center;
-  font-size:24px;
-  font-weight:900;
-  color:#70ffd4;
-  border:1px solid rgba(112,255,212,.35);
-  background:rgba(112,255,212,.08);
-  box-shadow:0 0 18px rgba(112,255,212,.12);
-  flex:0 0 auto;
-}
-#progress .stats-chart-empty-copy strong{
-  display:block;
-  color:#ffffff;
-  font-size:18px;
-  line-height:1.15;
-  margin-bottom:6px;
-}
-#progress .stats-chart-empty-copy span{
-  display:block;
-  color:rgba(221,232,255,.72);
-  font-size:13px;
-  line-height:1.35;
-}
-#progress .stats-quiz-score{
-  min-width:0;
-}
-#progress .stats-quiz-score em{
-  line-height:1.2;
-}
-#progress .stats-quiz-score p{
-  margin:8px 0 12px;
-}
-@media(max-width:430px){
-  #progress .stats-chart{
-    min-height:210px;
-  }
-  #progress .stats-chart-empty{
-    padding:16px;
-    gap:12px;
-  }
-  #progress .stats-chart-empty-icon{
-    width:48px;
-    height:48px;
-    border-radius:14px;
-    font-size:22px;
-  }
-  #progress .stats-chart-empty-copy strong{
-    font-size:17px;
-  }
-  #progress .stats-chart-empty-copy span{
-    font-size:12px;
-  }
-}
-</style>
-
-<script id="stats-performance-final-script">
-(function(){
-  function formatShortDate(d){
-    try{
-      return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
-    }catch(e){ return '—'; }
-  }
-
-  function buildLast7Labels(iso){
-    var base = iso ? new Date(iso) : new Date();
-    if(isNaN(base.getTime())) base = new Date();
-    var labels = [];
-    for(var i=6; i>=0; i--){
-      var d = new Date(base);
-      d.setDate(base.getDate() - i);
-      labels.push(formatShortDate(d));
-    }
-    return labels;
-  }
-
-  function renderPerformanceChart(lastQuiz){
-    var chart = document.getElementById('statsPerformanceChart');
-    var empty = document.getElementById('statsChartEmpty');
-    var svg = document.getElementById('statsPerformanceSvg');
-    var polyline = document.getElementById('statsPerformancePolyline');
-    var labelsWrap = document.getElementById('statsChartLabels');
-    var scoreWrap = document.getElementById('statsPerformanceScore');
-    if(!chart || !empty || !svg || !polyline || !labelsWrap || !scoreWrap) return;
-
-    var strong = scoreWrap.querySelector('strong');
-    var p = scoreWrap.querySelector('p');
-    var em = scoreWrap.querySelector('em');
-    var circles = svg.querySelectorAll('circle');
-    var xs = [10, 60, 110, 160, 210, 260, 310];
-
-    if(!lastQuiz){
-      chart.classList.add('is-empty');
-      empty.hidden = false;
-      if(strong) strong.innerHTML = '—';
-      if(p) p.textContent = 'aucun quiz terminé';
-      if(em) em.innerHTML = 'Commencez<small>par le quiz général</small>';
-      polyline.setAttribute('points', '10,135 60,135 110,135 160,135 210,135 260,135 310,135');
-      circles.forEach(function(c, idx){
-        c.setAttribute('cy', '135');
-        c.setAttribute('r', idx === circles.length - 1 ? '6' : '4');
-        c.style.opacity = idx === circles.length - 1 ? '.42' : '.18';
-      });
-      labelsWrap.innerHTML = '<span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span><span>—</span>';
-      return;
-    }
-
-    var score = Number(lastQuiz.score || 0);
-    var total = Number(lastQuiz.total || 15);
-    var percent = Number(lastQuiz.percent || Math.round((score / Math.max(total,1)) * 100));
-    percent = Math.max(0, Math.min(100, percent));
-    var y = Math.round(135 - (percent / 100) * 105);
-    var points = xs.map(function(x, idx){ return x + ',' + (idx < xs.length - 1 ? 135 : y); }).join(' ');
-    polyline.setAttribute('points', points);
-
-    circles.forEach(function(c, idx){
-      c.setAttribute('cx', String(xs[idx]));
-      c.setAttribute('cy', String(idx < xs.length - 1 ? 135 : y));
-      c.setAttribute('r', idx === xs.length - 1 ? '6' : '4');
-      c.style.opacity = idx === xs.length - 1 ? '1' : '.24';
-    });
-
-    var labels = buildLast7Labels(lastQuiz.date);
-    labelsWrap.innerHTML = labels.map(function(label){ return '<span>' + label + '</span>'; }).join('');
-
-    chart.classList.remove('is-empty');
-    empty.hidden = true;
-    if(strong) strong.innerHTML = percent + '<span>%</span>';
-    if(p) p.textContent = 'dernier score au quiz général';
-    if(em){
-      if(percent >= 80) em.innerHTML = '↥ Très bon<small>bases solides</small>';
-      else if(percent >= 60) em.innerHTML = '→ Correct<small>à consolider</small>';
-      else em.innerHTML = '↧ À revoir<small>reprendre les bases</small>';
-    }
-  }
-
-  function runStatsPatch(){
-    var lastQuiz = null;
-    try{ lastQuiz = JSON.parse(localStorage.getItem('osteoPratikLastQuiz') || 'null'); }catch(e){ lastQuiz = null; }
-
-    var lastPractice = document.querySelector('#progress .stats-last-practice');
-    if(lastPractice) lastPractice.remove();
-
-    renderPerformanceChart(lastQuiz);
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    runStatsPatch();
-    setTimeout(runStatsPatch, 80);
-    setTimeout(runStatsPatch, 300);
-  });
-
-  var _origGoStatsPatch = typeof go === 'function' ? go : null;
-  if(_origGoStatsPatch && !window.__statsPerformancePatched){
-    window.__statsPerformancePatched = true;
-    go = function(id){
-      _origGoStatsPatch(id);
-      if(id === 'progress'){
-        setTimeout(runStatsPatch, 40);
-        setTimeout(runStatsPatch, 220);
-      }
-    };
-  }
-
-  window.updateQuizPerformanceCard = function(lastQuiz){
-    renderPerformanceChart(lastQuiz || null);
-  };
-  window.refreshStatsPerformanceCard = runStatsPatch;
-})();
-</script>
-
-
-<style id="stats-performance-bug-display-fix">
-/* === STATS : correction affichage Performance aux quiz === */
-#progress .stats-quiz-card .stats-quiz-layout{
-  align-items:stretch !important;
-}
-
-#progress .stats-quiz-card.performance-empty .stats-quiz-layout{
-  display:block !important;
-}
-
-#progress .stats-quiz-card.performance-empty #statsPerformanceScore{
-  display:none !important;
-}
-
-#progress .stats-quiz-card.performance-empty #statsPerformanceChart{
-  min-height:300px !important;
-}
-
-#progress .stats-quiz-card.performance-empty .stats-chart-empty{
-  position:relative !important;
-  min-height:300px !important;
-  inset:auto !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  padding:28px 22px !important;
-  border-radius:22px !important;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(53,230,167,.10), transparent 34%),
-    radial-gradient(circle at 76% 82%, rgba(0,229,255,.08), transparent 38%) !important;
-}
-
-#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy{
-  max-width:330px !important;
-}
-
-#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy strong{
-  font-size:24px !important;
-  line-height:1.1 !important;
-}
-
-#progress .stats-quiz-card.performance-empty .stats-chart-empty-copy span{
-  font-size:16px !important;
-  line-height:1.35 !important;
-}
-
-/* Masque de secours si un ancien bloc reste encore injecté */
-#progress .stats-quiz-card.performance-empty .stats-quiz-score:not(#statsQuizScore){
-  display:none !important;
-}
-
-@media(max-width:430px){
-  #progress .stats-quiz-card.performance-empty #statsPerformanceChart,
-  #progress .stats-quiz-card.performance-empty .stats-chart-empty{
-    min-height:260px !important;
-  }
-
-  #progress .stats-quiz-card.performance-empty .stats-chart-empty{
-    padding:24px 18px !important;
-  }
-
-  #progress .stats-quiz-card.performance-empty .stats-chart-empty-copy strong{
-    font-size:22px !important;
-  }
-
-  #progress .stats-quiz-card.performance-empty .stats-chart-empty-copy span{
-    font-size:15px !important;
-  }
-}
-</style>
-
-
-<script id="stats-performance-bug-display-script">
-/* === STATS : état vide propre pour la performance aux quiz === */
-(function(){
-  function readLastQuiz(){
-    try{ return JSON.parse(localStorage.getItem('osteoPratikLastQuiz') || 'null'); }
-    catch(e){ return null; }
-  }
-
-  function applyStatsPerformanceEmptyState(){
-    var card = document.querySelector('#progress .stats-quiz-card:has(#statsPerformanceChart)');
-    var chart = document.getElementById('statsPerformanceChart');
-    var score = document.getElementById('statsPerformanceScore');
-    var lastQuiz = readLastQuiz();
-
-    if(!card || !chart) return;
-
-    if(!lastQuiz){
-      card.classList.add('performance-empty');
-      chart.classList.add('is-empty');
-      if(score) score.style.setProperty('display','none','important');
-    }else{
-      card.classList.remove('performance-empty');
-      chart.classList.remove('is-empty');
-      if(score) score.style.removeProperty('display');
-    }
-
-    var lastPractice = document.querySelector('#progress .stats-last-practice');
-    if(lastPractice) lastPractice.remove();
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', applyStatsPerformanceEmptyState);
-  }else{
-    applyStatsPerformanceEmptyState();
-  }
-
-  [80, 250, 700, 1500].forEach(function(delay){
-    setTimeout(applyStatsPerformanceEmptyState, delay);
-  });
-
-  var oldGo = typeof go === 'function' ? go : null;
-  if(oldGo && !window.__statsPerformanceDisplayBugPatched){
-    window.__statsPerformanceDisplayBugPatched = true;
-    go = function(id){
-      var r = oldGo.apply(this, arguments);
-      if(id === 'progress'){
-        setTimeout(applyStatsPerformanceEmptyState, 40);
-        setTimeout(applyStatsPerformanceEmptyState, 250);
-      }
-      return r;
-    };
-  }
-})();
-</script>
-
-
-<style id="revision-background-visible-final-fix">
-/* === RÉVISER : image de fond beaucoup plus visible === */
-#revision .revision-orbit-nav{
-  filter:none !important;
-}
-
-#revision .revision-orbit-nav::before{
-  display:none !important;
-  content:none !important;
-}
-
-#revision .revision-orbit-backdrop{
-  inset:-18px 0 -12px !important;
-  opacity:1 !important;
-  mix-blend-mode:normal !important;
-  filter:
-    drop-shadow(0 0 26px rgba(0,229,255,.40))
-    drop-shadow(0 0 48px rgba(45,140,255,.18)) !important;
-  background:
-    url("assets/images/revision-bg.webp") center 52% / 92% auto no-repeat !important;
-  z-index:1 !important;
-}
-
-/* Cartouches plus transparents pour ne plus masquer l'image */
-#revision .revision-orbit-card{
-  background:
-    radial-gradient(circle at 38% 26%, color-mix(in srgb,currentColor 10%, transparent), transparent 48%),
-    linear-gradient(145deg, rgba(5,15,31,.36), rgba(5,15,31,.58)) !important;
-  box-shadow:
-    0 0 14px color-mix(in srgb,currentColor 14%, transparent),
-    inset 0 0 12px rgba(255,255,255,.018) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-
-/* Suppression des voiles/halos qui cachaient le visuel */
-#revision .revision-orbit-card::before,
-#revision .revision-orbit-card::after{
-  display:none !important;
-  content:none !important;
-}
-
-#revision .revision-orbit-center{
-  background:rgba(5,15,31,.34) !important;
-  box-shadow:
-    0 0 14px rgba(0,229,255,.18),
-    inset 0 0 12px rgba(0,229,255,.06) !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-orbit-backdrop{
-    inset:-10px -8px -8px !important;
-    background-size:104% auto !important;
-    background-position:center 53% !important;
-  }
-
-  #revision .revision-orbit-card{
-    background:
-      radial-gradient(circle at 38% 26%, color-mix(in srgb,currentColor 9%, transparent), transparent 48%),
-      linear-gradient(145deg, rgba(5,15,31,.32), rgba(5,15,31,.52)) !important;
-  }
-}
-</style>
-
-
-<style id="collection-vues-seulement-final-fix">
-/* === COLLECTION : uniquement les techniques vues entièrement === */
-#seenCollections .quick-cervical-orange{
-  display:none !important;
-}
-
-#seenCollections .seen-album-title p,
-#seenCards .seen-album-title p{
-  max-width:360px !important;
-}
-
-#seenCollections .collection-grid{
-  display:grid !important;
-  gap:14px !important;
-}
-
-#seenCollections .collection-card{
-  opacity:1 !important;
-  filter:none !important;
-}
-
-#seenCollections .collection-card.collection-zone-empty{
-  display:none !important;
-}
-
-#seenCollections .collection-card .collection-progress{
-  min-width:62px !important;
-  text-align:center !important;
-}
-
-.collection-empty-premium{
-  display:grid;
-  gap:10px;
-  padding:22px 18px;
-  border-radius:24px;
-  border:1px solid rgba(0,229,255,.18);
-  background:
-    radial-gradient(circle at 20% 18%, rgba(0,229,255,.10), transparent 36%),
-    linear-gradient(145deg, rgba(10,29,55,.68), rgba(5,15,31,.82));
-  box-shadow:0 18px 55px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
-  color:#dbe8f6;
-}
-
-.collection-empty-premium strong{
-  color:#ffffff;
-  font-size:19px;
-  line-height:1.18;
-}
-
-.collection-empty-premium p{
-  margin:0;
-  color:rgba(221,232,255,.72);
-  font-size:14px;
-  line-height:1.35;
-}
-
-#seenCards .card-grid.only-unlocked .play-card.locked{
-  display:none !important;
-}
-
-#seenCards .album-toolbar .album-chip.active{
-  color:#03111f !important;
-  background:linear-gradient(135deg, var(--cyan), var(--blue)) !important;
-  border-color:rgba(255,255,255,.55) !important;
-}
-
-/* Les cartes affichées dans Collection sont toujours actives */
-#seenCards .play-card.collection-unlocked{
-  cursor:pointer !important;
-  opacity:1 !important;
-  filter:none !important;
-}
-</style>
-
-
-<script id="collection-vues-seulement-final-script">
-/* === COLLECTION : zones et cartes uniquement si vidéo vue entièrement === */
-(function(){
-  var COMPLETED_DETAIL_KEY = 'osteoPratikCompletedTechniqueDetails';
-  var STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
-
-  function uniqueNumbers(values){
-    var out = [];
-    var seen = {};
-    (Array.isArray(values) ? values : []).forEach(function(value){
-      var n = Number(value);
-      if(n && !seen[n]){
-        seen[n] = true;
-        out.push(n);
-      }
-    });
-    return out;
-  }
-
-  function readCompletedDetailIds(){
-    try{
-      var raw = localStorage.getItem(COMPLETED_DETAIL_KEY);
-      var details = raw ? JSON.parse(raw) : {};
-      if(details && typeof details === 'object'){
-        return uniqueNumbers(Object.keys(details));
-      }
-    }catch(e){}
-    return [];
-  }
-
-  function readStrictIds(){
-    try{
-      var raw = localStorage.getItem(STRICT_KEY);
-      var ids = raw ? JSON.parse(raw) : [];
-      return uniqueNumbers(ids);
-    }catch(e){}
-    return [];
-  }
-
-  function writeCompletedDetail(id, source){
-    var n = Number(id);
-    if(!n) return;
-    try{
-      var raw = localStorage.getItem(COMPLETED_DETAIL_KEY);
-      var details = raw ? JSON.parse(raw) : {};
-      if(!details || typeof details !== 'object') details = {};
-      details[String(n)] = {
-        id:n,
-        source:source || 'video-complete',
-        completedAt:new Date().toISOString()
-      };
-      localStorage.setItem(COMPLETED_DETAIL_KEY, JSON.stringify(details));
-    }catch(e){}
-  }
-
-  function syncCompletedIdsIntoUnlocked(ids){
-    ids = uniqueNumbers(ids);
-    try{
-      if(typeof unlockedTechniqueIds !== 'undefined' && unlockedTechniqueIds && typeof unlockedTechniqueIds.add === 'function'){
-        ids.forEach(function(id){ unlockedTechniqueIds.add(Number(id)); });
-      }
-    }catch(e){}
-
-    try{
-      var strict = readStrictIds();
-      ids.forEach(function(id){
-        if(strict.indexOf(id) === -1) strict.push(id);
-      });
-      localStorage.setItem(STRICT_KEY, JSON.stringify(uniqueNumbers(strict)));
-      localStorage.setItem('osteoPratikViewedTechniqueIds', JSON.stringify(uniqueNumbers(strict)));
-    }catch(e){}
-  }
-
-  function getCollectionCompletedIds(){
-    var ids = readCompletedDetailIds();
-
-    /*
-      Sécurité de migration :
-      si l'ancien code n'a jamais créé la clé de détail, on reprend les IDs stricts existants.
-      Dès qu'une nouvelle vidéo est terminée, la collection utilisera en priorité la clé complète.
-    */
-    if(!ids.length){
-      ids = readStrictIds();
-    }
-
-    syncCompletedIdsIntoUnlocked(ids);
-    return ids;
-  }
-
-  window.isTechniqueCompletedForCollection = function(tOrId){
-    var id = typeof tOrId === 'object' && tOrId ? tOrId.id : tOrId;
-    return getCollectionCompletedIds().indexOf(Number(id)) !== -1;
-  };
-
-  function zoneColorKey(zone){
-    if(zone === 'Rachis') return 'cervicales';
-    if(zone === 'Membres supérieurs') return 'msup';
-    if(zone === 'Membres inférieurs') return 'minf';
-    if(zone === 'Bassin') return 'bassin';
-    return 'cervicales';
-  }
-
-  function zoneIcon(zone){
-    if(zone === 'Rachis') return 'R';
-    if(zone === 'Membres supérieurs') return 'MS';
-    if(zone === 'Membres inférieurs') return 'MI';
-    if(zone === 'Bassin') return 'B';
-    return '◎';
-  }
-
-  function zoneOrderIndex(zone){
-    var order = ['Rachis', 'Membres supérieurs', 'Membres inférieurs', 'Bassin'];
-    var i = order.indexOf(zone);
-    return i === -1 ? 99 : i;
-  }
-
-  function escapeJsAttr(value){
-    return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-  }
-
-  function completedItemsByZone(){
-    var completedIds = getCollectionCompletedIds();
-    var map = new Map();
-
-    (Array.isArray(techniques) ? techniques : []).forEach(function(t){
-      if(!t || completedIds.indexOf(Number(t.id)) === -1) return;
-      if(!map.has(t.zone)) map.set(t.zone, []);
-      map.get(t.zone).push(t);
-    });
-
-    return Array.from(map.entries())
-      .map(function(entry){ return {zone:entry[0], items:entry[1]}; })
-      .sort(function(a,b){ return zoneOrderIndex(a.zone) - zoneOrderIndex(b.zone); });
-  }
-
-  window.openSeenCollections = function(){
-    renderSeenCollections();
-    go('seenCollections');
-  };
-
-  window.renderSeenCollections = function(){
-    var grid = document.getElementById('collectionGrid');
-    if(!grid) return;
-
-    var groups = completedItemsByZone();
-    var completedCount = groups.reduce(function(sum, g){ return sum + g.items.length; }, 0);
-    var total = Array.isArray(techniques) ? techniques.length : 0;
-
-    var headerLogo = document.querySelector('#seenCollections .brand .logo');
-    var headerSub = document.querySelector('#seenCollections .brand .subtitle');
-    var intro = document.querySelector('#seenCollections .seen-album-title p');
-    var summary = document.getElementById('seenAlbumSummary');
-    var summaryText = document.querySelector('#seenCollections .collection-summary p');
-
-    if(headerLogo) headerLogo.innerHTML = 'Collection';
-    if(headerSub) headerSub.textContent = 'Cartes débloquées';
-    if(intro) intro.textContent = 'Seules les techniques vues entièrement apparaissent dans votre collection.';
-    if(summary) summary.textContent = completedCount + ' / ' + total + ' cartes débloquées';
-    if(summaryText){
-      summaryText.textContent = completedCount
-        ? 'Touchez une zone colorée pour afficher uniquement les cartes que vous avez déjà débloquées.'
-        : 'Terminez une vidéo jusqu’au bout pour faire apparaître sa carte dans votre collection.';
-    }
-
-    var fixedButton = document.querySelector('#seenCollections .quick-cervical-orange');
-    if(fixedButton) fixedButton.style.setProperty('display', 'none', 'important');
-
-    if(!completedCount){
-      grid.innerHTML = '<article class="collection-empty-premium"><strong>Aucune carte débloquée pour le moment</strong><p>Visionnez une technique en entier. Dès qu’elle est validée, sa carte apparaîtra ici.</p></article>';
-      return;
-    }
-
-    grid.innerHTML = groups.map(function(group){
-      var zone = group.zone;
-      var unlocked = group.items.length;
-      var zoneTotal = (Array.isArray(techniques) ? techniques : []).filter(function(t){ return t.zone === zone; }).length || unlocked;
-      var percent = Math.round((unlocked / Math.max(zoneTotal, 1)) * 100);
-
-      return '<button class="collection-card collection-zone-card collection-color-' + zoneColorKey(zone) + '" onclick="openSeenCollectionZone(\'' + escapeJsAttr(zone) + '\')">' +
-        '<div class="collection-badge">' + zoneIcon(zone) + '</div>' +
-        '<div>' +
-          '<h3>' + zone + '</h3>' +
-          '<p>' + unlocked + ' carte' + (unlocked > 1 ? 's' : '') + ' débloquée' + (unlocked > 1 ? 's' : '') + '</p>' +
-        '</div>' +
-        '<div class="collection-progress">' + unlocked + '/' + zoneTotal + '</div>' +
-        '<div class="collection-bar"><i style="width:' + percent + '%"></i></div>' +
-      '</button>';
-    }).join('');
-  };
-
-  window.openSeenCollectionZone = function(zone){
-    window.currentSeenZone = zone;
-    window.currentSeenSub = '__ALL_UNLOCKED__';
-    renderSeenCards(zone, '__ALL_UNLOCKED__');
-    go('seenCards');
-  };
-
-  window.openSeenCollection = function(zone, sub){
-    window.currentSeenZone = zone;
-    window.currentSeenSub = sub || '__ALL_UNLOCKED__';
-    renderSeenCards(zone, sub || '__ALL_UNLOCKED__');
-    go('seenCards');
-  };
-
-  function renderUnlockedCollectionCard(t){
-    var poster = 'assets/images/' + String(t.id).padStart(3,'0') + '-' + slugify(t.title) + '.webp';
-    var colorKey = typeof getTechniqueColorKey === 'function' ? getTechniqueColorKey(t) : 'cervicales';
-    var safeTitle = typeof escapeHtml === 'function' ? escapeHtml(t.title) : String(t.title || '');
-
-    return '<article class="play-card collection-unlocked tech-color-' + colorKey + '" data-tech-id="' + t.id + '" data-tech-color="' + colorKey + '" onclick="openFullCard(' + Number(t.id) + ')">' +
-      '<div class="play-card-inner">' +
-        '<div class="play-card-face card-front">' +
-          '<div class="card-kicker"><span>' + t.sub + '</span><span>#' + String(t.id).padStart(3,'0') + '</span></div>' +
-          '<div class="card-image">' +
-            '<img src="' + poster + '" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'block\';" alt="">' +
-            '<div class="card-fallback card-fallback-' + colorKey + '" style="display:none">' + (t.icon || '◎') + '</div>' +
-          '</div>' +
-          '<div>' +
-            '<div class="card-title">' + safeTitle + '</div>' +
-            '<span class="card-status">carte débloquée · toucher pour agrandir</span>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</article>';
-  }
-
-  window.renderSeenCards = function(zone, sub){
-    var grid = document.getElementById('seenCardGrid');
-    if(!grid) return;
-
-    var completedIds = getCollectionCompletedIds();
-    var items = (Array.isArray(techniques) ? techniques : []).filter(function(t){
-      if(!t || completedIds.indexOf(Number(t.id)) === -1) return false;
-      if(zone && t.zone !== zone) return false;
-      if(sub && sub !== '__ALL_UNLOCKED__' && t.sub !== sub) return false;
-      return true;
-    }).sort(function(a,b){
-      return String(a.sub).localeCompare(String(b.sub)) || Number(a.id) - Number(b.id);
-    });
-
-    syncCompletedIdsIntoUnlocked(items.map(function(t){ return t.id; }));
-
-    var title = document.getElementById('seenCardsTitle');
-    var subtitle = document.getElementById('seenCardsSubtitle');
-    var heading = document.getElementById('seenCollectionHeading');
-    var intro = document.getElementById('seenCollectionIntro');
-    var count = document.getElementById('seenCollectionCount');
-
-    if(title) title.innerHTML = 'Collection';
-    if(subtitle) subtitle.textContent = zone || 'Cartes débloquées';
-    if(heading) heading.textContent = zone || 'Cartes débloquées';
-    if(intro) intro.textContent = 'Cartes des techniques vues entièrement. Touchez une carte pour l’ouvrir en plein écran.';
-    if(count) count.textContent = items.length + ' carte' + (items.length > 1 ? 's' : '') + ' débloquée' + (items.length > 1 ? 's' : '');
-
-    grid.classList.add('only-unlocked');
-
-    if(!items.length){
-      grid.innerHTML = '<article class="collection-empty-premium"><strong>Aucune carte débloquée dans cette zone</strong><p>Terminez une vidéo de cette zone pour faire apparaître sa carte ici.</p></article>';
-      return;
-    }
-
-    grid.innerHTML = items.map(renderUnlockedCollectionCard).join('');
-  };
-
-  // On marque aussi la clé complète lorsqu'une vidéo est validée après cette correction.
-  var oldMarkComplete = window.markTechniqueViewedAfterComplete || (typeof markTechniqueViewedAfterComplete === 'function' ? markTechniqueViewedAfterComplete : null);
-  window.markTechniqueViewedAfterComplete = function(id){
-    var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
-    if(n) writeCompletedDetail(n, 'markTechniqueViewedAfterComplete');
-    if(oldMarkComplete){
-      try{ oldMarkComplete.apply(this, arguments); }catch(e){}
-    }
-    try{ renderSeenCollections(); }catch(e){}
-  };
-  try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
-
-  var oldVideoCompleted = window.markTechniqueVideoCompleted || (typeof markTechniqueVideoCompleted === 'function' ? markTechniqueVideoCompleted : null);
-  window.markTechniqueVideoCompleted = function(id, source){
-    var n = Number(id || (typeof currentPlayerTechniqueId !== 'undefined' ? currentPlayerTechniqueId : 0));
-    if(n) writeCompletedDetail(n, source || 'markTechniqueVideoCompleted');
-    if(oldVideoCompleted){
-      try{ oldVideoCompleted.apply(this, arguments); }catch(e){}
-    }
-    try{ renderSeenCollections(); }catch(e){}
-  };
-  try{ markTechniqueVideoCompleted = window.markTechniqueVideoCompleted; }catch(e){}
-
-  document.addEventListener('DOMContentLoaded', function(){
-    try{ renderSeenCollections(); }catch(e){}
-  });
-})();
-</script>
-
-
-<style id="stats-performance-display-final-fix-v2">
-/* === STATS : correction finale affichage Performance aux quiz === */
-#progress .stats-performance-card-final .stats-quiz-layout{
-  display:grid !important;
-  grid-template-columns:minmax(0,1fr) 136px !important;
-  gap:18px !important;
-  align-items:center !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceChart{
-  position:relative !important;
-  min-height:170px !important;
-  overflow:hidden !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceChart svg{
-  width:100% !important;
-  height:140px !important;
-  display:block !important;
-  opacity:1 !important;
-  visibility:visible !important;
-}
-
-#progress .stats-performance-card-final #statsChartLabels{
-  display:flex !important;
-  justify-content:space-between !important;
-  gap:4px !important;
-  margin-top:8px !important;
-  font-size:11px !important;
-  color:rgba(221,232,255,.62) !important;
-  opacity:1 !important;
-  visibility:visible !important;
-}
-
-#progress .stats-performance-card-final #statsChartEmpty{
-  display:none !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore{
-  position:static !important;
-  display:block !important;
-  align-self:center !important;
-  border-left:1px solid rgba(255,255,255,.11) !important;
-  border-top:0 !important;
-  padding-left:16px !important;
-  padding-top:0 !important;
-  min-width:0 !important;
-  background:transparent !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore strong{
-  display:block !important;
-  color:#fff !important;
-  font-size:42px !important;
-  line-height:1 !important;
-  white-space:nowrap !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore strong span{
-  font-size:22px !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore p{
-  margin:8px 0 12px !important;
-  color:rgba(221,232,255,.70) !important;
-  font-size:13px !important;
-  line-height:1.28 !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore em{
-  display:block !important;
-  max-width:126px !important;
-  color:#35e6a7 !important;
-  font-style:normal !important;
-  font-weight:900 !important;
-  padding:10px !important;
-  border-radius:14px !important;
-  border:1px solid rgba(53,230,167,.22) !important;
-  background:rgba(53,230,167,.06) !important;
-  line-height:1.18 !important;
-}
-
-#progress .stats-performance-card-final #statsPerformanceScore em small{
-  display:block !important;
-  color:rgba(221,232,255,.65) !important;
-  font-weight:650 !important;
-  font-size:11px !important;
-  margin-top:4px !important;
-}
-
-/* État sans quiz : un seul message propre, pas de graphique ni score parasite */
-#progress .stats-performance-card-final.performance-empty .stats-quiz-layout{
-  display:block !important;
-}
-
-#progress .stats-performance-card-final.performance-empty #statsPerformanceScore{
-  display:none !important;
-}
-
-#progress .stats-performance-card-final.performance-empty #statsPerformanceChart{
-  min-height:260px !important;
-}
-
-#progress .stats-performance-card-final.performance-empty #statsPerformanceChart svg,
-#progress .stats-performance-card-final.performance-empty #statsChartLabels{
-  display:none !important;
-  opacity:0 !important;
-  visibility:hidden !important;
-}
-
-#progress .stats-performance-card-final.performance-empty #statsChartEmpty{
-  position:relative !important;
-  inset:auto !important;
-  min-height:260px !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  gap:16px !important;
-  padding:28px 22px !important;
-  border-radius:22px !important;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(53,230,167,.10), transparent 34%),
-    radial-gradient(circle at 78% 82%, rgba(0,229,255,.08), transparent 38%) !important;
-}
-
-#progress .stats-performance-card-final.performance-empty .stats-chart-empty-copy{
-  max-width:330px !important;
-}
-
-#progress .stats-performance-card-final.performance-empty .stats-chart-empty-copy strong{
-  font-size:24px !important;
-  line-height:1.1 !important;
-}
-
-#progress .stats-performance-card-final.performance-empty .stats-chart-empty-copy span{
-  font-size:16px !important;
-  line-height:1.35 !important;
-}
-
-/* On supprime définitivement "Votre dernière pratique" des stats */
-#progress .stats-last-practice{
-  display:none !important;
-}
-
-@media(max-width:430px){
-  #progress .stats-performance-card-final .stats-quiz-layout{
-    display:block !important;
-  }
-
-  #progress .stats-performance-card-final #statsPerformanceChart{
-    min-height:155px !important;
-  }
-
-  #progress .stats-performance-card-final #statsPerformanceChart svg{
-    height:128px !important;
-  }
-
-  #progress .stats-performance-card-final #statsPerformanceScore{
-    margin-top:16px !important;
-    border-left:0 !important;
-    border-top:1px solid rgba(255,255,255,.11) !important;
-    padding-left:0 !important;
-    padding-top:14px !important;
-  }
-
-  #progress .stats-performance-card-final #statsPerformanceScore strong{
-    font-size:38px !important;
-  }
-
-  #progress .stats-performance-card-final #statsPerformanceScore em{
-    max-width:100% !important;
-  }
-
-  #progress .stats-performance-card-final.performance-empty #statsPerformanceChart,
-  #progress .stats-performance-card-final.performance-empty #statsChartEmpty{
-    min-height:235px !important;
-  }
-
-  #progress .stats-performance-card-final.performance-empty #statsChartEmpty{
-    padding:22px 16px !important;
-    align-items:center !important;
-  }
-
-  #progress .stats-performance-card-final.performance-empty .stats-chart-empty-icon{
-    width:48px !important;
-    height:48px !important;
-    border-radius:14px !important;
-    font-size:22px !important;
-  }
-
-  #progress .stats-performance-card-final.performance-empty .stats-chart-empty-copy strong{
-    font-size:22px !important;
-  }
-
-  #progress .stats-performance-card-final.performance-empty .stats-chart-empty-copy span{
-    font-size:15px !important;
-  }
-}
-</style>
-
-<script id="stats-performance-display-final-script-v2">
-/* === STATS : affichage fiable Performance aux quiz === */
-(function(){
-  var QUIZ_KEY = 'osteoPratikLastQuiz';
-
-  function readQuiz(){
-    try{
-      var q = JSON.parse(localStorage.getItem(QUIZ_KEY) || 'null');
-      if(!q || typeof q !== 'object') return null;
-      var score = Number(q.score);
-      var total = Number(q.total || 15);
-      if(!isFinite(score) || !isFinite(total) || total <= 0) return null;
-      return q;
-    }catch(e){
-      return null;
-    }
-  }
-
-  function percentFromQuiz(q){
-    var score = Number(q && q.score || 0);
-    var total = Number(q && q.total || 15);
-    var pct = Number(q && q.percent);
-    if(!isFinite(pct)){
-      pct = Math.round((score / Math.max(total, 1)) * 100);
-    }
-    return Math.max(0, Math.min(100, Math.round(pct)));
-  }
-
-  function shortDate(iso){
-    try{
-      var d = iso ? new Date(iso) : new Date();
-      if(isNaN(d.getTime())) d = new Date();
-      return d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit'});
-    }catch(e){
-      return '—';
-    }
-  }
-
-  function labelsForQuiz(q){
-    var base = q && q.date ? new Date(q.date) : new Date();
-    if(isNaN(base.getTime())) base = new Date();
-    var labels = [];
-    for(var i=6; i>=0; i--){
-      var d = new Date(base);
-      d.setDate(base.getDate() - i);
-      labels.push(shortDate(d));
-    }
-    return labels;
-  }
-
-  function getPerformanceCard(){
-    var chart = document.getElementById('statsPerformanceChart');
-    return chart ? chart.closest('.stats-quiz-card') : null;
-  }
-
-  function setEmptyState(){
-    var card = getPerformanceCard();
-    var chart = document.getElementById('statsPerformanceChart');
-    var empty = document.getElementById('statsChartEmpty');
-    var svg = document.getElementById('statsPerformanceSvg');
-    var labels = document.getElementById('statsChartLabels');
-    var score = document.getElementById('statsPerformanceScore');
-
-    if(!card || !chart) return;
-
-    card.classList.add('stats-performance-card-final', 'performance-empty');
-    chart.classList.add('is-empty');
-
-    if(empty){
-      empty.hidden = false;
-      empty.style.removeProperty('display');
-      var title = empty.querySelector('strong');
-      var subtitle = empty.querySelector('span');
-      if(title) title.textContent = 'Aucun quiz terminé';
-      if(subtitle) subtitle.textContent = "Le graphique de performance s'affichera après votre premier quiz général.";
-    }
-
-    if(svg) svg.style.setProperty('display', 'none', 'important');
-    if(labels) labels.style.setProperty('display', 'none', 'important');
-    if(score) score.style.setProperty('display', 'none', 'important');
-
-    var lastPractice = document.querySelector('#progress .stats-last-practice');
-    if(lastPractice) lastPractice.remove();
-  }
-
-  function setQuizState(q){
-    var card = getPerformanceCard();
-    var chart = document.getElementById('statsPerformanceChart');
-    var empty = document.getElementById('statsChartEmpty');
-    var svg = document.getElementById('statsPerformanceSvg');
-    var polyline = document.getElementById('statsPerformancePolyline');
-    var labels = document.getElementById('statsChartLabels');
-    var score = document.getElementById('statsPerformanceScore');
-
-    if(!card || !chart || !svg || !polyline || !labels || !score) return;
-
-    var pct = percentFromQuiz(q);
-    var y = Math.round(135 - (pct / 100) * 105);
-    var xs = [10, 60, 110, 160, 210, 260, 310];
-
-    card.classList.add('stats-performance-card-final');
-    card.classList.remove('performance-empty');
-    chart.classList.remove('is-empty');
-
-    if(empty){
-      empty.hidden = true;
-      empty.style.setProperty('display', 'none', 'important');
-    }
-
-    svg.style.removeProperty('display');
-    labels.style.removeProperty('display');
-    score.style.removeProperty('display');
-
-    polyline.setAttribute('points', xs.map(function(x, idx){
-      var previous = 135;
-      return x + ',' + (idx < xs.length - 1 ? previous : y);
-    }).join(' '));
-
-    svg.querySelectorAll('circle').forEach(function(c, idx){
-      c.setAttribute('cx', String(xs[idx] || 310));
-      c.setAttribute('cy', String(idx < xs.length - 1 ? 135 : y));
-      c.setAttribute('r', idx < xs.length - 1 ? '4' : '6');
-      c.style.opacity = idx < xs.length - 1 ? '.22' : '1';
-    });
-
-    labels.innerHTML = labelsForQuiz(q).map(function(label){
-      return '<span>' + label + '</span>';
-    }).join('');
-
-    var strong = score.querySelector('strong');
-    var p = score.querySelector('p');
-    var em = score.querySelector('em');
-
-    if(strong) strong.innerHTML = pct + '<span>%</span>';
-    if(p) p.textContent = 'dernier score au quiz général';
-
-    if(em){
-      if(pct >= 80){
-        em.innerHTML = '↥ Très bon<small>bases solides</small>';
-      }else if(pct >= 60){
-        em.innerHTML = '→ Correct<small>à consolider</small>';
-      }else{
-        em.innerHTML = '↧ À revoir<small>reprendre les bases</small>';
-      }
-    }
-
-    var lastPractice = document.querySelector('#progress .stats-last-practice');
-    if(lastPractice) lastPractice.remove();
-  }
-
-  function refreshStatsPerformance(){
-    var q = readQuiz();
-    if(q) setQuizState(q);
-    else setEmptyState();
-  }
-
-  window.refreshStatsPerformanceFinal = refreshStatsPerformance;
-  window.updateQuizPerformanceCard = function(lastQuiz){
-    if(lastQuiz && typeof lastQuiz === 'object') setQuizState(lastQuiz);
-    else refreshStatsPerformance();
-  };
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', refreshStatsPerformance);
-  }else{
-    refreshStatsPerformance();
-  }
-
-  [80, 250, 700, 1500, 3000].forEach(function(delay){
-    setTimeout(refreshStatsPerformance, delay);
-  });
-
-  var oldGo = typeof go === 'function' ? go : null;
-  if(oldGo && !window.__statsPerformanceDisplayFinalV2Patched){
-    window.__statsPerformanceDisplayFinalV2Patched = true;
-    go = function(id){
-      var result = oldGo.apply(this, arguments);
-      if(id === 'progress'){
-        setTimeout(refreshStatsPerformance, 40);
-        setTimeout(refreshStatsPerformance, 240);
-        setTimeout(refreshStatsPerformance, 800);
-      }
-      return result;
-    };
-    try{ window.go = go; }catch(e){}
-  }
-})();
-</script>
-
-
-<style id="revision-bg-visible-path-fallback-fix">
-/* === RÉVISION : image de fond visible + chemin sécurisé === */
-#revision .revision-orbit-nav{
-  position:relative !important;
-  overflow:visible !important;
-  isolation:isolate !important;
-}
-
-/* On garde le conteneur image prévu par le code, mais on force son affichage */
-#revision .revision-orbit-backdrop{
-  display:block !important;
-  position:absolute !important;
-  inset:-18px -10px -12px !important;
-  z-index:1 !important;
-  opacity:1 !important;
-  pointer-events:none !important;
-  mix-blend-mode:screen !important;
-  filter:
-    drop-shadow(0 0 22px rgba(0,229,255,.42))
-    drop-shadow(0 0 44px rgba(168,85,255,.16)) !important;
-  background:
-    url("assets/images/revision-bg.webp?v=8") center 52% / 112% auto no-repeat !important;
-}
-
-/* Image injectée en secours : si le CSS background ne charge pas, celle-ci prend le relais */
-#revision .revision-bg-img-fallback{
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  width:112% !important;
-  max-width:none !important;
-  height:auto !important;
-  transform:translate(-50%,-48%) !important;
-  z-index:1 !important;
-  opacity:.98 !important;
-  pointer-events:none !important;
-  object-fit:contain !important;
-  mix-blend-mode:screen !important;
-  filter:
-    drop-shadow(0 0 22px rgba(0,229,255,.40))
-    drop-shadow(0 0 44px rgba(168,85,255,.16)) !important;
-}
-
-/* Les cartes doivent rester au-dessus de l'image */
-#revision .revision-orbit-card{
-  position:absolute !important;
-  z-index:3 !important;
-  background:
-    radial-gradient(circle at 38% 26%, color-mix(in srgb,currentColor 8%, transparent), transparent 48%),
-    linear-gradient(145deg, rgba(5,15,31,.30), rgba(5,15,31,.50)) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-}
-
-/* On supprime les halos qui masquaient le fond */
-#revision .revision-orbit-nav::before,
-#revision .revision-orbit-card::before,
-#revision .revision-orbit-card::after{
-  display:none !important;
-  content:none !important;
-}
-
-#revision .revision-orbit-center{
-  z-index:4 !important;
-  background:rgba(5,15,31,.36) !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-orbit-backdrop{
-    inset:-14px -18px -10px !important;
-    background-size:126% auto !important;
-    background-position:center 52% !important;
-  }
-
-  #revision .revision-bg-img-fallback{
-    width:126% !important;
-    transform:translate(-50%,-48%) !important;
-  }
-}
-</style>
-
-
-
-
-<style id="revision-bg-filter-final-nb">
-/* === RÉVISION : fond revision-bg plus discret avec filtre === */
-/* Correction finale : l'image était trop présente, surtout parce qu'elle pouvait être chargée
-   à la fois en background CSS et en image de secours. On filtre donc les deux sources. */
-
-#revision .revision-orbit-nav{
-  position:relative !important;
-  isolation:isolate !important;
-}
-
-/* Fond CSS principal : moins lumineux, moins saturé, légèrement adouci */
-#revision .revision-orbit-backdrop{
-  display:block !important;
-  opacity:.46 !important;
-  mix-blend-mode:screen !important;
-  filter:
-    brightness(.62)
-    contrast(.92)
-    saturate(.70)
-    blur(.6px)
-    drop-shadow(0 0 12px rgba(0,229,255,.10)) !important;
-  background:
-    linear-gradient(180deg, rgba(3,10,22,.54), rgba(3,10,22,.76)),
-    url("assets/images/revision-bg.webp?v=8") center 52% / 112% auto no-repeat !important;
-}
-
-/* Image de secours injectée par le script : elle aussi est calmée pour éviter le double affichage */
-#revision .revision-bg-img-fallback{
-  opacity:.30 !important;
-  mix-blend-mode:screen !important;
-  filter:
-    brightness(.58)
-    contrast(.92)
-    saturate(.68)
-    blur(.6px)
-    drop-shadow(0 0 10px rgba(0,229,255,.08)) !important;
-}
-
-/* Voile sombre placé entre le fond et les cartes : il améliore la lisibilité sans toucher aux boutons */
-#revision .revision-orbit-nav::after{
-  content:"" !important;
-  position:absolute !important;
-  inset:-18px -10px -12px !important;
-  z-index:2 !important;
-  pointer-events:none !important;
-  border-radius:34px !important;
-  background:
-    radial-gradient(circle at 50% 45%, rgba(3,10,22,.26), rgba(3,10,22,.58) 66%, rgba(3,10,22,.72) 100%) !important;
-}
-
-/* Les cartes restent au-dessus du voile */
-#revision .revision-orbit-card{
-  z-index:3 !important;
-}
-
-#revision .revision-orbit-center{
-  z-index:4 !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-orbit-backdrop{
-    opacity:.42 !important;
-    background:
-      linear-gradient(180deg, rgba(3,10,22,.58), rgba(3,10,22,.80)),
-      url("assets/images/revision-bg.webp?v=8") center 52% / 126% auto no-repeat !important;
-  }
-
-  #revision .revision-bg-img-fallback{
-    opacity:.26 !important;
-  }
-
-  #revision .revision-orbit-nav::after{
-    inset:-14px -18px -10px !important;
-    background:
-      radial-gradient(circle at 50% 45%, rgba(3,10,22,.30), rgba(3,10,22,.62) 66%, rgba(3,10,22,.76) 100%) !important;
-  }
-}
-</style>
-
-<script id="revision-bg-path-fallback-script">
-/* === RÉVISION : charge revision-bg.webp même si le fichier est au mauvais dossier === */
-(function(){
-  function installRevisionBackground(){
-    var nav = document.querySelector('#revision .revision-orbit-nav');
-    if(!nav) return;
-
-    var existing = nav.querySelector('.revision-bg-img-fallback');
-    if(existing) return;
-
-    var img = document.createElement('img');
-    img.className = 'revision-bg-img-fallback';
-    img.alt = '';
-    img.setAttribute('aria-hidden', 'true');
-    img.decoding = 'async';
-    img.loading = 'eager';
-
-    var primary = 'assets/images/revision-bg.webp?v=8';
-    var fallback = 'revision-bg.webp?v=8';
-
-    img.onerror = function(){
-      if(img.dataset.fallbackTried === '1') return;
-      img.dataset.fallbackTried = '1';
-      img.src = fallback;
-    };
-
-    img.src = primary;
-
-    var firstCard = nav.querySelector('.revision-orbit-card');
-    if(firstCard){
-      nav.insertBefore(img, firstCard);
-    }else{
-      nav.appendChild(img);
-    }
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', installRevisionBackground);
-  }else{
-    installRevisionBackground();
-  }
-
-  [80, 300, 1000].forEach(function(delay){
-    setTimeout(installRevisionBackground, delay);
-  });
-
-  var oldGo = typeof go === 'function' ? go : null;
-  if(oldGo && !window.__revisionBgFallbackPatched){
-    window.__revisionBgFallbackPatched = true;
-    go = function(id){
-      var result = oldGo.apply(this, arguments);
-      if(id === 'revision'){
-        setTimeout(installRevisionBackground, 40);
-        setTimeout(installRevisionBackground, 250);
-      }
-      return result;
-    };
-    try{ window.go = go; }catch(e){}
-  }
-})();
-</script>
-
-
-
-<style id="revision-bg-filter-final-visible-nb">
-/* === CORRECTION RÉVISION : image visible + filtre doux === */
-/* Le fond avait disparu car le filtre précédent ajoutait un voile trop sombre
-   directement dans le background. Ici, l'image reste une vraie image,
-   et le filtre sombre est séparé par un voile léger. */
-
-#revision .revision-orbit-nav{
-  position:relative !important;
-  overflow:visible !important;
-  isolation:isolate !important;
-}
-
-/* Le background CSS ne porte plus de voile sombre : il garde uniquement l'image. */
-#revision .revision-orbit-backdrop{
-  display:block !important;
-  position:absolute !important;
-  inset:-18px -10px -12px !important;
-  z-index:1 !important;
-  pointer-events:none !important;
-  opacity:.72 !important;
-  mix-blend-mode:screen !important;
-  background:url("assets/images/revision-bg.webp?v=9") center 52% / 112% auto no-repeat !important;
-  filter:
-    brightness(.86)
-    contrast(.98)
-    saturate(.86)
-    blur(.25px)
-    drop-shadow(0 0 18px rgba(0,229,255,.18)) !important;
-}
-
-/* Image de secours : elle reste visible, mais pas trop forte. */
-#revision .revision-bg-img-fallback{
-  display:block !important;
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  width:112% !important;
-  max-width:none !important;
-  height:auto !important;
-  transform:translate(-50%,-48%) !important;
-  z-index:1 !important;
-  pointer-events:none !important;
-  opacity:.58 !important;
-  object-fit:contain !important;
-  mix-blend-mode:screen !important;
-  filter:
-    brightness(.84)
-    contrast(.98)
-    saturate(.84)
-    blur(.25px)
-    drop-shadow(0 0 16px rgba(0,229,255,.16)) !important;
-}
-
-/* Voile séparé : il calme l'image sans la faire disparaître. */
-#revision .revision-orbit-nav::after{
-  content:"" !important;
-  position:absolute !important;
-  inset:-18px -10px -12px !important;
-  z-index:2 !important;
-  pointer-events:none !important;
-  border-radius:34px !important;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(3,10,22,.08), rgba(3,10,22,.24) 68%, rgba(3,10,22,.36) 100%) !important;
-}
-
-/* Les cartes restent bien au-dessus de l'image et du voile. */
-#revision .revision-orbit-card{
-  z-index:3 !important;
-}
-
-#revision .revision-orbit-center{
-  z-index:4 !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-orbit-backdrop{
-    inset:-14px -18px -10px !important;
-    opacity:.68 !important;
-    background:url("assets/images/revision-bg.webp?v=9") center 52% / 126% auto no-repeat !important;
-  }
-
-  #revision .revision-bg-img-fallback{
-    width:126% !important;
-    opacity:.54 !important;
-  }
-
-  #revision .revision-orbit-nav::after{
-    inset:-14px -18px -10px !important;
-    background:
-      radial-gradient(circle at 50% 48%, rgba(3,10,22,.10), rgba(3,10,22,.28) 68%, rgba(3,10,22,.40) 100%) !important;
-  }
-}
-</style>
-
-<script id="revision-bg-visible-guard-nb">
-/* === SÉCURITÉ : si le fond CSS ne s'affiche pas, on force une vraie image visible === */
-(function(){
-  function ensureRevisionBgVisible(){
-    var nav = document.querySelector('#revision .revision-orbit-nav');
-    if(!nav) return;
-
-    var img = nav.querySelector('.revision-bg-img-fallback');
-    if(!img){
-      img = document.createElement('img');
-      img.className = 'revision-bg-img-fallback';
-      img.alt = '';
-      img.setAttribute('aria-hidden','true');
-      img.decoding = 'async';
-      img.loading = 'eager';
-
-      var firstCard = nav.querySelector('.revision-orbit-card');
-      if(firstCard){ nav.insertBefore(img, firstCard); }
-      else { nav.appendChild(img); }
-    }
-
-    img.onerror = function(){
-      if(img.dataset.fallbackTried === '1') return;
-      img.dataset.fallbackTried = '1';
-      img.src = 'revision-bg.webp?v=9';
-    };
-
-    if(!img.getAttribute('src')){
-      img.src = 'assets/images/revision-bg.webp?v=9';
-    }
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', ensureRevisionBgVisible);
-  }else{
-    ensureRevisionBgVisible();
-  }
-
-  [80, 250, 800, 1500].forEach(function(delay){
-    setTimeout(ensureRevisionBgVisible, delay);
-  });
-
-  var oldGo = typeof go === 'function' ? go : null;
-  if(oldGo && !window.__revisionBgVisibleGuardNb){
-    window.__revisionBgVisibleGuardNb = true;
-    go = function(id){
-      var result = oldGo.apply(this, arguments);
-      if(id === 'revision'){
-        setTimeout(ensureRevisionBgVisible, 40);
-        setTimeout(ensureRevisionBgVisible, 250);
-      }
-      return result;
-    };
-    try{ window.go = go; }catch(e){}
-  }
-})();
-</script>
-
-
-
-<style id="revision-bg-plus-visible-final-nb">
-/* === CORRECTION FINALE RÉVISION : image bien visible, mais calmée === */
-/* On ne met plus de voile sombre épais. On utilise une vraie image en opacity,
-   avec un filtre léger. Cela garde le fond présent sans écraser les textes. */
-
-#revision .revision-orbit-nav{
-  position:relative !important;
-  overflow:visible !important;
-  isolation:isolate !important;
-}
-
-/* On désactive le fond CSS pour éviter le doublon avec l'image de secours. */
-#revision .revision-orbit-backdrop{
-  display:none !important;
-}
-
-/* Image de fond principale forcée par le script : plus visible, sans blend screen. */
-#revision .revision-bg-img-fallback{
-  display:block !important;
-  position:absolute !important;
-  left:50% !important;
-  top:50% !important;
-  width:132% !important;
-  max-width:none !important;
-  height:auto !important;
-  transform:translate(-50%,-48%) !important;
-  z-index:1 !important;
-  pointer-events:none !important;
-  opacity:.82 !important;
-  object-fit:contain !important;
-  mix-blend-mode:normal !important;
-  filter:
-    brightness(.96)
-    contrast(1.02)
-    saturate(.96)
-    drop-shadow(0 0 18px rgba(0,229,255,.12)) !important;
-}
-
-/* Voile ultra léger uniquement pour garder la lecture des textes. */
-#revision .revision-orbit-nav::after{
-  content:"" !important;
-  position:absolute !important;
-  inset:-18px -10px -12px !important;
-  z-index:2 !important;
-  pointer-events:none !important;
-  border-radius:34px !important;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(3,10,22,.00), rgba(3,10,22,.08) 72%, rgba(3,10,22,.16) 100%) !important;
-}
-
-#revision .revision-orbit-card{
-  z-index:3 !important;
-}
-
-#revision .revision-orbit-center{
-  z-index:4 !important;
-}
-
-/* Les textes restent lisibles sur l'image plus présente. */
-#revision .revision-orbit-card strong,
-#revision .revision-orbit-card small{
-  text-shadow:
-    0 2px 10px rgba(0,0,0,.82),
-    0 0 14px rgba(0,0,0,.46) !important;
-}
-
-@media(max-width:430px){
-  #revision .revision-bg-img-fallback{
-    width:140% !important;
-    opacity:.80 !important;
-    transform:translate(-50%,-48%) !important;
-  }
-
-  #revision .revision-orbit-nav::after{
-    inset:-14px -18px -10px !important;
-    background:
-      radial-gradient(circle at 50% 48%, rgba(3,10,22,.00), rgba(3,10,22,.09) 72%, rgba(3,10,22,.18) 100%) !important;
-  }
-}
-</style>
 
 </body>
 </html>
