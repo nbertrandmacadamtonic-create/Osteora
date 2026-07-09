@@ -7059,8 +7059,8 @@ button[data-tech-id="12"]{
 
 </style>
 
-<link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.png">
-<link rel="apple-touch-icon" href="assets/images/icon-osteo-pratik.png">
+<link rel="icon" type="image/png" href="assets/images/icon-osteo-pratik.webp">
+<link rel="apple-touch-icon" href="assets/images/icon-osteo-pratik.webp">
 <meta name="theme-color" content="#07162E">
 
 <link rel="preload" as="image" href="assets/images/welcome-presentation.webp">
@@ -7330,7 +7330,7 @@ assets/icons/icon-profil.webp
 
   <section class="video-zone-layout">
     <div class="video-zone-person">
-      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/video-zone-person.png" alt="">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/video-zone-person.webp" alt="">
     </div>
 
     <div class="video-hotspot-dot dot-rachis"></div>
@@ -7436,7 +7436,7 @@ assets/icons/icon-profil.webp
 
   <section class="rachis-region-layout">
     <div class="rachis-side-image">
-      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-side.png" alt="">
+      <img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/rachis-side.webp" alt="">
     </div>
 
     <button class="rachis-region-card cervicales" onclick="openRachisRegion('Cervicales')">
@@ -8172,7 +8172,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image msup"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/msup-side.png" alt="Membres supérieurs"/></div>
+    <div class="module-side-image msup"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/msup-side.webp" alt="Membres supérieurs"/></div>
     <button class="module-region-card shoulder purple-card left" onclick="openMappedSubzone('msupMenu','Membres supérieurs','Épaule',['Clavicule','Épaule'])">
       <div class="region-icon">E</div><div><h3>Épaule</h3><small>Clavicule · Épaule</small></div><div class="arrow">›</div>
     </button>
@@ -8217,7 +8217,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image minf"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/minf-side.png" alt="Membres inférieurs"/></div>
+    <div class="module-side-image minf"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/minf-side.webp" alt="Membres inférieurs"/></div>
     <button class="module-region-card hip purple-card left" onclick="openMappedSubzone('minfMenu','Membres inférieurs','Hanche',['Hanche'])">
       <div class="region-icon">H</div><div><h3>Hanche</h3><small>Coxo-fémorale</small></div><div class="arrow">›</div>
     </button>
@@ -8262,7 +8262,7 @@ assets/icons/icon-profil.webp
     <p>Choisissez une région</p>
   </div>
   <section class="module-region-layout">
-    <div class="module-side-image bassin"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/bassin-side.png" alt="Bassin"/></div>
+    <div class="module-side-image bassin"><img decoding="async" loading="lazy" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" data-lazy-src="assets/images/bassin-side.webp" alt="Bassin"/></div>
     <button class="module-region-card ilium purple-card left" onclick="openMappedSubzone('bassinMenu','Bassin','Sacro-iliaques',['Ilium'])">
       <div class="region-icon">SI</div><div><h3>Sacro-iliaques</h3><small>Antériorité · postériorité · ouverture · fermeture</small></div><div class="arrow">›</div>
     </button>
@@ -11593,6 +11593,22 @@ function makeJointSvg(type, sideKey){
   `);
 }
 
+function getPremiumJointImagePath(type){
+  const map = {
+    clavicle: "./images/articulations/clavicle_sternoclavicular_premium.webp",
+    shoulder: "./images/articulations/shoulder_premium.webp",
+    elbow: "./images/articulations/elbow_premium.webp",
+    wrist: "./images/articulations/wrist_hand_premium.webp",
+    pelvis: "./images/articulations/pelvis_premium.webp",
+    spine: "./images/articulations/cervical_spine_premium.webp",
+    rib: "./images/articulations/thoracic_rib_premium.webp",
+    hip: "./images/articulations/hip_premium.webp",
+    knee: "./images/articulations/knee_premium.webp",
+    ankle: "./images/articulations/ankle_foot_premium.webp"
+  };
+  return map[type] || "";
+}
+
 function inferArticulationMeta(t, detail){
   const hay = getArticulationSearchText(t, detail);
   const side = detectTechniqueSide(hay);
@@ -11620,10 +11636,12 @@ function inferArticulationMeta(t, detail){
   if(/genou/.test(hay)) label = 'Articulation du genou';
 
   return {
+    type,
     sideLetter: side.letter,
     sideLabel: side.label,
     sideKey: side.key,
     label,
+    imagePath: getPremiumJointImagePath(type),
     figure: makeJointSvg(type, side.key)
   };
 }
@@ -11652,7 +11670,7 @@ function renderTechniqueDetail(){
   if(articulationLabel) articulationLabel.textContent = articulationMeta.label;
   if(sideLetter) sideLetter.textContent = articulationMeta.sideLetter;
   if(sideLabel) sideLabel.textContent = articulationMeta.sideLabel;
-  if(jointFigure) jointFigure.innerHTML = articulationMeta.figure;
+  if(jointFigure) jointFigure.innerHTML = articulationMeta.imagePath ? `<img src="${articulationMeta.imagePath}" alt="${escapeHtml(articulationMeta.label)}"/>` : articulationMeta.figure;
 
   if(planche){
     planche.style.display = "none";
@@ -13857,6 +13875,14 @@ Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&b
 .fiche-joint-figure svg{
   width:100%;
   height:100%;
+}
+
+.fiche-joint-figure img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 0 28px rgba(0,229,255,.20)) drop-shadow(0 0 24px rgba(168,85,255,.18));
 }
 
 .fiche-joint-figure .bone{
@@ -17653,7 +17679,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
   pointer-events:none !important;
   background:
     linear-gradient(180deg, rgba(4,15,31,.10), rgba(4,15,31,.50)),
-    url("assets/images/video-zone-person.png") center 54% / contain no-repeat !important;
+    url("assets/images/video-zone-person.webp") center 54% / contain no-repeat !important;
   filter:drop-shadow(0 0 30px rgba(0,229,255,.22)) !important;
 }
 
