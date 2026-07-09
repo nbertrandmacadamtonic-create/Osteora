@@ -11424,6 +11424,28 @@ function openFichePlancheComplete(){
   }
 }
 
+
+function formatFicheTechniqueBody(value){
+  const raw = String(value || "").trim();
+  if(!raw) return "";
+
+  let clean = raw
+    .replace(/\s+/g, " ")
+    .replace(/\s+([,;.])/g, "$1")
+    .trim();
+
+  let html = escapeHtml(clean);
+
+  html = html.replace(/\b(PATIENT|SUJET|PRATICIEN)\s*:?/g, '<strong class="fiche-inline-label">$1 :</strong>');
+  html = html.replace(/\b(MAIN CÉPHALIQUE|MAIN CAUDALE|MAIN APPLICATRICE)\b/g, '<strong class="fiche-inline-label">$1</strong>');
+
+  html = html
+    .replace(/\.\s+(?=<strong class="fiche-inline-label">(?:PATIENT|SUJET|PRATICIEN)\s*:<\/strong>)/g, '.</p><p>')
+    .replace(/\.\s+(?=(?:Dans le même axe|Majorer|Au relâchement|Puis|Ensuite|Demander|Porter|Amener|Stabiliser|Tracter|La main|Les doigts)\b)/g, '.</p><p>');
+
+  return `<p>${html}</p>`;
+}
+
 function renderTechniqueDetail(){
   const t = getCurrentTechnique();
   const detail = getTechniqueDetail(t);
@@ -11461,9 +11483,11 @@ function renderTechniqueDetail(){
     timeline.innerHTML = (detail.steps || []).map((s, index) => {
       const stepColor = getTechniqueStepColorKey(s);
       const logoSrc = getTechniqueStepLogoSrc(s);
-      const photoSrc = getVersionedAssetSrc(s.photo || "");
+      const photoSrcRaw = String(s.photo || "").trim();
+      const photoSrc = getVersionedAssetSrc(photoSrcRaw);
+      const hasPhoto = !!photoSrcRaw;
       return `
-      <article class="fiche-step-card fiche-step-${stepColor}">
+      <article class="fiche-step-card fiche-step-${stepColor}${hasPhoto ? '' : ' fiche-step-no-image'}">
         <div class="fiche-step-left">
           <div class="fiche-step-logo fiche-logo-${stepColor}">
             ${logoSrc ? `<img src="${escapeAttr(logoSrc)}" alt="${escapeAttr(s.label || '')}">` : `<span>${index + 1}</span>`}
@@ -11474,12 +11498,10 @@ function renderTechniqueDetail(){
         <div class="fiche-step-copy">
           <small>${index + 1}. ${escapeHtml(s.label || '')}</small>
           <h3>${escapeHtml(s.title || '')}</h3>
-          <p>${escapeHtml(s.body || '')}</p>
+          <div class="fiche-step-body">${formatFicheTechniqueBody(s.body || '')}</div>
         </div>
 
-        <button class="fiche-step-image" onclick="openStepImage('${escapeAttr(photoSrc)}', '${escapeAttr(s.label || '')}')">
-          ${photoSrc ? `<img src="${escapeAttr(photoSrc)}" alt="${escapeAttr(s.label || '')}">` : `<span>Logo ${escapeHtml(s.label || '')}</span>`}
-        </button>
+        ${hasPhoto ? `<button class="fiche-step-image" onclick="openStepImage('${escapeAttr(photoSrc)}', '${escapeAttr(s.label || '')}')"><img src="${escapeAttr(photoSrc)}" alt="${escapeAttr(s.label || '')}"></button>` : ''}
       </article>`;
     }).join("");
   }
@@ -24524,6 +24546,84 @@ if(!window.__osteoVimeoEventsPatched){
 .fiche-step-card.fiche-step-normalisation .fiche-step-copy small{color:#52ff8a!important;}
 .fiche-step-image span{padding:10px;text-align:center;line-height:1.15;}
 .fiche-hero-visual{background:radial-gradient(ellipse at 55% 60%,rgba(0,229,255,.18),transparent 30%),radial-gradient(circle at 48% 58%,rgba(168,85,255,.28),transparent 18%)!important;}
+</style>
+
+
+
+<style>
+/* === PATCH TEXTE TECHNIQUE : suppression des cases vides + texte réorganisé === */
+.fiche-step-card.fiche-step-no-image{
+  grid-template-columns:68px minmax(0,1fr) !important;
+  min-height:auto !important;
+  align-items:flex-start !important;
+  padding:16px 16px 16px 14px !important;
+}
+
+.fiche-step-card.fiche-step-no-image .fiche-step-copy{
+  padding-right:2px !important;
+}
+
+.fiche-step-body{
+  display:grid;
+  gap:8px;
+}
+
+.fiche-step-body p{
+  margin:0 !important;
+  color:#d7e2f2;
+  font-size:14.2px;
+  line-height:1.46;
+}
+
+.fiche-inline-label{
+  display:inline-block;
+  margin-right:4px;
+  color:currentColor;
+  font-weight:950;
+  letter-spacing:.02em;
+}
+
+.fiche-step-card.fiche-step-position .fiche-inline-label{color:#33eaff;}
+.fiche-step-card.fiche-step-mains .fiche-inline-label{color:#ff6b9b;}
+.fiche-step-card.fiche-step-barriere .fiche-inline-label{color:#ffb020;}
+.fiche-step-card.fiche-step-normalisation .fiche-inline-label{color:#52ff8a;}
+
+.fiche-step-no-image .fiche-step-left{
+  align-self:stretch !important;
+  padding-top:2px;
+}
+
+.fiche-step-no-image .fiche-step-logo{
+  width:60px !important;
+  height:60px !important;
+}
+
+.fiche-step-no-image .fiche-step-left i{
+  top:74px !important;
+}
+
+@media(max-width:430px){
+  .fiche-step-card.fiche-step-no-image{
+    grid-template-columns:54px minmax(0,1fr) !important;
+    gap:10px !important;
+    padding:13px !important;
+  }
+
+  .fiche-step-no-image .fiche-step-logo{
+    width:50px !important;
+    height:50px !important;
+  }
+
+  .fiche-step-no-image .fiche-step-logo img{
+    width:44px !important;
+    height:44px !important;
+  }
+
+  .fiche-step-body p{
+    font-size:13.4px;
+    line-height:1.42;
+  }
+}
 </style>
 
 </body>
