@@ -7673,12 +7673,13 @@ assets/icons/icon-profil.webp
     </div>
 
     <div class="fiche-hero-visual">
-      <div class="fiche-side-badge">
-        <strong>D</strong>
-        <span>Droite</span>
+      <div class="fiche-side-badge" id="detailSideBadge">
+        <strong id="detailSideLetter">D</strong>
+        <span id="detailSideLabel">Droite</span>
       </div>
+      <div class="fiche-joint-figure" id="ficheJointFigure" aria-hidden="true"></div>
       <div class="fiche-foot-glow">
-        <span>Articulation<br>sous-astragalienne</span>
+        <span id="detailArticulationLabel">Articulation<br>sous-astragalienne</span>
       </div>
     </div>
   </section>
@@ -11446,6 +11447,187 @@ function formatFicheTechniqueBody(value){
   return `<p>${html}</p>`;
 }
 
+function detectTechniqueSide(textValue){
+  const text = String(textValue || '').toLowerCase();
+  if(/à droite|droite|droit|valgus droit/.test(text)) return { letter:'D', label:'Droite', key:'right' };
+  if(/à gauche|gauche/.test(text)) return { letter:'G', label:'Gauche', key:'left' };
+  if(/bilat|double|des deux côtés|des 2 côtés/.test(text)) return { letter:'B', label:'Bilat.', key:'both' };
+  return { letter:'N', label:'Neutre', key:'neutral' };
+}
+
+function getArticulationSearchText(t, detail){
+  return [t && t.title, t && t.zone, t && t.sub, detail && detail.category, detail && detail.titleSource, detail && detail.intro]
+    .filter(Boolean).join(' ').toLowerCase();
+}
+
+function makeJointSvg(type, sideKey){
+  const left = sideKey === 'left';
+  const right = sideKey === 'right';
+  const both = sideKey === 'both';
+  const sideX = left ? 78 : 142;
+  const sideY = 92;
+  const dualX = [80, 140];
+  const glow = (x,y,r=20)=>`<circle class="joint-glow" cx="${x}" cy="${y}" r="${r}"/>`;
+  const core = (x,y,r=9)=>`<circle class="joint-core" cx="${x}" cy="${y}" r="${r}"/>`;
+  const hi = (x,y,r=12)=>`<circle class="joint-highlight" cx="${x}" cy="${y}" r="${r}"/>`;
+  const sideAccent = both ? glow(dualX[0], sideY, 20)+glow(dualX[1], sideY, 20)+hi(dualX[0], sideY, 11)+hi(dualX[1], sideY, 11) : glow(sideX, sideY, 22)+hi(sideX, sideY, 12);
+
+  const wrap = inner => `<svg viewBox="0 0 220 220" role="img" aria-hidden="true"><defs><radialGradient id="jointGlow"><stop offset="0%" stop-color="rgba(0,229,255,.95)"/><stop offset="45%" stop-color="rgba(112,98,255,.45)"/><stop offset="100%" stop-color="rgba(0,229,255,0)"/></radialGradient></defs>${inner}</svg>`;
+
+  if(type === 'clavicle') return wrap(`
+    <path class="bone-soft" d="M45 92 C70 72, 96 72, 110 88"/>
+    <path class="bone-soft" d="M175 92 C150 72, 124 72, 110 88"/>
+    <path class="bone" d="M46 98 C72 78, 97 78, 109 92"/>
+    <path class="bone" d="M174 98 C148 78, 123 78, 111 92"/>
+    <path class="bone-soft" d="M110 92 L110 162"/>
+    <path class="bone" d="M110 96 L110 166"/>
+    <path class="bone-soft" d="M110 126 L82 166"/>
+    <path class="bone-soft" d="M110 126 L138 166"/>
+    ${core(110,94,8)}
+    ${sideAccent}
+  `);
+
+  if(type === 'shoulder') return wrap(`
+    <path class="bone" d="M52 88 Q84 64 108 80"/>
+    <path class="bone" d="M168 88 Q136 64 112 80"/>
+    <path class="bone" d="M110 82 L110 158"/>
+    <path class="bone-soft" d="M78 110 L50 154"/>
+    <path class="bone-soft" d="M142 110 L170 154"/>
+    <circle class="joint-core" cx="110" cy="82" r="8"/>
+    ${both ? glow(62,98,18)+glow(158,98,18)+hi(62,98,10)+hi(158,98,10) : glow(left?62:158,98,20)+hi(left?62:158,98,11)}
+    <circle class="joint-core" cx="62" cy="98" r="6"/>
+    <circle class="joint-core" cx="158" cy="98" r="6"/>
+  `);
+
+  if(type === 'elbow') return wrap(`
+    <path class="bone" d="M72 52 L98 110"/>
+    <path class="bone" d="M148 52 L122 110"/>
+    <path class="bone" d="M98 110 L76 168"/>
+    <path class="bone" d="M122 110 L144 168"/>
+    ${core(110,110,8)}
+    ${sideAccent.replaceAll('cy="92"','cy="110"')}
+  `);
+
+  if(type === 'wrist') return wrap(`
+    <path class="bone" d="M82 40 L98 106"/>
+    <path class="bone" d="M138 40 L122 106"/>
+    <path class="bone-soft" d="M86 126 L134 126"/>
+    <path class="bone-soft" d="M84 144 L136 144"/>
+    <path class="bone-soft" d="M92 160 L92 184"/>
+    <path class="bone-soft" d="M106 160 L106 190"/>
+    <path class="bone-soft" d="M120 160 L120 188"/>
+    <path class="bone-soft" d="M134 160 L134 182"/>
+    ${core(110,126,8)}
+    ${sideAccent.replaceAll('cy="92"','cy="126"')}
+  `);
+
+  if(type === 'pelvis') return wrap(`
+    <path class="bone" d="M70 70 C56 92, 58 124, 84 142"/>
+    <path class="bone" d="M150 70 C164 92, 162 124, 136 142"/>
+    <path class="bone" d="M84 142 C94 156, 126 156, 136 142"/>
+    <path class="bone-soft" d="M92 68 L128 68"/>
+    <path class="bone-soft" d="M108 68 L108 148"/>
+    <path class="bone-soft" d="M112 68 L112 148"/>
+    ${core(110,118,8)}
+    ${both ? glow(84,112,18)+glow(136,112,18)+hi(84,112,10)+hi(136,112,10) : glow(left?84:136,112,20)+hi(left?84:136,112,11)}
+    <circle class="joint-core" cx="84" cy="112" r="6"/>
+    <circle class="joint-core" cx="136" cy="112" r="6"/>
+  `);
+
+  if(type === 'spine') return wrap(`
+    <path class="bone" d="M110 34 C94 52, 124 70, 110 88 C96 106, 122 124, 110 142 C98 160, 122 178, 110 194"/>
+    <path class="bone-soft" d="M78 58 L142 58"/>
+    <path class="bone-soft" d="M74 96 L146 96"/>
+    <path class="bone-soft" d="M70 134 L150 134"/>
+    ${core(110,112,7)}
+    ${glow(110, left ? 78 : right ? 146 : 112, 22)}
+    ${hi(110, left ? 78 : right ? 146 : 112, 12)}
+  `);
+
+  if(type === 'rib') return wrap(`
+    <path class="bone-soft" d="M110 36 L110 188"/>
+    <path class="bone" d="M110 58 C78 56, 66 78, 70 98 C74 118, 88 130, 110 130"/>
+    <path class="bone" d="M110 76 C144 74, 156 94, 150 114 C144 134, 132 144, 110 146"/>
+    ${core(110,110,7)}
+    ${both ? glow(78,100,18)+glow(142,114,18)+hi(78,100,10)+hi(142,114,10) : glow(left?78:142,left?100:114,20)+hi(left?78:142,left?100:114,11)}
+  `);
+
+  if(type === 'hip') return wrap(`
+    <path class="bone" d="M74 60 C62 86, 66 120, 88 136"/>
+    <path class="bone" d="M146 60 C158 86, 154 120, 132 136"/>
+    <path class="bone-soft" d="M88 136 L102 190"/>
+    <path class="bone-soft" d="M132 136 L118 190"/>
+    <path class="bone-soft" d="M86 60 L134 60"/>
+    ${core(110,96,7)}
+    ${both ? glow(88,130,18)+glow(132,130,18)+hi(88,130,10)+hi(132,130,10) : glow(left?88:132,130,20)+hi(left?88:132,130,11)}
+  `);
+
+  if(type === 'knee') return wrap(`
+    <path class="bone" d="M92 30 L106 102"/>
+    <path class="bone" d="M128 30 L114 102"/>
+    <path class="bone" d="M102 118 L88 192"/>
+    <path class="bone" d="M118 118 L132 192"/>
+    ${core(110,110,10)}
+    ${sideAccent.replaceAll('cy="92"','cy="110"')}
+  `);
+
+  if(type === 'ankle') return wrap(`
+    <path class="bone" d="M92 28 L104 114"/>
+    <path class="bone" d="M128 28 L116 114"/>
+    <path class="bone-soft" d="M92 132 L130 132"/>
+    <path class="bone-soft" d="M96 148 L144 150"/>
+    <path class="bone-soft" d="M144 150 L168 152"/>
+    <path class="bone-soft" d="M94 148 L80 170"/>
+    ${core(110,132,9)}
+    ${sideAccent.replaceAll('cy="92"','cy="132"')}
+  `);
+
+  return wrap(`
+    <circle class="joint-core" cx="110" cy="110" r="24"/>
+    <path class="bone" d="M110 30 L110 74"/>
+    <path class="bone" d="M110 146 L110 190"/>
+    <path class="bone" d="M30 110 L74 110"/>
+    <path class="bone" d="M146 110 L190 110"/>
+    ${glow(110,110,32)}
+    ${hi(110,110,18)}
+  `);
+}
+
+function inferArticulationMeta(t, detail){
+  const hay = getArticulationSearchText(t, detail);
+  const side = detectTechniqueSide(hay);
+  let type = 'generic';
+  let label = 'Articulation concernée';
+
+  if(/clavicule|sterno-clavic|acromio-clavic/.test(hay)){ type='clavicle'; label='Articulation sterno-claviculaire'; }
+  else if(/epaule|épaule|gl[ée]no|omo-?hum[ée]ral|scapulo|acromio/.test(hay)){ type='shoulder'; label="Articulation de l'épaule"; }
+  else if(/coude|hum[ée]ro-radial|hum[ée]ro-ulnaire|radio-ulnaire/.test(hay)){ type='elbow'; label='Articulation du coude'; }
+  else if(/poignet|radio-carp|carpienne|scapho|luna|pyramidal/.test(hay)){ type='wrist'; label='Articulation du poignet'; }
+  else if(/main|m[ée]ta|phalange|pouce|doigt/.test(hay)){ type='wrist'; label='Articulations de la main'; }
+  else if(/sacro|ilium|iliaque|sacrum|symphyse|pubi|pelvis|bassin/.test(hay)){ type='pelvis'; label='Articulation du bassin'; }
+  else if(/cervic|dorsal|thorac|lomb|vert[ée]br|rachis|atlas|axis/.test(hay)){ type='spine'; label='Segment rachidien'; }
+  else if(/c[oô]te|costo|sternum/.test(hay)){ type='rib'; label='Articulation costo-vertébrale'; }
+  else if(/hanche|cox|f[ée]moro-ac[ée]tab|acetab/.test(hay)){ type='hip'; label='Articulation de la hanche'; }
+  else if(/genou|tibio-f[ée]moral|f[ée]moro-patell|rotule/.test(hay)){ type='knee'; label='Articulation du genou'; }
+  else if(/cheville|talo|sous-tal|sous astrag|astrag|calcan|m[ée]dio[- ]?tars|tars|cubo[iï]d|navicul|lisfranc|malleol|pied/.test(hay)){ type='ankle'; label='Articulation du pied / cheville'; }
+
+  if(/sous-tal|astrag|calcan/.test(hay)) label = 'Articulation sous-talienne';
+  if(/sterno-clavic|clavicule/.test(hay)) label = 'Articulation sterno-claviculaire';
+  if(/acromio-clavic/.test(hay)) label = 'Articulation acromio-claviculaire';
+  if(/sacro-?ilium|sacro ilium/.test(hay)) label = 'Articulation sacro-iliaque';
+  if(/symphyse/.test(hay)) label = 'Symphyse pubienne';
+  if(/costo/.test(hay)) label = 'Articulation costo-vertébrale';
+  if(/genou/.test(hay)) label = 'Articulation du genou';
+
+  return {
+    sideLetter: side.letter,
+    sideLabel: side.label,
+    sideKey: side.key,
+    label,
+    figure: makeJointSvg(type, side.key)
+  };
+}
+
 function renderTechniqueDetail(){
   const t = getCurrentTechnique();
   const detail = getTechniqueDetail(t);
@@ -11457,11 +11639,20 @@ function renderTechniqueDetail(){
   const timeline = document.getElementById("ficheTimeline");
   const planche = document.getElementById("fichePlancheComplete");
   const keypoints = document.getElementById("ficheKeypointsList");
+  const articulationLabel = document.getElementById("detailArticulationLabel");
+  const sideLetter = document.getElementById("detailSideLetter");
+  const sideLabel = document.getElementById("detailSideLabel");
+  const jointFigure = document.getElementById("ficheJointFigure");
+  const articulationMeta = inferArticulationMeta(t, detail);
 
   if(subtitle) subtitle.textContent = "Technique détaillée";
   if(kicker) kicker.textContent = `${t.zone} · ${t.sub}`;
   if(title) title.textContent = t.title;
   if(intro) intro.textContent = detail.intro || "Texte, images et repères clés de la technique.";
+  if(articulationLabel) articulationLabel.textContent = articulationMeta.label;
+  if(sideLetter) sideLetter.textContent = articulationMeta.sideLetter;
+  if(sideLabel) sideLabel.textContent = articulationMeta.sideLabel;
+  if(jointFigure) jointFigure.innerHTML = articulationMeta.figure;
 
   if(planche){
     planche.style.display = "none";
@@ -13628,29 +13819,77 @@ Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&b
 
 .fiche-hero-visual{
   position:absolute;
-  right:-22px;
-  top:24px;
-  width:58%;
-  height:270px;
+  right:-8px;
+  top:18px;
+  width:56%;
+  height:282px;
   z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
   background:
-    radial-gradient(ellipse at 55% 60%, rgba(0,229,255,.30), transparent 30%),
-    url("assets/images/techniques/sous-talienne-valgus-droite/planche-texte.webp?v=4");
-  background-size:cover;
-  background-position:center;
-  opacity:.88;
-  mix-blend-mode:screen;
-  mask-image:radial-gradient(ellipse at center, #000 0%, #000 62%, transparent 82%);
-  -webkit-mask-image:radial-gradient(ellipse at center, #000 0%, #000 62%, transparent 82%);
+    radial-gradient(circle at 60% 44%, rgba(0,229,255,.14), transparent 28%),
+    radial-gradient(circle at 42% 68%, rgba(168,85,255,.14), transparent 24%);
 }
 
 .fiche-hero-visual::before{
   content:"";
   position:absolute;
-  inset:0;
-  background:
-    radial-gradient(circle at 52% 62%, rgba(168,85,255,.48), transparent 12%),
-    radial-gradient(circle at 48% 58%, rgba(0,229,255,.50), transparent 19%);
+  inset:18px 30px 34px 30px;
+  border-radius:28px;
+  border:1px solid rgba(0,229,255,.18);
+  background:linear-gradient(160deg, rgba(6,20,44,.45), rgba(2,10,24,.10));
+  box-shadow:inset 0 0 25px rgba(0,229,255,.06), 0 0 32px rgba(168,85,255,.08);
+}
+
+.fiche-joint-figure{
+  position:relative;
+  z-index:2;
+  width:100%;
+  max-width:250px;
+  height:210px;
+  display:grid;
+  place-items:center;
+  filter:drop-shadow(0 0 26px rgba(0,229,255,.18)) drop-shadow(0 0 22px rgba(168,85,255,.14));
+}
+
+.fiche-joint-figure svg{
+  width:100%;
+  height:100%;
+}
+
+.fiche-joint-figure .bone{
+  stroke:rgba(228,238,255,.88);
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+}
+
+.fiche-joint-figure .bone-soft{
+  stroke:rgba(228,238,255,.48);
+  stroke-width:5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  fill:none;
+}
+
+.fiche-joint-figure .joint-core{
+  fill:rgba(0,229,255,.20);
+  stroke:#66f0ff;
+  stroke-width:2.5;
+}
+
+.fiche-joint-figure .joint-highlight{
+  fill:rgba(168,85,255,.24);
+  stroke:#ca8cff;
+  stroke-width:2.5;
+}
+
+.fiche-joint-figure .joint-glow{
+  fill:url(#jointGlow);
+  opacity:.95;
 }
 
 .fiche-side-badge{
@@ -13687,14 +13926,63 @@ Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&b
 
 .fiche-foot-glow{
   position:absolute;
-  right:84px;
-  top:126px;
-  color:#52f7ff;
+  left:50%;
+  bottom:14px;
+  transform:translateX(-50%);
+  z-index:3;
+  min-width:172px;
+  max-width:220px;
+  border-radius:18px;
+  padding:12px 14px;
+  text-align:center;
+  background:rgba(5,18,38,.82);
+  border:1px solid rgba(0,229,255,.24);
+  box-shadow:0 0 24px rgba(0,229,255,.10);
+  backdrop-filter:blur(6px);
+}
+
+.fiche-foot-glow span{
+  display:block;
+  color:#dff8ff;
   font-size:12px;
   line-height:1.25;
-  text-align:left;
-  z-index:3;
-  text-shadow:0 0 16px rgba(0,229,255,.35);
+  font-weight:850;
+  letter-spacing:.02em;
+}
+
+@media (max-width: 740px){
+  .fiche-hero{
+    min-height:520px;
+    padding-bottom:250px;
+  }
+  .fiche-hero-copy{
+    width:100%;
+    min-width:0;
+  }
+  .fiche-hero-visual{
+    position:absolute;
+    left:14px;
+    right:14px;
+    top:auto;
+    bottom:16px;
+    width:auto;
+    height:220px;
+  }
+  .fiche-joint-figure{
+    max-width:220px;
+    height:170px;
+  }
+  .fiche-side-badge{
+    right:20px;
+    top:10px;
+    width:56px;
+    height:56px;
+  }
+  .fiche-foot-glow{
+    bottom:10px;
+    min-width:148px;
+    padding:10px 12px;
+  }
 }
 
 .fiche-timeline{
