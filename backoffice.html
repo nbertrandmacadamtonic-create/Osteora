@@ -19,6 +19,7 @@
     <div class="cloud-copy">
       <strong>Base centrale</strong>
       <span id="cloudMessage">Configuration Supabase à compléter.</span>
+      <span id="storageMessage" class="storage-message">🖼 Storage images : vérification après connexion.</span>
     </div>
     <div class="cloud-actions">
       <input id="adminEmail" type="email" placeholder="E-mail administrateur" autocomplete="username">
@@ -73,6 +74,11 @@
           <label class="wide">Image principale / chemin image
             <input id="fImage" placeholder="assets/images/… ou https://…">
           </label>
+          <div class="upload-bar wide">
+            <input id="fImageFile" type="file" accept="image/*" hidden>
+            <button type="button" class="btn storage-upload" id="uploadMainImageBtn">☁ Téléverser l’image principale</button>
+            <span id="mainUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+          </div>
           <div id="mainImagePreview" class="image-preview wide"></div>
 
           <label class="wide">Texte libre de la technique
@@ -121,11 +127,16 @@
         <div class="subsection-head images-head">
           <div>
             <strong>Images / planches associées</strong>
-            <span>Un chemin ou une URL par ligne. Les images restent hébergées sur GitHub, Vimeo CDN ou un autre stockage accessible.</span>
+            <span>Conservez les anciennes URL GitHub ou téléversez directement de nouvelles images dans Supabase Storage.</span>
           </div>
         </div>
+        <div class="upload-bar wide">
+          <input id="fGalleryFiles" type="file" accept="image/*" multiple hidden>
+          <button type="button" class="btn storage-upload" id="uploadGalleryBtn">☁ Ajouter des images au Storage</button>
+          <span id="galleryUploadState" class="upload-state">Sélection multiple possible · maximum 10 Mo par image</span>
+        </div>
         <label class="wide">Liste des images de la fiche
-          <textarea id="fDetailImages" class="images-textarea" placeholder="assets/images/techniques/…/planche.webp&#10;https://…"></textarea>
+          <textarea id="fDetailImages" class="images-textarea" placeholder="https://…supabase.co/storage/v1/object/public/…&#10;assets/images/…"></textarea>
         </label>
         <div id="detailImagesPreview" class="gallery-preview"></div>
       </section>

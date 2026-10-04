@@ -2,6 +2,8 @@
   'use strict';
 
   const TABLE = 'osteo_techniques';
+  const STORAGE_BUCKET = 'osteo-pratik-images';
+  const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
   const LOCAL_SNAPSHOT_KEY = 'osteoRA.backoffice.snapshot.v1';
   const LOCAL_DETAIL_SNAPSHOT_KEY = 'osteoRA.backoffice.snapshot.v2.details';
   const $ = (id) => document.getElementById(id);
@@ -116,6 +118,185 @@
       quiz:item.quiz||'',
       detail:clone(item.detail||{})
     };
+  }
+
+
+  function storagePathSafe(value){
+    return String(value||'image')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .replace(/[^a-zA-Z0-9._-]+/g,'-')
+      .replace(/-+/g,'-')
+      .replace(/^-|-$/g,'')
+      .slice(0,100) || 'image';
+  }
+
+  function fileExtension(file){
+    const name=String(file?.name||'');
+    const parts=name.split('.');
+    if(parts.length>1){
+      const ext=parts.pop().toLowerCase().replace(/[^a-z0-9]/g,'');
+      if(ext && ext.length<=8) return ext==='jpeg'?'jpg':ext;
+    }
+    const mime=String(file?.type||'').split('/')[1] || 'jpg';
+    return mime.replace('jpeg','jpg').replace(/[^a-z0-9]/g,'') || 'jpg';
+  }
+
+  function validateImageFile(file){
+    if(!file) return 'Aucun fichier sélectionné.';
+    if(!String(file.type||'').startsWith('image/')) return 'Le fichier doit être une image.';
+    if(file.size > MAX_IMAGE_BYTES) return 'Image trop lourde : maximum 10 Mo.';
+    return '';
+  }
+
+  async function verifyStorage(){
+    const el=$('storageMessage');
+    if(!el) return false;
+    if(!client || !currentUser){
+      el.textContent='🖼 Storage images : connexion administrateur requise.';
+      el.className='storage-message';
+      return false;
+    }
+
+    el.textContent='🖼 Storage images : vérification…';
+    el.className='storage-message';
+
+    const { error }=await client.storage.from(STORAGE_BUCKET).list('',{limit:1});
+    if(error){
+      el.textContent='🖼 Storage non configuré : exécutez supabase-storage.sql dans Supabase.';
+      el.className='storage-message warn';
+      return false;
+    }
+
+    el.textContent='🖼 Storage images actif · bucket « '+STORAGE_BUCKET+' ».';
+    el.className='storage-message ok';
+    return true;
+  }
+
+  async function uploadImageFile(file, kind, stateEl){
+    if(!(await requireAdmin())) return '';
+
+    const problem=validateImageFile(file);
+    if(problem){
+      if(stateEl){
+        stateEl.textContent=problem;
+        stateEl.className='upload-state error';
+      }
+      return '';
+    }
+
+    const techniqueId=Number($('fId')?.value || selectedId || 0);
+    if(!techniqueId){
+      if(stateEl){
+        stateEl.textContent='Sélectionnez d’abord une technique.';
+        stateEl.className='upload-state error';
+      }
+      return '';
+    }
+
+    const ext=fileExtension(file);
+    const originalBase=String(file.name||'image').replace(/\.[^.]+$/,'');
+    const base=storagePathSafe(originalBase);
+    const path=`techniques/${techniqueId}/${kind}/${Date.now()}-${base}.${ext}`;
+
+    if(stateEl){
+      stateEl.textContent='Téléversement…';
+      stateEl.className='upload-state';
+    }
+
+    const { error }=await client.storage.from(STORAGE_BUCKET).upload(path,file,{
+      cacheControl:'3600',
+      upsert:false,
+      contentType:file.type || undefined
+    });
+
+    if(error){
+      if(stateEl){
+        stateEl.textContent='Erreur Storage : '+error.message;
+        stateEl.className='upload-state error';
+      }
+      return '';
+    }
+
+    const { data }=client.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+    const url=data?.publicUrl || '';
+
+    if(stateEl){
+      stateEl.textContent=url
+        ? 'Image téléversée · cliquez ensuite sur « Enregistrer dans Supabase ».'
+        : 'Téléversement terminé.';
+      stateEl.className=url?'upload-state ok':'upload-state';
+    }
+
+    return url;
+  }
+
+  function chooseMainImage(){
+    const input=$('fImageFile');
+    input.value='';
+    input.click();
+  }
+
+  async function handleMainImageFile(){
+    const input=$('fImageFile');
+    const file=input.files?.[0];
+    const url=await uploadImageFile(file,'main',$('mainUploadState'));
+    if(!url) return;
+    $('fImage').value=url;
+    renderImagePreviews();
+  }
+
+  function chooseGalleryImages(){
+    const input=$('fGalleryFiles');
+    input.value='';
+    input.click();
+  }
+
+  async function handleGalleryFiles(){
+    const files=[...($('fGalleryFiles').files||[])];
+    if(!files.length) return;
+
+    const state=$('galleryUploadState');
+    const existing=$('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    const added=[];
+
+    for(let i=0;i<files.length;i++){
+      state.textContent=`Téléversement ${i+1}/${files.length}…`;
+      state.className='upload-state';
+      const url=await uploadImageFile(files[i],'gallery',state);
+      if(url) added.push(url);
+    }
+
+    if(added.length){
+      $('fDetailImages').value=[...existing,...added].join('\n');
+      renderImagePreviews();
+      updateDetailState();
+      state.textContent=`${added.length} image${added.length>1?'s':''} ajoutée${added.length>1?'s':''} · enregistrez la fiche.`;
+      state.className='upload-state ok';
+    }
+  }
+
+  function chooseStepPhoto(index){
+    syncStepsFromDom();
+    const card=document.querySelector(`.detail-step[data-step-index="${index}"]`);
+    const input=card?.querySelector('[data-step-file]');
+    if(!input) return;
+    input.value='';
+    input.click();
+  }
+
+  async function handleStepPhoto(index,input){
+    const card=document.querySelector(`.detail-step[data-step-index="${index}"]`);
+    const state=card?.querySelector('.step-upload-state');
+    const key=storagePathSafe(card?.querySelector('[data-step-field="key"]')?.value || `etape-${index+1}`);
+    const url=await uploadImageFile(input.files?.[0],`steps/${key}`,state);
+    if(!url) return;
+
+    const photo=card?.querySelector('[data-step-field="photo"]');
+    if(photo){
+      photo.value=url;
+      renderStepPhotoPreview(photo);
+      updateDetailState();
+    }
   }
 
   function escapeHtml(v){
@@ -249,6 +430,11 @@
           <label>Logo / chemin<input data-step-field="logo" value="${escapeHtml(step.logo)}" placeholder="assets/images/…"></label>
           <label class="step-body">Texte<textarea data-step-field="body" placeholder="Texte détaillé de l’étape…">${escapeHtml(step.body)}</textarea></label>
           <label>Photo / chemin<input data-step-field="photo" value="${escapeHtml(step.photo)}" placeholder="assets/images/… ou https://…"></label>
+          <div class="step-upload-row">
+            <input type="file" accept="image/*" data-step-file="${index}" hidden>
+            <button type="button" class="btn storage-upload" data-step-upload="${index}">☁ Téléverser la photo</button>
+            <span class="step-upload-state upload-state">Supabase Storage</span>
+          </div>
           <div class="step-photo-preview">${step.photo?`<img src="${escapeHtml(safeImageSrc(step.photo))}" alt="">`:''}</div>
         </div>
       </article>`;
@@ -262,6 +448,12 @@
       detailStepsDraft.splice(Number(btn.dataset.removeStep),1);
       renderDetailSteps();
       updateDetailState();
+    }));
+    box.querySelectorAll('[data-step-upload]').forEach(btn=>btn.addEventListener('click',()=>{
+      chooseStepPhoto(Number(btn.dataset.stepUpload));
+    }));
+    box.querySelectorAll('[data-step-file]').forEach(input=>input.addEventListener('change',()=>{
+      handleStepPhoto(Number(input.dataset.stepFile),input);
     }));
     box.querySelectorAll('input,textarea').forEach(el=>el.addEventListener('input',()=>{
       if(el.dataset.stepField==='photo') renderStepPhotoPreview(el);
@@ -313,11 +505,20 @@
     $('mainImagePreview').innerHTML=main?`<img src="${escapeHtml(main)}" alt="Image principale">`:'';
 
     const imgs=$('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    $('detailImagesPreview').innerHTML=imgs.map(src=>`
+    $('detailImagesPreview').innerHTML=imgs.map((src,index)=>`
       <article class="gallery-card">
         <img src="${escapeHtml(safeImageSrc(src))}" alt="">
+        <button type="button" class="gallery-remove" data-remove-gallery="${index}" title="Retirer cette image de la fiche">×</button>
         <small>${escapeHtml(src)}</small>
       </article>`).join('');
+
+    $('detailImagesPreview').querySelectorAll('[data-remove-gallery]').forEach(btn=>btn.addEventListener('click',()=>{
+      const current=$('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+      current.splice(Number(btn.dataset.removeGallery),1);
+      $('fDetailImages').value=current.join('\n');
+      renderImagePreviews();
+      updateDetailState();
+    }));
   }
 
   function updateDetailState(){
@@ -353,6 +554,7 @@
     $('detailsSyncBtn').hidden = !currentUser || rows.length===0;
     render();
     if(selectedId && rows.some(x=>Number(x.id)===Number(selectedId))) openEditor(selectedId);
+    if(currentUser) verifyStorage();
   }
 
   async function saveCurrent(e){
@@ -541,7 +743,13 @@
     $('adminPassword').hidden=logged;
     $('seedBtn').hidden=!(logged && rows.length===0);
     $('detailsSyncBtn').hidden=!(logged && rows.length>0);
-    if(logged) setCloud(`Administrateur connecté : ${currentUser.email||''}`,'ok');
+    if(logged){
+      setCloud(`Administrateur connecté : ${currentUser.email||''}`,'ok');
+      setTimeout(verifyStorage,50);
+    }else if($('storageMessage')){
+      $('storageMessage').textContent='🖼 Storage images : connexion administrateur requise.';
+      $('storageMessage').className='storage-message';
+    }
   }
 
   async function init(){
@@ -581,6 +789,10 @@
   $('detailsSyncBtn').addEventListener('click',syncDetailedSheets);
   $('addStepBtn').addEventListener('click',addStep);
   $('fImage').addEventListener('input',renderImagePreviews);
+  $('uploadMainImageBtn').addEventListener('click',chooseMainImage);
+  $('fImageFile').addEventListener('change',handleMainImageFile);
+  $('uploadGalleryBtn').addEventListener('click',chooseGalleryImages);
+  $('fGalleryFiles').addEventListener('change',handleGalleryFiles);
   $('fDetailImages').addEventListener('input',()=>{renderImagePreviews();updateDetailState();});
   ['fDetailSource','fDetailCategory','fDetailMethod','fDetailIntro'].forEach(id=>$(id).addEventListener('input',updateDetailState));
 
