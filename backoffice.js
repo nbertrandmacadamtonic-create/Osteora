@@ -15,6 +15,70 @@
   let isConfigured = false;
   let detailStepsDraft = [];
 
+
+  const PDF_IMPORT_PRESETS = [
+    {
+      slug:'charniere-d12-l1-lumbar-roll-droite',
+      matchers:['charniere d12 l1','lumbar roll'],
+      title:'Dysfonction de la charnière D12/L1, technique indirecte à droite en « Lumbar Roll »',
+      zone:'Rachis',
+      sub:'Lombaires',
+      level:'Niveau intermédiaire',
+      status:'non vue',
+      icon:'D12/L1',
+      video:'',
+      text:'Vérifier le côté de la postériorité. Technique indirecte en « Lumbar Roll ».',
+      headerImage:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-1-entete.png',
+      image:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-2-image-principale.png',
+      detail:{
+        source:'PDF OSTPRA1 - Partie 32',
+        category:'Lombaire – lombaire',
+        method:'Technique indirecte · Lumbar Roll',
+        intro:'Vérifier le côté de la postériorité. Dysfonction de la charnière D12/L1, technique indirecte à droite en « Lumbar Roll ».',
+        steps:[
+          {key:'position',logoKey:'position',logo:'',label:'Position',title:'Patient et praticien',body:'PATIENT : en latérocubitus droit. PRATICIEN : debout à la hauteur du pelvis.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/position.png'},
+          {key:'mains',logoKey:'mains',logo:'',label:'Position des mains',title:'Contacts et prises',body:'L’avant-bras caudal contacte la face postéro-externe de la fesse sus-jacente du patient. La main caudale contacte la zone en dysfonction. L’avant-bras céphalique contacte le sillon delto-pectoral sus-jacent du patient, la main céphalique est sur la zone en dysfonction.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/mains.png'},
+          {key:'barriere',logoKey:'barriere',logo:'',label:'Barrière motrice',title:'Mise en tension',body:'Le membre inférieur sous-jacent est amené en extension. Le membre inférieur sus-jacent est en flexion de hanche et de genou, la cheville est calée dans la fosse poplitée. Tracter le membre supérieur sous-jacent pour ramener le thorax en rotation jusqu’à l’étage concerné. Demander au sujet de tenir ses poignets pour fixer la position.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/barriere.png'},
+          {key:'normalisation',logoKey:'normalisation',logo:'',label:'Normalisation',title:'Geste de correction',body:'Amener le levier supérieur en rotation jusqu’à la zone en dysfonction. Amener le levier inférieur en rotation opposée. Fixer les leviers en amenant le sujet sous le praticien. Porter le thrust en exagération du levier inférieur sous le levier supérieur sur la phase expiratoire.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/normalisation.png'}
+        ],
+        images:[
+          'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-1-entete.png',
+          'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-2-image-principale.png'
+        ]
+      }
+    },
+    {
+      slug:'sous-talienne-valgus-droite',
+      matchers:['sous talienne','calcaneus en valgus'],
+      title:'Dysfonction de la sous-talienne, calcanéus en valgus, à droite',
+      zone:'Membres inférieurs',
+      sub:'Sous-astragalienne',
+      level:'Niveau intermédiaire',
+      status:'non vue',
+      icon:'ST',
+      video:'',
+      text:'Technique de correction de la sous-talienne en valgus à droite.',
+      headerImage:'assets/imported-techniques/sous-talienne-valgus-droite/planche-1-entete.png',
+      image:'assets/imported-techniques/sous-talienne-valgus-droite/planche-2-image-principale.png',
+      detail:{
+        source:'PDF OSTPRA3 - Partie 50',
+        category:'Membre inférieur – sous-astragalienne',
+        method:'Thrust',
+        intro:'Dysfonction de la sous-talienne, calcanéus en valgus, à droite.',
+        steps:[
+          {key:'position',logoKey:'position',logo:'',label:'Position',title:'Patient et praticien',body:'PATIENT : en décubitus dorsal, les genoux sont fléchis, le pied en dysfonction est en dehors de la table. PRATICIEN : debout en bout de table, à la hauteur des pieds du sujet.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/position.png'},
+          {key:'mains',logoKey:'mains',logo:'',label:'Position des mains',title:'Contacts et prises',body:'Amener le talon en dysfonction en dehors de la table, le reste du pied est sur la table. La main caudale empaume et fixe l’avant-pied en éversion. La main céphalique empaume la face interne du calcanéus.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/mains.png'},
+          {key:'barriere',logoKey:'barriere',logo:'',label:'Barrière motrice',title:'Mise en tension',body:'La main céphalique maintient le calcanéus en valgus. La main caudale exerce une pression progressive, en direction de la table jusqu’à la barrière motrice.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/barriere.png'},
+          {key:'normalisation',logoKey:'normalisation',logo:'',label:'Normalisation',title:'Geste de correction',body:'Porter le thrust par la main céphalique en direction de la table.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/normalisation.png'}
+        ],
+        images:[
+          'assets/imported-techniques/sous-talienne-valgus-droite/planche-1-entete.png',
+          'assets/imported-techniques/sous-talienne-valgus-droite/planche-2-image-principale.png'
+        ]
+      }
+    }
+  ];
+
   function cfg(){ return window.OSTEO_SUPABASE || {}; }
 
   function configured(){
@@ -360,6 +424,85 @@
     return s;
   }
 
+
+  function normalizeLoose(value){
+    return String(value||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,' ')
+      .trim();
+  }
+
+  function setDetailTab(name){
+    document.querySelectorAll('.detail-subtab').forEach(btn=>btn.classList.toggle('active',btn.dataset.detailTab===name));
+    const steps=$('detailTabSteps');
+    const planches=$('detailTabPlanches');
+    if(steps) steps.classList.toggle('active',name==='steps');
+    if(planches) planches.classList.toggle('active',name==='planches');
+  }
+
+  function plancheLines(){
+    return $('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  }
+
+  function applyPlanchesToPrimaryImages(){
+    const imgs=plancheLines();
+    if(imgs[0]) $('fHeaderImage').value=imgs[0];
+    if(imgs[1]) $('fImage').value=imgs[1];
+    renderImagePreviews();
+    updateDetailState();
+    showStatus('Planche 1 appliquée à l’image d’en-tête · planche 2 appliquée à l’image principale.');
+  }
+
+  function findPresetTarget(preset){
+    const matchers=(preset.matchers||[]).map(normalizeLoose).filter(Boolean);
+    return rows.find(row=>{
+      const title=normalizeLoose(canonical(row).title);
+      return matchers.every(m=>title.includes(m));
+    }) || null;
+  }
+
+  async function importPdfTechniques(){
+    if(!(await requireAdmin())) return;
+    if(!rows.length){ showStatus('Chargez d’abord la base centrale avant l’import PDF.'); return; }
+    let nextId=Math.max(0,...rows.map(x=>Number(x.id)||0))+1;
+    const report=[];
+    for(const preset of PDF_IMPORT_PRESETS){
+      let native=findPresetTarget(preset);
+      const existed=!!native;
+      const id=existed?Number(native.id):nextId++;
+      const current=existed?canonical(native):{};
+      const value={
+        id,
+        title:preset.title,
+        zone:preset.zone,
+        sub:preset.sub,
+        level:preset.level,
+        status:current.status || preset.status || 'non vue',
+        icon:current.icon || preset.icon || '•',
+        video:current.video || preset.video || '',
+        headerImage:preset.headerImage,
+        image:preset.image,
+        text:preset.text,
+        quiz:current.quiz || '',
+        detail:clone(preset.detail)
+      };
+      if(existed){
+        applyCanonicalPatch(native,value);
+      }else{
+        native=canonicalToNative(value);
+        rows.push(native);
+      }
+      const { error }=await client.from(TABLE).upsert({id:id,data:native},{onConflict:'id'});
+      if(error) report.push('⚠ '+preset.title+' : '+error.message);
+      else report.push((existed?'Mise à jour : ':'Création : ')+preset.title);
+    }
+    render();
+    const firstTarget=findPresetTarget(PDF_IMPORT_PRESETS[0]);
+    if(firstTarget) openEditor(Number(firstTarget.id));
+    showStatus(report.join(' · '));
+  }
+
   function render(){
     const canon = rows.map(canonical).sort((a,b)=>a.id-b.id);
     const q = ($('search').value || '').trim().toLowerCase();
@@ -433,6 +576,7 @@
     $('fDetailImages').value=d.images.join('\n');
 
     detailStepsDraft=d.steps;
+    setDetailTab('steps');
     renderDetailSteps();
     renderImagePreviews();
     updateDetailState();
@@ -561,12 +705,16 @@
     $('mainImagePreview').innerHTML=main?`<img src="${escapeHtml(main)}" alt="Image principale">`:'';
 
     const imgs=$('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
-    $('detailImagesPreview').innerHTML=imgs.map((src,index)=>`
-      <article class="gallery-card">
-        <img src="${escapeHtml(safeImageSrc(src))}" alt="">
-        <button type="button" class="gallery-remove" data-remove-gallery="${index}" title="Retirer cette image de la fiche">×</button>
+    $('detailImagesPreview').innerHTML=imgs.map((src,index)=>{
+      const badge=index===0?'<span class=\"gallery-badge header\">ENTÊTE</span>':index===1?'<span class=\"gallery-badge main\">PRINCIPALE</span>':'';
+      return `
+      <article class=\"gallery-card\">
+        ${badge}
+        <img src=\"${escapeHtml(safeImageSrc(src))}\" alt=\"\">
+        <button type=\"button\" class=\"gallery-remove\" data-remove-gallery=\"${index}\" title=\"Retirer cette image de la fiche\">×</button>
         <small>${escapeHtml(src)}</small>
-      </article>`).join('');
+      </article>`;
+    }).join('');
 
     $('detailImagesPreview').querySelectorAll('[data-remove-gallery]').forEach(btn=>btn.addEventListener('click',()=>{
       const current=$('fDetailImages').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
@@ -608,6 +756,7 @@
     setCloud(`${rows.length} techniques synchronisées · ${detailed} fiches détaillées.`, 'ok');
     $('seedBtn').hidden = !(currentUser && rows.length===0);
     $('detailsSyncBtn').hidden = !currentUser || rows.length===0;
+    if($('pdfImportBtn')) $('pdfImportBtn').hidden = !currentUser || rows.length===0;
     render();
     if(selectedId && rows.some(x=>Number(x.id)===Number(selectedId))) openEditor(selectedId);
     if(currentUser) verifyStorage();
@@ -830,6 +979,7 @@
     $('adminPassword').hidden=logged;
     $('seedBtn').hidden=!(logged && rows.length===0);
     $('detailsSyncBtn').hidden=!(logged && rows.length>0);
+    if($('pdfImportBtn')) $('pdfImportBtn').hidden=!(logged && rows.length>0);
     if(logged){
       setCloud(`Administrateur connecté : ${currentUser.email||''}`,'ok');
       setTimeout(verifyStorage,50);
@@ -875,7 +1025,10 @@
   $('logoutBtn').addEventListener('click',logout);
   $('seedBtn').addEventListener('click',seedCentral);
   $('detailsSyncBtn').addEventListener('click',syncDetailedSheets);
+  if($('pdfImportBtn')) $('pdfImportBtn').addEventListener('click',importPdfTechniques);
   $('addStepBtn').addEventListener('click',addStep);
+  document.querySelectorAll('.detail-subtab').forEach(btn=>btn.addEventListener('click',()=>setDetailTab(btn.dataset.detailTab)));
+  if($('applyPlanchesBtn')) $('applyPlanchesBtn').addEventListener('click',applyPlanchesToPrimaryImages);
   $('fHeaderImage').addEventListener('input',renderImagePreviews);
   // Le label HTML ouvre directement le sélecteur de fichiers.
   $('fHeaderImageFile').addEventListener('change',handleHeaderImageFile);

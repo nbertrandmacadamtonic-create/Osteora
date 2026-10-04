@@ -248,3 +248,73 @@ textarea{min-height:150px;resize:vertical}.short-textarea{min-height:92px}.image
   color:#00e5ff;border-color:rgba(0,229,255,.34);
   background:rgba(0,229,255,.08);
 }
+
+
+/* === V10.1 · Correctif téléversement image d’en-tête === */
+.native-file-input{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  padding:0 !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  white-space:nowrap !important;
+  border:0 !important;
+}
+label.btn.storage-upload{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+}
+
+
+/* === V11 · Quiz éditables + banque de questions === */
+.quiz-workspace-v11{display:block !important;grid-column:1/-1}
+.quiz-workspace-v11[hidden]{display:none !important}
+.quiz-subtabs{
+  display:flex;gap:8px;margin:0 0 14px;padding:6px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.10);background:rgba(5,15,31,.58)
+}
+.quiz-subtab{
+  padding:10px 16px;border-radius:12px;border:1px solid transparent;
+  background:transparent;color:#8fa7c7;font-weight:900;cursor:pointer
+}
+.quiz-subtab.active{
+  color:#fff;border-color:rgba(0,229,255,.30);background:rgba(0,229,255,.09)
+}
+.quiz-subview{display:grid;grid-template-columns:minmax(340px,.75fr) minmax(560px,1.65fr);gap:18px;align-items:start}
+.quiz-subview[hidden]{display:none !important}
+.quiz-set-help{
+  margin-top:12px;padding:12px 14px;border-radius:14px;
+  border:1px solid rgba(0,229,255,.16);background:rgba(0,229,255,.04)
+}
+.quiz-set-help strong,.quiz-set-help span{display:block}
+.quiz-set-help span{margin-top:5px;color:#91a6c3;font-size:11.5px;line-height:1.4}
+.quiz-set-item{display:grid;grid-template-columns:46px minmax(0,1fr) auto;gap:10px;align-items:center}
+.quiz-set-item .badge{
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  color:#00e5ff;border:1px solid rgba(0,229,255,.34);font-weight:950
+}
+.quiz-set-item small{display:block;color:#8fa7c7;margin-top:4px}
+.quiz-set-item .pill{padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900;border:1px solid rgba(255,255,255,.12)}
+.quiz-set-item .pill.publie{color:#55efc4;border-color:rgba(85,239,196,.30)}
+.quiz-set-item .pill.brouillon{color:#ffbc42;border-color:rgba(255,188,66,.30)}
+@media(max-width:980px){.quiz-subview{grid-template-columns:1fr}}
+@media(max-width:620px){.quiz-subtabs{flex-direction:column}.quiz-subtab{width:100%}}
+
+
+/* === V12 · Onglet Planches + import PDF === */
+.btn.pdf-import{grid-column:1/-1;width:100%;border-color:rgba(0,229,255,.42);color:#8defff;background:rgba(0,229,255,.08)}
+.detail-subtabs{display:flex;gap:8px;align-items:center;margin:16px 0 12px;padding:6px;border:1px solid rgba(255,255,255,.10);border-radius:16px;background:rgba(2,7,20,.46)}
+.detail-subtab{padding:9px 14px;border-radius:12px;border:1px solid transparent;background:transparent;color:#9eb1cb;font-weight:800}
+.detail-subtab.active{color:#fff;border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.08)}
+.detail-tab-pane{display:none}
+.detail-tab-pane.active{display:block}
+.planche-tip{margin:0 0 12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(0,229,255,.18);background:rgba(0,229,255,.04);color:#a8c8de;font-size:12px;line-height:1.45}
+.gallery-card .gallery-badge{position:absolute;left:8px;top:8px;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:900;letter-spacing:.02em;background:rgba(2,7,20,.86);border:1px solid rgba(255,255,255,.16);color:#fff;z-index:2}
+.gallery-card .gallery-badge.header{border-color:rgba(0,229,255,.34);color:#8defff}
+.gallery-card .gallery-badge.main{border-color:rgba(168,85,255,.34);color:#e1c4ff}
+@media(max-width:700px){.detail-subtabs{flex-wrap:wrap}.detail-subtab{flex:1 1 0;min-width:120px}}

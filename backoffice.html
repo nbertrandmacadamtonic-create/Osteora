@@ -28,6 +28,7 @@
       <button class="btn" id="logoutBtn" type="button" hidden>Se déconnecter</button>
       <button class="btn green" id="seedBtn" type="button" hidden>Initialiser la base depuis Ostéo RA</button>
       <button class="btn detail-sync" id="detailsSyncBtn" type="button" hidden>↻ Importer / actualiser les fiches détaillées depuis Ostéo RA</button>
+      <button class="btn pdf-import" id="pdfImportBtn" type="button" hidden>＋ Importer les 2 techniques PDF</button>
     </div>
   </section>
 
@@ -146,31 +147,42 @@
           </label>
         </div>
 
-        <div class="subsection-head">
-          <div>
-            <strong>Étapes de la fiche</strong>
-            <span>Position, mains, barrière motrice, normalisation…</span>
-          </div>
-          <button type="button" class="btn green compact" id="addStepBtn">+ Ajouter une étape</button>
+        <div class="detail-subtabs" aria-label="Sous-sections de la fiche détaillée">
+          <button type="button" class="detail-subtab active" data-detail-tab="steps">Étapes</button>
+          <button type="button" class="detail-subtab" data-detail-tab="planches">Planches</button>
         </div>
 
-        <div id="detailStepsEditor" class="detail-steps"></div>
-
-        <div class="subsection-head images-head">
-          <div>
-            <strong>Images / planches associées</strong>
-            <span>Conservez les anciennes URL GitHub ou téléversez directement de nouvelles images dans Supabase Storage.</span>
+        <div id="detailTabSteps" class="detail-tab-pane active">
+          <div class="subsection-head">
+            <div>
+              <strong>Étapes de la fiche</strong>
+              <span>Position, mains, barrière motrice, normalisation…</span>
+            </div>
+            <button type="button" class="btn green compact" id="addStepBtn">+ Ajouter une étape</button>
           </div>
+
+          <div id="detailStepsEditor" class="detail-steps"></div>
         </div>
-        <div class="upload-bar wide">
-          <input id="fGalleryFiles" type="file" accept="image/*" multiple hidden>
-          <button type="button" class="btn storage-upload" id="uploadGalleryBtn">☁ Ajouter des images au Storage</button>
-          <span id="galleryUploadState" class="upload-state">Sélection multiple possible · maximum 10 Mo par image</span>
+
+        <div id="detailTabPlanches" class="detail-tab-pane">
+          <div class="subsection-head images-head">
+            <div>
+              <strong>Planches associées</strong>
+              <span>Planche 1 = image d’en-tête · Planche 2 = image principale de la technique.</span>
+            </div>
+            <button type="button" class="btn compact" id="applyPlanchesBtn">Appliquer 1 → entête · 2 → principale</button>
+          </div>
+          <div class="planche-tip">Conseil : pour les fiches PDF importées, laissez les 2 premières planches comme référence visuelle complète de la technique.</div>
+          <div class="upload-bar wide">
+            <input id="fGalleryFiles" type="file" accept="image/*" multiple hidden>
+            <button type="button" class="btn storage-upload" id="uploadGalleryBtn">☁ Ajouter des planches au Storage</button>
+            <span id="galleryUploadState" class="upload-state">Sélection multiple possible · maximum 10 Mo par image</span>
+          </div>
+          <label class="wide">Liste des planches
+            <textarea id="fDetailImages" class="images-textarea" placeholder="https://…supabase.co/storage/v1/object/public/…&#10;assets/imported-techniques/…"></textarea>
+          </label>
+          <div id="detailImagesPreview" class="gallery-preview"></div>
         </div>
-        <label class="wide">Liste des images de la fiche
-          <textarea id="fDetailImages" class="images-textarea" placeholder="https://…supabase.co/storage/v1/object/public/…&#10;assets/images/…"></textarea>
-        </label>
-        <div id="detailImagesPreview" class="gallery-preview"></div>
       </section>
 
       <div class="actions sticky-actions">
@@ -361,7 +373,7 @@
 <script src="supabase-config.js"></script>
 <script src="osteo-ra-details-data.js"></script>
 <script src="quiz-seed-data.js"></script>
-<script src="backoffice.js?v=10.1"></script>
+<script src="backoffice.js?v=12"></script>
 <script src="quiz-admin-v11.js?v=11"></script>
 </body>
 </html>
