@@ -324,3 +324,91 @@
     min-height:52px !important;
   }
 }
+
+
+/* =========================================================
+   V11.1 — ALIGNEMENT RESPONSIVE
+   Correction ciblée des décalages visibles sur ordinateur.
+   ========================================================= */
+@media (min-width:700px){
+  /* Un même axe central pour les écrans de l'application. */
+  .screen > .top{
+    width:min(980px,100%) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* Les titres graphiques utilisent la même largeur que leur contenu. */
+  #videoMap > .video-page-title,
+  #rachisMenu > .rachis-menu-title,
+  #bassinMenu > .module-menu-title,
+  #msupMenu > .module-menu-title,
+  #minfMenu > .module-menu-title{
+    width:min(760px,100%) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* IMPORTANT : la règle historique #videoMap .video-zone-layout
+     imposait margin-left/right:0 avec une spécificité plus forte.
+     On la surcharge explicitement ici pour recentrer le bloc. */
+  #videoMap .video-zone-layout{
+    width:min(760px,100%) !important;
+    margin:14px auto 18px !important;
+    left:auto !important;
+    right:auto !important;
+  }
+
+  #videoMap .video-helper-card,
+  #videoMap .video-stats-card{
+    width:min(760px,100%) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* Réviser : le titre et la roue appartiennent au même axe visuel. */
+  #revision > .revision-page-title{
+    width:min(640px,100%) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  #revision .revision-orbit-nav{
+    width:min(520px,100%) !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* Accueil : garder le grand dessin, mais le verrouiller sur l'axe central. */
+  #home > .home-top,
+  #home > .home-orbit,
+  #home > .last-card{
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+  /* Les autres cartes de navigation anatomique doivent elles aussi être centrées. */
+  #rachisMenu .rachis-region-layout,
+  #bassinMenu .module-region-layout,
+  #msupMenu .module-region-layout,
+  #minfMenu .module-region-layout{
+    margin-left:auto !important;
+    margin-right:auto !important;
+    left:auto !important;
+    right:auto !important;
+  }
+}
+
+@media (min-width:1000px){
+  /* Sur grand écran on évite que les titres prennent toute la largeur
+     alors que le module interactif reste plus compact. */
+  #videoMap > .video-page-title{
+    width:760px !important;
+    max-width:calc(100vw - 96px) !important;
+  }
+
+  #revision > .revision-page-title{
+    width:640px !important;
+    max-width:calc(100vw - 96px) !important;
+  }
+}
