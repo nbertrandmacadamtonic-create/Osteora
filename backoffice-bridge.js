@@ -507,415 +507,94 @@
   setTimeout(install,500);
 })();
 
-
-/* === V10.2 · BANQUE DE QUESTIONS + SOUS-MENU TESTER SANS TOUCHER À LA NAVIGATION ===
-   Correctif critique :
-   - ne remplace jamais window.go()
-   - ne modifie jamais la navigation Accueil / Commencer / Catalogue / Profil
-   - intercepte uniquement les boutons qui ouvraient directement le quiz
-*/
+/* === V11 · QUIZ DYNAMIQUES + BANQUE DE QUESTIONS === */
 (function(){
   'use strict';
-
-  const TABLE='osteo_quiz_questions';
+  const QUESTIONS_TABLE='osteo_quiz_questions';
+  const SETS_TABLE='osteo_quiz_sets';
   const SESSION_SIZE=15;
-  const ZONES=[
-    'Rachis',
-    'Bassin',
-    'Membres supérieurs',
-    'Membres inférieurs'
-  ];
-
   let bank=[];
-  let sessionMode='Général';
+  let quizSets=[];
+  let sessionMode='Quiz';
 
-  function appGo(id){
-    try{
-      if(typeof window.go==='function') return window.go(id);
-    }catch(_){}
-    try{
-      if(typeof go==='function') return go(id);
-    }catch(_){}
-  }
+  function appGo(id){try{if(typeof window.go==='function')return window.go(id);}catch(_){} try{if(typeof go==='function')return go(id);}catch(_){}}
+  function fn(name){try{if(typeof window[name]==='function')return window[name];}catch(_){} try{return eval('typeof '+name+'==="function"?'+name+':null');}catch(_){return null;}}
+  function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  function toLegacy(q,i){return{id:q.code||`bank_${i+1}`,category:q.category||q.zone||'Général',question:q.question,answers:Array.isArray(q.answers)?q.answers.slice(0,4):[],correct:Number(q.correct)||0,explanation:q.explanation||''};}
 
-  function fn(name){
-    try{ if(typeof window[name]==='function') return window[name]; }catch(_){}
-    try{ return eval('typeof '+name+'==="function"?'+name+':null'); }catch(_){}
-    return null;
-  }
-
-  function shuffle(arr){
-    const a=[...arr];
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [a[i],a[j]]=[a[j],a[i]];
-    }
-    return a;
-  }
-
-  function toLegacyQuestion(q,index){
-    return {
-      id:q.code || `bank_${index+1}`,
-      category:q.category || q.zone || 'Général',
-      question:q.question,
-      answers:Array.isArray(q.answers)?q.answers.slice(0,4):[],
-      correct:Number(q.correct)||0,
-      explanation:q.explanation || ''
-    };
-  }
-
-  function zoneCount(zone){
-    return bank.filter(q=>q.zone===zone).length;
-  }
-
-  function buildMenu(){
-    if(document.getElementById('quizMenu')) return;
-
-    const menu=document.createElement('section');
-    menu.id='quizMenu';
-    menu.className='screen quiz-menu-screen';
-    menu.innerHTML=`
-      <header class="top">
-        <button class="icon round" type="button" data-quiz-menu-back>‹</button>
-        <div class="brand">
-          <h1 class="logo">Tester</h1>
-          <p class="subtitle">Choisir un quiz</p>
-        </div>
-        <button class="icon" type="button" data-quiz-menu-refresh>↻</button>
-      </header>
-
-      <div class="quiz-menu-title">
-        <h1>Tester mes acquis</h1>
-        <p>15 questions par session · banque centralisée</p>
-      </div>
-
-      <div class="quiz-menu-grid">
-        <button class="quiz-menu-card general" type="button" data-quiz-mode="Général">
-          <span class="quiz-menu-icon">★</span>
-          <strong>Quiz général</strong>
-          <small>15 questions mélangées sur l’ensemble des zones.</small>
-          <em id="quizMenuCountGeneral">${bank.length}</em>
-        </button>
-
-        <button class="quiz-menu-card rachis" type="button" data-quiz-mode="Rachis">
-          <span class="quiz-menu-icon">R</span>
-          <strong>Rachis</strong>
-          <small>Cervicales · Dorsales · Lombaires</small>
-          <em id="quizMenuCountRachis">${zoneCount('Rachis')}</em>
-        </button>
-
-        <button class="quiz-menu-card bassin" type="button" data-quiz-mode="Bassin">
-          <span class="quiz-menu-icon">B</span>
-          <strong>Bassin</strong>
-          <small>Ilium · Sacrum · Symphyse</small>
-          <em id="quizMenuCountBassin">${zoneCount('Bassin')}</em>
-        </button>
-
-        <button class="quiz-menu-card msup" type="button" data-quiz-mode="Membres supérieurs">
-          <span class="quiz-menu-icon">MS</span>
-          <strong>Membre supérieur</strong>
-          <small>Épaule · Coude · Poignet · Main</small>
-          <em id="quizMenuCountMSup">${zoneCount('Membres supérieurs')}</em>
-        </button>
-
-        <button class="quiz-menu-card minf" type="button" data-quiz-mode="Membres inférieurs">
-          <span class="quiz-menu-icon">MI</span>
-          <strong>Membre inférieur</strong>
-          <small>Hanche · Genou · Cheville · Pied</small>
-          <em id="quizMenuCountMInf">${zoneCount('Membres inférieurs')}</em>
-        </button>
-      </div>
-
-      <article class="quiz-menu-info">
-        <strong>Principe</strong>
-        <p>Chaque test tire 15 questions différentes dans la banque.</p>
-      </article>
-    `;
-
-    const quiz=document.getElementById('quiz');
-    if(quiz?.parentNode) quiz.parentNode.insertBefore(menu,quiz);
-    else document.body.appendChild(menu);
-
-    if(!document.getElementById('quizMenuStylesV10_2')){
-      const style=document.createElement('style');
-      style.id='quizMenuStylesV10_2';
-      style.textContent=`
-        .quiz-menu-title{
-          margin:12px 0 14px;padding:18px;border-radius:24px;text-align:center;
-          border:1px solid rgba(0,229,255,.20);
-          background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.90));
-        }
-        .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}
-        .quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
-        .quiz-menu-grid{display:grid;gap:12px}
-        .quiz-menu-card{
-          position:relative;min-height:104px;padding:14px 56px 14px 76px;
-          border-radius:22px;text-align:left;border:1px solid currentColor;
-          background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));
-        }
-        .quiz-menu-card.general{color:#ffb020}
-        .quiz-menu-card.rachis{color:#00e5ff}
-        .quiz-menu-card.bassin{color:#ff9f43}
-        .quiz-menu-card.msup{color:#a855ff}
-        .quiz-menu-card.minf{color:#00e6a7}
-        .quiz-menu-icon{
-          position:absolute;left:14px;top:50%;transform:translateY(-50%);
-          width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
-          border:1px solid currentColor;font-weight:950;
-        }
-        .quiz-menu-card strong{display:block;color:#fff;font-size:18px}
-        .quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}
-        .quiz-menu-card em{
-          position:absolute;right:14px;top:50%;transform:translateY(-50%);
-          width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-          font-style:normal;border:1px solid currentColor;font-weight:950;
-        }
-        .quiz-menu-card.disabled{opacity:.45;filter:saturate(.6)}
-        .quiz-menu-info{
-          margin-top:14px;padding:14px;border-radius:20px;
-          border:1px solid rgba(255,255,255,.10);
-          background:rgba(255,255,255,.035);
-        }
-        .quiz-menu-info strong{color:#fff}
-        .quiz-menu-info p{margin:6px 0 0;color:#aeb8cc;font-size:12px}
-      `;
-      document.head.appendChild(style);
-    }
-
-    menu.querySelector('[data-quiz-menu-back]').addEventListener('click',()=>appGo('home'));
-    menu.querySelector('[data-quiz-menu-refresh]').addEventListener('click',()=>{
-      loadBank().then(updateMenuCounts);
-    });
-    menu.querySelectorAll('[data-quiz-mode]').forEach(btn=>{
-      btn.addEventListener('click',()=>startSession(btn.dataset.quizMode));
-    });
-  }
-
-  function updateMenuCounts(){
-    const mapping={
-      quizMenuCountGeneral:bank.length,
-      quizMenuCountRachis:zoneCount('Rachis'),
-      quizMenuCountBassin:zoneCount('Bassin'),
-      quizMenuCountMSup:zoneCount('Membres supérieurs'),
-      quizMenuCountMInf:zoneCount('Membres inférieurs')
-    };
-
-    Object.entries(mapping).forEach(([id,count])=>{
-      const el=document.getElementById(id);
-      if(el) el.textContent=String(count);
-    });
-
-    document.querySelectorAll('[data-quiz-mode]').forEach(btn=>{
-      const mode=btn.dataset.quizMode;
-      const available=mode==='Général' ? bank.length : zoneCount(mode);
-      btn.classList.toggle('disabled',available<SESSION_SIZE);
-    });
-  }
-
-  async function ensureConfig(){
-    if(window.OSTEO_SUPABASE) return window.OSTEO_SUPABASE;
-
-    await new Promise(resolve=>{
-      const existing=document.querySelector('script[src*="supabase-config.js"]');
-      if(existing){
-        if(window.OSTEO_SUPABASE) return resolve();
-        setTimeout(resolve,250);
-        return;
-      }
-      const s=document.createElement('script');
-      s.src='supabase-config.js';
-      s.onload=resolve;
-      s.onerror=resolve;
-      document.head.appendChild(s);
-    });
-
+  async function config(){
+    if(window.OSTEO_SUPABASE)return window.OSTEO_SUPABASE;
+    await new Promise(r=>{const s=document.querySelector('script[src*="supabase-config.js"]');if(s){setTimeout(r,150);return;}const n=document.createElement('script');n.src='supabase-config.js';n.onload=r;n.onerror=r;document.head.appendChild(n);});
     return window.OSTEO_SUPABASE||null;
   }
 
-  async function loadBank(){
-    const cfg=await ensureConfig();
-    if(!cfg?.url || !cfg?.anonKey) return false;
-
+  async function loadData(){
+    const c=await config(); if(!c?.url||!c?.anonKey)return false;
+    const headers={apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,Accept:'application/json'};
     try{
-      const url=cfg.url.replace(/\/$/,'')+
-        '/rest/v1/'+TABLE+
-        '?select=id,code,zone,subzone,category,level,question,answers,correct,explanation,status&status=eq.publie&order=id.asc';
+      const [qr,sr]=await Promise.all([
+        fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+QUESTIONS_TABLE+'?select=id,code,zone,subzone,category,level,question,answers,correct,explanation,status&status=eq.publie&order=id.asc',{headers,cache:'no-store'}),
+        fetch(c.url.replace(/\/$/,'')+'/rest/v1/'+SETS_TABLE+'?select=id,slug,title,kind,zone,subzone,question_count,status,position&status=eq.publie&order=position.asc,id.asc',{headers,cache:'no-store'})
+      ]);
+      if(qr.ok) bank=await qr.json();
+      if(sr.ok) quizSets=await sr.json();
+      window.OSTEO_QUESTION_BANK=bank; window.OSTEO_QUIZ_SETS=quizSets;
+      renderMenu(); return true;
+    }catch(e){console.warn('[Ostéo Pratik] Quiz central indisponible.',e);return false;}
+  }
 
-      const response=await fetch(url,{
-        headers:{
-          apikey:cfg.anonKey,
-          Authorization:'Bearer '+cfg.anonKey,
-          Accept:'application/json'
-        },
-        cache:'no-store'
-      });
+  function available(set){
+    if(set.kind==='general')return bank;
+    if(set.kind==='zone')return bank.filter(q=>q.zone===set.zone);
+    return bank.filter(q=>q.zone===set.zone && String(q.subzone||'').trim()===String(set.subzone||'').trim());
+  }
 
-      if(!response.ok) return false;
+  function cardColor(set,i){
+    if(set.kind==='general')return '#ffb020';
+    const map={'Rachis':'#00e5ff','Bassin':'#ff9f43','Membres supérieurs':'#a855ff','Membres inférieurs':'#00e6a7'};
+    return map[set.zone]||['#00e5ff','#a855ff','#00e6a7','#ff9f43'][i%4];
+  }
 
-      const data=await response.json();
-      bank=Array.isArray(data)?data:[];
-      window.OSTEO_QUESTION_BANK=bank;
-      updateMenuCounts();
-      return true;
-    }catch(error){
-      console.warn('[Ostéo Pratik] Banque de questions indisponible.',error);
-      return false;
+  function buildMenu(){
+    let menu=document.getElementById('quizMenu');
+    if(menu)return menu;
+    menu=document.createElement('section'); menu.id='quizMenu'; menu.className='screen quiz-menu-screen';
+    const quiz=document.getElementById('quiz'); if(quiz?.parentNode)quiz.parentNode.insertBefore(menu,quiz); else document.body.appendChild(menu);
+    if(!document.getElementById('quizMenuStylesV11')){
+      const s=document.createElement('style');s.id='quizMenuStylesV11';s.textContent=`
+        .quiz-menu-title{margin:12px auto 14px;padding:18px;border-radius:24px;text-align:center;border:1px solid rgba(0,229,255,.20);background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.90))}
+        .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}.quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
+        .quiz-menu-grid{display:grid;gap:12px}.quiz-menu-card{position:relative;min-height:104px;padding:14px 56px 14px 76px;border-radius:22px;text-align:left;border:1px solid var(--qc);color:var(--qc);background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90))}
+        .quiz-menu-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:1px solid currentColor;font-weight:950}
+        .quiz-menu-card strong{display:block;color:#fff;font-size:18px}.quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}.quiz-menu-card em{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;border:1px solid currentColor;font-weight:950}.quiz-menu-card.disabled{opacity:.45}.quiz-menu-info{margin:14px auto 0;padding:14px;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035)}
+      `;document.head.appendChild(s);
     }
+    return menu;
   }
 
-  function balancedGeneralSession(){
-    const byZone=Object.fromEntries(ZONES.map(z=>[z,shuffle(bank.filter(q=>q.zone===z))]));
-    const picked=[];
-
-    // 4 + 4 + 4 + 3, avec rotation aléatoire de la zone à 3 questions.
-    const rotated=shuffle(ZONES);
-    rotated.forEach((zone,index)=>{
-      const wanted=index===3 ? 3 : 4;
-      picked.push(...byZone[zone].slice(0,wanted));
-    });
-
-    if(picked.length<SESSION_SIZE){
-      const general=shuffle(bank.filter(q=>q.zone==='Général' && !picked.includes(q)));
-      picked.push(...general.slice(0,SESSION_SIZE-picked.length));
-    }
-
-    if(picked.length<SESSION_SIZE){
-      const remaining=shuffle(bank.filter(q=>!picked.includes(q)));
-      picked.push(...remaining.slice(0,SESSION_SIZE-picked.length));
-    }
-
-    return shuffle(picked.slice(0,SESSION_SIZE));
+  function renderMenu(){
+    const menu=buildMenu();
+    const sets=quizSets.length?quizSets:[{slug:'general',title:'Quiz général',kind:'general',zone:'',subzone:''}];
+    menu.innerHTML=`<header class="top"><button class="icon round" type="button" data-quiz-back>‹</button><div class="brand"><h1 class="logo">Tester</h1><p class="subtitle">Choisir un quiz</p></div><button class="icon" type="button" data-quiz-refresh>↻</button></header><div class="quiz-menu-title"><h1>Tester mes acquis</h1><p>15 questions par session</p></div><div class="quiz-menu-grid">${sets.map((s,i)=>{const n=available(s).length;return `<button class="quiz-menu-card ${n<15?'disabled':''}" style="--qc:${cardColor(s,i)}" type="button" data-quiz-slug="${s.slug}"><span class="quiz-menu-icon">15</span><strong>${s.title}</strong><small>${s.kind==='general'?'Toutes les zones':(s.subzone||s.zone||'')}</small><em>${n}</em></button>`;}).join('')}</div><article class="quiz-menu-info"><strong>Principe</strong><p>Chaque quiz tire 15 questions dans la banque selon son filtre.</p></article>`;
+    menu.querySelector('[data-quiz-back]').onclick=()=>appGo('home');
+    menu.querySelector('[data-quiz-refresh]').onclick=()=>loadData();
+    menu.querySelectorAll('[data-quiz-slug]').forEach(b=>b.onclick=()=>startSet(b.dataset.quizSlug));
   }
 
-  function sessionFor(mode){
-    if(mode==='Général') return balancedGeneralSession();
-    return shuffle(bank.filter(q=>q.zone===mode)).slice(0,SESSION_SIZE);
+  function inject(qs){try{if(typeof generalQuizQuestions==='undefined'||!Array.isArray(generalQuizQuestions))return false;generalQuizQuestions.splice(0,generalQuizQuestions.length,...qs.map(toLegacy));return true;}catch(e){console.warn(e);return false;}}
+  function startSet(slug){
+    const set=quizSets.find(s=>s.slug===slug)||{slug:'general',title:'Quiz général',kind:'general'};
+    const pool=available(set); if(pool.length<15){const t=fn('toast');if(t)t(`Il faut au moins 15 questions publiées pour « ${set.title} ».`);return;}
+    const qs=shuffle(pool).slice(0,15); if(!inject(qs))return; sessionMode=set.title;
+    try{generalQuizIndex=0;generalQuizScore=0;generalQuizAnswered=false;}catch(_){}
+    const title=document.querySelector('#quiz .quiz-general-title h1');const sub=document.querySelector('#quiz .quiz-general-title p');if(title)title.textContent=set.title;if(sub)sub.textContent='15 questions';
+    appGo('quiz'); const restart=fn('restartGeneralQuiz'); if(restart)restart();
   }
 
-  function injectSession(questions){
-    try{
-      if(typeof generalQuizQuestions==='undefined' || !Array.isArray(generalQuizQuestions)) return false;
-      generalQuizQuestions.splice(
-        0,
-        generalQuizQuestions.length,
-        ...questions.map(toLegacyQuestion)
-      );
-      return true;
-    }catch(error){
-      console.warn('[Ostéo Pratik] Injection quiz impossible.',error);
-      return false;
-    }
-  }
+  function showMenu(e){if(e){e.preventDefault();e.stopPropagation();}renderMenu();appGo('quizMenu');return false;}
+  function interceptQuizButtons(){document.querySelectorAll('[onclick]').forEach(el=>{const code=String(el.getAttribute('onclick')||'');if(!/go\s*\(\s*['\"]quiz['\"]\s*\)/.test(code)||el.dataset.quizMenuIntercepted==='1')return;el.dataset.quizMenuIntercepted='1';el.removeAttribute('onclick');el.addEventListener('click',showMenu);});}
 
-  function setQuizTitle(mode){
-    const title=document.querySelector('#quiz .quiz-general-title h1');
-    const subtitle=document.querySelector('#quiz .quiz-general-title p');
-    if(title) title.textContent=mode==='Général'?'Quiz général':`Quiz ${mode}`;
-    if(subtitle) subtitle.textContent=`${SESSION_SIZE} questions · ${mode}`;
-
-    const back=document.querySelector('#quiz .top .icon.round');
-    if(back){
-      back.onclick=null;
-      back.addEventListener('click',showQuizMenu,{once:true});
-    }
-  }
-
-  function startSession(mode){
-    const available=mode==='Général' ? bank.length : zoneCount(mode);
-
-    if(available<SESSION_SIZE){
-      const toastFn=fn('toast');
-      if(typeof toastFn==='function'){
-        toastFn(`Il faut au moins ${SESSION_SIZE} questions publiées pour ${mode}.`);
-      }
-      return;
-    }
-
-    const questions=sessionFor(mode);
-    if(questions.length<SESSION_SIZE || !injectSession(questions)) return;
-
-    sessionMode=mode;
-
-    try{
-      generalQuizIndex=0;
-      generalQuizScore=0;
-      generalQuizAnswered=false;
-    }catch(_){}
-
-    setQuizTitle(mode);
-    appGo('quiz');
-
-    const restart=fn('restartGeneralQuiz');
-    if(typeof restart==='function') restart();
-
-    window.dispatchEvent(new CustomEvent('osteo-quiz-session-start',{
-      detail:{mode,count:questions.length}
-    }));
-  }
-
-  function showQuizMenu(event){
-    if(event){
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    buildMenu();
-    updateMenuCounts();
-    appGo('quizMenu');
-    return false;
-  }
-
-  function interceptOnlyQuizButtons(){
-    // IMPORTANT : on ne remplace jamais go().
-    // On modifie uniquement les éléments dont le HTML demandait explicitement go('quiz').
-    document.querySelectorAll('[onclick]').forEach(el=>{
-      const code=String(el.getAttribute('onclick')||'');
-      if(!/go\s*\(\s*['"]quiz['"]\s*\)/.test(code)) return;
-      if(el.dataset.quizMenuIntercepted==='1') return;
-
-      el.dataset.quizMenuIntercepted='1';
-      el.removeAttribute('onclick');
-      el.addEventListener('click',showQuizMenu);
-    });
-  }
-
-  function wrapFinish(){
-    const original=fn('finishGeneralQuiz');
-    if(typeof original!=='function' || original.__osteoBankFinishV10_2) return;
-
-    const wrapped=function(){
-      const r=original.apply(this,arguments);
-      try{
-        const raw=localStorage.getItem('osteoPratikLastQuiz');
-        const data=raw?JSON.parse(raw):{};
-        data.category=sessionMode;
-        data.mode=sessionMode;
-        localStorage.setItem('osteoPratikLastQuiz',JSON.stringify(data));
-      }catch(_){}
-      return r;
-    };
-
-    wrapped.__osteoBankFinishV10_2=true;
-
-    try{
-      finishGeneralQuiz=wrapped;
-      window.finishGeneralQuiz=wrapped;
-    }catch(_){}
-  }
-
-  window.showQuizMenuV9=showQuizMenu;
-  window.startQuizSessionV9=startSession;
-
-  function install(){
-    buildMenu();
-    interceptOnlyQuizButtons();
-    wrapFinish();
-    loadBank().then(updateMenuCounts);
-  }
-
-  // L'installation est volontairement non invasive.
-  install();
-  document.addEventListener('DOMContentLoaded',install,{once:true});
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible') loadBank();
-  });
+  window.showQuizMenuV9=showMenu; window.startQuizSessionV9=startSet;
+  function install(){buildMenu();interceptQuizButtons();loadData();}
+  install(); document.addEventListener('DOMContentLoaded',install,{once:true}); document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')loadData();});
 })();
