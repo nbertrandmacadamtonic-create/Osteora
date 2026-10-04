@@ -331,7 +331,7 @@
   const link = document.createElement("link");
   link.id = "osteoResponsiveWebCss";
   link.rel = "stylesheet";
-  link.href = "responsive-web.css";
+  link.href = "responsive-web.css?v=10.3";
   document.head.appendChild(link);
 })();
 
