@@ -508,7 +508,12 @@
 })();
 
 
-/* === V9 · BANQUE DE QUESTIONS + SOUS-MENU TESTER === */
+/* === V10.2 · BANQUE DE QUESTIONS + SOUS-MENU TESTER SANS TOUCHER À LA NAVIGATION ===
+   Correctif critique :
+   - ne remplace jamais window.go()
+   - ne modifie jamais la navigation Accueil / Commencer / Catalogue / Profil
+   - intercepte uniquement les boutons qui ouvraient directement le quiz
+*/
 (function(){
   'use strict';
 
@@ -523,8 +528,15 @@
 
   let bank=[];
   let sessionMode='Général';
-  let originalGo=null;
-  let directQuizNavigation=false;
+
+  function appGo(id){
+    try{
+      if(typeof window.go==='function') return window.go(id);
+    }catch(_){}
+    try{
+      if(typeof go==='function') return go(id);
+    }catch(_){}
+  }
 
   function fn(name){
     try{ if(typeof window[name]==='function') return window[name]; }catch(_){}
@@ -564,12 +576,12 @@
     menu.className='screen quiz-menu-screen';
     menu.innerHTML=`
       <header class="top">
-        <button class="icon round" data-quiz-menu-back>‹</button>
+        <button class="icon round" type="button" data-quiz-menu-back>‹</button>
         <div class="brand">
           <h1 class="logo">Tester</h1>
           <p class="subtitle">Choisir un quiz</p>
         </div>
-        <button class="icon" data-quiz-menu-refresh>↻</button>
+        <button class="icon" type="button" data-quiz-menu-refresh>↻</button>
       </header>
 
       <div class="quiz-menu-title">
@@ -578,35 +590,35 @@
       </div>
 
       <div class="quiz-menu-grid">
-        <button class="quiz-menu-card general" data-quiz-mode="Général">
+        <button class="quiz-menu-card general" type="button" data-quiz-mode="Général">
           <span class="quiz-menu-icon">★</span>
           <strong>Quiz général</strong>
           <small>15 questions mélangées sur l’ensemble des zones.</small>
           <em id="quizMenuCountGeneral">${bank.length}</em>
         </button>
 
-        <button class="quiz-menu-card rachis" data-quiz-mode="Rachis">
+        <button class="quiz-menu-card rachis" type="button" data-quiz-mode="Rachis">
           <span class="quiz-menu-icon">R</span>
           <strong>Rachis</strong>
           <small>Cervicales · Dorsales · Lombaires</small>
           <em id="quizMenuCountRachis">${zoneCount('Rachis')}</em>
         </button>
 
-        <button class="quiz-menu-card bassin" data-quiz-mode="Bassin">
+        <button class="quiz-menu-card bassin" type="button" data-quiz-mode="Bassin">
           <span class="quiz-menu-icon">B</span>
           <strong>Bassin</strong>
           <small>Ilium · Sacrum · Symphyse</small>
           <em id="quizMenuCountBassin">${zoneCount('Bassin')}</em>
         </button>
 
-        <button class="quiz-menu-card msup" data-quiz-mode="Membres supérieurs">
+        <button class="quiz-menu-card msup" type="button" data-quiz-mode="Membres supérieurs">
           <span class="quiz-menu-icon">MS</span>
           <strong>Membre supérieur</strong>
           <small>Épaule · Coude · Poignet · Main</small>
           <em id="quizMenuCountMSup">${zoneCount('Membres supérieurs')}</em>
         </button>
 
-        <button class="quiz-menu-card minf" data-quiz-mode="Membres inférieurs">
+        <button class="quiz-menu-card minf" type="button" data-quiz-mode="Membres inférieurs">
           <span class="quiz-menu-icon">MI</span>
           <strong>Membre inférieur</strong>
           <small>Hanche · Genou · Cheville · Pied</small>
@@ -616,74 +628,66 @@
 
       <article class="quiz-menu-info">
         <strong>Principe</strong>
-        <p>Chaque test tire 15 questions différentes dans la banque. Plus la banque contient de questions, plus les sessions varient.</p>
+        <p>Chaque test tire 15 questions différentes dans la banque.</p>
       </article>
     `;
 
-    const app=document.querySelector('.app') || document.body;
     const quiz=document.getElementById('quiz');
     if(quiz?.parentNode) quiz.parentNode.insertBefore(menu,quiz);
-    else app.appendChild(menu);
+    else document.body.appendChild(menu);
 
-    const style=document.createElement('style');
-    style.id='quizMenuStylesV9';
-    style.textContent=`
-      .quiz-menu-title{
-        margin:12px 0 14px;padding:18px;border-radius:24px;text-align:center;
-        border:1px solid rgba(0,229,255,.20);
-        background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.90));
-      }
-      .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}
-      .quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
-      .quiz-menu-grid{display:grid;gap:12px}
-      .quiz-menu-card{
-        position:relative;min-height:104px;padding:14px 56px 14px 76px;
-        border-radius:22px;text-align:left;border:1px solid currentColor;
-        background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));
-        box-shadow:0 0 20px color-mix(in srgb,currentColor 16%,transparent);
-      }
-      .quiz-menu-card.general{color:#ffb020}
-      .quiz-menu-card.rachis{color:#00e5ff}
-      .quiz-menu-card.bassin{color:#ff9f43}
-      .quiz-menu-card.msup{color:#a855ff}
-      .quiz-menu-card.minf{color:#00e6a7}
-      .quiz-menu-icon{
-        position:absolute;left:14px;top:50%;transform:translateY(-50%);
-        width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
-        border:1px solid currentColor;background:color-mix(in srgb,currentColor 10%,transparent);
-        font-weight:950;
-      }
-      .quiz-menu-card strong{display:block;color:#fff;font-size:18px}
-      .quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}
-      .quiz-menu-card em{
-        position:absolute;right:14px;top:50%;transform:translateY(-50%);
-        width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
-        font-style:normal;border:1px solid currentColor;font-weight:950;
-      }
-      .quiz-menu-card.disabled{opacity:.45;filter:saturate(.6)}
-      .quiz-menu-info{
-        margin-top:14px;padding:14px;border-radius:20px;
-        border:1px solid rgba(255,255,255,.10);
-        background:rgba(255,255,255,.035);
-      }
-      .quiz-menu-info strong{color:#fff}
-      .quiz-menu-info p{margin:6px 0 0;color:#aeb8cc;font-size:12px;line-height:1.35}
-    `;
-    document.head.appendChild(style);
+    if(!document.getElementById('quizMenuStylesV10_2')){
+      const style=document.createElement('style');
+      style.id='quizMenuStylesV10_2';
+      style.textContent=`
+        .quiz-menu-title{
+          margin:12px 0 14px;padding:18px;border-radius:24px;text-align:center;
+          border:1px solid rgba(0,229,255,.20);
+          background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.90));
+        }
+        .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}
+        .quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
+        .quiz-menu-grid{display:grid;gap:12px}
+        .quiz-menu-card{
+          position:relative;min-height:104px;padding:14px 56px 14px 76px;
+          border-radius:22px;text-align:left;border:1px solid currentColor;
+          background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));
+        }
+        .quiz-menu-card.general{color:#ffb020}
+        .quiz-menu-card.rachis{color:#00e5ff}
+        .quiz-menu-card.bassin{color:#ff9f43}
+        .quiz-menu-card.msup{color:#a855ff}
+        .quiz-menu-card.minf{color:#00e6a7}
+        .quiz-menu-icon{
+          position:absolute;left:14px;top:50%;transform:translateY(-50%);
+          width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+          border:1px solid currentColor;font-weight:950;
+        }
+        .quiz-menu-card strong{display:block;color:#fff;font-size:18px}
+        .quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}
+        .quiz-menu-card em{
+          position:absolute;right:14px;top:50%;transform:translateY(-50%);
+          width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+          font-style:normal;border:1px solid currentColor;font-weight:950;
+        }
+        .quiz-menu-card.disabled{opacity:.45;filter:saturate(.6)}
+        .quiz-menu-info{
+          margin-top:14px;padding:14px;border-radius:20px;
+          border:1px solid rgba(255,255,255,.10);
+          background:rgba(255,255,255,.035);
+        }
+        .quiz-menu-info strong{color:#fff}
+        .quiz-menu-info p{margin:6px 0 0;color:#aeb8cc;font-size:12px}
+      `;
+      document.head.appendChild(style);
+    }
 
-    menu.querySelector('[data-quiz-menu-back]').onclick=()=>{
-      originalGo ? originalGo('home') : fn('go')?.('home');
-    };
-
-    menu.querySelector('[data-quiz-menu-refresh]').onclick=()=>{
+    menu.querySelector('[data-quiz-menu-back]').addEventListener('click',()=>appGo('home'));
+    menu.querySelector('[data-quiz-menu-refresh]').addEventListener('click',()=>{
       loadBank().then(updateMenuCounts);
-    };
-
+    });
     menu.querySelectorAll('[data-quiz-mode]').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        const mode=btn.dataset.quizMode;
-        startSession(mode);
-      });
+      btn.addEventListener('click',()=>startSession(btn.dataset.quizMode));
     });
   }
 
@@ -695,6 +699,7 @@
       quizMenuCountMSup:zoneCount('Membres supérieurs'),
       quizMenuCountMInf:zoneCount('Membres inférieurs')
     };
+
     Object.entries(mapping).forEach(([id,count])=>{
       const el=document.getElementById(id);
       if(el) el.textContent=String(count);
@@ -709,13 +714,21 @@
 
   async function ensureConfig(){
     if(window.OSTEO_SUPABASE) return window.OSTEO_SUPABASE;
+
     await new Promise(resolve=>{
+      const existing=document.querySelector('script[src*="supabase-config.js"]');
+      if(existing){
+        if(window.OSTEO_SUPABASE) return resolve();
+        setTimeout(resolve,250);
+        return;
+      }
       const s=document.createElement('script');
       s.src='supabase-config.js';
       s.onload=resolve;
       s.onerror=resolve;
       document.head.appendChild(s);
     });
+
     return window.OSTEO_SUPABASE||null;
   }
 
@@ -741,8 +754,8 @@
 
       const data=await response.json();
       bank=Array.isArray(data)?data:[];
-      updateMenuCounts();
       window.OSTEO_QUESTION_BANK=bank;
+      updateMenuCounts();
       return true;
     }catch(error){
       console.warn('[Ostéo Pratik] Banque de questions indisponible.',error);
@@ -752,16 +765,13 @@
 
   function balancedGeneralSession(){
     const byZone=Object.fromEntries(ZONES.map(z=>[z,shuffle(bank.filter(q=>q.zone===z))]));
-    const counts=[4,4,4,3];
-
-    // L'extra de 4 tourne aléatoirement pour ne pas favoriser toujours la même zone.
-    const rotated=shuffle(ZONES);
     const picked=[];
 
+    // 4 + 4 + 4 + 3, avec rotation aléatoire de la zone à 3 questions.
+    const rotated=shuffle(ZONES);
     rotated.forEach((zone,index)=>{
-      const wanted=counts[index];
+      const wanted=index===3 ? 3 : 4;
       picked.push(...byZone[zone].slice(0,wanted));
-      byZone[zone]=byZone[zone].slice(wanted);
     });
 
     if(picked.length<SESSION_SIZE){
@@ -774,12 +784,6 @@
       picked.push(...remaining.slice(0,SESSION_SIZE-picked.length));
     }
 
-    // Si la banque ne contient encore que les 15 questions générales,
-    // elles constituent naturellement le Quiz général.
-    if(picked.length<SESSION_SIZE){
-      return shuffle(bank).slice(0,SESSION_SIZE);
-    }
-
     return shuffle(picked.slice(0,SESSION_SIZE));
   }
 
@@ -788,24 +792,31 @@
     return shuffle(bank.filter(q=>q.zone===mode)).slice(0,SESSION_SIZE);
   }
 
+  function injectSession(questions){
+    try{
+      if(typeof generalQuizQuestions==='undefined' || !Array.isArray(generalQuizQuestions)) return false;
+      generalQuizQuestions.splice(
+        0,
+        generalQuizQuestions.length,
+        ...questions.map(toLegacyQuestion)
+      );
+      return true;
+    }catch(error){
+      console.warn('[Ostéo Pratik] Injection quiz impossible.',error);
+      return false;
+    }
+  }
+
   function setQuizTitle(mode){
     const title=document.querySelector('#quiz .quiz-general-title h1');
     const subtitle=document.querySelector('#quiz .quiz-general-title p');
     if(title) title.textContent=mode==='Général'?'Quiz général':`Quiz ${mode}`;
     if(subtitle) subtitle.textContent=`${SESSION_SIZE} questions · ${mode}`;
-    const back=document.querySelector('#quiz .top .icon.round');
-    if(back) back.onclick=()=>window.showQuizMenuV9();
-  }
 
-  function injectSession(questions){
-    try{
-      if(typeof generalQuizQuestions==='undefined' || !Array.isArray(generalQuizQuestions)) return false;
-      const legacy=questions.map(toLegacyQuestion);
-      generalQuizQuestions.splice(0,generalQuizQuestions.length,...legacy);
-      return true;
-    }catch(error){
-      console.warn('[Ostéo Pratik] Injection du quiz impossible.',error);
-      return false;
+    const back=document.querySelector('#quiz .top .icon.round');
+    if(back){
+      back.onclick=null;
+      back.addEventListener('click',showQuizMenu,{once:true});
     }
   }
 
@@ -821,8 +832,7 @@
     }
 
     const questions=sessionFor(mode);
-    if(questions.length<SESSION_SIZE) return;
-    if(!injectSession(questions)) return;
+    if(questions.length<SESSION_SIZE || !injectSession(questions)) return;
 
     sessionMode=mode;
 
@@ -833,10 +843,7 @@
     }catch(_){}
 
     setQuizTitle(mode);
-
-    directQuizNavigation=true;
-    originalGo('quiz');
-    directQuizNavigation=false;
+    appGo('quiz');
 
     const restart=fn('restartGeneralQuiz');
     if(typeof restart==='function') restart();
@@ -846,38 +853,34 @@
     }));
   }
 
-  function installGoWrapper(){
-    const current=fn('go');
-    if(typeof current!=='function') return false;
-    if(current.__osteoQuizMenuV9){
-      originalGo=current.__osteoOriginalGo;
-      return true;
+  function showQuizMenu(event){
+    if(event){
+      event.preventDefault();
+      event.stopPropagation();
     }
+    buildMenu();
+    updateMenuCounts();
+    appGo('quizMenu');
+    return false;
+  }
 
-    originalGo=current;
+  function interceptOnlyQuizButtons(){
+    // IMPORTANT : on ne remplace jamais go().
+    // On modifie uniquement les éléments dont le HTML demandait explicitement go('quiz').
+    document.querySelectorAll('[onclick]').forEach(el=>{
+      const code=String(el.getAttribute('onclick')||'');
+      if(!/go\s*\(\s*['"]quiz['"]\s*\)/.test(code)) return;
+      if(el.dataset.quizMenuIntercepted==='1') return;
 
-    const wrapped=function(id){
-      if(id==='quiz' && !directQuizNavigation){
-        return originalGo('quizMenu');
-      }
-      return originalGo.apply(this,arguments);
-    };
-
-    wrapped.__osteoQuizMenuV9=true;
-    wrapped.__osteoOriginalGo=originalGo;
-
-    try{
-      go=wrapped;
-      window.go=wrapped;
-      return true;
-    }catch(_){
-      return false;
-    }
+      el.dataset.quizMenuIntercepted='1';
+      el.removeAttribute('onclick');
+      el.addEventListener('click',showQuizMenu);
+    });
   }
 
   function wrapFinish(){
     const original=fn('finishGeneralQuiz');
-    if(typeof original!=='function' || original.__osteoBankFinishV9) return;
+    if(typeof original!=='function' || original.__osteoBankFinishV10_2) return;
 
     const wrapped=function(){
       const r=original.apply(this,arguments);
@@ -891,29 +894,25 @@
       return r;
     };
 
-    wrapped.__osteoBankFinishV9=true;
+    wrapped.__osteoBankFinishV10_2=true;
+
     try{
       finishGeneralQuiz=wrapped;
       window.finishGeneralQuiz=wrapped;
     }catch(_){}
   }
 
-  window.showQuizMenuV9=function(){
-    if(!originalGo) installGoWrapper();
-    if(originalGo) originalGo('quizMenu');
-    updateMenuCounts();
-  };
-
+  window.showQuizMenuV9=showQuizMenu;
   window.startQuizSessionV9=startSession;
 
-  async function install(){
+  function install(){
     buildMenu();
-    installGoWrapper();
+    interceptOnlyQuizButtons();
     wrapFinish();
-    await loadBank();
-    updateMenuCounts();
+    loadBank().then(updateMenuCounts);
   }
 
+  // L'installation est volontairement non invasive.
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   document.addEventListener('visibilitychange',()=>{
