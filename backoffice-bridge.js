@@ -1,10 +1,10 @@
 /*
-  Ostéo RA / Ostéo Pratik — Bridge central Supabase V4
-  - app.js et styles.css restent intacts.
-  - charge la configuration Supabase dynamiquement.
-  - lit la base centrale publique et remplace uniquement le tableau de données
-    en mémoire, sans réécrire le moteur de l'application.
-  - en cas de problème réseau/configuration, le catalogue original reste utilisable.
+  Ostéo RA / Ostéo Pratik — Bridge central Supabase V5
+  - app.js, styles.css et la navigation Ostéo RA restent intacts.
+  - les données publiques viennent de Supabase.
+  - les fiches détaillées éditées dans le back-office sont lues via t.detail.
+  - une copie enrichie des fiches originales d’Ostéo RA est mise à disposition
+    du back-office pour l’import initial / la récupération des textes et images.
 */
 (function(){
   'use strict';
@@ -12,6 +12,10 @@
   const CONFIG_SRC='supabase-config.js';
   const TABLE='osteo_techniques';
   const LOCAL_SNAPSHOT_KEY='osteoRA.backoffice.snapshot.v1';
+  const LOCAL_DETAIL_SNAPSHOT_KEY='osteoRA.backoffice.snapshot.v2.details';
+
+  let originalDetailResolver=null;
+  let detailOverrideInstalled=false;
 
   function clone(v){
     try{return structuredClone(v);}
@@ -28,6 +32,57 @@
     return null;
   }
 
+  function resolveGlobalFunction(name){
+    try{
+      if(typeof window[name]==='function') return window[name];
+    }catch(_){}
+    try{
+      return eval('typeof '+name+'==="function"?'+name+':null');
+    }catch(_){}
+    return null;
+  }
+
+  function captureOriginalDetailResolver(){
+    if(originalDetailResolver) return originalDetailResolver;
+    const fn=resolveGlobalFunction('getTechniqueDetail');
+    if(fn && !fn.__osteoCentralDetailOverride){
+      originalDetailResolver=fn;
+    }
+    return originalDetailResolver;
+  }
+
+  function hasCentralDetail(t){
+    const d=t&&t.detail;
+    return !!(d && (
+      String(d.intro||'').trim() ||
+      String(d.category||'').trim() ||
+      String(d.method||'').trim() ||
+      (Array.isArray(d.steps) && d.steps.length) ||
+      (Array.isArray(d.images) && d.images.length)
+    ));
+  }
+
+  function installDetailOverride(){
+    if(detailOverrideInstalled) return;
+    const original=captureOriginalDetailResolver();
+    if(typeof original!=='function') return;
+
+    const wrapped=function(t){
+      if(t && hasCentralDetail(t)) return t.detail;
+      return original(t);
+    };
+    wrapped.__osteoCentralDetailOverride=true;
+    wrapped.__osteoOriginal=original;
+
+    try{
+      getTechniqueDetail=wrapped;
+      window.getTechniqueDetail=wrapped;
+      detailOverrideInstalled=true;
+    }catch(error){
+      console.warn('[Ostéo Pratik] Impossible d’installer la surcouche fiche détaillée.',error);
+    }
+  }
+
   function refreshKnownViews(){
     [
       'renderTechniques','renderSeenCollections','renderRevisionWheel',
@@ -35,10 +90,17 @@
       'updateProgressZoneStats'
     ].forEach(name=>{
       try{
-        const fn=window[name]||eval('typeof '+name+'==="function"?'+name+':null');
+        const fn=resolveGlobalFunction(name);
         if(typeof fn==='function') fn();
       }catch(_){}
     });
+
+    // Si une fiche est déjà ouverte, on la redessine avec les données centrales.
+    try{
+      const detailScreen=document.getElementById('techniqueDetail');
+      const render=resolveGlobalFunction('renderTechniqueDetail');
+      if(detailScreen?.classList.contains('active') && typeof render==='function') render();
+    }catch(_){}
   }
 
   function saveOriginalSnapshot(){
@@ -49,6 +111,36 @@
         localStorage.setItem(LOCAL_SNAPSHOT_KEY,JSON.stringify(clone(list)));
       }
     }catch(_){}
+  }
+
+  function buildDetailedSnapshot(){
+    const list=getTechniques();
+    if(!list) return [];
+
+    const resolver=captureOriginalDetailResolver();
+    const enriched=list.map(t=>{
+      const copy=clone(t);
+      let detail=null;
+
+      // Priorité à la fiche originale d’Ostéo RA pour permettre une récupération fiable.
+      try{
+        if(typeof resolver==='function') detail=resolver(t);
+      }catch(_){}
+
+      // Si aucune fiche originale n'est trouvée, conserver la fiche centrale éventuelle.
+      if(!detail && t.detail) detail=t.detail;
+      if(detail) copy.detail=clone(detail);
+
+      return copy;
+    });
+
+    try{
+      localStorage.setItem(LOCAL_DETAIL_SNAPSHOT_KEY,JSON.stringify(enriched));
+      localStorage.setItem(LOCAL_DETAIL_SNAPSHOT_KEY+'.updatedAt',String(Date.now()));
+    }catch(error){
+      console.warn('[Ostéo Pratik] Snapshot détaillé trop volumineux ou indisponible.',error);
+    }
+    return enriched;
   }
 
   function loadConfig(){
@@ -74,13 +166,15 @@
     const list=getTechniques();
     if(!list) return false;
 
+    captureOriginalDetailResolver();
     saveOriginalSnapshot();
+    buildDetailedSnapshot();
+    installDetailOverride();
 
     const c=await loadConfig();
     if(!configured(c)) return false;
 
-    const url=c.url.replace(/\/$/,'')+
-      '/rest/v1/'+TABLE+'?select=id,data&order=id.asc';
+    const url=c.url.replace(/\/$/,'')+'/rest/v1/'+TABLE+'?select=id,data&order=id.asc';
 
     try{
       const response=await fetch(url,{
@@ -97,10 +191,18 @@
 
       const remote=rows.map(r=>r&&r.data).filter(Boolean);
       list.splice(0,list.length,...remote);
+
+      // Recrée aussi un snapshot détaillé en se basant sur les techniques centrales
+      // et le moteur de fiches d’origine encore disponible.
+      buildDetailedSnapshot();
+      installDetailOverride();
       refreshKnownViews();
 
       window.dispatchEvent(new CustomEvent('osteo-central-data-loaded',{
-        detail:{count:remote.length}
+        detail:{
+          count:remote.length,
+          detailed:remote.filter(hasCentralDetail).length
+        }
       }));
       return true;
     }catch(error){
@@ -110,14 +212,23 @@
   }
 
   window.OsteoRACentralBridge={
-    reload:loadCentral
+    reload:loadCentral,
+    exportDetailedSnapshot:buildDetailedSnapshot
   };
 
+  captureOriginalDetailResolver();
   saveOriginalSnapshot();
+  buildDetailedSnapshot();
+  installDetailOverride();
   loadCentral();
-  document.addEventListener('DOMContentLoaded',loadCentral,{once:true});
 
-  // Synchronise aussi quand l'onglet redevient actif après une modification admin.
+  document.addEventListener('DOMContentLoaded',()=>{
+    captureOriginalDetailResolver();
+    buildDetailedSnapshot();
+    installDetailOverride();
+    loadCentral();
+  },{once:true});
+
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible') loadCentral();
   });

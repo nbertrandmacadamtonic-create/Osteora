@@ -13,23 +13,24 @@
   <span id="cloudState" class="cloud-state">☁ Configuration requise</span>
   <a class="topbtn" href="index.html">← Application</a>
 </header>
+
 <main>
+  <section class="cloud-panel">
+    <div class="cloud-copy">
+      <strong>Base centrale</strong>
+      <span id="cloudMessage">Configuration Supabase à compléter.</span>
+    </div>
+    <div class="cloud-actions">
+      <input id="adminEmail" type="email" placeholder="E-mail administrateur" autocomplete="username">
+      <input id="adminPassword" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="btn primary" id="loginBtn" type="button">Se connecter</button>
+      <button class="btn" id="logoutBtn" type="button" hidden>Se déconnecter</button>
+      <button class="btn green" id="seedBtn" type="button" hidden>Initialiser la base depuis Ostéo RA</button>
+      <button class="btn detail-sync" id="detailsSyncBtn" type="button" hidden>↻ Importer / actualiser les fiches détaillées depuis Ostéo RA</button>
+    </div>
+  </section>
 
-<section class="cloud-panel">
-  <div class="cloud-copy">
-    <strong>Base centrale</strong>
-    <span id="cloudMessage">Configuration Supabase à compléter.</span>
-  </div>
-  <div class="cloud-actions">
-    <input id="adminEmail" type="email" placeholder="E-mail administrateur" autocomplete="username">
-    <input id="adminPassword" type="password" placeholder="Mot de passe" autocomplete="current-password">
-    <button class="btn primary" id="loginBtn" type="button">Se connecter</button>
-    <button class="btn" id="logoutBtn" type="button" hidden>Se déconnecter</button>
-    <button class="btn green" id="seedBtn" type="button" hidden>Initialiser la base depuis Ostéo RA</button>
-  </div>
-</section>
-
-  <section class="panel">
+  <section class="panel techniques-panel">
     <div class="panel-head">
       <h1>Techniques</h1>
       <p id="count">Chargement…</p>
@@ -38,32 +39,99 @@
       <input id="search" type="search" placeholder="Rechercher une technique…" autocomplete="off">
       <button class="btn green" id="newBtn">+ Ajouter</button>
     </div>
-    <div id="bootWarning" class="warning" hidden>Initialisation de la base Ostéo RA… L'application s'ouvre brièvement en arrière-plan pour récupérer le catalogue sans modifier son code.</div>
+    <div id="bootWarning" class="warning" hidden>Lecture d’Ostéo RA en arrière-plan pour récupérer le catalogue, les fiches détaillées et les images associées.</div>
     <div id="list" class="list"></div>
   </section>
 
-  <section class="panel">
+  <section class="panel editor-panel">
     <div class="panel-head">
       <h2>Éditeur</h2>
-      <p>Les modifications sont appliquées par la couche back-office, sans réécrire app.js ni styles.css.</p>
+      <p>Titre, vidéo, fiche technique détaillée, étapes et images sont enregistrés dans la base centrale.</p>
     </div>
+
     <div id="editorEmpty" class="empty">Sélectionnez une technique à gauche.</div>
+
     <form id="editor" class="editor" hidden>
-      <div class="grid">
-        <label>ID<input id="fId" readonly></label>
-        <label>Icône<input id="fIcon" placeholder="C7, EM, ◉…"></label>
-        <label class="wide">Titre<input id="fTitle" required></label>
-        <label>Zone / monde<input id="fZone" list="zones"></label>
-        <label>Sous-zone / région<input id="fSub"></label>
-        <label>Niveau<input id="fLevel"></label>
-        <label>Statut<input id="fStatus" placeholder="non vue / publiée / brouillon…"></label>
-        <label class="wide">Lien Vimeo / vidéo<input id="fVideo" type="url" placeholder="https://vimeo.com/…"></label>
-        <label class="wide">Image / chemin image<input id="fImage" placeholder="assets/images/…"></label>
-        <label class="wide">Texte de la technique<textarea id="fText" placeholder="Description, étapes, repères…"></textarea></label>
-        <label class="wide">Quiz associé<textarea id="fQuiz" placeholder="Question, réponses ou référence quiz…"></textarea></label>
-      </div>
-      <div class="actions">
-        <button class="btn primary" type="submit">Enregistrer</button>
+      <section class="editor-section">
+        <div class="section-title">
+          <div>
+            <small>Technique</small>
+            <h3>Informations générales</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <label>ID<input id="fId" readonly></label>
+          <label>Icône<input id="fIcon" placeholder="C7, EM, ◉…"></label>
+          <label class="wide">Titre<input id="fTitle" required></label>
+          <label>Zone / monde<input id="fZone" list="zones"></label>
+          <label>Sous-zone / région<input id="fSub"></label>
+          <label>Niveau<input id="fLevel"></label>
+          <label>Statut<input id="fStatus" placeholder="non vue / publiée / brouillon…"></label>
+          <label class="wide">Lien Vimeo / vidéo<input id="fVideo" type="url" placeholder="https://vimeo.com/…"></label>
+
+          <label class="wide">Image principale / chemin image
+            <input id="fImage" placeholder="assets/images/… ou https://…">
+          </label>
+          <div id="mainImagePreview" class="image-preview wide"></div>
+
+          <label class="wide">Texte libre de la technique
+            <textarea id="fText" placeholder="Note complémentaire, description libre…"></textarea>
+          </label>
+          <label class="wide">Quiz associé
+            <textarea id="fQuiz" placeholder="Question, réponses ou référence quiz…"></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="editor-section detail-section">
+        <div class="section-title">
+          <div>
+            <small>Application · Technique détaillée</small>
+            <h3>Fiche technique complète</h3>
+          </div>
+          <span id="detailState" class="detail-state">À compléter</span>
+        </div>
+
+        <div class="grid">
+          <label>Source
+            <input id="fDetailSource" placeholder="OSTPRA…">
+          </label>
+          <label>Catégorie
+            <input id="fDetailCategory" placeholder="Rachis – cervicales…">
+          </label>
+          <label>Méthode
+            <input id="fDetailMethod" placeholder="Thrust, Énergie musculaire…">
+          </label>
+          <label class="wide">Introduction / résumé
+            <textarea id="fDetailIntro" class="short-textarea" placeholder="Résumé affiché en tête de fiche…"></textarea>
+          </label>
+        </div>
+
+        <div class="subsection-head">
+          <div>
+            <strong>Étapes de la fiche</strong>
+            <span>Position, mains, barrière motrice, normalisation…</span>
+          </div>
+          <button type="button" class="btn green compact" id="addStepBtn">+ Ajouter une étape</button>
+        </div>
+
+        <div id="detailStepsEditor" class="detail-steps"></div>
+
+        <div class="subsection-head images-head">
+          <div>
+            <strong>Images / planches associées</strong>
+            <span>Un chemin ou une URL par ligne. Les images restent hébergées sur GitHub, Vimeo CDN ou un autre stockage accessible.</span>
+          </div>
+        </div>
+        <label class="wide">Liste des images de la fiche
+          <textarea id="fDetailImages" class="images-textarea" placeholder="assets/images/techniques/…/planche.webp&#10;https://…"></textarea>
+        </label>
+        <div id="detailImagesPreview" class="gallery-preview"></div>
+      </section>
+
+      <div class="actions sticky-actions">
+        <button class="btn primary" type="submit">Enregistrer dans Supabase</button>
         <button class="btn danger" type="button" id="deleteBtn">Supprimer</button>
         <button class="btn" type="button" id="exportBtn">Exporter JSON</button>
         <button class="btn" type="button" id="resetBtn">Recharger depuis le serveur</button>
@@ -72,9 +140,14 @@
     </form>
   </section>
 </main>
+
 <datalist id="zones">
-  <option value="Rachis"><option value="Bassin"><option value="Membres supérieurs"><option value="Membres inférieurs">
+  <option value="Rachis">
+  <option value="Bassin">
+  <option value="Membres supérieurs">
+  <option value="Membres inférieurs">
 </datalist>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="backoffice.js"></script>
