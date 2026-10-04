@@ -77,15 +77,43 @@
           <label>Statut<input id="fStatus" placeholder="non vue / publiée / brouillon…"></label>
           <label class="wide">Lien Vimeo / vidéo<input id="fVideo" type="url" placeholder="https://vimeo.com/…"></label>
 
-          <label class="wide">Image principale / chemin image
-            <input id="fImage" placeholder="assets/images/… ou https://…">
-          </label>
-          <div class="upload-bar wide">
-            <input id="fImageFile" type="file" accept="image/*" hidden>
-            <button type="button" class="btn storage-upload" id="uploadMainImageBtn">☁ Téléverser l’image principale</button>
-            <span id="mainUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+          <div class="image-role-card wide">
+            <div class="image-role-head">
+              <div>
+                <strong>Image d’en-tête</strong>
+                <span>Visuel affiché tout en haut de la fiche technique.</span>
+              </div>
+              <span class="image-role-tag">COUVERTURE</span>
+            </div>
+            <label class="wide">Chemin / URL de l’image d’en-tête
+              <input id="fHeaderImage" placeholder="https://… ou assets/images/…">
+            </label>
+            <div class="upload-bar wide">
+              <input id="fHeaderImageFile" type="file" accept="image/*" hidden>
+              <button type="button" class="btn storage-upload" id="uploadHeaderImageBtn">☁ Téléverser l’image d’en-tête</button>
+              <span id="headerUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+            </div>
+            <div id="headerImagePreview" class="image-preview wide"></div>
           </div>
-          <div id="mainImagePreview" class="image-preview wide"></div>
+
+          <div class="image-role-card wide">
+            <div class="image-role-head">
+              <div>
+                <strong>Image principale de la technique</strong>
+                <span>Image pédagogique affichée dans le contenu de la fiche, avant les étapes.</span>
+              </div>
+              <span class="image-role-tag main">CONTENU</span>
+            </div>
+            <label class="wide">Chemin / URL de l’image principale
+              <input id="fImage" placeholder="https://… ou assets/images/…">
+            </label>
+            <div class="upload-bar wide">
+              <input id="fImageFile" type="file" accept="image/*" hidden>
+              <button type="button" class="btn storage-upload" id="uploadMainImageBtn">☁ Téléverser l’image principale</button>
+              <span id="mainUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+            </div>
+            <div id="mainImagePreview" class="image-preview wide"></div>
+          </div>
 
           <label class="wide">Texte libre de la technique
             <textarea id="fText" placeholder="Note complémentaire, description libre…"></textarea>
@@ -155,47 +183,86 @@
     </form>
   </section>
 
+  
   <section id="quizWorkspace" class="quiz-workspace" hidden>
     <section class="panel quiz-list-panel">
       <div class="panel-head">
-        <h1>Quiz</h1>
+        <h1>Banque de questions</h1>
         <p id="quizCount">Base indépendante · chargement…</p>
       </div>
+
       <div class="toolbar">
-        <input id="quizSearch" type="search" placeholder="Rechercher un quiz…" autocomplete="off">
-        <button class="btn green" id="newQuizBtn" type="button">+ Nouveau quiz</button>
+        <input id="quizSearch" type="search" placeholder="Rechercher une question…" autocomplete="off">
+        <select id="quizZoneFilter">
+          <option value="">Toutes les zones</option>
+          <option>Général</option>
+          <option>Rachis</option>
+          <option>Bassin</option>
+          <option>Membres supérieurs</option>
+          <option>Membres inférieurs</option>
+        </select>
+        <button class="btn green" id="newQuizBtn" type="button">+ Nouvelle question</button>
       </div>
+
       <div class="quiz-seed-box" id="quizSeedBox" hidden>
-        <strong>Quiz général actuel</strong>
-        <span>Importer les 15 questions déjà présentes dans Ostéo RA.</span>
-        <button type="button" class="btn detail-sync" id="seedQuizBtn">Initialiser avec les 15 questions actuelles</button>
+        <strong>15 questions actuelles d’Ostéo RA</strong>
+        <span>Les importer dans la banque comme questions générales publiées.</span>
+        <button type="button" class="btn detail-sync" id="seedQuizBtn">Importer les 15 questions actuelles</button>
       </div>
+
+      <div class="question-bank-stats" id="questionBankStats"></div>
       <div id="quizList" class="list"></div>
     </section>
 
     <section class="panel quiz-editor-panel">
       <div class="panel-head">
-        <h2>Éditeur de quiz</h2>
-        <p>Cette base est indépendante des techniques. Chaque quiz contient exactement 15 questions.</p>
+        <h2>Éditeur de question</h2>
+        <p>Les quiz de l’application tirent 15 questions depuis cette banque.</p>
       </div>
 
-      <div id="quizEditorEmpty" class="empty">Sélectionnez un quiz à gauche.</div>
+      <div id="quizEditorEmpty" class="empty">Sélectionnez une question à gauche.</div>
 
       <form id="quizEditor" class="quiz-editor" hidden>
         <section class="editor-section">
           <div class="section-title">
             <div>
-              <small>Quiz indépendant</small>
-              <h3>Informations générales</h3>
+              <small>Question indépendante</small>
+              <h3>Classement pédagogique</h3>
             </div>
-            <span id="quizValidationState" class="detail-state">15 questions requises</span>
+            <span id="quizValidationState" class="detail-state">À compléter</span>
           </div>
 
           <div class="grid">
             <label>ID<input id="qId" readonly></label>
-            <label>Identifiant / slug<input id="qSlug" placeholder="general, rachis, bassin…"></label>
-            <label class="wide">Titre<input id="qTitle" required placeholder="Quiz général"></label>
-            <label>Zone / thème<input id="qZone" placeholder="Général, Rachis, Bassin…"></label>
+            <label>Code<input id="qSlug" placeholder="rachis-cervicales-001"></label>
+
+            <label>Zone
+              <select id="qZone">
+                <option>Général</option>
+                <option>Rachis</option>
+                <option>Bassin</option>
+                <option>Membres supérieurs</option>
+                <option>Membres inférieurs</option>
+              </select>
+            </label>
+
+            <label>Sous-zone
+              <input id="qSubzone" placeholder="Cervicales, Dorsales, Genou…">
+            </label>
+
+            <label>Catégorie
+              <input id="qCategory" placeholder="Sécurité, Technique, Anatomie…">
+            </label>
+
+            <label>Niveau
+              <select id="qLevel">
+                <option>Tous niveaux</option>
+                <option>Débutant</option>
+                <option>Intermédiaire</option>
+                <option>Avancé</option>
+              </select>
+            </label>
+
             <label>Statut
               <select id="qStatus">
                 <option value="brouillon">Brouillon</option>
@@ -208,19 +275,42 @@
         <section class="editor-section">
           <div class="section-title">
             <div>
-              <small>Questions</small>
-              <h3>15 questions</h3>
+              <small>Contenu</small>
+              <h3>Question et réponses</h3>
             </div>
-            <span id="quizFilledCount" class="detail-state">0 / 15 complètes</span>
           </div>
-          <div id="quizQuestionsEditor" class="quiz-questions-editor"></div>
+
+          <div class="quiz-question-grid">
+            <label class="wide">Question
+              <textarea id="qQuestion" placeholder="Écrire la question…"></textarea>
+            </label>
+
+            <label>Réponse A<input id="qAnswerA"></label>
+            <label>Réponse B<input id="qAnswerB"></label>
+            <label>Réponse C<input id="qAnswerC"></label>
+            <label>Réponse D<input id="qAnswerD"></label>
+
+            <label>Bonne réponse
+              <select id="qCorrect">
+                <option value="0">A</option>
+                <option value="1">B</option>
+                <option value="2">C</option>
+                <option value="3">D</option>
+              </select>
+            </label>
+
+            <label class="wide">Explication pédagogique
+              <textarea id="qExplanation" placeholder="Explication affichée après la réponse…"></textarea>
+            </label>
+          </div>
         </section>
 
         <div class="actions sticky-actions">
-          <button class="btn primary" type="submit">Enregistrer le quiz</button>
+          <button class="btn primary" type="submit">Enregistrer la question</button>
           <button class="btn danger" type="button" id="deleteQuizBtn">Supprimer</button>
           <button class="btn" type="button" id="reloadQuizzesBtn">Recharger</button>
         </div>
+
         <div id="quizStatusMessage" class="status" hidden></div>
       </form>
     </section>
@@ -240,6 +330,6 @@
 <script src="osteo-ra-details-data.js"></script>
 <script src="quiz-seed-data.js"></script>
 <script src="backoffice.js"></script>
-<script src="quiz-admin.js"></script>
+<script src="question-bank-admin.js"></script>
 </body>
 </html>

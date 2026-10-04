@@ -336,7 +336,7 @@
 })();
 
 
-/* === V7 · IMAGE PRINCIPALE DANS LA FICHE APPLICATION === */
+/* === V10 · IMAGE D’EN-TÊTE + IMAGE PRINCIPALE SÉPARÉES === */
 (function(){
   'use strict';
 
@@ -349,6 +349,10 @@
   function current(){
     const get=fn('getCurrentTechnique');
     return typeof get==='function' ? get() : null;
+  }
+
+  function headerImage(t){
+    return String((t && (t.headerImage || t.coverImage || t.heroImage)) || '').trim();
   }
 
   function mainImage(t){
@@ -396,29 +400,30 @@
   function showMain(){
     styles();
     const t=current();
-    const src=mainImage(t);
+    const headerSrc=headerImage(t);
+    const mainSrc=mainImage(t);
     const screen=document.getElementById('techniqueDetail');
     if(!screen) return;
 
     const hero=screen.querySelector('.fiche-hero-visual');
     if(hero){
       hero.querySelectorAll('.osteo-hero-main-image').forEach(x=>x.remove());
-      hero.classList.toggle('osteo-has-main-image',!!src);
-      if(src){
+      hero.classList.toggle('osteo-has-main-image',!!headerSrc);
+      if(headerSrc){
         const img=document.createElement('img');
         img.className='osteo-hero-main-image';
-        img.src=src;
-        img.alt=t?.title || 'Image principale';
+        img.src=headerSrc;
+        img.alt=t?.title || 'Image d’en-tête';
         img.onclick=()=>{
           const open=fn('openStepImage');
-          if(typeof open==='function') open(src,'Image principale');
+          if(typeof open==='function') open(headerSrc,'Image d’en-tête');
         };
         hero.prepend(img);
       }
     }
 
     let panel=document.getElementById('osteoCentralMainImagePanel');
-    if(!src){
+    if(!mainSrc){
       if(panel) panel.remove();
       return;
     }
@@ -438,11 +443,11 @@
       </button>
     `;
     const img=panel.querySelector('img');
-    img.src=src;
+    img.src=mainSrc;
     img.alt=t?.title || 'Image principale';
     panel.querySelector('button').onclick=()=>{
       const open=fn('openStepImage');
-      if(typeof open==='function') open(src,'Image principale');
+      if(typeof open==='function') open(mainSrc,'Image principale');
     };
   }
 
@@ -503,17 +508,203 @@
 })();
 
 
-/* === V8 · QUIZ CENTRAL INDÉPENDANT ===
-   Charge le quiz publié "general" depuis public.osteo_quizzes.
-   Si Supabase est indisponible, les 15 questions locales d'Ostéo RA restent utilisées.
-*/
+/* === V9 · BANQUE DE QUESTIONS + SOUS-MENU TESTER === */
 (function(){
   'use strict';
 
-  const QUIZ_TABLE='osteo_quizzes';
+  const TABLE='osteo_quiz_questions';
+  const SESSION_SIZE=15;
+  const ZONES=[
+    'Rachis',
+    'Bassin',
+    'Membres supérieurs',
+    'Membres inférieurs'
+  ];
 
-  function config(){
-    return window.OSTEO_SUPABASE || {};
+  let bank=[];
+  let sessionMode='Général';
+  let originalGo=null;
+  let directQuizNavigation=false;
+
+  function fn(name){
+    try{ if(typeof window[name]==='function') return window[name]; }catch(_){}
+    try{ return eval('typeof '+name+'==="function"?'+name+':null'); }catch(_){}
+    return null;
+  }
+
+  function shuffle(arr){
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function toLegacyQuestion(q,index){
+    return {
+      id:q.code || `bank_${index+1}`,
+      category:q.category || q.zone || 'Général',
+      question:q.question,
+      answers:Array.isArray(q.answers)?q.answers.slice(0,4):[],
+      correct:Number(q.correct)||0,
+      explanation:q.explanation || ''
+    };
+  }
+
+  function zoneCount(zone){
+    return bank.filter(q=>q.zone===zone).length;
+  }
+
+  function buildMenu(){
+    if(document.getElementById('quizMenu')) return;
+
+    const menu=document.createElement('section');
+    menu.id='quizMenu';
+    menu.className='screen quiz-menu-screen';
+    menu.innerHTML=`
+      <header class="top">
+        <button class="icon round" data-quiz-menu-back>‹</button>
+        <div class="brand">
+          <h1 class="logo">Tester</h1>
+          <p class="subtitle">Choisir un quiz</p>
+        </div>
+        <button class="icon" data-quiz-menu-refresh>↻</button>
+      </header>
+
+      <div class="quiz-menu-title">
+        <h1>Tester mes acquis</h1>
+        <p>15 questions par session · banque centralisée</p>
+      </div>
+
+      <div class="quiz-menu-grid">
+        <button class="quiz-menu-card general" data-quiz-mode="Général">
+          <span class="quiz-menu-icon">★</span>
+          <strong>Quiz général</strong>
+          <small>15 questions mélangées sur l’ensemble des zones.</small>
+          <em id="quizMenuCountGeneral">${bank.length}</em>
+        </button>
+
+        <button class="quiz-menu-card rachis" data-quiz-mode="Rachis">
+          <span class="quiz-menu-icon">R</span>
+          <strong>Rachis</strong>
+          <small>Cervicales · Dorsales · Lombaires</small>
+          <em id="quizMenuCountRachis">${zoneCount('Rachis')}</em>
+        </button>
+
+        <button class="quiz-menu-card bassin" data-quiz-mode="Bassin">
+          <span class="quiz-menu-icon">B</span>
+          <strong>Bassin</strong>
+          <small>Ilium · Sacrum · Symphyse</small>
+          <em id="quizMenuCountBassin">${zoneCount('Bassin')}</em>
+        </button>
+
+        <button class="quiz-menu-card msup" data-quiz-mode="Membres supérieurs">
+          <span class="quiz-menu-icon">MS</span>
+          <strong>Membre supérieur</strong>
+          <small>Épaule · Coude · Poignet · Main</small>
+          <em id="quizMenuCountMSup">${zoneCount('Membres supérieurs')}</em>
+        </button>
+
+        <button class="quiz-menu-card minf" data-quiz-mode="Membres inférieurs">
+          <span class="quiz-menu-icon">MI</span>
+          <strong>Membre inférieur</strong>
+          <small>Hanche · Genou · Cheville · Pied</small>
+          <em id="quizMenuCountMInf">${zoneCount('Membres inférieurs')}</em>
+        </button>
+      </div>
+
+      <article class="quiz-menu-info">
+        <strong>Principe</strong>
+        <p>Chaque test tire 15 questions différentes dans la banque. Plus la banque contient de questions, plus les sessions varient.</p>
+      </article>
+    `;
+
+    const app=document.querySelector('.app') || document.body;
+    const quiz=document.getElementById('quiz');
+    if(quiz?.parentNode) quiz.parentNode.insertBefore(menu,quiz);
+    else app.appendChild(menu);
+
+    const style=document.createElement('style');
+    style.id='quizMenuStylesV9';
+    style.textContent=`
+      .quiz-menu-title{
+        margin:12px 0 14px;padding:18px;border-radius:24px;text-align:center;
+        border:1px solid rgba(0,229,255,.20);
+        background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.90));
+      }
+      .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}
+      .quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
+      .quiz-menu-grid{display:grid;gap:12px}
+      .quiz-menu-card{
+        position:relative;min-height:104px;padding:14px 56px 14px 76px;
+        border-radius:22px;text-align:left;border:1px solid currentColor;
+        background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));
+        box-shadow:0 0 20px color-mix(in srgb,currentColor 16%,transparent);
+      }
+      .quiz-menu-card.general{color:#ffb020}
+      .quiz-menu-card.rachis{color:#00e5ff}
+      .quiz-menu-card.bassin{color:#ff9f43}
+      .quiz-menu-card.msup{color:#a855ff}
+      .quiz-menu-card.minf{color:#00e6a7}
+      .quiz-menu-icon{
+        position:absolute;left:14px;top:50%;transform:translateY(-50%);
+        width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+        border:1px solid currentColor;background:color-mix(in srgb,currentColor 10%,transparent);
+        font-weight:950;
+      }
+      .quiz-menu-card strong{display:block;color:#fff;font-size:18px}
+      .quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}
+      .quiz-menu-card em{
+        position:absolute;right:14px;top:50%;transform:translateY(-50%);
+        width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+        font-style:normal;border:1px solid currentColor;font-weight:950;
+      }
+      .quiz-menu-card.disabled{opacity:.45;filter:saturate(.6)}
+      .quiz-menu-info{
+        margin-top:14px;padding:14px;border-radius:20px;
+        border:1px solid rgba(255,255,255,.10);
+        background:rgba(255,255,255,.035);
+      }
+      .quiz-menu-info strong{color:#fff}
+      .quiz-menu-info p{margin:6px 0 0;color:#aeb8cc;font-size:12px;line-height:1.35}
+    `;
+    document.head.appendChild(style);
+
+    menu.querySelector('[data-quiz-menu-back]').onclick=()=>{
+      originalGo ? originalGo('home') : fn('go')?.('home');
+    };
+
+    menu.querySelector('[data-quiz-menu-refresh]').onclick=()=>{
+      loadBank().then(updateMenuCounts);
+    };
+
+    menu.querySelectorAll('[data-quiz-mode]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const mode=btn.dataset.quizMode;
+        startSession(mode);
+      });
+    });
+  }
+
+  function updateMenuCounts(){
+    const mapping={
+      quizMenuCountGeneral:bank.length,
+      quizMenuCountRachis:zoneCount('Rachis'),
+      quizMenuCountBassin:zoneCount('Bassin'),
+      quizMenuCountMSup:zoneCount('Membres supérieurs'),
+      quizMenuCountMInf:zoneCount('Membres inférieurs')
+    };
+    Object.entries(mapping).forEach(([id,count])=>{
+      const el=document.getElementById(id);
+      if(el) el.textContent=String(count);
+    });
+
+    document.querySelectorAll('[data-quiz-mode]').forEach(btn=>{
+      const mode=btn.dataset.quizMode;
+      const available=mode==='Général' ? bank.length : zoneCount(mode);
+      btn.classList.toggle('disabled',available<SESSION_SIZE);
+    });
   }
 
   async function ensureConfig(){
@@ -525,71 +716,207 @@
       s.onerror=resolve;
       document.head.appendChild(s);
     });
-    return config();
+    return window.OSTEO_SUPABASE||null;
   }
 
-  function validConfig(c){
-    return c && c.url && c.anonKey &&
-      !String(c.url).includes('VOTRE-PROJET') &&
-      !String(c.anonKey).includes('VOTRE_CLE');
-  }
-
-  async function loadPublishedGeneralQuiz(){
-    const c=await ensureConfig();
-    if(!validConfig(c)) return false;
+  async function loadBank(){
+    const cfg=await ensureConfig();
+    if(!cfg?.url || !cfg?.anonKey) return false;
 
     try{
-      const url=c.url.replace(/\/$/,'')+
-        '/rest/v1/'+QUIZ_TABLE+
-        '?select=slug,title,zone,status,questions&slug=eq.general&status=eq.publie&limit=1';
+      const url=cfg.url.replace(/\/$/,'')+
+        '/rest/v1/'+TABLE+
+        '?select=id,code,zone,subzone,category,level,question,answers,correct,explanation,status&status=eq.publie&order=id.asc';
 
       const response=await fetch(url,{
         headers:{
-          apikey:c.anonKey,
-          Authorization:'Bearer '+c.anonKey,
+          apikey:cfg.anonKey,
+          Authorization:'Bearer '+cfg.anonKey,
           Accept:'application/json'
         },
         cache:'no-store'
       });
 
       if(!response.ok) return false;
+
       const data=await response.json();
-      const row=Array.isArray(data)?data[0]:null;
-      const questions=row?.questions;
-
-      if(!Array.isArray(questions) || questions.length!==15) return false;
-
-      // generalQuizQuestions est déclaré en const dans Ostéo RA :
-      // on ne le réassigne pas, on remplace son contenu.
-      try{
-        if(typeof generalQuizQuestions!=='undefined' && Array.isArray(generalQuizQuestions)){
-          generalQuizQuestions.splice(0,generalQuizQuestions.length,...questions);
-          if(typeof generalQuizIndex!=='undefined') generalQuizIndex=0;
-          if(typeof generalQuizScore!=='undefined') generalQuizScore=0;
-          if(typeof generalQuizAnswered!=='undefined') generalQuizAnswered=false;
-          if(typeof renderGeneralQuiz==='function') renderGeneralQuiz();
-        }
-      }catch(error){
-        console.warn('[Ostéo Pratik] Quiz central chargé mais non injecté.',error);
-        return false;
-      }
-
-      window.OSTEO_QUIZ_CURRENT=row;
-      window.dispatchEvent(new CustomEvent('osteo-quiz-loaded',{
-        detail:{slug:row.slug,count:questions.length}
-      }));
+      bank=Array.isArray(data)?data:[];
+      updateMenuCounts();
+      window.OSTEO_QUESTION_BANK=bank;
       return true;
     }catch(error){
-      console.warn('[Ostéo Pratik] Quiz central indisponible, quiz local conservé.',error);
+      console.warn('[Ostéo Pratik] Banque de questions indisponible.',error);
       return false;
     }
   }
 
-  window.OsteoQuizCentral={reload:loadPublishedGeneralQuiz};
+  function balancedGeneralSession(){
+    const byZone=Object.fromEntries(ZONES.map(z=>[z,shuffle(bank.filter(q=>q.zone===z))]));
+    const counts=[4,4,4,3];
 
-  loadPublishedGeneralQuiz();
-  document.addEventListener('DOMContentLoaded',loadPublishedGeneralQuiz,{once:true});
+    // L'extra de 4 tourne aléatoirement pour ne pas favoriser toujours la même zone.
+    const rotated=shuffle(ZONES);
+    const picked=[];
+
+    rotated.forEach((zone,index)=>{
+      const wanted=counts[index];
+      picked.push(...byZone[zone].slice(0,wanted));
+      byZone[zone]=byZone[zone].slice(wanted);
+    });
+
+    if(picked.length<SESSION_SIZE){
+      const general=shuffle(bank.filter(q=>q.zone==='Général' && !picked.includes(q)));
+      picked.push(...general.slice(0,SESSION_SIZE-picked.length));
+    }
+
+    if(picked.length<SESSION_SIZE){
+      const remaining=shuffle(bank.filter(q=>!picked.includes(q)));
+      picked.push(...remaining.slice(0,SESSION_SIZE-picked.length));
+    }
+
+    // Si la banque ne contient encore que les 15 questions générales,
+    // elles constituent naturellement le Quiz général.
+    if(picked.length<SESSION_SIZE){
+      return shuffle(bank).slice(0,SESSION_SIZE);
+    }
+
+    return shuffle(picked.slice(0,SESSION_SIZE));
+  }
+
+  function sessionFor(mode){
+    if(mode==='Général') return balancedGeneralSession();
+    return shuffle(bank.filter(q=>q.zone===mode)).slice(0,SESSION_SIZE);
+  }
+
+  function setQuizTitle(mode){
+    const title=document.querySelector('#quiz .quiz-general-title h1');
+    const subtitle=document.querySelector('#quiz .quiz-general-title p');
+    if(title) title.textContent=mode==='Général'?'Quiz général':`Quiz ${mode}`;
+    if(subtitle) subtitle.textContent=`${SESSION_SIZE} questions · ${mode}`;
+    const back=document.querySelector('#quiz .top .icon.round');
+    if(back) back.onclick=()=>window.showQuizMenuV9();
+  }
+
+  function injectSession(questions){
+    try{
+      if(typeof generalQuizQuestions==='undefined' || !Array.isArray(generalQuizQuestions)) return false;
+      const legacy=questions.map(toLegacyQuestion);
+      generalQuizQuestions.splice(0,generalQuizQuestions.length,...legacy);
+      return true;
+    }catch(error){
+      console.warn('[Ostéo Pratik] Injection du quiz impossible.',error);
+      return false;
+    }
+  }
+
+  function startSession(mode){
+    const available=mode==='Général' ? bank.length : zoneCount(mode);
+
+    if(available<SESSION_SIZE){
+      const toastFn=fn('toast');
+      if(typeof toastFn==='function'){
+        toastFn(`Il faut au moins ${SESSION_SIZE} questions publiées pour ${mode}.`);
+      }
+      return;
+    }
+
+    const questions=sessionFor(mode);
+    if(questions.length<SESSION_SIZE) return;
+    if(!injectSession(questions)) return;
+
+    sessionMode=mode;
+
+    try{
+      generalQuizIndex=0;
+      generalQuizScore=0;
+      generalQuizAnswered=false;
+    }catch(_){}
+
+    setQuizTitle(mode);
+
+    directQuizNavigation=true;
+    originalGo('quiz');
+    directQuizNavigation=false;
+
+    const restart=fn('restartGeneralQuiz');
+    if(typeof restart==='function') restart();
+
+    window.dispatchEvent(new CustomEvent('osteo-quiz-session-start',{
+      detail:{mode,count:questions.length}
+    }));
+  }
+
+  function installGoWrapper(){
+    const current=fn('go');
+    if(typeof current!=='function') return false;
+    if(current.__osteoQuizMenuV9){
+      originalGo=current.__osteoOriginalGo;
+      return true;
+    }
+
+    originalGo=current;
+
+    const wrapped=function(id){
+      if(id==='quiz' && !directQuizNavigation){
+        return originalGo('quizMenu');
+      }
+      return originalGo.apply(this,arguments);
+    };
+
+    wrapped.__osteoQuizMenuV9=true;
+    wrapped.__osteoOriginalGo=originalGo;
+
+    try{
+      go=wrapped;
+      window.go=wrapped;
+      return true;
+    }catch(_){
+      return false;
+    }
+  }
+
+  function wrapFinish(){
+    const original=fn('finishGeneralQuiz');
+    if(typeof original!=='function' || original.__osteoBankFinishV9) return;
+
+    const wrapped=function(){
+      const r=original.apply(this,arguments);
+      try{
+        const raw=localStorage.getItem('osteoPratikLastQuiz');
+        const data=raw?JSON.parse(raw):{};
+        data.category=sessionMode;
+        data.mode=sessionMode;
+        localStorage.setItem('osteoPratikLastQuiz',JSON.stringify(data));
+      }catch(_){}
+      return r;
+    };
+
+    wrapped.__osteoBankFinishV9=true;
+    try{
+      finishGeneralQuiz=wrapped;
+      window.finishGeneralQuiz=wrapped;
+    }catch(_){}
+  }
+
+  window.showQuizMenuV9=function(){
+    if(!originalGo) installGoWrapper();
+    if(originalGo) originalGo('quizMenu');
+    updateMenuCounts();
+  };
+
+  window.startQuizSessionV9=startSession;
+
+  async function install(){
+    buildMenu();
+    installGoWrapper();
+    wrapFinish();
+    await loadBank();
+    updateMenuCounts();
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
   document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible') loadPublishedGeneralQuiz();
+    if(document.visibilityState==='visible') loadBank();
   });
 })();

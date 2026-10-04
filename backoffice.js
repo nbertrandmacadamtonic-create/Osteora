@@ -56,7 +56,8 @@
     const photos=(Array.isArray(d.steps)?d.steps:[]).filter(s=>String(s?.photo||'').trim()).length;
     const plates=(Array.isArray(d.images)?d.images:[]).filter(Boolean).length;
     const main=String(first(item,['image','imageUrl','poster'],'')).trim()?1:0;
-    return main+photos+plates;
+    const header=String(first(item,['headerImage','coverImage','heroImage'],'')).trim()?1:0;
+    return header+main+photos+plates;
   }
 
   function canonical(item){
@@ -69,6 +70,7 @@
       status: first(item,['status','statut','publication']),
       icon: first(item,['icon']),
       video: first(item,['videoUrl','video','vimeoUrl','directVimeo']),
+      headerImage: first(item,['headerImage','coverImage','heroImage']),
       image: first(item,['image','imageUrl','poster']),
       text: first(item,['text','texte','description','techniqueText']),
       quiz: first(item,['quiz','quizText','associatedQuiz']),
@@ -95,6 +97,7 @@
       setAliased(target,['videoUrl','video','vimeoUrl','directVimeo'],patch.video,'videoUrl');
       if(String(patch.video||'').includes('vimeo')) target.videoProvider='vimeo';
     }
+    if('headerImage' in patch) setAliased(target,['headerImage','coverImage','heroImage'],patch.headerImage,'headerImage');
     if('image' in patch) setAliased(target,['image','imageUrl','poster'],patch.image,'image');
     if('text' in patch) setAliased(target,['text','texte','description','techniqueText'],patch.text,'text');
     if('quiz' in patch) setAliased(target,['quiz','quizText','associatedQuiz'],patch.quiz,'quiz');
@@ -113,6 +116,7 @@
       icon:item.icon||'•',
       videoProvider:String(item.video||'').includes('vimeo')?'vimeo':'',
       videoUrl:item.video||'',
+      headerImage:item.headerImage||'',
       image:item.image||'',
       text:item.text||'',
       quiz:item.quiz||'',
@@ -228,6 +232,21 @@
     }
 
     return url;
+  }
+
+  function chooseHeaderImage(){
+    const input=$('fHeaderImageFile');
+    input.value='';
+    input.click();
+  }
+
+  async function handleHeaderImageFile(){
+    const input=$('fHeaderImageFile');
+    const file=input.files?.[0];
+    const url=await uploadImageFile(file,'header',$('headerUploadState'));
+    if(!url) return;
+    $('fHeaderImage').value=url;
+    renderImagePreviews();
   }
 
   function chooseMainImage(){
@@ -370,6 +389,7 @@
     $('fStatus').value=x.status;
     $('fIcon').value=x.icon;
     $('fVideo').value=x.video;
+    $('fHeaderImage').value=x.headerImage;
     $('fImage').value=x.image;
     $('fText').value=x.text;
     $('fQuiz').value=x.quiz;
@@ -409,6 +429,7 @@
       status:$('fStatus').value.trim(),
       icon:$('fIcon').value.trim(),
       video:$('fVideo').value.trim(),
+      headerImage:$('fHeaderImage').value.trim(),
       image:$('fImage').value.trim(),
       text:$('fText').value,
       quiz:$('fQuiz').value,
@@ -501,6 +522,9 @@
   }
 
   function renderImagePreviews(){
+    const header=safeImageSrc($('fHeaderImage').value);
+    $('headerImagePreview').innerHTML=header?`<img src="${escapeHtml(header)}" alt="Image d’en-tête">`:'';
+
     const main=safeImageSrc($('fImage').value);
     $('mainImagePreview').innerHTML=main?`<img src="${escapeHtml(main)}" alt="Image principale">`:'';
 
@@ -820,6 +844,9 @@
   $('seedBtn').addEventListener('click',seedCentral);
   $('detailsSyncBtn').addEventListener('click',syncDetailedSheets);
   $('addStepBtn').addEventListener('click',addStep);
+  $('fHeaderImage').addEventListener('input',renderImagePreviews);
+  $('uploadHeaderImageBtn').addEventListener('click',chooseHeaderImage);
+  $('fHeaderImageFile').addEventListener('change',handleHeaderImageFile);
   $('fImage').addEventListener('input',renderImagePreviews);
   $('uploadMainImageBtn').addEventListener('click',chooseMainImage);
   $('fImageFile').addEventListener('change',handleMainImageFile);
