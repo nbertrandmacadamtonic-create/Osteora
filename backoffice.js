@@ -767,6 +767,7 @@
 
   function updateAuthUi(){
     const logged=!!currentUser;
+    window.dispatchEvent(new CustomEvent('osteo-backoffice-auth',{detail:{user:currentUser,logged}}));
     $('loginBtn').hidden=logged;
     $('logoutBtn').hidden=!logged;
     $('adminEmail').hidden=logged;
@@ -794,6 +795,7 @@
     client=window.supabase.createClient(c.url,c.anonKey,{
       auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
     });
+    window.OSTEO_BACKOFFICE_CLIENT=client;
 
     const { data:{ session } }=await client.auth.getSession();
     currentUser=session?.user||null;

@@ -501,3 +501,95 @@
   });
   setTimeout(install,500);
 })();
+
+
+/* === V8 · QUIZ CENTRAL INDÉPENDANT ===
+   Charge le quiz publié "general" depuis public.osteo_quizzes.
+   Si Supabase est indisponible, les 15 questions locales d'Ostéo RA restent utilisées.
+*/
+(function(){
+  'use strict';
+
+  const QUIZ_TABLE='osteo_quizzes';
+
+  function config(){
+    return window.OSTEO_SUPABASE || {};
+  }
+
+  async function ensureConfig(){
+    if(window.OSTEO_SUPABASE) return window.OSTEO_SUPABASE;
+    await new Promise(resolve=>{
+      const s=document.createElement('script');
+      s.src='supabase-config.js';
+      s.onload=resolve;
+      s.onerror=resolve;
+      document.head.appendChild(s);
+    });
+    return config();
+  }
+
+  function validConfig(c){
+    return c && c.url && c.anonKey &&
+      !String(c.url).includes('VOTRE-PROJET') &&
+      !String(c.anonKey).includes('VOTRE_CLE');
+  }
+
+  async function loadPublishedGeneralQuiz(){
+    const c=await ensureConfig();
+    if(!validConfig(c)) return false;
+
+    try{
+      const url=c.url.replace(/\/$/,'')+
+        '/rest/v1/'+QUIZ_TABLE+
+        '?select=slug,title,zone,status,questions&slug=eq.general&status=eq.publie&limit=1';
+
+      const response=await fetch(url,{
+        headers:{
+          apikey:c.anonKey,
+          Authorization:'Bearer '+c.anonKey,
+          Accept:'application/json'
+        },
+        cache:'no-store'
+      });
+
+      if(!response.ok) return false;
+      const data=await response.json();
+      const row=Array.isArray(data)?data[0]:null;
+      const questions=row?.questions;
+
+      if(!Array.isArray(questions) || questions.length!==15) return false;
+
+      // generalQuizQuestions est déclaré en const dans Ostéo RA :
+      // on ne le réassigne pas, on remplace son contenu.
+      try{
+        if(typeof generalQuizQuestions!=='undefined' && Array.isArray(generalQuizQuestions)){
+          generalQuizQuestions.splice(0,generalQuizQuestions.length,...questions);
+          if(typeof generalQuizIndex!=='undefined') generalQuizIndex=0;
+          if(typeof generalQuizScore!=='undefined') generalQuizScore=0;
+          if(typeof generalQuizAnswered!=='undefined') generalQuizAnswered=false;
+          if(typeof renderGeneralQuiz==='function') renderGeneralQuiz();
+        }
+      }catch(error){
+        console.warn('[Ostéo Pratik] Quiz central chargé mais non injecté.',error);
+        return false;
+      }
+
+      window.OSTEO_QUIZ_CURRENT=row;
+      window.dispatchEvent(new CustomEvent('osteo-quiz-loaded',{
+        detail:{slug:row.slug,count:questions.length}
+      }));
+      return true;
+    }catch(error){
+      console.warn('[Ostéo Pratik] Quiz central indisponible, quiz local conservé.',error);
+      return false;
+    }
+  }
+
+  window.OsteoQuizCentral={reload:loadPublishedGeneralQuiz};
+
+  loadPublishedGeneralQuiz();
+  document.addEventListener('DOMContentLoaded',loadPublishedGeneralQuiz,{once:true});
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') loadPublishedGeneralQuiz();
+  });
+})();

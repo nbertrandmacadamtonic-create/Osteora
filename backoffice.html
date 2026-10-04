@@ -31,6 +31,12 @@
     </div>
   </section>
 
+
+  <nav class="workspace-tabs" aria-label="Sections du back-office">
+    <button type="button" class="workspace-tab active" id="techniquesTabBtn">Techniques</button>
+    <button type="button" class="workspace-tab" id="quizzesTabBtn">Quiz · 15 questions</button>
+  </nav>
+
   <section class="panel techniques-panel">
     <div class="panel-head">
       <h1>Techniques</h1>
@@ -84,9 +90,7 @@
           <label class="wide">Texte libre de la technique
             <textarea id="fText" placeholder="Note complémentaire, description libre…"></textarea>
           </label>
-          <label class="wide">Quiz associé
-            <textarea id="fQuiz" placeholder="Question, réponses ou référence quiz…"></textarea>
-          </label>
+          <textarea id="fQuiz" hidden></textarea>
         </div>
       </section>
 
@@ -150,6 +154,78 @@
       <div id="status" class="status" hidden></div>
     </form>
   </section>
+
+  <section id="quizWorkspace" class="quiz-workspace" hidden>
+    <section class="panel quiz-list-panel">
+      <div class="panel-head">
+        <h1>Quiz</h1>
+        <p id="quizCount">Base indépendante · chargement…</p>
+      </div>
+      <div class="toolbar">
+        <input id="quizSearch" type="search" placeholder="Rechercher un quiz…" autocomplete="off">
+        <button class="btn green" id="newQuizBtn" type="button">+ Nouveau quiz</button>
+      </div>
+      <div class="quiz-seed-box" id="quizSeedBox" hidden>
+        <strong>Quiz général actuel</strong>
+        <span>Importer les 15 questions déjà présentes dans Ostéo RA.</span>
+        <button type="button" class="btn detail-sync" id="seedQuizBtn">Initialiser avec les 15 questions actuelles</button>
+      </div>
+      <div id="quizList" class="list"></div>
+    </section>
+
+    <section class="panel quiz-editor-panel">
+      <div class="panel-head">
+        <h2>Éditeur de quiz</h2>
+        <p>Cette base est indépendante des techniques. Chaque quiz contient exactement 15 questions.</p>
+      </div>
+
+      <div id="quizEditorEmpty" class="empty">Sélectionnez un quiz à gauche.</div>
+
+      <form id="quizEditor" class="quiz-editor" hidden>
+        <section class="editor-section">
+          <div class="section-title">
+            <div>
+              <small>Quiz indépendant</small>
+              <h3>Informations générales</h3>
+            </div>
+            <span id="quizValidationState" class="detail-state">15 questions requises</span>
+          </div>
+
+          <div class="grid">
+            <label>ID<input id="qId" readonly></label>
+            <label>Identifiant / slug<input id="qSlug" placeholder="general, rachis, bassin…"></label>
+            <label class="wide">Titre<input id="qTitle" required placeholder="Quiz général"></label>
+            <label>Zone / thème<input id="qZone" placeholder="Général, Rachis, Bassin…"></label>
+            <label>Statut
+              <select id="qStatus">
+                <option value="brouillon">Brouillon</option>
+                <option value="publie">Publié</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="editor-section">
+          <div class="section-title">
+            <div>
+              <small>Questions</small>
+              <h3>15 questions</h3>
+            </div>
+            <span id="quizFilledCount" class="detail-state">0 / 15 complètes</span>
+          </div>
+          <div id="quizQuestionsEditor" class="quiz-questions-editor"></div>
+        </section>
+
+        <div class="actions sticky-actions">
+          <button class="btn primary" type="submit">Enregistrer le quiz</button>
+          <button class="btn danger" type="button" id="deleteQuizBtn">Supprimer</button>
+          <button class="btn" type="button" id="reloadQuizzesBtn">Recharger</button>
+        </div>
+        <div id="quizStatusMessage" class="status" hidden></div>
+      </form>
+    </section>
+  </section>
+
 </main>
 
 <datalist id="zones">
@@ -162,6 +238,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="osteo-ra-details-data.js"></script>
+<script src="quiz-seed-data.js"></script>
 <script src="backoffice.js"></script>
+<script src="quiz-admin.js"></script>
 </body>
 </html>
