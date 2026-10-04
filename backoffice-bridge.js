@@ -334,3 +334,170 @@
   link.href = "responsive-web.css";
   document.head.appendChild(link);
 })();
+
+
+/* === V7 · IMAGE PRINCIPALE DANS LA FICHE APPLICATION === */
+(function(){
+  'use strict';
+
+  function fn(name){
+    try{ if(typeof window[name]==='function') return window[name]; }catch(_){}
+    try{ return eval('typeof '+name+'==="function"?'+name+':null'); }catch(_){}
+    return null;
+  }
+
+  function current(){
+    const get=fn('getCurrentTechnique');
+    return typeof get==='function' ? get() : null;
+  }
+
+  function mainImage(t){
+    return String((t && (t.image || t.imageUrl || t.poster)) || '').trim();
+  }
+
+  function styles(){
+    if(document.getElementById('osteoCentralImageStyles')) return;
+    const s=document.createElement('style');
+    s.id='osteoCentralImageStyles';
+    s.textContent=`
+      .osteo-central-main-image{
+        margin:14px 0 18px;padding:10px;border-radius:22px;
+        border:1px solid rgba(0,229,255,.22);
+        background:linear-gradient(145deg,rgba(10,29,55,.88),rgba(5,15,31,.94));
+        box-shadow:0 14px 42px rgba(0,0,0,.24);
+      }
+      .osteo-central-main-image small{
+        display:block;margin:0 0 8px;color:#8fa7c7;font-size:11px;
+        font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+      }
+      .osteo-central-main-image button{
+        display:block;width:100%;padding:0;border:0;background:transparent;
+        border-radius:16px;overflow:hidden;cursor:pointer;
+      }
+      .osteo-central-main-image img{
+        display:block;width:100%;max-height:360px;object-fit:contain;
+        border-radius:16px;background:#020714;
+      }
+      .fiche-hero-visual.osteo-has-main-image{
+        overflow:hidden;padding:0 !important;
+      }
+      .fiche-hero-visual.osteo-has-main-image > .osteo-hero-main-image{
+        width:100%;height:100%;min-height:180px;object-fit:cover;
+        display:block;border-radius:inherit;cursor:pointer;
+      }
+      .fiche-hero-visual.osteo-has-main-image .fiche-side-badge,
+      .fiche-hero-visual.osteo-has-main-image .fiche-foot-glow{
+        display:none !important;
+      }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function showMain(){
+    styles();
+    const t=current();
+    const src=mainImage(t);
+    const screen=document.getElementById('techniqueDetail');
+    if(!screen) return;
+
+    const hero=screen.querySelector('.fiche-hero-visual');
+    if(hero){
+      hero.querySelectorAll('.osteo-hero-main-image').forEach(x=>x.remove());
+      hero.classList.toggle('osteo-has-main-image',!!src);
+      if(src){
+        const img=document.createElement('img');
+        img.className='osteo-hero-main-image';
+        img.src=src;
+        img.alt=t?.title || 'Image principale';
+        img.onclick=()=>{
+          const open=fn('openStepImage');
+          if(typeof open==='function') open(src,'Image principale');
+        };
+        hero.prepend(img);
+      }
+    }
+
+    let panel=document.getElementById('osteoCentralMainImagePanel');
+    if(!src){
+      if(panel) panel.remove();
+      return;
+    }
+
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='osteoCentralMainImagePanel';
+      panel.className='osteo-central-main-image';
+      const timeline=document.getElementById('ficheTimeline');
+      if(timeline?.parentNode) timeline.parentNode.insertBefore(panel,timeline);
+    }
+
+    panel.innerHTML=`
+      <small>Image principale</small>
+      <button type="button" aria-label="Agrandir l’image principale">
+        <img alt="">
+      </button>
+    `;
+    const img=panel.querySelector('img');
+    img.src=src;
+    img.alt=t?.title || 'Image principale';
+    panel.querySelector('button').onclick=()=>{
+      const open=fn('openStepImage');
+      if(typeof open==='function') open(src,'Image principale');
+    };
+  }
+
+  function wrapRender(){
+    const original=fn('renderTechniqueDetail');
+    if(typeof original!=='function' || original.__osteoV7MainImage) return;
+    const wrapped=function(){
+      const r=original.apply(this,arguments);
+      setTimeout(showMain,0);
+      return r;
+    };
+    wrapped.__osteoV7MainImage=true;
+    wrapped.__osteoOriginal=original;
+    try{
+      renderTechniqueDetail=wrapped;
+      window.renderTechniqueDetail=wrapped;
+    }catch(_){}
+  }
+
+  function wrapImagesButton(){
+    const original=fn('openTechniqueImagesPage');
+    if(typeof original!=='function' || original.__osteoV7ImagesButton) return;
+    const wrapped=function(){
+      const r=original.apply(this,arguments);
+      setTimeout(()=>{
+        showMain();
+        const p=document.getElementById('osteoCentralMainImagePanel');
+        if(p) p.scrollIntoView({behavior:'smooth',block:'start'});
+        else{
+          const open=fn('openFichePlancheComplete');
+          if(typeof open==='function') open();
+        }
+      },100);
+      return r;
+    };
+    wrapped.__osteoV7ImagesButton=true;
+    wrapped.__osteoOriginal=original;
+    try{
+      openTechniqueImagesPage=wrapped;
+      window.openTechniqueImagesPage=wrapped;
+    }catch(_){}
+  }
+
+  function install(){
+    styles();
+    wrapRender();
+    wrapImagesButton();
+    showMain();
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(install,30));
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') setTimeout(install,20);
+  });
+  setTimeout(install,500);
+})();

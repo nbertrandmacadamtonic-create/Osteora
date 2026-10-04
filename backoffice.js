@@ -656,6 +656,28 @@
     await loadCentral();
   }
 
+
+  function getEmbeddedOsteoRADetail(item){
+    const pack=window.OSTEO_RA_EMBEDDED_DETAILS || {};
+    const byId=pack.byTechniqueId || {};
+    const byRow=pack.bySourceRow || {};
+    const id=String(Number(item?.id||0));
+    const sourceRow=String(Number(item?.videoSourceRow||0));
+
+    if(byId[id] && hasDetail(byId[id])) return clone(byId[id]);
+    if(sourceRow !== '0' && byRow[sourceRow] && hasDetail(byRow[sourceRow])) return clone(byRow[sourceRow]);
+    return null;
+  }
+
+  function buildEmbeddedDetailSnapshot(){
+    return rows.map(item=>{
+      const copy=clone(item);
+      const detail=getEmbeddedOsteoRADetail(item);
+      if(detail) copy.detail=detail;
+      return copy;
+    }).filter(item=>hasDetail(item.detail));
+  }
+
   async function syncDetailedSheets(){
     if(!(await requireAdmin())) return;
     if(!rows.length){ showStatus('La base centrale est vide.'); return; }
@@ -667,10 +689,18 @@
     if(!ok) return;
 
     setCloud('Lecture des fiches détaillées d’Ostéo RA…');
-    const snapshot=await ensureSnapshot(LOCAL_DETAIL_SNAPSHOT_KEY,'force');
+
+    let snapshot=buildEmbeddedDetailSnapshot();
+
+    // Repli de sécurité vers l’ancien mécanisme si le fichier V7
+    // n’a pas été déposé sur GitHub.
+    if(!snapshot.length){
+      snapshot=await ensureSnapshot(LOCAL_DETAIL_SNAPSHOT_KEY,'force');
+    }
+
     if(!snapshot.length){
       setCloud('Impossible de lire les fiches détaillées.', 'warn');
-      showStatus('Aucune fiche détaillée n’a pu être récupérée depuis l’application.');
+      showStatus('Aucune fiche détaillée récupérée. Vérifiez que osteo-ra-details-data.js est présent à la racine GitHub.');
       return;
     }
 
@@ -712,7 +742,7 @@
     const detailed=rows.filter(x=>hasDetail(x.detail)).length;
     const images=rows.reduce((n,x)=>n+imageCount(x),0);
     setCloud(`${rows.length} techniques synchronisées · ${detailed} fiches détaillées.`, 'ok');
-    showStatus(`${detailed} fiches détaillées disponibles dans le back-office · ${images} images référencées.`);
+    showStatus(`${detailed} fiches détaillées disponibles dans le back-office · ${images} images référencées. L’image principale est visible dans la fiche technique de l’application.`);
     render();
     if(selectedId) openEditor(selectedId);
   }
