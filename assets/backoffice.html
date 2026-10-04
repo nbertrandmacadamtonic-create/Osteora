@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Ostéo Pratik — Back-office</title>
+  <link rel="stylesheet" href="backoffice.css">
+</head>
+<body>
+<header>
+  <div class="brand">Ostéo <span>Pratik</span> · Back-office</div>
+  <div class="spacer"></div>
+  <span id="cloudState" class="cloud-state">☁ Configuration requise</span>
+  <a class="topbtn" href="index.html">← Application</a>
+</header>
+
+<main>
+  <section class="cloud-panel">
+    <div class="cloud-copy">
+      <strong>Base centrale</strong>
+      <span id="cloudMessage">Configuration Supabase à compléter.</span>
+      <span id="storageMessage" class="storage-message">🖼 Storage images : vérification après connexion.</span>
+    </div>
+    <div class="cloud-actions">
+      <input id="adminEmail" type="email" placeholder="E-mail administrateur" autocomplete="username">
+      <input id="adminPassword" type="password" placeholder="Mot de passe" autocomplete="current-password">
+      <button class="btn primary" id="loginBtn" type="button">Se connecter</button>
+      <button class="btn" id="logoutBtn" type="button" hidden>Se déconnecter</button>
+      <button class="btn green" id="seedBtn" type="button" hidden>Initialiser la base depuis Ostéo RA</button>
+      <button class="btn detail-sync" id="detailsSyncBtn" type="button" hidden>↻ Importer / actualiser les fiches détaillées depuis Ostéo RA</button>
+      <button class="btn pdf-import" id="pdfImportBtn" type="button" hidden>＋ Importer les 2 techniques PDF</button>
+    </div>
+  </section>
+
+
+  <nav class="workspace-tabs" aria-label="Sections du back-office">
+    <button type="button" class="workspace-tab active" id="techniquesTabBtn">Techniques</button>
+    <button type="button" class="workspace-tab" id="quizzesTabBtn">Quiz</button>
+  </nav>
+
+  <section class="panel techniques-panel">
+    <div class="panel-head">
+      <h1>Techniques</h1>
+      <p id="count">Chargement…</p>
+    </div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Rechercher une technique…" autocomplete="off">
+      <button class="btn green" id="newBtn">+ Ajouter</button>
+    </div>
+    <div id="bootWarning" class="warning" hidden>Lecture d’Ostéo RA en arrière-plan pour récupérer le catalogue, les fiches détaillées et les images associées.</div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <section class="panel editor-panel">
+    <div class="panel-head">
+      <h2>Éditeur</h2>
+      <p>Titre, vidéo, fiche technique détaillée, étapes et images sont enregistrés dans la base centrale.</p>
+    </div>
+
+    <div id="editorEmpty" class="empty">Sélectionnez une technique à gauche.</div>
+
+    <form id="editor" class="editor" hidden>
+      <section class="editor-section">
+        <div class="section-title">
+          <div>
+            <small>Technique</small>
+            <h3>Informations générales</h3>
+          </div>
+        </div>
+
+        <div class="grid">
+          <label>ID<input id="fId" readonly></label>
+          <label>Icône<input id="fIcon" placeholder="C7, EM, ◉…"></label>
+          <label class="wide">Titre<input id="fTitle" required></label>
+          <label>Zone / monde<input id="fZone" list="zones"></label>
+          <label>Sous-zone / région<input id="fSub"></label>
+          <label>Niveau<input id="fLevel"></label>
+          <label>Statut<input id="fStatus" placeholder="non vue / publiée / brouillon…"></label>
+          <label class="wide">Lien Vimeo / vidéo<input id="fVideo" type="url" placeholder="https://vimeo.com/…"></label>
+
+          <div class="image-role-card wide">
+            <div class="image-role-head">
+              <div>
+                <strong>Image d’en-tête</strong>
+                <span>Visuel affiché tout en haut de la fiche technique.</span>
+              </div>
+              <span class="image-role-tag">COUVERTURE</span>
+            </div>
+            <label class="wide">Chemin / URL de l’image d’en-tête
+              <input id="fHeaderImage" placeholder="https://… ou assets/images/…">
+            </label>
+            <div class="upload-bar wide">
+              <input id="fHeaderImageFile" class="native-file-input" type="file" accept="image/*">
+              <label for="fHeaderImageFile" class="btn storage-upload" id="uploadHeaderImageBtn">☁ Téléverser l’image d’en-tête</label>
+              <span id="headerUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+            </div>
+            <div id="headerImagePreview" class="image-preview wide"></div>
+          </div>
+
+          <div class="image-role-card wide">
+            <div class="image-role-head">
+              <div>
+                <strong>Image principale de la technique</strong>
+                <span>Image pédagogique affichée dans le contenu de la fiche, avant les étapes.</span>
+              </div>
+              <span class="image-role-tag main">CONTENU</span>
+            </div>
+            <label class="wide">Chemin / URL de l’image principale
+              <input id="fImage" placeholder="https://… ou assets/images/…">
+            </label>
+            <div class="upload-bar wide">
+              <input id="fImageFile" type="file" accept="image/*" hidden>
+              <button type="button" class="btn storage-upload" id="uploadMainImageBtn">☁ Téléverser l’image principale</button>
+              <span id="mainUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
+            </div>
+            <div id="mainImagePreview" class="image-preview wide"></div>
+          </div>
+
+          <label class="wide">Texte libre de la technique
+            <textarea id="fText" placeholder="Note complémentaire, description libre…"></textarea>
+          </label>
+          <textarea id="fQuiz" hidden></textarea>
+        </div>
+      </section>
+
+      <section class="editor-section detail-section">
+        <div class="section-title">
+          <div>
+            <small>Application · Technique détaillée</small>
+            <h3>Fiche technique complète</h3>
+          </div>
+          <span id="detailState" class="detail-state">À compléter</span>
+        </div>
+
+        <div class="grid">
+          <label>Source
+            <input id="fDetailSource" placeholder="OSTPRA…">
+          </label>
+          <label>Catégorie
+            <input id="fDetailCategory" placeholder="Rachis – cervicales…">
+          </label>
+          <label>Méthode
+            <input id="fDetailMethod" placeholder="Thrust, Énergie musculaire…">
+          </label>
+          <label class="wide">Introduction / résumé
+            <textarea id="fDetailIntro" class="short-textarea" placeholder="Résumé affiché en tête de fiche…"></textarea>
+          </label>
+        </div>
+
+        <div class="detail-subtabs" aria-label="Sous-sections de la fiche détaillée">
+          <button type="button" class="detail-subtab active" data-detail-tab="steps">Étapes</button>
+          <button type="button" class="detail-subtab" data-detail-tab="planches">Planches</button>
+        </div>
+
+        <div id="detailTabSteps" class="detail-tab-pane active">
+          <div class="subsection-head">
+            <div>
+              <strong>Étapes de la fiche</strong>
+              <span>Position, mains, barrière motrice, normalisation…</span>
+            </div>
+            <button type="button" class="btn green compact" id="addStepBtn">+ Ajouter une étape</button>
+          </div>
+
+          <div id="detailStepsEditor" class="detail-steps"></div>
+        </div>
+
+        <div id="detailTabPlanches" class="detail-tab-pane">
+          <div class="subsection-head images-head">
+            <div>
+              <strong>Planches associées</strong>
+              <span>Planche 1 = image d’en-tête · Planche 2 = image principale de la technique.</span>
+            </div>
+            <button type="button" class="btn compact" id="applyPlanchesBtn">Appliquer 1 → entête · 2 → principale</button>
+          </div>
+          <div class="planche-tip">Conseil : pour les fiches PDF importées, laissez les 2 premières planches comme référence visuelle complète de la technique.</div>
+          <div class="upload-bar wide">
+            <input id="fGalleryFiles" type="file" accept="image/*" multiple hidden>
+            <button type="button" class="btn storage-upload" id="uploadGalleryBtn">☁ Ajouter des planches au Storage</button>
+            <span id="galleryUploadState" class="upload-state">Sélection multiple possible · maximum 10 Mo par image</span>
+          </div>
+          <label class="wide">Liste des planches
+            <textarea id="fDetailImages" class="images-textarea" placeholder="https://…supabase.co/storage/v1/object/public/…&#10;assets/imported-techniques/…"></textarea>
+          </label>
+          <div id="detailImagesPreview" class="gallery-preview"></div>
+        </div>
+      </section>
+
+      <div class="actions sticky-actions">
+        <button class="btn primary" type="submit">Enregistrer dans Supabase</button>
+        <button class="btn danger" type="button" id="deleteBtn">Supprimer</button>
+        <button class="btn" type="button" id="exportBtn">Exporter JSON</button>
+        <button class="btn" type="button" id="resetBtn">Recharger depuis le serveur</button>
+      </div>
+      <div id="status" class="status" hidden></div>
+    </form>
+  </section>
+
+  
+    <section id="quizWorkspace" class="quiz-workspace quiz-workspace-v11" hidden>
+    <div class="quiz-subtabs">
+      <button type="button" class="quiz-subtab active" id="quizSetsSubTab">Mes quiz</button>
+      <button type="button" class="quiz-subtab" id="questionBankSubTab">Banque de questions</button>
+    </div>
+
+    <section id="quizSetsView" class="quiz-subview">
+      <section class="panel quiz-list-panel">
+        <div class="panel-head">
+          <h1>Mes quiz</h1>
+          <p id="quizSetCount">Chargement…</p>
+        </div>
+        <div class="toolbar">
+          <input id="quizSetSearch" type="search" placeholder="Rechercher un quiz…" autocomplete="off">
+          <button class="btn green" id="newQuizSetBtn" type="button">+ Nouveau quiz</button>
+        </div>
+        <div id="quizSetList" class="list"></div>
+      </section>
+
+      <section class="panel quiz-editor-panel">
+        <div class="panel-head">
+          <h2>Éditeur de quiz</h2>
+          <p>Un quiz tire automatiquement 15 questions dans la banque selon son filtre.</p>
+        </div>
+        <div id="quizSetEditorEmpty" class="empty">Sélectionnez un quiz à gauche ou créez-en un nouveau.</div>
+        <form id="quizSetEditor" class="quiz-editor" hidden>
+          <section class="editor-section">
+            <div class="section-title">
+              <div>
+                <small>Quiz</small>
+                <h3>Définition du quiz</h3>
+              </div>
+              <span id="quizSetAvailability" class="detail-state">0 question disponible</span>
+            </div>
+            <div class="grid">
+              <label>ID<input id="qsId" readonly></label>
+              <label>Identifiant / slug<input id="qsSlug" placeholder="cervicales"></label>
+              <label class="wide">Titre<input id="qsTitle" placeholder="Quiz Cervicales"></label>
+              <label>Type
+                <select id="qsKind">
+                  <option value="general">Général</option>
+                  <option value="zone">Zone</option>
+                  <option value="subzone">Sous-zone</option>
+                </select>
+              </label>
+              <label>Zone
+                <select id="qsZone">
+                  <option value="">Toutes</option>
+                  <option>Rachis</option>
+                  <option>Bassin</option>
+                  <option>Membres supérieurs</option>
+                  <option>Membres inférieurs</option>
+                </select>
+              </label>
+              <label>Sous-zone<input id="qsSubzone" placeholder="Cervicales, Dorsales, Genou…"></label>
+              <label>Nombre de questions<input value="15" readonly></label>
+              <label>Statut
+                <select id="qsStatus">
+                  <option value="brouillon">Brouillon</option>
+                  <option value="publie">Publié</option>
+                </select>
+              </label>
+              <label>Ordre<input id="qsPosition" type="number" min="0" step="10" value="100"></label>
+            </div>
+            <div class="quiz-set-help">
+              <strong>Comment ça fonctionne ?</strong>
+              <span>Général = toute la banque · Zone = une grande zone · Sous-zone = une zone précise comme Cervicales ou Genou.</span>
+            </div>
+          </section>
+          <div class="actions sticky-actions">
+            <button class="btn primary" type="submit">Enregistrer le quiz</button>
+            <button class="btn danger" type="button" id="deleteQuizSetBtn">Supprimer</button>
+            <button class="btn" type="button" id="reloadQuizSetsBtn">Recharger</button>
+          </div>
+          <div id="quizSetStatusMessage" class="status" hidden></div>
+        </form>
+      </section>
+    </section>
+
+    <section id="questionBankView" class="quiz-subview" hidden>
+      <section class="panel quiz-list-panel">
+        <div class="panel-head">
+          <h1>Banque de questions</h1>
+          <p id="quizCount">Base indépendante · chargement…</p>
+        </div>
+        <div class="toolbar">
+          <input id="quizSearch" type="search" placeholder="Rechercher une question…" autocomplete="off">
+          <select id="quizZoneFilter">
+            <option value="">Toutes les zones</option>
+            <option>Général</option>
+            <option>Rachis</option>
+            <option>Bassin</option>
+            <option>Membres supérieurs</option>
+            <option>Membres inférieurs</option>
+          </select>
+          <button class="btn green" id="newQuizBtn" type="button">+ Nouvelle question</button>
+        </div>
+        <div class="quiz-seed-box" id="quizSeedBox" hidden>
+          <strong>15 questions actuelles d’Ostéo RA</strong>
+          <span>Les importer dans la banque comme questions générales publiées.</span>
+          <button type="button" class="btn detail-sync" id="seedQuizBtn">Importer les 15 questions actuelles</button>
+        </div>
+        <div class="question-bank-stats" id="questionBankStats"></div>
+        <div id="quizList" class="list"></div>
+      </section>
+
+      <section class="panel quiz-editor-panel">
+        <div class="panel-head">
+          <h2>Éditeur de question</h2>
+          <p>Les quiz tirent 15 questions depuis cette banque.</p>
+        </div>
+        <div id="quizEditorEmpty" class="empty">Sélectionnez une question à gauche.</div>
+        <form id="quizEditor" class="quiz-editor" hidden>
+          <section class="editor-section">
+            <div class="section-title">
+              <div><small>Question indépendante</small><h3>Classement pédagogique</h3></div>
+              <span id="quizValidationState" class="detail-state">À compléter</span>
+            </div>
+            <div class="grid">
+              <label>ID<input id="qId" readonly></label>
+              <label>Code<input id="qSlug" placeholder="rachis-cervicales-001"></label>
+              <label>Zone
+                <select id="qZone">
+                  <option>Général</option><option>Rachis</option><option>Bassin</option>
+                  <option>Membres supérieurs</option><option>Membres inférieurs</option>
+                </select>
+              </label>
+              <label>Sous-zone<input id="qSubzone" placeholder="Cervicales, Dorsales, Genou…"></label>
+              <label>Catégorie<input id="qCategory" placeholder="Sécurité, Technique, Anatomie…"></label>
+              <label>Niveau
+                <select id="qLevel">
+                  <option>Tous niveaux</option><option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
+                </select>
+              </label>
+              <label>Statut
+                <select id="qStatus"><option value="brouillon">Brouillon</option><option value="publie">Publié</option></select>
+              </label>
+            </div>
+          </section>
+          <section class="editor-section">
+            <div class="section-title"><div><small>Contenu</small><h3>Question et réponses</h3></div></div>
+            <div class="quiz-question-grid">
+              <label class="wide">Question<textarea id="qQuestion" placeholder="Écrire la question…"></textarea></label>
+              <label>Réponse A<input id="qAnswerA"></label>
+              <label>Réponse B<input id="qAnswerB"></label>
+              <label>Réponse C<input id="qAnswerC"></label>
+              <label>Réponse D<input id="qAnswerD"></label>
+              <label>Bonne réponse
+                <select id="qCorrect"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+              </label>
+              <label class="wide">Explication pédagogique<textarea id="qExplanation" placeholder="Explication affichée après la réponse…"></textarea></label>
+            </div>
+          </section>
+          <div class="actions sticky-actions">
+            <button class="btn primary" type="submit">Enregistrer la question</button>
+            <button class="btn danger" type="button" id="deleteQuizBtn">Supprimer</button>
+            <button class="btn" type="button" id="reloadQuizzesBtn">Recharger</button>
+          </div>
+          <div id="quizStatusMessage" class="status" hidden></div>
+        </form>
+      </section>
+    </section>
+  </section>
+
+</main>
+
+<datalist id="zones">
+  <option value="Rachis">
+  <option value="Bassin">
+  <option value="Membres supérieurs">
+  <option value="Membres inférieurs">
+</datalist>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="osteo-ra-details-data.js"></script>
+<script src="quiz-seed-data.js"></script>
+<script src="backoffice.js?v=12"></script>
+<script src="quiz-admin-v11.js?v=11"></script>
+</body>
+</html>
