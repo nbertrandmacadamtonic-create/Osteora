@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Ostéo Pratik — Back-office</title>
+  <link rel="stylesheet" href="backoffice.css">
+</head>
+<body>
+<header>
+  <div class="brand">Ostéo <span>Pratik</span> · Back-office</div>
+  <div class="spacer"></div>
+  <a class="topbtn" href="index.html">← Application</a>
+</header>
+<main>
+  <section class="panel">
+    <div class="panel-head">
+      <h1>Techniques</h1>
+      <p id="count">Chargement…</p>
+    </div>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="Rechercher une technique…" autocomplete="off">
+      <button class="btn green" id="newBtn">+ Ajouter</button>
+    </div>
+    <div id="bootWarning" class="warning" hidden>Initialisation de la base Ostéo RA… L'application s'ouvre brièvement en arrière-plan pour récupérer le catalogue sans modifier son code.</div>
+    <div id="list" class="list"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Éditeur</h2>
+      <p>Les modifications sont appliquées par la couche back-office, sans réécrire app.js ni styles.css.</p>
+    </div>
+    <div id="editorEmpty" class="empty">Sélectionnez une technique à gauche.</div>
+    <form id="editor" class="editor" hidden>
+      <div class="grid">
+        <label>ID<input id="fId" readonly></label>
+        <label>Icône<input id="fIcon" placeholder="C7, EM, ◉…"></label>
+        <label class="wide">Titre<input id="fTitle" required></label>
+        <label>Zone / monde<input id="fZone" list="zones"></label>
+        <label>Sous-zone / région<input id="fSub"></label>
+        <label>Niveau<input id="fLevel"></label>
+        <label>Statut<input id="fStatus" placeholder="non vue / publiée / brouillon…"></label>
+        <label class="wide">Lien Vimeo / vidéo<input id="fVideo" type="url" placeholder="https://vimeo.com/…"></label>
+        <label class="wide">Image / chemin image<input id="fImage" placeholder="assets/images/…"></label>
+        <label class="wide">Texte de la technique<textarea id="fText" placeholder="Description, étapes, repères…"></textarea></label>
+        <label class="wide">Quiz associé<textarea id="fQuiz" placeholder="Question, réponses ou référence quiz…"></textarea></label>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="submit">Enregistrer</button>
+        <button class="btn danger" type="button" id="deleteBtn">Supprimer</button>
+        <button class="btn" type="button" id="exportBtn">Exporter JSON</button>
+        <button class="btn" type="button" id="resetBtn">Annuler toutes les modifications</button>
+      </div>
+      <div id="status" class="status" hidden></div>
+    </form>
+  </section>
+</main>
+<datalist id="zones">
+  <option value="Rachis"><option value="Bassin"><option value="Membres supérieurs"><option value="Membres inférieurs">
+</datalist>
+<script src="backoffice.js"></script>
+</body>
+</html>
