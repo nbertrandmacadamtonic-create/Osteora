@@ -89,8 +89,8 @@
               <input id="fHeaderImage" placeholder="https://… ou assets/images/…">
             </label>
             <div class="upload-bar wide">
-              <input id="fHeaderImageFile" type="file" accept="image/*" hidden>
-              <button type="button" class="btn storage-upload" id="uploadHeaderImageBtn">☁ Téléverser l’image d’en-tête</button>
+              <input id="fHeaderImageFile" class="native-file-input" type="file" accept="image/*">
+              <label for="fHeaderImageFile" class="btn storage-upload" id="uploadHeaderImageBtn">☁ Téléverser l’image d’en-tête</label>
               <span id="headerUploadState" class="upload-state">PNG, JPG, WEBP… maximum 10 Mo</span>
             </div>
             <div id="headerImagePreview" class="image-preview wide"></div>
@@ -329,7 +329,7 @@
 <script src="supabase-config.js"></script>
 <script src="osteo-ra-details-data.js"></script>
 <script src="quiz-seed-data.js"></script>
-<script src="backoffice.js"></script>
-<script src="question-bank-admin.js"></script>
+<script src="backoffice.js?v=10.1"></script>
+<script src="question-bank-admin.js?v=10.1"></script>
 </body>
 </html>

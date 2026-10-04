@@ -235,18 +235,50 @@
   }
 
   function chooseHeaderImage(){
+    // V10.1 : le sélecteur est ouvert nativement par <label for="fHeaderImageFile">.
+    // Cette fonction reste uniquement pour compatibilité avec une ancienne page mise en cache.
     const input=$('fHeaderImageFile');
+    if(!input) return;
     input.value='';
-    input.click();
+    try{ input.click(); }catch(_){}
   }
 
   async function handleHeaderImageFile(){
     const input=$('fHeaderImageFile');
-    const file=input.files?.[0];
-    const url=await uploadImageFile(file,'header',$('headerUploadState'));
-    if(!url) return;
-    $('fHeaderImage').value=url;
-    renderImagePreviews();
+    const state=$('headerUploadState');
+    const file=input?.files?.[0];
+
+    if(!file){
+      if(state){
+        state.textContent='Aucune image sélectionnée.';
+        state.className='upload-state';
+      }
+      return;
+    }
+
+    try{
+      if(state){
+        state.textContent='Préparation du téléversement…';
+        state.className='upload-state';
+      }
+
+      const url=await uploadImageFile(file,'header',state);
+      if(!url) return;
+
+      $('fHeaderImage').value=url;
+      renderImagePreviews();
+
+      if(state){
+        state.textContent='Image d’en-tête téléversée · cliquez maintenant sur « Enregistrer dans Supabase ».';
+        state.className='upload-state ok';
+      }
+    }catch(error){
+      console.error('[Ostéo Pratik] Erreur upload image d’en-tête',error);
+      if(state){
+        state.textContent='Erreur : '+(error?.message || 'téléversement impossible');
+        state.className='upload-state error';
+      }
+    }
   }
 
   function chooseMainImage(){
@@ -845,7 +877,7 @@
   $('detailsSyncBtn').addEventListener('click',syncDetailedSheets);
   $('addStepBtn').addEventListener('click',addStep);
   $('fHeaderImage').addEventListener('input',renderImagePreviews);
-  $('uploadHeaderImageBtn').addEventListener('click',chooseHeaderImage);
+  // Le label HTML ouvre directement le sélecteur de fichiers.
   $('fHeaderImageFile').addEventListener('change',handleHeaderImageFile);
   $('fImage').addEventListener('input',renderImagePreviews);
   $('uploadMainImageBtn').addEventListener('click',chooseMainImage);
