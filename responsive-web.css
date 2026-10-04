@@ -1,0 +1,73 @@
+
+/* Ostéo RA / Ostéo Pratik — couche responsive non destructive
+   Mobile : aucune modification de la mise en page historique.
+   Ordinateur/tablette : l'application reste centrée et cadrée sans étirer
+   les écrans anatomiques conçus pour le format mobile.
+*/
+
+@media (min-width: 700px) {
+  html, body {
+    width: 100%;
+    min-height: 100%;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(0,229,255,.12), transparent 34%),
+      radial-gradient(circle at 12% 70%, rgba(168,85,255,.08), transparent 30%),
+      linear-gradient(135deg,#020714,#061a33 50%,#020714) !important;
+  }
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: hidden !important;
+  }
+
+  .app {
+    width: 430px !important;
+    max-width: 430px !important;
+    height: 100dvh !important;
+    margin: 0 auto !important;
+    border-left: 1px solid rgba(170,205,225,.15);
+    border-right: 1px solid rgba(170,205,225,.15);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.02),
+      0 0 80px rgba(0,0,0,.55),
+      0 0 42px rgba(0,229,255,.07);
+  }
+
+  /* La barre basse reste exactement alignée avec le cadre de l'application. */
+  .bottom {
+    left: 50% !important;
+    right: auto !important;
+    width: 410px !important;
+    max-width: calc(100vw - 20px) !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .toast {
+    left: 50% !important;
+    right: auto !important;
+    width: 394px !important;
+    max-width: calc(100vw - 36px) !important;
+    transform: translate(-50%, 18px) !important;
+  }
+
+  .toast.show {
+    transform: translate(-50%, 0) !important;
+  }
+}
+
+/* Tablette étroite : on conserve le format mobile plein écran. */
+@media (min-width: 700px) and (max-width: 899px) {
+  .app {
+    box-shadow: 0 0 60px rgba(0,0,0,.48);
+  }
+}
+
+/* Grand écran : cadre un peu plus présent, sans toucher à l'architecture interne. */
+@media (min-width: 1200px) {
+  .app {
+    border-left-color: rgba(0,229,255,.16);
+    border-right-color: rgba(0,229,255,.16);
+  }
+}

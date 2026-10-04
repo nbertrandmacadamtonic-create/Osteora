@@ -1,168 +1,125 @@
 /*
-  Ostéo RA — Back-office bridge V1
-  Couche additive : ne modifie ni app.js ni styles.css.
-  Elle lit les modifications du back-office dans localStorage et les applique
-  en mémoire au tableau `techniques` déjà chargé par Ostéo RA.
+  Ostéo RA / Ostéo Pratik — Bridge central Supabase V4
+  - app.js et styles.css restent intacts.
+  - charge la configuration Supabase dynamiquement.
+  - lit la base centrale publique et remplace uniquement le tableau de données
+    en mémoire, sans réécrire le moteur de l'application.
+  - en cas de problème réseau/configuration, le catalogue original reste utilisable.
 */
-(function () {
+(function(){
   'use strict';
 
-  const KEYS = {
-    snapshot: 'osteoRA.backoffice.snapshot.v1',
-    patches: 'osteoRA.backoffice.patches.v1',
-    additions: 'osteoRA.backoffice.additions.v1',
-    deleted: 'osteoRA.backoffice.deleted.v1'
-  };
+  const CONFIG_SRC='supabase-config.js';
+  const TABLE='osteo_techniques';
+  const LOCAL_SNAPSHOT_KEY='osteoRA.backoffice.snapshot.v1';
 
-  function clone(value) {
-    try { return structuredClone(value); }
-    catch (_) { return JSON.parse(JSON.stringify(value)); }
+  function clone(v){
+    try{return structuredClone(v);}
+    catch(_){return JSON.parse(JSON.stringify(v));}
   }
 
-  function read(key, fallback) {
-    try {
-      const raw = localStorage.getItem(key);
-      return raw ? JSON.parse(raw) : fallback;
-    } catch (_) {
-      return fallback;
-    }
-  }
-
-  function write(key, value) {
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch (_) {}
-  }
-
-  function getTechniques() {
-    try {
-      if (typeof techniques !== 'undefined' && Array.isArray(techniques)) return techniques;
-    } catch (_) {}
-    try {
-      if (Array.isArray(window.techniques)) return window.techniques;
-    } catch (_) {}
+  function getTechniques(){
+    try{
+      if(typeof techniques!=='undefined' && Array.isArray(techniques)) return techniques;
+    }catch(_){}
+    try{
+      if(Array.isArray(window.techniques)) return window.techniques;
+    }catch(_){}
     return null;
   }
 
-  function setAliased(target, aliases, value, preferred) {
-    let touched = false;
-    aliases.forEach((key) => {
-      if (Object.prototype.hasOwnProperty.call(target, key)) {
-        target[key] = value;
-        touched = true;
+  function refreshKnownViews(){
+    [
+      'renderTechniques','renderSeenCollections','renderRevisionWheel',
+      'renderCatalogueSearch','updateHomeCount','updateCatalogueCounts',
+      'updateProgressZoneStats'
+    ].forEach(name=>{
+      try{
+        const fn=window[name]||eval('typeof '+name+'==="function"?'+name+':null');
+        if(typeof fn==='function') fn();
+      }catch(_){}
+    });
+  }
+
+  function saveOriginalSnapshot(){
+    const list=getTechniques();
+    if(!list) return;
+    try{
+      if(!localStorage.getItem(LOCAL_SNAPSHOT_KEY)){
+        localStorage.setItem(LOCAL_SNAPSHOT_KEY,JSON.stringify(clone(list)));
       }
-    });
-    if (!touched && preferred) target[preferred] = value;
+    }catch(_){}
   }
 
-  function applyCanonicalPatch(target, patch) {
-    if (!target || !patch) return;
-
-    if ('title' in patch) setAliased(target, ['title', 'titre'], patch.title, 'title');
-    if ('zone' in patch) setAliased(target, ['zone', 'monde'], patch.zone, 'zone');
-    if ('sub' in patch) setAliased(target, ['sub', 'region'], patch.sub, 'sub');
-    if ('level' in patch) setAliased(target, ['level', 'niveau'], patch.level, 'level');
-    if ('status' in patch) setAliased(target, ['status', 'statut'], patch.status, 'status');
-    if ('icon' in patch) setAliased(target, ['icon'], patch.icon, 'icon');
-    if ('image' in patch) setAliased(target, ['image', 'imageUrl', 'poster'], patch.image, 'image');
-    if ('text' in patch) setAliased(target, ['text', 'texte', 'description', 'techniqueText'], patch.text, 'text');
-    if ('quiz' in patch) setAliased(target, ['quiz', 'quizText', 'associatedQuiz'], patch.quiz, 'quiz');
-
-    if ('video' in patch) {
-      setAliased(target, ['videoUrl', 'video', 'vimeoUrl', 'directVimeo'], patch.video, 'videoUrl');
-      if (String(patch.video || '').includes('vimeo')) target.videoProvider = 'vimeo';
-    }
-
-    if ('published' in patch) {
-      if (Object.prototype.hasOwnProperty.call(target, 'published')) target.published = !!patch.published;
-      if (Object.prototype.hasOwnProperty.call(target, 'statut')) target.statut = patch.published ? 'publie' : 'brouillon';
-    }
-  }
-
-  function canonicalToNative(item) {
-    const obj = {
-      id: Number(item.id),
-      title: item.title || 'Nouvelle technique',
-      zone: item.zone || 'À classer',
-      sub: item.sub || 'À classer',
-      level: item.level || 'Tous niveaux',
-      status: item.status || 'non vue',
-      percent: 0,
-      icon: item.icon || '•',
-      videoProvider: String(item.video || '').includes('vimeo') ? 'vimeo' : '',
-      videoUrl: item.video || '',
-      image: item.image || '',
-      text: item.text || '',
-      quiz: item.quiz || ''
-    };
-    return obj;
-  }
-
-  function refreshKnownViews() {
-    const names = [
-      'renderTechniques', 'renderSeenCollections', 'renderRevisionWheel',
-      'updateHomeCount', 'updateCatalogueCounts', 'updateProgressZoneStats'
-    ];
-    names.forEach((name) => {
-      try {
-        const fn = window[name] || eval('typeof ' + name + ' === "function" ? ' + name + ' : null');
-        if (typeof fn === 'function') fn();
-      } catch (_) {}
+  function loadConfig(){
+    return new Promise(resolve=>{
+      if(window.OSTEO_SUPABASE){resolve(window.OSTEO_SUPABASE);return;}
+      const script=document.createElement('script');
+      script.src=CONFIG_SRC;
+      script.onload=()=>resolve(window.OSTEO_SUPABASE||null);
+      script.onerror=()=>resolve(null);
+      document.head.appendChild(script);
     });
   }
 
-  function applyAll() {
-    const list = getTechniques();
-    if (!list) return false;
-
-    if (!localStorage.getItem(KEYS.snapshot)) {
-      write(KEYS.snapshot, clone(list));
-    }
-
-    const patches = read(KEYS.patches, {});
-    const deleted = new Set(read(KEYS.deleted, []).map(Number));
-    const additions = read(KEYS.additions, []);
-
-    // Suppressions administratives.
-    for (let i = list.length - 1; i >= 0; i--) {
-      if (deleted.has(Number(list[i] && list[i].id))) list.splice(i, 1);
-    }
-
-    // Modifications sur les techniques existantes.
-    list.forEach((item) => {
-      const patch = patches[String(item.id)] || patches[item.id];
-      if (patch) applyCanonicalPatch(item, patch);
-    });
-
-    // Ajouts créés depuis le back-office.
-    additions.forEach((canonical) => {
-      const id = Number(canonical && canonical.id);
-      if (!id || deleted.has(id) || list.some((x) => Number(x.id) === id)) return;
-      list.push(canonicalToNative(canonical));
-    });
-
-    refreshKnownViews();
-    return true;
+  function configured(c){
+    return c
+      && /^https:\/\/.+\.supabase\.co$/i.test(String(c.url||'').trim())
+      && String(c.anonKey||'').length>20
+      && !String(c.url).includes('VOTRE-PROJET')
+      && !String(c.anonKey).includes('VOTRE_CLE');
   }
 
-  window.OsteoRABackofficeBridge = {
-    keys: KEYS,
-    apply: applyAll,
-    resetAdminEdits: function () {
-      localStorage.removeItem(KEYS.patches);
-      localStorage.removeItem(KEYS.additions);
-      localStorage.removeItem(KEYS.deleted);
-      location.reload();
+  async function loadCentral(){
+    const list=getTechniques();
+    if(!list) return false;
+
+    saveOriginalSnapshot();
+
+    const c=await loadConfig();
+    if(!configured(c)) return false;
+
+    const url=c.url.replace(/\/$/,'')+
+      '/rest/v1/'+TABLE+'?select=id,data&order=id.asc';
+
+    try{
+      const response=await fetch(url,{
+        headers:{
+          apikey:c.anonKey,
+          Authorization:'Bearer '+c.anonKey,
+          Accept:'application/json'
+        },
+        cache:'no-store'
+      });
+      if(!response.ok) throw new Error('HTTP '+response.status);
+      const rows=await response.json();
+      if(!Array.isArray(rows) || !rows.length) return false;
+
+      const remote=rows.map(r=>r&&r.data).filter(Boolean);
+      list.splice(0,list.length,...remote);
+      refreshKnownViews();
+
+      window.dispatchEvent(new CustomEvent('osteo-central-data-loaded',{
+        detail:{count:remote.length}
+      }));
+      return true;
+    }catch(error){
+      console.warn('[Ostéo Pratik] Base centrale indisponible, catalogue local conservé.',error);
+      return false;
     }
+  }
+
+  window.OsteoRACentralBridge={
+    reload:loadCentral
   };
 
-  // Le script est chargé tout en bas de l'index : on tente immédiatement,
-  // puis après DOMContentLoaded pour couvrir toutes les variantes du site.
-  applyAll();
-  document.addEventListener('DOMContentLoaded', applyAll, { once: true });
+  saveOriginalSnapshot();
+  loadCentral();
+  document.addEventListener('DOMContentLoaded',loadCentral,{once:true});
 
-  // Si le back-office est ouvert dans un autre onglet, les changements sont
-  // appliqués sans toucher au code source de l'application.
-  window.addEventListener('storage', function (event) {
-    if (Object.values(KEYS).includes(event.key)) applyAll();
+  // Synchronise aussi quand l'onglet redevient actif après une modification admin.
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') loadCentral();
   });
 })();
 
@@ -252,4 +209,17 @@
   installBackofficeAccess();
   document.addEventListener("DOMContentLoaded", installBackofficeAccess, { once:true });
   setTimeout(installBackofficeAccess, 250);
+})();
+
+
+/* === COUCHE RESPONSIVE WEB ===
+   Charge un CSS séparé sans modifier styles.css ni app.js.
+*/
+(function () {
+  if (document.getElementById("osteoResponsiveWebCss")) return;
+  const link = document.createElement("link");
+  link.id = "osteoResponsiveWebCss";
+  link.rel = "stylesheet";
+  link.href = "responsive-web.css";
+  document.head.appendChild(link);
 })();

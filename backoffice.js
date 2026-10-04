@@ -1,26 +1,39 @@
 (function(){
   'use strict';
 
-  const KEYS = {
-    snapshot: 'osteoRA.backoffice.snapshot.v1',
-    patches: 'osteoRA.backoffice.patches.v1',
-    additions: 'osteoRA.backoffice.additions.v1',
-    deleted: 'osteoRA.backoffice.deleted.v1'
-  };
-
+  const TABLE = 'osteo_techniques';
+  const LOCAL_SNAPSHOT_KEY = 'osteoRA.backoffice.snapshot.v1';
   const $ = (id) => document.getElementById(id);
-  let rows = [];
-  let selectedId = null;
 
-  function read(key, fallback){
-    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
-    catch(_){ return fallback; }
+  let client = null;
+  let rows = [];           // native technique objects from the central database
+  let selectedId = null;
+  let currentUser = null;
+  let isConfigured = false;
+
+  function cfg(){
+    return window.OSTEO_SUPABASE || {};
   }
-  function write(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+
+  function configured(){
+    const c = cfg();
+    return /^https:\/\/.+\.supabase\.co$/i.test(String(c.url || '').trim())
+      && String(c.anonKey || '').length > 20
+      && !String(c.url).includes('VOTRE-PROJET')
+      && !String(c.anonKey).includes('VOTRE_CLE');
+  }
+
+  function setCloud(message, mode=''){
+    $('cloudMessage').textContent = message;
+    $('cloudState').textContent = mode === 'ok' ? '☁ Centralisé' : mode === 'warn' ? '☁ À configurer' : '☁ Connexion';
+    $('cloudState').className = 'cloud-state ' + mode;
+  }
+
   function first(obj, keys, fallback=''){
     for(const k of keys){ if(obj && obj[k] !== undefined && obj[k] !== null) return obj[k]; }
     return fallback;
   }
+
   function canonical(item){
     return {
       id: Number(item.id),
@@ -28,7 +41,7 @@
       zone: first(item,['zone','monde']),
       sub: first(item,['sub','region']),
       level: first(item,['level','niveau']),
-      status: first(item,['status','statut']),
+      status: first(item,['status','statut','publication']),
       icon: first(item,['icon']),
       video: first(item,['videoUrl','video','vimeoUrl','directVimeo']),
       image: first(item,['image','imageUrl','poster']),
@@ -37,23 +50,59 @@
     };
   }
 
-  function mergedData(){
-    const base = read(KEYS.snapshot, []).map(canonical);
-    const patches = read(KEYS.patches, {});
-    const additions = read(KEYS.additions, []).map(canonical);
-    const deleted = new Set(read(KEYS.deleted, []).map(Number));
-    const out = base.filter(x=>!deleted.has(x.id)).map(x=>Object.assign({},x,patches[String(x.id)]||{}));
-    additions.forEach(x=>{
-      if(!deleted.has(x.id) && !out.some(y=>y.id===x.id)) out.push(x);
+  function setAliased(target, aliases, value, preferred){
+    let touched=false;
+    aliases.forEach(k=>{
+      if(Object.prototype.hasOwnProperty.call(target,k)){ target[k]=value; touched=true; }
     });
-    return out.sort((a,b)=>a.id-b.id);
+    if(!touched && preferred) target[preferred]=value;
+  }
+
+  function applyCanonicalPatch(target, patch){
+    if('title' in patch) setAliased(target,['title','titre'],patch.title,'title');
+    if('zone' in patch) setAliased(target,['zone','monde'],patch.zone,'zone');
+    if('sub' in patch) setAliased(target,['sub','region'],patch.sub,'sub');
+    if('level' in patch) setAliased(target,['level','niveau'],patch.level,'level');
+    if('status' in patch){
+      setAliased(target,['status','statut','publication'],patch.status,'status');
+    }
+    if('icon' in patch) setAliased(target,['icon'],patch.icon,'icon');
+    if('video' in patch){
+      setAliased(target,['videoUrl','video','vimeoUrl','directVimeo'],patch.video,'videoUrl');
+      if(String(patch.video||'').includes('vimeo')) target.videoProvider='vimeo';
+    }
+    if('image' in patch) setAliased(target,['image','imageUrl','poster'],patch.image,'image');
+    if('text' in patch) setAliased(target,['text','texte','description','techniqueText'],patch.text,'text');
+    if('quiz' in patch) setAliased(target,['quiz','quizText','associatedQuiz'],patch.quiz,'quiz');
+  }
+
+  function canonicalToNative(item){
+    return {
+      id:Number(item.id),
+      title:item.title||'Nouvelle technique',
+      zone:item.zone||'À classer',
+      sub:item.sub||'À classer',
+      level:item.level||'Tous niveaux',
+      status:item.status||'non vue',
+      percent:0,
+      icon:item.icon||'•',
+      videoProvider:String(item.video||'').includes('vimeo')?'vimeo':'',
+      videoUrl:item.video||'',
+      image:item.image||'',
+      text:item.text||'',
+      quiz:item.quiz||''
+    };
+  }
+
+  function escapeHtml(v){
+    return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
   function render(){
-    rows = mergedData();
+    const canon = rows.map(canonical).sort((a,b)=>a.id-b.id);
     const q = ($('search').value || '').trim().toLowerCase();
-    const filtered = rows.filter(x => !q || [x.title,x.zone,x.sub,String(x.id)].join(' ').toLowerCase().includes(q));
-    $('count').textContent = `${rows.length} techniques · ${rows.filter(x=>x.video).length} avec vidéo`;
+    const filtered = canon.filter(x => !q || [x.title,x.zone,x.sub,String(x.id)].join(' ').toLowerCase().includes(q));
+    $('count').textContent = `${canon.length} techniques · ${canon.filter(x=>x.video).length} avec vidéo`;
     $('list').innerHTML = filtered.map(x=>`
       <button class="item ${x.id===selectedId?'active':''}" data-id="${x.id}">
         <span class="badge">${escapeHtml(x.icon || String(x.id).slice(-2))}</span>
@@ -63,13 +112,10 @@
     document.querySelectorAll('.item').forEach(btn=>btn.addEventListener('click',()=>openEditor(Number(btn.dataset.id))));
   }
 
-  function escapeHtml(v){
-    return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
   function openEditor(id){
-    const x = mergedData().find(t=>t.id===id);
-    if(!x) return;
+    const native = rows.find(t=>Number(t.id)===Number(id));
+    if(!native) return;
+    const x=canonical(native);
     selectedId=id;
     $('editorEmpty').hidden=true;$('editor').hidden=false;
     $('fId').value=x.id;$('fTitle').value=x.title;$('fZone').value=x.zone;$('fSub').value=x.sub;
@@ -88,60 +134,163 @@
     };
   }
 
-  function saveCurrent(e){
-    e.preventDefault();
-    const value=formValue();
-    const baseIds=new Set(read(KEYS.snapshot,[]).map(x=>Number(x.id)));
-    if(baseIds.has(value.id)){
-      const patches=read(KEYS.patches,{});patches[String(value.id)]=value;write(KEYS.patches,patches);
-    }else{
-      const additions=read(KEYS.additions,[]);const i=additions.findIndex(x=>Number(x.id)===value.id);
-      if(i>=0)additions[i]=value;else additions.push(value);write(KEYS.additions,additions);
+  async function requireAdmin(){
+    if(!isConfigured){
+      showStatus('Supabase n’est pas encore configuré.');
+      return false;
     }
-    showStatus('Enregistré. Revenez à l’application : la modification sera appliquée automatiquement.');
+    if(!currentUser){
+      showStatus('Connectez-vous comme administrateur avant de modifier la base.');
+      return false;
+    }
+    return true;
+  }
+
+  async function loadCentral(){
+    if(!isConfigured) return;
+    setCloud('Chargement de la base centrale…');
+    const { data, error } = await client.from(TABLE).select('id,data').order('id', { ascending:true });
+    if(error){
+      setCloud('Erreur de lecture : ' + error.message, 'warn');
+      return;
+    }
+    rows=(data||[]).map(r=>r.data).filter(Boolean);
+    setCloud(`${rows.length} techniques synchronisées sur tous les appareils.`, 'ok');
+    $('seedBtn').hidden = !(currentUser && rows.length===0);
+    render();
+  }
+
+  async function saveCurrent(e){
+    e.preventDefault();
+    if(!(await requireAdmin())) return;
+    const value=formValue();
+    let native=rows.find(t=>Number(t.id)===value.id);
+    if(native){
+      native=JSON.parse(JSON.stringify(native));
+      applyCanonicalPatch(native,value);
+    }else{
+      native=canonicalToNative(value);
+    }
+    const { error }=await client.from(TABLE).upsert({id:value.id,data:native},{onConflict:'id'});
+    if(error){ showStatus('Erreur : '+error.message); return; }
+    const i=rows.findIndex(t=>Number(t.id)===value.id);
+    if(i>=0) rows[i]=native; else rows.push(native);
+    showStatus('Enregistré dans la base centrale. La modification est disponible sur tous les appareils.');
     render();
   }
 
   function addNew(){
-    const all=mergedData();
-    const id=Math.max(0,...all.map(x=>Number(x.id)||0))+1;
-    const additions=read(KEYS.additions,[]);
-    additions.push({id,title:'Nouvelle technique',zone:'À classer',sub:'À classer',level:'Tous niveaux',status:'non vue',icon:'•',video:'',image:'',text:'',quiz:''});
-    write(KEYS.additions,additions);render();openEditor(id);
+    if(!currentUser){ showStatus('Connectez-vous avant d’ajouter une technique.'); return; }
+    const id=Math.max(0,...rows.map(x=>Number(x.id)||0))+1;
+    rows.push(canonicalToNative({id,title:'Nouvelle technique',zone:'À classer',sub:'À classer',level:'Tous niveaux',status:'brouillon',icon:'•',video:'',image:'',text:'',quiz:''}));
+    render();openEditor(id);
   }
 
-  function deleteCurrent(){
-    if(!selectedId || !confirm('Supprimer cette technique du catalogue affiché ?')) return;
-    const ids=new Set(read(KEYS.deleted,[]).map(Number));ids.add(Number(selectedId));write(KEYS.deleted,[...ids]);
+  async function deleteCurrent(){
+    if(!(await requireAdmin())) return;
+    if(!selectedId || !confirm('Supprimer cette technique de la base centrale ?')) return;
+    const { error }=await client.from(TABLE).delete().eq('id',Number(selectedId));
+    if(error){ showStatus('Erreur : '+error.message); return; }
+    rows=rows.filter(x=>Number(x.id)!==Number(selectedId));
     selectedId=null;$('editor').hidden=true;$('editorEmpty').hidden=false;render();
+    showStatus('Technique supprimée de la base centrale.');
   }
 
   function exportJson(){
-    const blob=new Blob([JSON.stringify(mergedData(),null,2)],{type:'application/json'});
-    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='osteo-ra-backoffice-techniques.json';a.click();
+    const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='osteo-pratik-techniques-central.json';a.click();
     setTimeout(()=>URL.revokeObjectURL(a.href),500);
-  }
-
-  function resetAll(){
-    if(!confirm('Annuler toutes les modifications faites dans ce back-office ?')) return;
-    localStorage.removeItem(KEYS.patches);localStorage.removeItem(KEYS.additions);localStorage.removeItem(KEYS.deleted);
-    selectedId=null;$('editor').hidden=true;$('editorEmpty').hidden=false;render();
   }
 
   function showStatus(text){ $('status').textContent=text;$('status').hidden=false; }
 
-  function bootstrapIfNeeded(){
-    if(read(KEYS.snapshot,[]).length){ render(); return; }
+  function readLocalSnapshot(){
+    try{
+      const raw=localStorage.getItem(LOCAL_SNAPSHOT_KEY);
+      return raw?JSON.parse(raw):[];
+    }catch(_){return [];}
+  }
+
+  async function ensureSnapshot(){
+    let snapshot=readLocalSnapshot();
+    if(snapshot.length) return snapshot;
     $('bootWarning').hidden=false;
     const frame=document.createElement('iframe');
     frame.src='index.html?backoffice-bootstrap=1';
     frame.hidden=true;frame.setAttribute('aria-hidden','true');document.body.appendChild(frame);
-    let tries=0;
-    const timer=setInterval(()=>{
-      tries++;
-      if(read(KEYS.snapshot,[]).length){clearInterval(timer);frame.remove();$('bootWarning').hidden=true;render();}
-      else if(tries>30){clearInterval(timer);$('bootWarning').textContent="Impossible d'initialiser automatiquement. Ouvrez d'abord index.html une fois, puis revenez sur backoffice.html.";}
-    },150);
+    for(let i=0;i<40;i++){
+      await new Promise(r=>setTimeout(r,150));
+      snapshot=readLocalSnapshot();
+      if(snapshot.length){ frame.remove();$('bootWarning').hidden=true;return snapshot; }
+    }
+    frame.remove();
+    $('bootWarning').textContent="Impossible de récupérer automatiquement le catalogue Ostéo RA.";
+    return [];
+  }
+
+  async function seedCentral(){
+    if(!(await requireAdmin())) return;
+    const snapshot=await ensureSnapshot();
+    if(!snapshot.length){ showStatus('Aucune donnée locale trouvée pour initialiser la base.'); return; }
+    if(!confirm(`Initialiser la base centrale avec ${snapshot.length} techniques d’Ostéo RA ?`)) return;
+    const payload=snapshot.map(x=>({id:Number(x.id),data:x}));
+    const { error }=await client.from(TABLE).upsert(payload,{onConflict:'id'});
+    if(error){ showStatus('Erreur d’initialisation : '+error.message); return; }
+    showStatus(`Base centrale initialisée avec ${payload.length} techniques.`);
+    await loadCentral();
+  }
+
+  async function login(){
+    if(!isConfigured){ setCloud('Complétez supabase-config.js avant la connexion.', 'warn'); return; }
+    const email=$('adminEmail').value.trim();
+    const password=$('adminPassword').value;
+    if(!email || !password){ setCloud('Saisissez votre e-mail et votre mot de passe.', 'warn'); return; }
+    const { data, error }=await client.auth.signInWithPassword({email,password});
+    if(error){ setCloud('Connexion refusée : '+error.message,'warn'); return; }
+    currentUser=data.user||null;
+    updateAuthUi();
+    await loadCentral();
+  }
+
+  async function logout(){
+    if(client) await client.auth.signOut();
+    currentUser=null;
+    updateAuthUi();
+  }
+
+  function updateAuthUi(){
+    const logged=!!currentUser;
+    $('loginBtn').hidden=logged;
+    $('logoutBtn').hidden=!logged;
+    $('adminEmail').hidden=logged;
+    $('adminPassword').hidden=logged;
+    $('seedBtn').hidden=!(logged && rows.length===0);
+    if(logged) setCloud(`Administrateur connecté : ${currentUser.email||''}`,'ok');
+  }
+
+  async function init(){
+    isConfigured=configured();
+    if(!isConfigured || !window.supabase){
+      setCloud('Complétez supabase-config.js avec la Project URL et la clé publique Supabase.', 'warn');
+      $('count').textContent='Base centrale non configurée';
+      return;
+    }
+
+    const c=cfg();
+    client=window.supabase.createClient(c.url,c.anonKey,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+    });
+
+    const { data:{ session } }=await client.auth.getSession();
+    currentUser=session?.user||null;
+    updateAuthUi();
+
+    client.auth.onAuthStateChange((_event,session)=>{
+      currentUser=session?.user||null;
+      updateAuthUi();
+    });
+
+    await loadCentral();
   }
 
   $('search').addEventListener('input',render);
@@ -149,6 +298,10 @@
   $('editor').addEventListener('submit',saveCurrent);
   $('deleteBtn').addEventListener('click',deleteCurrent);
   $('exportBtn').addEventListener('click',exportJson);
-  $('resetBtn').addEventListener('click',resetAll);
-  bootstrapIfNeeded();
+  $('resetBtn').addEventListener('click',loadCentral);
+  $('loginBtn').addEventListener('click',login);
+  $('logoutBtn').addEventListener('click',logout);
+  $('seedBtn').addEventListener('click',seedCentral);
+
+  init();
 })();

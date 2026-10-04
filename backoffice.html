@@ -10,9 +10,25 @@
 <header>
   <div class="brand">Ostéo <span>Pratik</span> · Back-office</div>
   <div class="spacer"></div>
+  <span id="cloudState" class="cloud-state">☁ Configuration requise</span>
   <a class="topbtn" href="index.html">← Application</a>
 </header>
 <main>
+
+<section class="cloud-panel">
+  <div class="cloud-copy">
+    <strong>Base centrale</strong>
+    <span id="cloudMessage">Configuration Supabase à compléter.</span>
+  </div>
+  <div class="cloud-actions">
+    <input id="adminEmail" type="email" placeholder="E-mail administrateur" autocomplete="username">
+    <input id="adminPassword" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <button class="btn primary" id="loginBtn" type="button">Se connecter</button>
+    <button class="btn" id="logoutBtn" type="button" hidden>Se déconnecter</button>
+    <button class="btn green" id="seedBtn" type="button" hidden>Initialiser la base depuis Ostéo RA</button>
+  </div>
+</section>
+
   <section class="panel">
     <div class="panel-head">
       <h1>Techniques</h1>
@@ -50,7 +66,7 @@
         <button class="btn primary" type="submit">Enregistrer</button>
         <button class="btn danger" type="button" id="deleteBtn">Supprimer</button>
         <button class="btn" type="button" id="exportBtn">Exporter JSON</button>
-        <button class="btn" type="button" id="resetBtn">Annuler toutes les modifications</button>
+        <button class="btn" type="button" id="resetBtn">Recharger depuis le serveur</button>
       </div>
       <div id="status" class="status" hidden></div>
     </form>
@@ -59,6 +75,8 @@
 <datalist id="zones">
   <option value="Rachis"><option value="Bassin"><option value="Membres supérieurs"><option value="Membres inférieurs">
 </datalist>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="backoffice.js"></script>
 </body>
 </html>
