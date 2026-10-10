@@ -33,9 +33,19 @@
   </section>
 
 
-  <nav class="workspace-tabs" aria-label="Sections du back-office">
-    <button type="button" class="workspace-tab active" id="techniquesTabBtn">Techniques</button>
-    <button type="button" class="workspace-tab" id="quizzesTabBtn">Quiz</button>
+  <nav class="workspace-tabs workspace-tabs-v13" aria-label="Sections du back-office">
+    <button type="button" class="workspace-tab active" id="techniquesTabBtn" data-workspace="techniques">
+      <span class="workspace-tab-icon">▱</span><span><strong>Techniques</strong><small>Bibliothèque et fiches</small></span>
+    </button>
+    <button type="button" class="workspace-tab" id="quizzesTabBtn" data-workspace="quiz">
+      <span class="workspace-tab-icon violet">◆</span><span><strong>Quiz</strong><small>Quiz et questions</small></span>
+    </button>
+    <button type="button" class="workspace-tab" id="usersTabBtn" data-workspace="users">
+      <span class="workspace-tab-icon blue">◉</span><span><strong>Utilisateurs</strong><small>Étudiants, abonnements, paiements</small></span>
+    </button>
+    <button type="button" class="workspace-tab" id="statsTabBtn" data-workspace="stats">
+      <span class="workspace-tab-icon green">▥</span><span><strong>Statistiques</strong><small>Suivi individuel des étudiants</small></span>
+    </button>
   </nav>
 
   <section class="panel techniques-panel">
@@ -360,6 +370,134 @@
     </section>
   </section>
 
+
+  <!-- V13 · UTILISATEURS / CLIENTS -->
+  <section id="usersWorkspace" class="multi-workspace" hidden>
+    <section class="panel multi-list-panel">
+      <div class="panel-head multi-panel-title">
+        <div><h1>Utilisateurs</h1><p id="usersCount">Étudiants inscrits dans l’application</p></div>
+        <button class="btn" id="refreshUsersBtn" type="button">↻ Actualiser</button>
+      </div>
+      <div class="toolbar multi-toolbar">
+        <input id="usersSearch" type="search" placeholder="Rechercher un étudiant…" autocomplete="off">
+        <select id="usersFilter" aria-label="Filtrer les utilisateurs">
+          <option value="all">Tous</option>
+          <option value="actif">Abonnement actif</option>
+          <option value="expire_bientot">Expire bientôt</option>
+          <option value="expire">Abonnement expiré</option>
+          <option value="inactif">Inactif</option>
+        </select>
+      </div>
+      <div id="usersList" class="user-list"><div class="empty">Ouvrez l’onglet Utilisateurs pour charger les comptes.</div></div>
+    </section>
+
+    <section class="panel multi-editor-panel">
+      <div class="panel-head">
+        <h2>Client / étudiant</h2>
+        <p>Gérez le profil, l’abonnement et l’état du paiement. Les comptes d’authentification restent gérés par Supabase Auth.</p>
+      </div>
+      <div id="userEditorEmpty" class="empty">Sélectionnez un utilisateur à gauche.</div>
+      <form id="userEditor" class="editor user-editor" hidden>
+        <section class="editor-section user-identity-card">
+          <div class="user-avatar" id="userAvatar">OP</div>
+          <div class="user-identity-copy">
+            <small>Étudiant sélectionné</small>
+            <h3 id="userDisplayName">—</h3>
+            <p id="userDisplayEmail">—</p>
+          </div>
+          <span id="userSubscriptionBadge" class="subscription-badge">Inactif</span>
+        </section>
+        <section class="editor-section">
+          <div class="section-title"><div><small>Profil</small><h3>Informations étudiant</h3></div></div>
+          <div class="grid">
+            <label class="wide">E-mail<input id="uEmail" readonly></label>
+            <label>Prénom<input id="uFirstName"></label>
+            <label>Nom<input id="uLastName"></label>
+            <label>Année d’étude<input id="uStudentYear" placeholder="3e année"></label>
+            <label>Établissement<input id="uSchool" placeholder="École / université"></label>
+          </div>
+        </section>
+        <section class="editor-section">
+          <div class="section-title"><div><small>Client</small><h3>Abonnement et paiement</h3></div></div>
+          <div class="grid">
+            <label>Statut abonnement
+              <select id="uSubscriptionStatus">
+                <option value="inactif">Inactif</option>
+                <option value="actif">Actif</option>
+                <option value="expire_bientot">Expire bientôt</option>
+                <option value="expire">Expiré</option>
+              </select>
+            </label>
+            <label>Formule<input id="uSubscriptionPlan" placeholder="Premium / Étudiant…"></label>
+            <label>Fin d’abonnement<input id="uSubscriptionExpires" type="date"></label>
+            <label>État paiement
+              <select id="uPaymentStatus">
+                <option value="en_attente">En attente</option>
+                <option value="paye">Payé</option>
+                <option value="impaye">Impayé</option>
+                <option value="gratuit">Gratuit / offert</option>
+              </select>
+            </label>
+            <label class="wide">Notes administrateur<textarea id="uAdminNotes" class="short-textarea" placeholder="Notes internes…"></textarea></label>
+          </div>
+        </section>
+        <div class="actions sticky-actions">
+          <button class="btn primary" type="submit">Enregistrer le client</button>
+        </div>
+        <div id="userStatus" class="status" hidden></div>
+      </form>
+    </section>
+  </section>
+
+  <!-- V13 · STATISTIQUES INDIVIDUELLES -->
+  <section id="statsWorkspace" class="stats-workspace" hidden>
+    <section class="panel stats-user-panel">
+      <div class="panel-head"><h1>Étudiants</h1><p>Choisissez l’utilisateur dont vous voulez consulter la progression.</p></div>
+      <div class="toolbar"><input id="statsUsersSearch" type="search" placeholder="Rechercher un étudiant…" autocomplete="off"></div>
+      <div id="statsUsersList" class="user-list compact"><div class="empty">Aucun étudiant chargé.</div></div>
+    </section>
+
+    <section class="stats-dashboard" id="statsDashboard">
+      <section class="panel stats-profile-card">
+        <div class="stats-profile-main">
+          <div class="user-avatar large" id="statsAvatar">OP</div>
+          <div><small>Étudiant sélectionné</small><h2 id="statsName">Sélectionnez un étudiant</h2><p id="statsEmail">—</p></div>
+        </div>
+        <div class="stats-profile-subscription"><small>Statut client</small><strong id="statsSubscription">—</strong><span id="statsPlan">—</span></div>
+        <div class="stats-last-activity"><small>Activité récente</small><strong id="statsLastActivityTop">—</strong><span id="statsLastActivityType">Aucune donnée</span></div>
+      </section>
+
+      <section class="stats-kpis">
+        <article class="stat-card"><span class="stat-icon">▥</span><small>Progression globale</small><strong id="statProgress">0%</strong><div class="stat-progress"><i id="statProgressBar" style="width:0%"></i></div><em id="statProgressCaption">0 technique consultée</em></article>
+        <article class="stat-card violet"><span class="stat-icon">◆</span><small>Quiz réussis</small><strong id="statQuizRate">0%</strong><div class="stat-progress"><i id="statQuizBar" style="width:0%"></i></div><em id="statQuizCaption">0 quiz terminé</em></article>
+        <article class="stat-card"><span class="stat-icon">▣</span><small>Jours actifs</small><strong id="statActiveDays">0</strong><em>sur les 30 derniers jours</em></article>
+        <article class="stat-card"><span class="stat-icon">◷</span><small>Dernière activité</small><strong id="statLastActivity">—</strong><em id="statLastCaption">Aucune activité</em></article>
+      </section>
+
+      <section class="stats-grid-main">
+        <article class="panel stats-zone-panel">
+          <div class="panel-head inline"><div><h2>Zones les plus travaillées</h2><p>Répartition des techniques et quiz consultés.</p></div></div>
+          <div id="statsZoneBars" class="zone-bars"><div class="empty">Aucune donnée.</div></div>
+        </article>
+        <article class="panel stats-performance-panel">
+          <div class="panel-head inline"><div><h2>Performances par zone</h2><p>Taux de réussite aux quiz pour cet étudiant.</p></div></div>
+          <div id="statsPerformanceBars" class="performance-bars"><div class="empty">Aucune donnée.</div></div>
+        </article>
+      </section>
+
+      <section class="stats-grid-bottom">
+        <article class="panel stats-activity-panel">
+          <div class="panel-head inline"><div><h2>Dernière activité d’apprentissage</h2><p>Techniques consultées et quiz terminés.</p></div></div>
+          <div id="statsActivityList" class="activity-list"><div class="empty">Aucune activité.</div></div>
+        </article>
+        <article class="panel stats-timeline-panel">
+          <div class="panel-head inline"><div><h2>Progression dans le temps</h2><p>Techniques uniques consultées.</p></div></div>
+          <div id="statsTimeline" class="timeline-chart"><div class="empty">Aucune donnée.</div></div>
+        </article>
+      </section>
+    </section>
+  </section>
+
 </main>
 
 <datalist id="zones">
@@ -375,5 +513,6 @@
 <script src="quiz-seed-data.js"></script>
 <script src="backoffice.js?v=12"></script>
 <script src="quiz-admin-v11.js?v=11"></script>
+<script src="user-admin-v13.js?v=13"></script>
 </body>
 </html>
