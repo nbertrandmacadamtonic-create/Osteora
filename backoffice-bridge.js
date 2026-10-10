@@ -336,7 +336,7 @@
 })();
 
 
-/* === V11.3 · IMAGE D’EN-TÊTE + IMAGE PRINCIPALE SÉPARÉES / PRINCIPALE FLOUE === */
+/* === V14 · IMAGE D’EN-TÊTE AUTOMATIQUE PAR ZONE + IMAGE PRINCIPALE FLOUE === */
 (function(){
   'use strict';
 
@@ -351,8 +351,64 @@
     return typeof get==='function' ? get() : null;
   }
 
+  const ZONE_HEADER_IMAGES_V14={
+    cervicales:'assets/images/zones/zone-cervicales.webp',
+    dorsales:'assets/images/zones/zone-dorsales.webp',
+    lombaires:'assets/images/zones/zone-lombaires.webp',
+    bassin:'assets/images/zones/zone-bassin.webp',
+    membresSuperieurs:'assets/images/zones/zone-membres-superieurs.webp',
+    membresInferieurs:'assets/images/zones/zone-membres-inferieurs.webp'
+  };
+
+  function zoneNormalizeV14(value){
+    return String(value||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,' ')
+      .trim();
+  }
+
+  function zoneHeaderImageV14(t){
+    if(!t) return '';
+    const hay=zoneNormalizeV14([
+      t.title,t.titre,t.zone,t.monde,t.sub,t.region,t.category,t.categorie
+    ].filter(Boolean).join(' '));
+
+    // Membres : les termes anatomiques précis passent avant "bassin" / "rachis".
+    if(/\b(epaule|scapula|scapulaire|clavicule|acromio|gleno|humerus|bras|coude|ulna|cubitus|radius|avant bras|poignet|carpe|carpien|main|doigt|pouce|membre superieur|membres superieurs)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.membresSuperieurs;
+
+    if(/\b(hanche|coxal|coxofemoral|femur|femoral|cuisse|genou|patella|patellaire|rotule|tibia|tibial|fibula|perone|cheville|talus|astragale|astragalien|sous talienne|sous astragalienne|calcaneus|calcaneen|pied|metatarse|metatarsien|orteil|membre inferieur|membres inferieurs)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.membresInferieurs;
+
+    if(/\b(bassin|pelvis|pelvien|iliaque|sacro iliaque|sacroiliaque|sacrum|sacre|coccyx|pubis|pubien)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.bassin;
+
+    // Rachis : charnières particulières puis sous-régions.
+    if(/\b(d12 l1|t12 l1|lombo sacre|lombo sacree|l5 s1|l4 l5|l3 l4|l2 l3|l1 l2|lombaire|lombaires|lumbar)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.lombaires;
+
+    if(/\b(cervico dorsal|cervicodorsal|cervical|cervicales|cervico|occiput|occipital|c0 c1|c1 c2|c2 c3|c3 c4|c4 c5|c5 c6|c6 c7|c7 d1|c7 d2)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.cervicales;
+
+    if(/\b(dorsal|dorsales|thoracique|thoraciques|thoracic|cage thoracique|costal|costale|cote|cotes|sternum|d1|d2|d3|d4|d5|d6|d7|d8|d9|d10|d11|d12)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.dorsales;
+
+    // Repli par champs de classement.
+    if(hay.includes('membres superieurs')) return ZONE_HEADER_IMAGES_V14.membresSuperieurs;
+    if(hay.includes('membres inferieurs')) return ZONE_HEADER_IMAGES_V14.membresInferieurs;
+    if(hay.includes('bassin')) return ZONE_HEADER_IMAGES_V14.bassin;
+    if(hay.includes('lomb')) return ZONE_HEADER_IMAGES_V14.lombaires;
+    if(hay.includes('cervic')) return ZONE_HEADER_IMAGES_V14.cervicales;
+    if(hay.includes('dorsal') || hay.includes('thorac')) return ZONE_HEADER_IMAGES_V14.dorsales;
+    return '';
+  }
+
   function headerImage(t){
-    return String((t && (t.headerImage || t.coverImage || t.heroImage)) || '').trim();
+    // V14 : la première image représente automatiquement la zone anatomique.
+    // Une ancienne image d'en-tête reste le repli pour les techniques non classées.
+    return zoneHeaderImageV14(t) ||
+      String((t && (t.headerImage || t.coverImage || t.heroImage)) || '').trim();
   }
 
   function mainImage(t){

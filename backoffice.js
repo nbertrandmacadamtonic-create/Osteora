@@ -105,6 +105,57 @@
     return fallback;
   }
 
+
+  const ZONE_HEADER_IMAGES_V14={
+    cervicales:'assets/images/zones/zone-cervicales.webp',
+    dorsales:'assets/images/zones/zone-dorsales.webp',
+    lombaires:'assets/images/zones/zone-lombaires.webp',
+    bassin:'assets/images/zones/zone-bassin.webp',
+    membresSuperieurs:'assets/images/zones/zone-membres-superieurs.webp',
+    membresInferieurs:'assets/images/zones/zone-membres-inferieurs.webp'
+  };
+
+  function zoneNormalizeV14(value){
+    return String(value||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g,' ')
+      .trim();
+  }
+
+  function zoneHeaderImageV14(item){
+    if(!item) return '';
+    const hay=zoneNormalizeV14([
+      item.title,item.titre,item.zone,item.monde,item.sub,item.region,item.category,item.categorie
+    ].filter(Boolean).join(' '));
+
+    if(/\b(epaule|scapula|scapulaire|clavicule|acromio|gleno|humerus|bras|coude|ulna|cubitus|radius|avant bras|poignet|carpe|carpien|main|doigt|pouce|membre superieur|membres superieurs)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.membresSuperieurs;
+
+    if(/\b(hanche|coxal|coxofemoral|femur|femoral|cuisse|genou|patella|patellaire|rotule|tibia|tibial|fibula|perone|cheville|talus|astragale|astragalien|sous talienne|sous astragalienne|calcaneus|calcaneen|pied|metatarse|metatarsien|orteil|membre inferieur|membres inferieurs)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.membresInferieurs;
+
+    if(/\b(bassin|pelvis|pelvien|iliaque|sacro iliaque|sacroiliaque|sacrum|sacre|coccyx|pubis|pubien)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.bassin;
+
+    if(/\b(d12 l1|t12 l1|lombo sacre|lombo sacree|l5 s1|l4 l5|l3 l4|l2 l3|l1 l2|lombaire|lombaires|lumbar)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.lombaires;
+
+    if(/\b(cervico dorsal|cervicodorsal|cervical|cervicales|cervico|occiput|occipital|c0 c1|c1 c2|c2 c3|c3 c4|c4 c5|c5 c6|c6 c7|c7 d1|c7 d2)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.cervicales;
+
+    if(/\b(dorsal|dorsales|thoracique|thoraciques|thoracic|cage thoracique|costal|costale|cote|cotes|sternum|d1|d2|d3|d4|d5|d6|d7|d8|d9|d10|d11|d12)\b/.test(hay))
+      return ZONE_HEADER_IMAGES_V14.dorsales;
+
+    if(hay.includes('membres superieurs')) return ZONE_HEADER_IMAGES_V14.membresSuperieurs;
+    if(hay.includes('membres inferieurs')) return ZONE_HEADER_IMAGES_V14.membresInferieurs;
+    if(hay.includes('bassin')) return ZONE_HEADER_IMAGES_V14.bassin;
+    if(hay.includes('lomb')) return ZONE_HEADER_IMAGES_V14.lombaires;
+    if(hay.includes('cervic')) return ZONE_HEADER_IMAGES_V14.cervicales;
+    if(hay.includes('dorsal') || hay.includes('thorac')) return ZONE_HEADER_IMAGES_V14.dorsales;
+    return '';
+  }
+
   function hasDetail(detail){
     return !!(detail && (
       String(detail.intro||'').trim() ||
@@ -564,7 +615,7 @@
     $('fStatus').value=x.status;
     $('fIcon').value=x.icon;
     $('fVideo').value=x.video;
-    $('fHeaderImage').value=x.headerImage;
+    $('fHeaderImage').value=zoneHeaderImageV14(x) || x.headerImage;
     $('fImage').value=x.image;
     $('fText').value=x.text;
     $('fQuiz').value=x.quiz;
@@ -757,6 +808,7 @@
     $('seedBtn').hidden = !(currentUser && rows.length===0);
     $('detailsSyncBtn').hidden = !currentUser || rows.length===0;
     if($('pdfImportBtn')) $('pdfImportBtn').hidden = !currentUser || rows.length===0;
+    if($('zoneImagesBtn')) $('zoneImagesBtn').hidden = !currentUser || rows.length===0;
     render();
     if(selectedId && rows.some(x=>Number(x.id)===Number(selectedId))) openEditor(selectedId);
     if(currentUser) verifyStorage();
@@ -952,6 +1004,54 @@
     if(selectedId) openEditor(selectedId);
   }
 
+
+  async function applyZoneHeadersToAll(){
+    if(!(await requireAdmin())) return;
+    if(!rows.length){ showStatus('Aucune technique à mettre à jour.'); return; }
+
+    const ok=confirm(
+      "Attribuer automatiquement l’image d’en-tête anatomique à toutes les techniques ?\n\n"+
+      "Le choix se fait d’après le titre, la zone et la sous-zone : cervicales, dorsales, lombaires, bassin, membres supérieurs ou membres inférieurs.\n\n"+
+      "Les images principales, textes, vidéos, quiz et planches ne seront pas modifiés."
+    );
+    if(!ok) return;
+
+    const updated=[];
+    const payload=[];
+
+    for(const row of rows){
+      const x=canonical(row);
+      const img=zoneHeaderImageV14(x);
+      if(!img) continue;
+      if(String(x.headerImage||'')===img) continue;
+
+      const copy=clone(row);
+      applyCanonicalPatch(copy,{headerImage:img});
+      updated.push(copy);
+      payload.push({id:Number(copy.id),data:copy});
+    }
+
+    if(!payload.length){
+      showStatus("Toutes les techniques classées utilisent déjà leur image de zone.");
+      return;
+    }
+
+    setCloud(`Attribution des images de zones… ${payload.length} technique(s)`);
+    const { error }=await client.from(TABLE).upsert(payload,{onConflict:'id'});
+    if(error){
+      setCloud('Erreur : '+error.message,'warn');
+      showStatus('Impossible d’enregistrer les images de zones : '+error.message);
+      return;
+    }
+
+    const byId=new Map(updated.map(x=>[Number(x.id),x]));
+    rows=rows.map(x=>byId.get(Number(x.id))||x);
+    setCloud(`${rows.length} techniques synchronisées · images de zones appliquées.`, 'ok');
+    render();
+    if(selectedId) openEditor(selectedId);
+    showStatus(`${payload.length} technique(s) mise(s) à jour avec l’image anatomique correspondant à leur zone.`);
+  }
+
   async function login(){
     if(!isConfigured){ setCloud('Complétez supabase-config.js avant la connexion.', 'warn'); return; }
     const email=$('adminEmail').value.trim();
@@ -980,6 +1080,7 @@
     $('seedBtn').hidden=!(logged && rows.length===0);
     $('detailsSyncBtn').hidden=!(logged && rows.length>0);
     if($('pdfImportBtn')) $('pdfImportBtn').hidden=!(logged && rows.length>0);
+    if($('zoneImagesBtn')) $('zoneImagesBtn').hidden=!(logged && rows.length>0);
     if(logged){
       setCloud(`Administrateur connecté : ${currentUser.email||''}`,'ok');
       setTimeout(verifyStorage,50);
@@ -1026,6 +1127,7 @@
   $('seedBtn').addEventListener('click',seedCentral);
   $('detailsSyncBtn').addEventListener('click',syncDetailedSheets);
   if($('pdfImportBtn')) $('pdfImportBtn').addEventListener('click',importPdfTechniques);
+  if($('zoneImagesBtn')) $('zoneImagesBtn').addEventListener('click',applyZoneHeadersToAll);
   $('addStepBtn').addEventListener('click',addStep);
   document.querySelectorAll('.detail-subtab').forEach(btn=>btn.addEventListener('click',()=>setDetailTab(btn.dataset.detailTab)));
   if($('applyPlanchesBtn')) $('applyPlanchesBtn').addEventListener('click',applyPlanchesToPrimaryImages);
