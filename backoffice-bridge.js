@@ -878,19 +878,19 @@
 
 
 
-/* === V15.3 · FUSION TEXTE + IMAGES / ÉTAPES INTERACTIVES === */
+/* === V15.5 · BOUTON UNIQUE TECHNIQUE + TEXTE + IMAGES === */
 (function(){
   'use strict';
 
   let requestedTechniqueId = null;
 
-  function globalFn(name){
+  function fn(name){
     try{ if(typeof window[name] === 'function') return window[name]; }catch(_){}
     try{ return eval('typeof '+name+'==="function" ? '+name+' : null'); }catch(_){}
     return null;
   }
 
-  function escapeHtml(value){
+  function esc(value){
     return String(value == null ? '' : value)
       .replace(/&/g,'&amp;')
       .replace(/</g,'&lt;')
@@ -899,14 +899,19 @@
       .replace(/'/g,'&#039;');
   }
 
-  function textHtml(value){
-    return escapeHtml(value)
-      .replace(/\r\n|\r|\n/g,'<br>');
+  function htmlText(value){
+    return esc(value).replace(/\r\n|\r|\n/g,'<br>');
+  }
+
+  function normalize(value){
+    return String(value || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase();
   }
 
   function getTechnique(id){
     if(id !== null && id !== undefined){
-      const byId = globalFn('getTechniqueById');
+      const byId = fn('getTechniqueById');
       if(typeof byId === 'function'){
         try{
           const t = byId(id);
@@ -914,7 +919,7 @@
         }catch(_){}
       }
     }
-    const current = globalFn('getCurrentTechnique');
+    const current = fn('getCurrentTechnique');
     if(typeof current === 'function'){
       try{ return current(); }catch(_){}
     }
@@ -923,7 +928,7 @@
 
   function getDetail(t){
     if(!t) return null;
-    const resolver = globalFn('getTechniqueDetail');
+    const resolver = fn('getTechniqueDetail');
     if(typeof resolver === 'function'){
       try{
         const d = resolver(t);
@@ -933,19 +938,18 @@
     return t.detail || null;
   }
 
-  function findStep(steps, tokens){
-    return steps.find(step => {
-      const hay = [
+  function findStep(steps,tokens){
+    return steps.find(step=>{
+      const hay = normalize([
         step && step.key,
         step && step.label,
         step && step.title
-      ].filter(Boolean).join(' ').toLowerCase()
-       .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-      return tokens.some(token => hay.includes(token));
+      ].filter(Boolean).join(' '));
+      return tokens.some(token=>hay.includes(token));
     }) || null;
   }
 
-  function canonicalSteps(detail){
+  function officialSteps(detail){
     const all = Array.isArray(detail && detail.steps) ? detail.steps.filter(Boolean) : [];
     if(!all.length) return [];
 
@@ -956,9 +960,8 @@
       findStep(all,['normalisation','normalization','normaliser'])
     ].filter(Boolean);
 
-    // Évite les doublons tout en gardant l'ordre pédagogique officiel.
     const seen = new Set();
-    return ordered.filter(step => {
+    return ordered.filter(step=>{
       const key = String(step.key || step.label || step.title || '');
       if(seen.has(key)) return false;
       seen.add(key);
@@ -966,129 +969,164 @@
     });
   }
 
-  function stepLabel(step, index){
-    const key = String(step && step.key || '').toLowerCase();
-    if(key.includes('position')) return 'Position';
-    if(key.includes('mains') || key.includes('main')) return 'Position des mains';
+  function stepLabel(step,index){
+    const key = normalize(step && step.key);
+    if(key.includes('position') && !key.includes('main')) return 'Position';
+    if(key.includes('main') || key.includes('contact')) return 'Position des mains';
     if(key.includes('bar')) return 'Barrière motrice';
     if(key.includes('normal')) return 'Normalisation';
     return String(step && (step.label || step.title) || ('Étape '+(index+1)));
   }
 
-  function stepIcon(step){
-    const key = String(step && step.key || '').toLowerCase();
-    if(key.includes('position')) return '01';
-    if(key.includes('mains') || key.includes('main')) return '02';
-    if(key.includes('bar')) return '03';
-    if(key.includes('normal')) return '04';
-    return '•';
+  function stepLogo(step,index){
+    const resolver = fn('getTechniqueStepLogoSrc');
+    if(typeof resolver === 'function'){
+      try{
+        const src = String(resolver(step) || '').trim();
+        if(src) return src;
+      }catch(_){}
+    }
+    return '';
+  }
+
+  function stepColor(step,index){
+    const resolver = fn('getTechniqueStepColorKey');
+    if(typeof resolver === 'function'){
+      try{
+        const key = String(resolver(step) || '').trim().toLowerCase();
+        if(key) return key;
+      }catch(_){}
+    }
+    return ['cyan','red','orange','green'][index] || 'cyan';
+  }
+
+  function colorValue(key){
+    const map={
+      cyan:'#00e5ff',
+      blue:'#36b8ff',
+      red:'#ff6b77',
+      rose:'#ff6b77',
+      orange:'#ffb020',
+      yellow:'#ffb020',
+      green:'#00e6a7',
+      violet:'#a855ff',
+      purple:'#a855ff'
+    };
+    return map[key] || '#00e5ff';
+  }
+
+  function logoMarkup(step,index){
+    const src = stepLogo(step,index);
+    const color = colorValue(stepColor(step,index));
+    if(src){
+      return `<span class="osteo-v155-logo" style="--step-color:${color}"><img src="${esc(src)}" alt=""></span>`;
+    }
+    return `<span class="osteo-v155-logo osteo-v155-logo-fallback" style="--step-color:${color}">${String(index+1).padStart(2,'0')}</span>`;
   }
 
   function installStyles(){
-    if(document.getElementById('osteoInteractiveStepsV153Styles')) return;
-    const style = document.createElement('style');
-    style.id = 'osteoInteractiveStepsV153Styles';
-    style.textContent = `
-      #player .video-premium-actions .osteo-v153-hidden{
+    if(document.getElementById('osteoV155Styles')) return;
+    const style=document.createElement('style');
+    style.id='osteoV155Styles';
+    style.textContent=`
+      #player .video-premium-actions .osteo-v155-old-action{
         display:none !important;
       }
+
+      #player .video-premium-actions{
+        grid-template-columns:1fr !important;
+      }
+
+      #player .video-premium-actions .osteo-v155-master-btn{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        gap:9px !important;
+        width:100% !important;
+        min-height:52px !important;
+        border-radius:20px !important;
+        border:1px solid rgba(0,229,255,.34) !important;
+        background:linear-gradient(135deg,rgba(0,229,255,.10),rgba(45,140,255,.08)) !important;
+        color:#fff !important;
+        font-weight:950 !important;
+        box-shadow:0 0 20px rgba(0,229,255,.08) !important;
+      }
+
+      #player .video-premium-actions .osteo-v155-master-btn span{
+        font-size:18px;
+      }
+
       #player .video-premium-actions #openVimeoDirectButton{
-        grid-column:1 / -1 !important;
         width:100% !important;
       }
 
-      #player .steps.osteo-v153-steps{
-        padding:16px !important;
+      #player .steps.osteo-v155-panel{
+        padding:15px !important;
         overflow:visible !important;
       }
-      #player .steps.osteo-v153-steps > h3{
-        margin:0 0 13px !important;
+
+      #player .steps.osteo-v155-panel > h3{
+        margin:0 0 12px !important;
         font-size:20px !important;
-        line-height:1.15 !important;
       }
 
-      .osteo-v153-step-nav{
+      .osteo-v155-cards{
         display:grid;
-        grid-template-columns:1fr;
-        gap:8px;
-      }
-      .osteo-v153-step-btn{
-        width:100%;
-        min-height:52px;
-        display:grid;
-        grid-template-columns:38px minmax(0,1fr) 24px;
-        gap:10px;
-        align-items:center;
-        padding:9px 10px;
-        text-align:left;
-        color:#dbe8fb;
-        border:1px solid rgba(170,205,225,.18);
-        border-radius:17px;
-        background:rgba(255,255,255,.035);
-        transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease;
-      }
-      .osteo-v153-step-btn:hover{
-        border-color:rgba(0,229,255,.40);
-        background:rgba(0,229,255,.055);
-      }
-      .osteo-v153-step-btn.active{
-        color:#fff;
-        border-color:rgba(0,229,255,.68);
-        background:linear-gradient(135deg,rgba(0,229,255,.13),rgba(45,140,255,.09));
-        box-shadow:0 0 24px rgba(0,229,255,.10),inset 0 1px 0 rgba(255,255,255,.05);
-      }
-      .osteo-v153-step-num{
-        width:36px;height:36px;
-        display:grid;place-items:center;
-        border-radius:50%;
-        color:#00e5ff;
-        font-weight:950;
-        font-size:12px;
-        border:1px solid rgba(0,229,255,.38);
-        background:rgba(0,229,255,.09);
-        box-shadow:0 0 16px rgba(0,229,255,.10);
-      }
-      .osteo-v153-step-btn strong{
-        display:block;
-        font-size:15px;
-        line-height:1.15;
-      }
-      .osteo-v153-step-arrow{
-        justify-self:end;
-        color:#00e5ff;
-        font-size:22px;
-        transform:rotate(0deg);
-        transition:transform .18s ease;
-      }
-      .osteo-v153-step-btn.active .osteo-v153-step-arrow{
-        transform:rotate(90deg);
+        gap:12px;
       }
 
-      .osteo-v153-step-detail{
-        margin-top:12px;
+      .osteo-v155-card{
         padding:12px;
-        border-radius:19px;
-        border:1px solid rgba(0,229,255,.20);
+        border-radius:20px;
+        border:1px solid rgba(170,205,225,.15);
         background:
-          radial-gradient(circle at 50% 0%,rgba(0,229,255,.07),transparent 42%),
-          rgba(2,9,22,.52);
+          radial-gradient(circle at 50% 0%,rgba(0,229,255,.055),transparent 44%),
+          rgba(255,255,255,.025);
       }
-      .osteo-v153-step-detail-title{
+
+      .osteo-v155-card-head{
         display:flex;
         align-items:center;
-        gap:9px;
-        margin:0 0 10px;
+        gap:10px;
+        margin-bottom:10px;
       }
-      .osteo-v153-step-detail-title b{
-        font-size:17px;
+
+      .osteo-v155-card-head b{
         color:#fff;
+        font-size:16px;
+        line-height:1.15;
       }
-      .osteo-v153-step-body{
+
+      .osteo-v155-logo{
+        width:44px;height:44px;
+        flex:0 0 44px;
+        display:grid;place-items:center;
+        border-radius:14px;
+        border:1px solid color-mix(in srgb,var(--step-color) 56%,transparent);
+        background:color-mix(in srgb,var(--step-color) 10%,transparent);
+        box-shadow:0 0 16px color-mix(in srgb,var(--step-color) 16%,transparent);
+        overflow:hidden;
+      }
+
+      .osteo-v155-logo img{
+        width:31px;height:31px;
+        object-fit:contain;
+        display:block;
+      }
+
+      .osteo-v155-logo-fallback{
+        color:var(--step-color);
+        font-size:11px;
+        font-weight:950;
+      }
+
+      .osteo-v155-body{
         color:#d7e1ef;
         font-size:14px;
         line-height:1.52;
       }
-      .osteo-v153-step-photo{
+
+      .osteo-v155-photo{
         display:block;
         width:100%;
         max-height:360px;
@@ -1097,180 +1135,182 @@
         border-radius:15px;
         background:#020714;
         border:1px solid rgba(255,255,255,.08);
-        box-shadow:0 12px 28px rgba(0,0,0,.24);
+        box-shadow:0 12px 28px rgba(0,0,0,.23);
         cursor:zoom-in;
       }
-      .osteo-v153-source{
-        margin:10px 2px 0;
-        color:#7890ad;
+
+      .osteo-v155-source{
+        margin:11px 2px 0;
+        color:#7187a3;
         font-size:10.5px;
         line-height:1.3;
       }
-      .osteo-v153-no-detail{
-        margin:0;
-        color:#aeb8cc;
+
+      .osteo-v155-empty{
+        color:#9fb0c5;
         font-size:13px;
         line-height:1.4;
-      }
-
-      @media(min-width:620px){
-        .osteo-v153-step-nav{
-          grid-template-columns:repeat(2,minmax(0,1fr));
-        }
       }
     `;
     document.head.appendChild(style);
   }
 
-  function hideOldActions(player){
-    const actions = player.querySelector('.video-premium-actions');
-    if(!actions) return;
+  function hideOldButtons(player){
+    const actions=player.querySelector('.video-premium-actions');
+    if(!actions) return null;
 
-    actions.querySelectorAll('button').forEach(button => {
-      const onclick = String(button.getAttribute('onclick') || '');
-      const label = String(button.textContent || '').trim().toLowerCase();
-      const isOldText = onclick.includes('openTechniqueTextPage') || label.includes('texte de la technique');
-      const isOldImages = onclick.includes('openTechniqueImagesPage') || label.includes('images associées');
-      button.classList.toggle('osteo-v153-hidden', isOldText || isOldImages);
-    });
-  }
-
-  function renderStepPanel(section, t, detail, steps, activeIndex){
-    const buttons = Array.from(section.querySelectorAll('.osteo-v153-step-btn'));
-    buttons.forEach((btn,index)=>{
-      btn.classList.toggle('active',index===activeIndex);
-      btn.setAttribute('aria-selected',index===activeIndex ? 'true' : 'false');
+    actions.querySelectorAll('button').forEach(button=>{
+      const onclick=String(button.getAttribute('onclick') || '');
+      const label=normalize(button.textContent || '');
+      const hide =
+        onclick.includes('openTechniqueTextPage') ||
+        onclick.includes('openTechniqueImagesPage') ||
+        label.includes('texte de la technique') ||
+        label.includes('images associees');
+      button.classList.toggle('osteo-v155-old-action',hide);
     });
 
-    const step = steps[activeIndex];
-    const target = section.querySelector('.osteo-v153-step-detail');
-    if(!step || !target) return;
-
-    const label = stepLabel(step, activeIndex);
-    const photo = String(step.photo || '').trim();
-    const source = String(detail && detail.source || '').trim();
-
-    target.innerHTML = `
-      <div class="osteo-v153-step-detail-title">
-        <span class="osteo-v153-step-num">${escapeHtml(stepIcon(step))}</span>
-        <b>${escapeHtml(label)}</b>
-      </div>
-      <div class="osteo-v153-step-body">${textHtml(step.body || '')}</div>
-      ${photo ? `<img class="osteo-v153-step-photo" src="${escapeHtml(photo)}" alt="${escapeHtml(label)}">` : ''}
-      ${source ? `<div class="osteo-v153-source">${escapeHtml(source)}</div>` : ''}
-    `;
-
-    const img = target.querySelector('.osteo-v153-step-photo');
-    if(img){
-      img.addEventListener('click',()=>{
-        const open = globalFn('openStepImage');
-        if(typeof open === 'function') open(photo,label);
-      });
-    }
+    return actions;
   }
 
-  function renderInteractiveSteps(id){
+  function ensureMasterButton(player){
+    const actions=hideOldButtons(player);
+    if(!actions) return null;
+
+    let button=actions.querySelector('.osteo-v155-master-btn');
+    if(button) return button;
+
+    button=document.createElement('button');
+    button.type='button';
+    button.className='secondary osteo-v155-master-btn';
+    button.innerHTML='<span>◉</span> Technique · Texte · Images';
+
+    const vimeo=actions.querySelector('#openVimeoDirectButton');
+    if(vimeo) actions.insertBefore(button,vimeo);
+    else actions.appendChild(button);
+
+    button.addEventListener('click',()=>{
+      renderCombined();
+      const panel=player.querySelector('.steps');
+      if(panel){
+        setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),40);
+      }
+    });
+
+    return button;
+  }
+
+  function renderCombined(){
     installStyles();
 
-    const player = document.getElementById('player');
+    const player=document.getElementById('player');
     if(!player) return false;
 
-    hideOldActions(player);
+    ensureMasterButton(player);
 
-    const section = player.querySelector('.steps');
-    if(!section) return false;
+    const panel=player.querySelector('.steps');
+    if(!panel) return false;
 
-    const t = getTechnique(id !== undefined ? id : requestedTechniqueId);
-    const detail = getDetail(t);
-    const steps = canonicalSteps(detail);
+    const t=getTechnique(requestedTechniqueId);
+    const detail=getDetail(t);
+    const steps=officialSteps(detail);
 
-    const signature = String(
-      (t && (t.id || t.title)) || ''
-    ) + '|' + steps.map(s=>String(s.key || s.label || '')).join(',');
-
-    // Si l'UI est déjà installée pour cette technique, ne pas la reconstruire.
-    if(section.dataset.osteoV153Signature === signature && section.classList.contains('osteo-v153-steps')){
-      return true;
-    }
-
-    section.classList.add('osteo-v153-steps');
-    section.dataset.osteoV153Signature = signature;
+    panel.classList.add('osteo-v155-panel');
 
     if(!steps.length){
-      section.innerHTML = `
-        <h3>Technique</h3>
-        <p class="osteo-v153-no-detail">Les étapes détaillées de cette technique ne sont pas encore disponibles.</p>
+      panel.innerHTML=`
+        <h3>Technique · Texte · Images</h3>
+        <p class="osteo-v155-empty">Les données détaillées de cette technique ne sont pas encore disponibles.</p>
       `;
       return false;
     }
 
-    section.innerHTML = `
-      <h3>Technique</h3>
-      <div class="osteo-v153-step-nav" role="tablist" aria-label="Étapes de la technique">
-        ${steps.map((step,index)=>`
-          <button type="button" class="osteo-v153-step-btn${index===0?' active':''}" data-step-index="${index}" role="tab" aria-selected="${index===0?'true':'false'}">
-            <span class="osteo-v153-step-num">${escapeHtml(stepIcon(step))}</span>
-            <strong>${escapeHtml(stepLabel(step,index))}</strong>
-            <span class="osteo-v153-step-arrow">›</span>
-          </button>
-        `).join('')}
+    panel.innerHTML=`
+      <h3>Technique · Texte · Images</h3>
+      <div class="osteo-v155-cards">
+        ${steps.map((step,index)=>{
+          const label=stepLabel(step,index);
+          const photo=String(step.photo || '').trim();
+          return `
+            <article class="osteo-v155-card">
+              <div class="osteo-v155-card-head">
+                ${logoMarkup(step,index)}
+                <b>${esc(label)}</b>
+              </div>
+              <div class="osteo-v155-body">${htmlText(step.body || '')}</div>
+              ${photo ? `<img class="osteo-v155-photo" src="${esc(photo)}" alt="${esc(label)}" data-photo="${esc(photo)}" data-label="${esc(label)}">` : ''}
+            </article>
+          `;
+        }).join('')}
       </div>
-      <div class="osteo-v153-step-detail" role="tabpanel"></div>
+      ${detail && detail.source ? `<div class="osteo-v155-source">${esc(detail.source)}</div>` : ''}
     `;
 
-    section.querySelectorAll('.osteo-v153-step-btn').forEach(button=>{
-      button.addEventListener('click',()=>{
-        const index = Number(button.dataset.stepIndex || 0);
-        renderStepPanel(section,t,detail,steps,index);
-        const panel = section.querySelector('.osteo-v153-step-detail');
-        if(panel && window.matchMedia('(max-width: 760px)').matches){
-          setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),40);
-        }
+    panel.querySelectorAll('.osteo-v155-photo').forEach(img=>{
+      img.addEventListener('click',()=>{
+        const open=fn('openStepImage');
+        if(typeof open==='function') open(img.dataset.photo,img.dataset.label);
       });
     });
 
-    // Première étape ouverte par défaut.
-    renderStepPanel(section,t,detail,steps,0);
     return true;
   }
 
-  function installOpenTechniqueHook(){
-    const original = globalFn('openTechnique');
-    if(typeof original !== 'function' || original.__osteoV153StepsHook) return;
+  function installInitialState(){
+    installStyles();
 
-    const wrapped = function(id){
-      requestedTechniqueId = id;
-      const result = original.apply(this,arguments);
-      [0,60,180,500].forEach(delay=>{
-        setTimeout(()=>renderInteractiveSteps(id),delay);
-      });
-      return result;
-    };
-    wrapped.__osteoV153StepsHook = true;
-    wrapped.__osteoOriginal = original;
+    const player=document.getElementById('player');
+    if(!player) return;
 
-    try{
-      window.openTechnique = wrapped;
-      openTechnique = wrapped;
-    }catch(_){
-      window.openTechnique = wrapped;
+    ensureMasterButton(player);
+
+    const panel=player.querySelector('.steps');
+    if(panel && !panel.dataset.osteoV155Initial){
+      panel.dataset.osteoV155Initial='1';
+      panel.classList.add('osteo-v155-panel');
+      panel.innerHTML=`
+        <h3>Technique</h3>
+        <p class="osteo-v155-empty">Clique sur « Technique · Texte · Images » pour afficher la fiche complète.</p>
+      `;
     }
   }
 
-  let observerTimer = null;
-  function installObserver(){
-    if(window.__osteoV153StepsObserver) return;
-    window.__osteoV153StepsObserver = new MutationObserver(()=>{
-      clearTimeout(observerTimer);
-      observerTimer = setTimeout(()=>{
-        installOpenTechniqueHook();
-        const player = document.getElementById('player');
-        if(player && player.classList.contains('active')){
-          renderInteractiveSteps(requestedTechniqueId);
-        }
+  function hookOpenTechnique(){
+    const original=fn('openTechnique');
+    if(typeof original!=='function' || original.__osteoV155Hook) return;
+
+    const wrapped=function(id){
+      requestedTechniqueId=id;
+      const result=original.apply(this,arguments);
+      [0,60,180,500].forEach(delay=>setTimeout(installInitialState,delay));
+      return result;
+    };
+
+    wrapped.__osteoV155Hook=true;
+    wrapped.__osteoOriginal=original;
+
+    try{
+      window.openTechnique=wrapped;
+      openTechnique=wrapped;
+    }catch(_){
+      window.openTechnique=wrapped;
+    }
+  }
+
+  let timer=null;
+  function observe(){
+    if(window.__osteoV155Observer) return;
+
+    window.__osteoV155Observer=new MutationObserver(()=>{
+      clearTimeout(timer);
+      timer=setTimeout(()=>{
+        hookOpenTechnique();
+        const player=document.getElementById('player');
+        if(player && player.classList.contains('active')) installInitialState();
       },60);
     });
-    window.__osteoV153StepsObserver.observe(document.documentElement,{
+
+    window.__osteoV155Observer.observe(document.documentElement,{
       subtree:true,
       childList:true,
       attributes:true,
@@ -1280,16 +1320,17 @@
 
   function install(){
     installStyles();
-    installOpenTechniqueHook();
-    installObserver();
-    renderInteractiveSteps(requestedTechniqueId);
+    hookOpenTechnique();
+    observe();
+    installInitialState();
   }
 
-  if(document.readyState === 'loading'){
+  if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',install,{once:true});
   }else{
     install();
   }
+
   window.addEventListener('osteo-central-data-loaded',()=>setTimeout(install,80));
   setTimeout(install,500);
 })();
