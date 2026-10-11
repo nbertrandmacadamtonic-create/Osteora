@@ -209,23 +209,66 @@
 
   function installReplayButton(){
     ensureStyles();
-    if(document.getElementById('osteoReplayIntroButton')) return;
 
-    const home=document.getElementById('home');
-    if(!home) return;
+    // Si une ancienne version du bouton existe sur l'accueil principal,
+    // on la déplace vers l'écran d'entrée / inscription.
+    const existing=document.getElementById('osteoReplayIntroButton');
 
-    const button=document.createElement('button');
+    // Priorité à l'écran "welcome". À défaut, on repère l'écran qui contient
+    // les choix Commencer / S'inscrire.
+    let target=document.getElementById('welcome') || null;
+
+    if(!target){
+      const screens=[...document.querySelectorAll('.screen')];
+      target=screens.find(screen=>{
+        const txt=String(screen.textContent||'')
+          .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+          .toLowerCase();
+        return txt.includes('commencer') && (
+          txt.includes("s'inscrire") ||
+          txt.includes('s inscrire') ||
+          txt.includes('inscription')
+        );
+      }) || null;
+    }
+
+    if(!target){
+      // L'interface peut être injectée un peu plus tard : on réessaiera.
+      return;
+    }
+
+    const button=existing || document.createElement('button');
     button.id='osteoReplayIntroButton';
     button.type='button';
     button.innerHTML='<span>▶</span> Revoir la vidéo de lancement';
-    button.addEventListener('click',()=>showIntro({force:true,sound:true}));
+    button.onclick=()=>showIntro({force:true,sound:true});
 
-    const intro=home.querySelector('.intro');
-    if(intro) intro.insertAdjacentElement('afterend',button);
-    else{
-      const header=home.querySelector('.top');
+    // On place le bouton juste AVANT la zone Commencer / S'inscrire.
+    const candidates=[...target.querySelectorAll('button,a')];
+    const firstAction=candidates.find(el=>{
+      const txt=String(el.textContent||'')
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+        .toLowerCase()
+        .trim();
+      return txt.includes('commencer') ||
+             txt.includes("s'inscrire") ||
+             txt.includes('s inscrire');
+    });
+
+    if(firstAction){
+      // Si les boutons sont regroupés dans un même bloc, on place le replay
+      // juste avant ce bloc pour qu'il reste visuellement lié à l'onboarding.
+      const group=firstAction.parentElement;
+      if(group && group!==target){
+        group.insertAdjacentElement('beforebegin',button);
+      }else{
+        firstAction.insertAdjacentElement('beforebegin',button);
+      }
+    }else{
+      // Fallback : sous le contenu principal de l'écran d'entrée.
+      const header=target.querySelector('.top,header,.brand,.welcome-brand,.onboarding-brand');
       if(header) header.insertAdjacentElement('afterend',button);
-      else home.prepend(button);
+      else target.prepend(button);
     }
   }
 
