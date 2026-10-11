@@ -1190,21 +1190,32 @@
       }
       #player .video-premium-actions{
         grid-template-columns:1fr !important;
+        width:100% !important;
+        align-items:stretch !important;
       }
       #player .video-premium-actions .osteo-v157-open-world{
         width:100% !important;
-        min-height:54px !important;
+        min-width:100% !important;
+        max-width:none !important;
+        min-height:56px !important;
         display:flex !important;
+        grid-column:1 / -1 !important;
+        justify-self:stretch !important;
+        align-self:stretch !important;
+        box-sizing:border-box !important;
+        margin:0 auto !important;
         align-items:center !important;
         justify-content:center !important;
         gap:9px !important;
-        padding:10px 14px !important;
+        padding:10px 16px !important;
         border-radius:20px !important;
         color:#fff !important;
         border:1px solid rgba(0,229,255,.42) !important;
         background:linear-gradient(135deg,rgba(0,229,255,.13),rgba(45,140,255,.10)) !important;
         box-shadow:0 0 24px rgba(0,229,255,.10),inset 0 1px 0 rgba(255,255,255,.05) !important;
         font-weight:950 !important;
+        text-align:center !important;
+        white-space:nowrap !important;
       }
       #player .video-premium-actions .osteo-v157-open-world span{
         color:#00e5ff;
