@@ -86,10 +86,17 @@
         font-size:15px;
         box-shadow:0 0 32px rgba(0,229,255,.18),0 12px 34px rgba(0,0,0,.30);
       }
+      .osteo-welcome-v161{
+        position:relative !important;
+        overflow-x:hidden !important;
+      }
+      .osteo-welcome-v161 .osteo-welcome-action-v161{
+        font-size:clamp(15px,3.2vw,20px) !important;
+      }
       #osteoReplayIntroButton{
-        width:100%;
-        min-height:48px;
-        margin:10px 0 14px;
+        width:150px;
+        min-height:46px;
+        margin:0;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -207,68 +214,101 @@
     });
   }
 
+  function fixWelcomeLayoutV161(target){
+    if(!target) return;
+
+    target.classList.add('osteo-welcome-v161');
+
+    const normalizeText=v=>String(v||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toLowerCase().replace(/\s+/g,' ').trim();
+
+    const actions=[...target.querySelectorAll('button,a')].filter(el=>{
+      const txt=normalizeText(el.textContent);
+      return txt.includes('commencer') ||
+             txt.includes("s'inscrire") ||
+             txt.includes('s inscrire') ||
+             txt.includes("j'ai deja") ||
+             txt.includes('j ai deja') ||
+             txt.includes('deja un compte');
+    });
+
+    actions.forEach(el=>{
+      el.classList.add('osteo-welcome-action-v161');
+      el.style.setProperty('min-width','150px','important');
+      el.style.setProperty('width','150px','important');
+      el.style.setProperty('max-width','150px','important');
+      el.style.setProperty('box-sizing','border-box','important');
+      el.style.setProperty('white-space','normal','important');
+      el.style.setProperty('overflow','visible','important');
+      el.style.setProperty('text-overflow','clip','important');
+      el.style.setProperty('line-height','1.12','important');
+    });
+
+    target.querySelectorAll('img').forEach(img=>{
+      img.style.setProperty('max-width','100%','important');
+    });
+  }
+
   function installReplayButton(){
     ensureStyles();
 
-    // Si une ancienne version du bouton existe sur l'accueil principal,
-    // on la déplace vers l'écran d'entrée / inscription.
-    const existing=document.getElementById('osteoReplayIntroButton');
-
-    // Priorité à l'écran "welcome". À défaut, on repère l'écran qui contient
-    // les choix Commencer / S'inscrire.
-    let target=document.getElementById('welcome') || null;
-
-    if(!target){
-      const screens=[...document.querySelectorAll('.screen')];
-      target=screens.find(screen=>{
-        const txt=String(screen.textContent||'')
+    const target=document.getElementById('welcome') ||
+      [...document.querySelectorAll('.screen,section,main,div')].find(el=>{
+        const txt=String(el.textContent||'')
           .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
           .toLowerCase();
-        return txt.includes('commencer') && (
-          txt.includes("s'inscrire") ||
-          txt.includes('s inscrire') ||
-          txt.includes('inscription')
-        );
-      }) || null;
+        return txt.includes('commencer') &&
+               (txt.includes("s'inscrire") || txt.includes('s inscrire'));
+      });
+
+    if(!target) return;
+
+    fixWelcomeLayoutV161(target);
+
+    let button=document.getElementById('osteoReplayIntroButton');
+    if(!button){
+      button=document.createElement('button');
+      button.id='osteoReplayIntroButton';
+      button.type='button';
+      button.innerHTML='<span>▶</span> Revoir la vidéo';
     }
 
-    if(!target){
-      // L'interface peut être injectée un peu plus tard : on réessaiera.
-      return;
-    }
-
-    const button=existing || document.createElement('button');
-    button.id='osteoReplayIntroButton';
-    button.type='button';
-    button.innerHTML='<span>▶</span> Revoir la vidéo de lancement';
     button.onclick=()=>showIntro({force:true,sound:true});
 
-    // On place le bouton juste AVANT la zone Commencer / S'inscrire.
-    const candidates=[...target.querySelectorAll('button,a')];
-    const firstAction=candidates.find(el=>{
+    // Le bouton est volontairement placé AU-DESSUS de « Commencer ».
+    const candidates=[...target.querySelectorAll('button,a')].filter(el=>el!==button);
+    const commencer=candidates.find(el=>{
       const txt=String(el.textContent||'')
         .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .toLowerCase()
-        .trim();
-      return txt.includes('commencer') ||
-             txt.includes("s'inscrire") ||
-             txt.includes('s inscrire');
+        .toLowerCase().trim();
+      return txt.includes('commencer');
     });
 
-    if(firstAction){
-      // Si les boutons sont regroupés dans un même bloc, on place le replay
-      // juste avant ce bloc pour qu'il reste visuellement lié à l'onboarding.
-      const group=firstAction.parentElement;
-      if(group && group!==target){
-        group.insertAdjacentElement('beforebegin',button);
-      }else{
-        firstAction.insertAdjacentElement('beforebegin',button);
-      }
+    if(commencer){
+      const targetRect=target.getBoundingClientRect();
+      const rect=commencer.getBoundingClientRect();
+      const top=Math.max(16,rect.top-targetRect.top-58);
+
+      button.style.setProperty('position','absolute','important');
+      button.style.setProperty('top',`${top}px`,'important');
+      button.style.setProperty('right','20px','important');
+      button.style.setProperty('left','auto','important');
+      button.style.setProperty('bottom','auto','important');
+      button.style.setProperty('width','150px','important');
+      button.style.setProperty('min-width','150px','important');
+      button.style.setProperty('max-width','150px','important');
+      button.style.setProperty('min-height','46px','important');
+      button.style.setProperty('z-index','30','important');
+
+      if(button.parentElement!==target) target.appendChild(button);
     }else{
-      // Fallback : sous le contenu principal de l'écran d'entrée.
-      const header=target.querySelector('.top,header,.brand,.welcome-brand,.onboarding-brand');
-      if(header) header.insertAdjacentElement('afterend',button);
-      else target.prepend(button);
+      button.style.setProperty('position','absolute','important');
+      button.style.setProperty('right','20px','important');
+      button.style.setProperty('bottom','110px','important');
+      button.style.setProperty('width','150px','important');
+      button.style.setProperty('z-index','30','important');
+      if(button.parentElement!==target) target.appendChild(button);
     }
   }
 
@@ -289,7 +329,12 @@
     install();
   }
   setTimeout(installReplayButton,500);
+  window.addEventListener('resize',()=>{
+    clearTimeout(window.__osteoWelcomeResizeV161);
+    window.__osteoWelcomeResizeV161=setTimeout(installReplayButton,100);
+  });
 })();
+
 
 
 /*
@@ -1291,6 +1336,26 @@
         text-overflow:ellipsis;
       }
 
+      .osteo-v161-header{
+        width:100%;
+        margin:0 0 14px;
+        aspect-ratio:16 / 7;
+        overflow:hidden;
+        border-radius:22px;
+        border:1px solid rgba(0,229,255,.30);
+        background:#020714;
+        box-shadow:0 14px 34px rgba(0,0,0,.24),0 0 24px rgba(0,229,255,.07);
+      }
+      .osteo-v161-header img{
+        display:block;
+        width:100%;
+        height:100%;
+        object-fit:cover;
+        object-position:center;
+        filter:none !important;
+        -webkit-filter:none !important;
+      }
+
       .osteo-v157-intro{
         margin:0 0 14px;
         padding:13px 14px;
@@ -1522,6 +1587,10 @@
         <div></div>
       </div>
 
+      <div class="osteo-v161-header" id="osteoV161Header" hidden>
+        <img id="osteoV161HeaderImage" alt="Image anatomique de la zone">
+      </div>
+
       <div class="osteo-v157-intro">
         Sélectionnez une étape pour afficher son texte et son image, ou ouvrez la technique globale.
       </div>
@@ -1612,6 +1681,33 @@
     content.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
 
+  function techniqueHeaderImageV161(t){
+    if(!t) return '';
+    const direct=String(
+      t.headerImage || t.coverImage || t.heroImage ||
+      t.header_image || t.cover_image || ''
+    ).trim();
+    if(direct) return direct;
+
+    const hay=normalize([
+      t.title,t.titre,t.zone,t.monde,t.sub,t.region,t.category,t.categorie
+    ].filter(Boolean).join(' '));
+
+    if(hay.includes('membre superieur') || /epaule|scapul|clavicul|coude|poignet|carp|main|pouce/.test(hay))
+      return 'assets/images/zones/zone-membres-superieurs.webp';
+    if(hay.includes('membre inferieur') || /hanche|cox|femur|genou|tibia|fibula|perone|cheville|talus|calcane|pied|metatars/.test(hay))
+      return 'assets/images/zones/zone-membres-inferieurs.webp';
+    if(/bassin|pelv|ilium|iliaque|sacrum|sacro|pubis|coccyx/.test(hay))
+      return 'assets/images/zones/zone-bassin.webp';
+    if(/lomb|l1|l2|l3|l4|l5|lombo/.test(hay))
+      return 'assets/images/zones/zone-lombaires.webp';
+    if(/cervic|occip|atlas|axis|c0|c1|c2|c3|c4|c5|c6|c7/.test(hay))
+      return 'assets/images/zones/zone-cervicales.webp';
+    if(/dorsal|thorac|cote|costal|sternum|d1|d2|d3|d4|d5|d6|d7|d8|d9|d10|d11|d12/.test(hay))
+      return 'assets/images/zones/zone-dorsales.webp';
+    return '';
+  }
+
   function renderWorld(){
     installStyles();
     const screen=ensureWorldScreen();
@@ -1621,6 +1717,14 @@
 
     const name=screen.querySelector('#osteoV157TechniqueName');
     if(name) name.textContent=String(t && t.title || 'Fiche technique');
+
+    const headerWrap=screen.querySelector('#osteoV161Header');
+    const headerImg=screen.querySelector('#osteoV161HeaderImage');
+    const headerSrc=techniqueHeaderImageV161(t);
+    if(headerWrap && headerImg){
+      headerWrap.hidden=!headerSrc;
+      if(headerSrc) headerImg.src=headerSrc;
+    }
 
     const menu=screen.querySelector('#osteoV157Menu');
     const content=screen.querySelector('#osteoV157Content');
