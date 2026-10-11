@@ -458,32 +458,58 @@
         z-index:1;
         display:block;
         width:100%;
+        min-height:240px;
         padding:0;
         border:0;
         background:transparent;
         border-radius:16px;
         overflow:hidden;
         cursor:pointer;
+        isolation:isolate;
+      }
+      .osteo-central-main-image button::before{
+        content:"";
+        position:absolute;
+        inset:-5%;
+        z-index:0;
+        background-image:var(--osteo-main-image);
+        background-size:cover;
+        background-position:center;
+        filter:blur(24px) saturate(1.06) brightness(.86);
+        transform:scale(1.10);
+        opacity:.95;
+      }
+      .osteo-central-main-image button::after{
+        content:"";
+        position:absolute;
+        inset:0;
+        z-index:1;
+        pointer-events:none;
+        background:
+          radial-gradient(ellipse at center,rgba(255,255,255,.02) 0%,rgba(255,255,255,0) 52%),
+          linear-gradient(180deg,rgba(2,7,20,.03),rgba(2,7,20,.22));
       }
       .osteo-central-main-image img{
+        position:relative;
+        z-index:2;
         display:block;
-        width:100%;
-        max-height:360px;
+        width:calc(100% - 20px);
+        margin:10px auto;
+        max-height:342px;
         object-fit:cover;
-        border-radius:16px;
+        border-radius:14px;
         background:#020714;
-        opacity:.84;
-        mix-blend-mode:screen;
-        filter:blur(6px) saturate(1.08) brightness(.92);
-        transform:scale(1.045);
-        -webkit-mask-image:radial-gradient(ellipse at center,#000 0%,#000 68%,rgba(0,0,0,.70) 82%,transparent 100%);
-        mask-image:radial-gradient(ellipse at center,#000 0%,#000 68%,rgba(0,0,0,.70) 82%,transparent 100%);
-        transition:filter .2s ease,transform .2s ease,opacity .2s ease;
+        opacity:1;
+        mix-blend-mode:normal;
+        filter:none !important;
+        -webkit-filter:none !important;
+        transform:none !important;
+        box-shadow:0 10px 28px rgba(0,0,0,.22);
+        transition:transform .2s ease,box-shadow .2s ease;
       }
       .osteo-central-main-image button:hover img{
-        filter:blur(4px) saturate(1.10) brightness(.96);
-        transform:scale(1.055);
-        opacity:.90;
+        transform:scale(1.01);
+        box-shadow:0 12px 30px rgba(0,0,0,.26);
       }
       .fiche-hero-visual.osteo-has-main-image{
         overflow:hidden;padding:0 !important;
@@ -545,9 +571,16 @@
         <img alt="">
       </button>
     `;
+    const btn=panel.querySelector('button');
     const img=panel.querySelector('img');
+    btn.style.setProperty('--osteo-main-image',`url("${mainSrc.replace(/"/g,'%22')}")`);
     img.src=mainSrc;
     img.alt=t?.title || 'Image principale';
+    img.style.filter='none';
+    img.style.webkitFilter='none';
+    img.style.transform='none';
+    img.style.opacity='1';
+    img.style.mixBlendMode='normal';
     panel.querySelector('button').onclick=()=>{
       const open=fn('openStepImage');
       if(typeof open==='function') open(mainSrc,'Image principale');
