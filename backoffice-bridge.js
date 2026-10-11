@@ -1,22 +1,14 @@
-/* === V15.2 · INTRO VIDÉO AVANT L’ACCUEIL === */
+/* === V15.6 · INTRO VIDÉO AVEC SON + BOUTON REVOIR === */
 (function(){
   'use strict';
 
   const VIDEO_SRC='assets/videos/osteo-pratik-intro.mp4';
-  const SESSION_KEY='osteoPratik.intro.v15.2.seen';
+  const SESSION_KEY='osteoPratik.intro.v15.6.seen';
 
-  function installIntro(){
-    try{
-      if(sessionStorage.getItem(SESSION_KEY)==='1') return;
-    }catch(_){}
-
-    if(document.getElementById('osteoPratikIntro')) return;
-
-    const previousOverflow=document.documentElement.style.overflow;
-    document.documentElement.style.overflow='hidden';
-
+  function ensureStyles(){
+    if(document.getElementById('osteoPratikIntroStylesV156')) return;
     const style=document.createElement('style');
-    style.id='osteoPratikIntroStyles';
+    style.id='osteoPratikIntroStylesV156';
     style.textContent=`
       #osteoPratikIntro{
         position:fixed;
@@ -55,28 +47,63 @@
       }
       #osteoPratikIntro .osteo-intro-actions{
         position:absolute;
-        z-index:3;
+        z-index:4;
         top:max(14px,env(safe-area-inset-top));
         right:max(14px,env(safe-area-inset-right));
         display:flex;
         gap:8px;
       }
-      #osteoPratikIntro button{
+      #osteoPratikIntro .osteo-intro-actions button,
+      #osteoPratikIntro .osteo-intro-launch{
         border:1px solid rgba(255,255,255,.20);
         border-radius:999px;
-        padding:9px 13px;
         color:#fff;
-        background:rgba(2,7,20,.56);
+        background:rgba(2,7,20,.68);
         backdrop-filter:blur(10px);
         -webkit-backdrop-filter:blur(10px);
-        font:700 12px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+        font:800 12px/1 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
         cursor:pointer;
-        box-shadow:0 8px 28px rgba(0,0,0,.24);
+        box-shadow:0 8px 28px rgba(0,0,0,.28);
       }
-      #osteoPratikIntro button:hover{
-        background:rgba(7,31,58,.78);
-        border-color:rgba(0,229,255,.42);
+      #osteoPratikIntro .osteo-intro-actions button{
+        padding:9px 13px;
       }
+      #osteoPratikIntro .osteo-intro-launch-wrap{
+        position:absolute;
+        inset:0;
+        z-index:3;
+        display:grid;
+        place-items:center;
+        padding:24px;
+        background:rgba(2,7,20,.20);
+      }
+      #osteoPratikIntro .osteo-intro-launch-wrap[hidden]{display:none}
+      #osteoPratikIntro .osteo-intro-launch{
+        min-width:210px;
+        padding:15px 22px;
+        border-color:rgba(0,229,255,.52);
+        background:linear-gradient(135deg,rgba(0,229,255,.20),rgba(45,140,255,.20));
+        font-size:15px;
+        box-shadow:0 0 32px rgba(0,229,255,.18),0 12px 34px rgba(0,0,0,.30);
+      }
+      #osteoReplayIntroButton{
+        width:100%;
+        min-height:48px;
+        margin:10px 0 14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        padding:10px 14px;
+        border:1px solid rgba(0,229,255,.28);
+        border-radius:18px;
+        color:#fff;
+        background:linear-gradient(135deg,rgba(0,229,255,.09),rgba(45,140,255,.07));
+        box-shadow:0 12px 28px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04);
+        font-weight:900;
+        cursor:pointer;
+      }
+      #osteoReplayIntroButton span{color:#00e5ff;font-size:19px}
       @media(max-width:760px){
         #osteoPratikIntro video{
           width:100vw;
@@ -86,56 +113,139 @@
       }
     `;
     document.head.appendChild(style);
+  }
+
+  function closeIntro(overlay,markSeen=true){
+    if(!overlay || !overlay.isConnected) return;
+    if(markSeen){
+      try{sessionStorage.setItem(SESSION_KEY,'1');}catch(_){}
+    }
+    overlay.classList.add('osteo-intro-leave');
+    setTimeout(()=>{
+      overlay.remove();
+      document.documentElement.style.overflow='';
+    },560);
+  }
+
+  function showIntro(options={}){
+    ensureStyles();
+
+    const force=!!options.force;
+    const sound=options.sound !== false;
+
+    if(!force){
+      try{if(sessionStorage.getItem(SESSION_KEY)==='1') return;}catch(_){}
+    }
+
+    const existing=document.getElementById('osteoPratikIntro');
+    if(existing) existing.remove();
+
+    document.documentElement.style.overflow='hidden';
 
     const overlay=document.createElement('div');
     overlay.id='osteoPratikIntro';
     overlay.innerHTML=`
-      <video autoplay muted playsinline preload="auto" aria-label="Introduction Ostéo Pratik">
+      <video playsinline preload="auto" aria-label="Introduction Ostéo Pratik">
         <source src="${VIDEO_SRC}" type="video/mp4">
       </video>
       <div class="osteo-intro-actions">
-        <button type="button" class="osteo-intro-sound">🔊 Son</button>
+        <button type="button" class="osteo-intro-sound">🔊 Son actif</button>
         <button type="button" class="osteo-intro-skip">Passer</button>
+      </div>
+      <div class="osteo-intro-launch-wrap" hidden>
+        <button type="button" class="osteo-intro-launch">▶ Lancer avec le son</button>
       </div>
     `;
 
-    const closeIntro=()=>{
-      if(!overlay.isConnected) return;
-      try{ sessionStorage.setItem(SESSION_KEY,'1'); }catch(_){}
-      overlay.classList.add('osteo-intro-leave');
-      setTimeout(()=>{
-        overlay.remove();
-        style.remove();
-        document.documentElement.style.overflow=previousOverflow;
-      },560);
-    };
-
     const video=overlay.querySelector('video');
     const soundBtn=overlay.querySelector('.osteo-intro-sound');
+    const launchWrap=overlay.querySelector('.osteo-intro-launch-wrap');
+    const launchBtn=overlay.querySelector('.osteo-intro-launch');
+
+    video.muted=!sound;
+    video.volume=1;
+
+    function syncSoundLabel(){
+      soundBtn.textContent=video.muted?'🔇 Activer le son':'🔊 Son actif';
+    }
+    syncSoundLabel();
 
     soundBtn.addEventListener('click',()=>{
       video.muted=!video.muted;
-      soundBtn.textContent=video.muted?'🔊 Son':'🔇 Couper le son';
+      video.volume=1;
+      syncSoundLabel();
       if(video.paused) video.play().catch(()=>{});
     });
 
-    overlay.querySelector('.osteo-intro-skip').addEventListener('click',closeIntro);
-    video.addEventListener('ended',closeIntro,{once:true});
-    video.addEventListener('error',()=>setTimeout(closeIntro,350),{once:true});
+    launchBtn.addEventListener('click',()=>{
+      video.muted=false;
+      video.volume=1;
+      syncSoundLabel();
+      launchWrap.hidden=true;
+      video.currentTime=0;
+      video.play().catch(()=>{launchWrap.hidden=false;});
+    });
+
+    overlay.querySelector('.osteo-intro-skip').addEventListener('click',()=>closeIntro(overlay,true));
+    video.addEventListener('ended',()=>closeIntro(overlay,true),{once:true});
+    video.addEventListener('error',()=>setTimeout(()=>closeIntro(overlay,false),350),{once:true});
 
     document.body.appendChild(overlay);
 
-    const playPromise=video.play();
-    if(playPromise && typeof playPromise.catch==='function'){
-      playPromise.catch(()=>{
-        video.muted=true;
-        video.play().catch(()=>{});
-      });
+    // On essaie d'abord avec le son. Les navigateurs peuvent bloquer
+    // l'autoplay sonore : dans ce cas, on garde l'écran d'intro et on propose
+    // un seul clic « Lancer avec le son » au lieu de basculer silencieusement.
+    video.play().then(()=>{
+      launchWrap.hidden=true;
+    }).catch(()=>{
+      video.pause();
+      video.currentTime=0;
+      video.muted=false;
+      video.volume=1;
+      syncSoundLabel();
+      launchWrap.hidden=false;
+    });
+  }
+
+  function installReplayButton(){
+    ensureStyles();
+    if(document.getElementById('osteoReplayIntroButton')) return;
+
+    const home=document.getElementById('home');
+    if(!home) return;
+
+    const button=document.createElement('button');
+    button.id='osteoReplayIntroButton';
+    button.type='button';
+    button.innerHTML='<span>▶</span> Revoir la vidéo de lancement';
+    button.addEventListener('click',()=>showIntro({force:true,sound:true}));
+
+    const intro=home.querySelector('.intro');
+    if(intro) intro.insertAdjacentElement('afterend',button);
+    else{
+      const header=home.querySelector('.top');
+      if(header) header.insertAdjacentElement('afterend',button);
+      else home.prepend(button);
     }
   }
 
-  if(document.body) installIntro();
-  else document.addEventListener('DOMContentLoaded',installIntro,{once:true});
+  window.OsteoPratikIntro={
+    replay:()=>showIntro({force:true,sound:true}),
+    reset:()=>{try{sessionStorage.removeItem(SESSION_KEY);}catch(_){}},
+    show:showIntro
+  };
+
+  function install(){
+    installReplayButton();
+    showIntro({force:false,sound:true});
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',install,{once:true});
+  }else{
+    install();
+  }
+  setTimeout(installReplayButton,500);
 })();
 
 
