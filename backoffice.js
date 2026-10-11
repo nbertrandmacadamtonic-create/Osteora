@@ -16,68 +16,8 @@
   let detailStepsDraft = [];
 
 
-  const PDF_IMPORT_PRESETS = [
-    {
-      slug:'charniere-d12-l1-lumbar-roll-droite',
-      matchers:['charniere d12 l1','lumbar roll'],
-      title:'Dysfonction de la charnière D12/L1, technique indirecte à droite en « Lumbar Roll »',
-      zone:'Rachis',
-      sub:'Lombaires',
-      level:'Niveau intermédiaire',
-      status:'non vue',
-      icon:'D12/L1',
-      video:'',
-      text:'Vérifier le côté de la postériorité. Technique indirecte en « Lumbar Roll ».',
-      headerImage:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-1-entete.png',
-      image:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-2-image-principale.png',
-      detail:{
-        source:'PDF OSTPRA1 - Partie 32',
-        category:'Lombaire – lombaire',
-        method:'Technique indirecte · Lumbar Roll',
-        intro:'Vérifier le côté de la postériorité. Dysfonction de la charnière D12/L1, technique indirecte à droite en « Lumbar Roll ».',
-        steps:[
-          {key:'position',logoKey:'position',logo:'',label:'Position',title:'Patient et praticien',body:'PATIENT : en latérocubitus droit. PRATICIEN : debout à la hauteur du pelvis.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/position.png'},
-          {key:'mains',logoKey:'mains',logo:'',label:'Position des mains',title:'Contacts et prises',body:'L’avant-bras caudal contacte la face postéro-externe de la fesse sus-jacente du patient. La main caudale contacte la zone en dysfonction. L’avant-bras céphalique contacte le sillon delto-pectoral sus-jacent du patient, la main céphalique est sur la zone en dysfonction.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/mains.png'},
-          {key:'barriere',logoKey:'barriere',logo:'',label:'Barrière motrice',title:'Mise en tension',body:'Le membre inférieur sous-jacent est amené en extension. Le membre inférieur sus-jacent est en flexion de hanche et de genou, la cheville est calée dans la fosse poplitée. Tracter le membre supérieur sous-jacent pour ramener le thorax en rotation jusqu’à l’étage concerné. Demander au sujet de tenir ses poignets pour fixer la position.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/barriere.png'},
-          {key:'normalisation',logoKey:'normalisation',logo:'',label:'Normalisation',title:'Geste de correction',body:'Amener le levier supérieur en rotation jusqu’à la zone en dysfonction. Amener le levier inférieur en rotation opposée. Fixer les leviers en amenant le sujet sous le praticien. Porter le thrust en exagération du levier inférieur sous le levier supérieur sur la phase expiratoire.',photo:'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/normalisation.png'}
-        ],
-        images:[
-          'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-1-entete.png',
-          'assets/imported-techniques/charniere-d12-l1-lumbar-roll-droite/planche-2-image-principale.png'
-        ]
-      }
-    },
-    {
-      slug:'sous-talienne-valgus-droite',
-      matchers:['sous talienne','calcaneus en valgus'],
-      title:'Dysfonction de la sous-talienne, calcanéus en valgus, à droite',
-      zone:'Membres inférieurs',
-      sub:'Sous-astragalienne',
-      level:'Niveau intermédiaire',
-      status:'non vue',
-      icon:'ST',
-      video:'',
-      text:'Technique de correction de la sous-talienne en valgus à droite.',
-      headerImage:'assets/imported-techniques/sous-talienne-valgus-droite/planche-1-entete.png',
-      image:'assets/imported-techniques/sous-talienne-valgus-droite/planche-2-image-principale.png',
-      detail:{
-        source:'PDF OSTPRA3 - Partie 50',
-        category:'Membre inférieur – sous-astragalienne',
-        method:'Thrust',
-        intro:'Dysfonction de la sous-talienne, calcanéus en valgus, à droite.',
-        steps:[
-          {key:'position',logoKey:'position',logo:'',label:'Position',title:'Patient et praticien',body:'PATIENT : en décubitus dorsal, les genoux sont fléchis, le pied en dysfonction est en dehors de la table. PRATICIEN : debout en bout de table, à la hauteur des pieds du sujet.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/position.png'},
-          {key:'mains',logoKey:'mains',logo:'',label:'Position des mains',title:'Contacts et prises',body:'Amener le talon en dysfonction en dehors de la table, le reste du pied est sur la table. La main caudale empaume et fixe l’avant-pied en éversion. La main céphalique empaume la face interne du calcanéus.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/mains.png'},
-          {key:'barriere',logoKey:'barriere',logo:'',label:'Barrière motrice',title:'Mise en tension',body:'La main céphalique maintient le calcanéus en valgus. La main caudale exerce une pression progressive, en direction de la table jusqu’à la barrière motrice.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/barriere.png'},
-          {key:'normalisation',logoKey:'normalisation',logo:'',label:'Normalisation',title:'Geste de correction',body:'Porter le thrust par la main céphalique en direction de la table.',photo:'assets/imported-techniques/sous-talienne-valgus-droite/normalisation.png'}
-        ],
-        images:[
-          'assets/imported-techniques/sous-talienne-valgus-droite/planche-1-entete.png',
-          'assets/imported-techniques/sous-talienne-valgus-droite/planche-2-image-principale.png'
-        ]
-      }
-    }
-  ];
+  const PDF_IMPORT_PRESETS = (window.OSTEO_RA_EMBEDDED_DETAILS?.officialTechniques || []);
+
 
   function cfg(){ return window.OSTEO_SUPABASE || {}; }
 
@@ -505,54 +445,110 @@
     showStatus('Planche 1 appliquée à l’image d’en-tête · planche 2 appliquée à l’image principale.');
   }
 
-  function findPresetTarget(preset){
-    const matchers=(preset.matchers||[]).map(normalizeLoose).filter(Boolean);
-    return rows.find(row=>{
-      const title=normalizeLoose(canonical(row).title);
-      return matchers.every(m=>title.includes(m));
-    }) || null;
+  function similarityScore(a,b){
+    const A=new Set(normalizeLoose(a).split(' ').filter(x=>x.length>1));
+    const B=new Set(normalizeLoose(b).split(' ').filter(x=>x.length>1));
+    if(!A.size || !B.size) return 0;
+    let common=0; A.forEach(x=>{ if(B.has(x)) common++; });
+    return (2*common)/(A.size+B.size);
+  }
+
+  function findPresetTarget(preset, usedIds=new Set()){
+    const sourceRow=Number(preset?.sourceRow||0);
+    if(sourceRow){
+      const exactRow=rows.find(row=>Number(row?.videoSourceRow||row?.sourceRow||0)===sourceRow && !usedIds.has(Number(row.id)));
+      if(exactRow) return exactRow;
+    }
+
+    const wanted=normalizeLoose(preset?.title||'');
+    const exact=rows.find(row=>normalizeLoose(canonical(row).title)===wanted && !usedIds.has(Number(row.id)));
+    if(exact) return exact;
+
+    let best=null, bestScore=0;
+    for(const row of rows){
+      const id=Number(row.id);
+      if(usedIds.has(id)) continue;
+      const score=similarityScore(canonical(row).title,preset?.title||'');
+      if(score>bestScore){ best=row; bestScore=score; }
+    }
+    return bestScore>=0.88?best:null;
   }
 
   async function importPdfTechniques(){
     if(!(await requireAdmin())) return;
-    if(!rows.length){ showStatus('Chargez d’abord la base centrale avant l’import PDF.'); return; }
+    if(!rows.length){ showStatus('Chargez d’abord la base centrale avant l’import des fiches officielles.'); return; }
+    if(!PDF_IMPORT_PRESETS.length){ showStatus('Le fichier osteo-ra-details-data.js V15 est absent ou incomplet.'); return; }
+
+    const ok=confirm(
+      `Importer / actualiser les ${PDF_IMPORT_PRESETS.length} fiches officielles OSTPRA ?\n\n`+
+      `Les textes, les quatre photos, l’image principale et le classement anatomique seront mis à jour depuis les trois PDF complets.\n\n`+
+      `Les liens vidéo, les quiz, les statuts et les icônes déjà présents sont conservés.`
+    );
+    if(!ok) return;
+
     let nextId=Math.max(0,...rows.map(x=>Number(x.id)||0))+1;
-    const report=[];
+    const usedIds=new Set();
+    const payload=[];
+    const replacements=new Map();
+    let created=0, updated=0;
+
     for(const preset of PDF_IMPORT_PRESETS){
-      let native=findPresetTarget(preset);
-      const existed=!!native;
-      const id=existed?Number(native.id):nextId++;
-      const current=existed?canonical(native):{};
+      const found=findPresetTarget(preset,usedIds);
+      const existed=!!found;
+      const id=existed?Number(found.id):nextId++;
+      const current=existed?canonical(found):{};
+      const native=existed?clone(found):canonicalToNative({id,title:'',zone:'',sub:'',level:'',status:'',icon:'',video:'',headerImage:'',image:'',text:'',quiz:'',detail:{}});
+
       const value={
         id,
         title:preset.title,
         zone:preset.zone,
         sub:preset.sub,
-        level:preset.level,
+        level:current.level || preset.level || 'Niveau intermédiaire',
         status:current.status || preset.status || 'non vue',
         icon:current.icon || preset.icon || '•',
-        video:current.video || preset.video || '',
+        video:current.video || '',
         headerImage:preset.headerImage,
         image:preset.image,
         text:preset.text,
         quiz:current.quiz || '',
         detail:clone(preset.detail)
       };
-      if(existed){
-        applyCanonicalPatch(native,value);
-      }else{
-        native=canonicalToNative(value);
-        rows.push(native);
-      }
-      const { error }=await client.from(TABLE).upsert({id:id,data:native},{onConflict:'id'});
-      if(error) report.push('⚠ '+preset.title+' : '+error.message);
-      else report.push((existed?'Mise à jour : ':'Création : ')+preset.title);
+      applyCanonicalPatch(native,value);
+      native.videoSourceRow=Number(preset.sourceRow||native.videoSourceRow||0) || native.videoSourceRow;
+      native.officialSource={book:preset.sourceBook,page:preset.sourcePage,sourceRow:preset.sourceRow};
+      usedIds.add(id);
+      replacements.set(id,native);
+      payload.push({id,data:native});
+      if(existed) updated++; else created++;
     }
+
+    setCloud(`Import des fiches officielles… 0/${payload.length}`);
+    let done=0;
+    for(let i=0;i<payload.length;i+=25){
+      const chunk=payload.slice(i,i+25);
+      const { error }=await client.from(TABLE).upsert(chunk,{onConflict:'id'});
+      if(error){
+        setCloud('Erreur pendant l’import des fiches officielles.','warn');
+        showStatus(`Import interrompu après ${done} fiche(s) : ${error.message}`);
+        return;
+      }
+      done+=chunk.length;
+      setCloud(`Import des fiches officielles… ${done}/${payload.length}`);
+    }
+
+    rows=rows.map(row=>replacements.get(Number(row.id))||row);
+    for(const [id,item] of replacements){
+      if(!rows.some(r=>Number(r.id)===id)) rows.push(item);
+    }
+    rows.sort((a,b)=>Number(a.id)-Number(b.id));
+    setCloud(`${rows.length} techniques synchronisées · ${PDF_IMPORT_PRESETS.length} fiches officielles importées.`,'ok');
+    showStatus(`${PDF_IMPORT_PRESETS.length} fiches officielles intégrées : ${updated} mise(s) à jour, ${created} créée(s). Textes et 4 photos par technique installés. Vidéos et quiz conservés.`);
     render();
-    const firstTarget=findPresetTarget(PDF_IMPORT_PRESETS[0]);
-    if(firstTarget) openEditor(Number(firstTarget.id));
-    showStatus(report.join(' · '));
+    const first=findPresetTarget(PDF_IMPORT_PRESETS[0],new Set());
+    if(first) openEditor(Number(first.id));
   }
+
 
   function render(){
     const canon = rows.map(canonical).sort((a,b)=>a.id-b.id);
