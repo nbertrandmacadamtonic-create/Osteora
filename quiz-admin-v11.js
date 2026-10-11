@@ -179,7 +179,7 @@
       return;
     }
     questions=data||[]; renderQuestionsList();
-    $('quizSeedBox').hidden=!(currentUser && questions.length===0 && window.OSTEO_QUIZ_SEED);
+    $('quizSeedBox').hidden=!(currentUser && window.OSTEO_QUIZ_SEED?.questions?.length);
     if(quizSets.length) renderQuizSets();
   }
 
@@ -234,11 +234,34 @@
   }
 
   async function seedQuestions(){
-    if(!(await requireAdmin('quizStatusMessage'))) return; const seed=window.OSTEO_QUIZ_SEED;
-    if(!seed?.questions || seed.questions.length!==15){status('quizStatusMessage','Les 15 questions source sont introuvables.');return;}
-    const payload=seed.questions.map((q,i)=>({code:`general-${String(i+1).padStart(3,'0')}`,zone:'Général',subzone:'',category:String(q.category||'Général'),level:'Tous niveaux',question:String(q.question||''),answers:[0,1,2,3].map(j=>String(q.answers?.[j]||'')),correct:Number(q.correct||0),explanation:String(q.explanation||''),status:'publie'}));
-    const {error}=await client.from(QUESTIONS_TABLE).upsert(payload,{onConflict:'code'}); if(error){status('quizStatusMessage','Erreur : '+error.message);return;}
-    status('quizStatusMessage','15 questions générales importées.','ok'); await loadAll();
+    if(!(await requireAdmin('quizStatusMessage'))) return;
+    const seed=window.OSTEO_QUIZ_SEED;
+    const source=Array.isArray(seed?.questions)?seed.questions:[];
+    if(!source.length){status('quizStatusMessage','La banque source est introuvable.');return;}
+
+    const payload=source.map((q,i)=>({
+      code:String(q.code||`general-${String(i+1).padStart(3,'0')}`),
+      zone:String(q.zone||'Général'),
+      subzone:String(q.subzone||''),
+      category:String(q.category||'Général'),
+      level:String(q.level||'Tous niveaux'),
+      question:String(q.question||''),
+      answers:[0,1,2,3].map(j=>String(q.answers?.[j]||'')),
+      correct:Number(q.correct||0),
+      explanation:String(q.explanation||''),
+      status:String(q.status||'publie')
+    }));
+
+    if(payload.some(q=>!q.code||!q.question||q.answers.some(a=>!a)||q.correct<0||q.correct>3)){
+      status('quizStatusMessage','Une question source est incomplète. Import annulé.');
+      return;
+    }
+
+    status('quizStatusMessage',`Import / actualisation de ${payload.length} questions…`);
+    const {error}=await client.from(QUESTIONS_TABLE).upsert(payload,{onConflict:'code'});
+    if(error){status('quizStatusMessage','Erreur : '+error.message);return;}
+    status('quizStatusMessage',`${payload.length} questions officielles importées / actualisées.`,'ok');
+    await loadAll();
   }
 
   // --------------------------- EVENTS ---------------------------

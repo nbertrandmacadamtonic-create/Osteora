@@ -1012,12 +1012,34 @@
   }
 
   function inject(qs){try{if(typeof generalQuizQuestions==='undefined'||!Array.isArray(generalQuizQuestions))return false;generalQuizQuestions.splice(0,generalQuizQuestions.length,...qs.map(toLegacy));return true;}catch(e){console.warn(e);return false;}}
+  function pickSession(set){
+    const pool=available(set);
+    if(set.kind!=='general') return shuffle(pool).slice(0,SESSION_SIZE);
+
+    const zones=shuffle(['Rachis','Bassin','Membres supérieurs','Membres inférieurs']);
+    const targets=[4,4,4,3];
+    const picked=[];
+    const used=new Set();
+
+    zones.forEach((zone,index)=>{
+      shuffle(pool.filter(q=>q.zone===zone)).slice(0,targets[index]).forEach(q=>{
+        picked.push(q); used.add(q.id ?? q.code);
+      });
+    });
+
+    if(picked.length<SESSION_SIZE){
+      const rest=shuffle(pool.filter(q=>!used.has(q.id ?? q.code)));
+      picked.push(...rest.slice(0,SESSION_SIZE-picked.length));
+    }
+    return shuffle(picked).slice(0,SESSION_SIZE);
+  }
+
   function startSet(slug){
     const set=quizSets.find(s=>s.slug===slug)||{slug:'general',title:'Quiz général',kind:'general'};
-    const pool=available(set); if(pool.length<15){const t=fn('toast');if(t)t(`Il faut au moins 15 questions publiées pour « ${set.title} ».`);return;}
-    const qs=shuffle(pool).slice(0,15); if(!inject(qs))return; sessionMode=set.title;
+    const pool=available(set); if(pool.length<SESSION_SIZE){const t=fn('toast');if(t)t(`Il faut au moins ${SESSION_SIZE} questions publiées pour « ${set.title} ».`);return;}
+    const qs=pickSession(set); if(qs.length<SESSION_SIZE||!inject(qs))return; sessionMode=set.title;
     try{generalQuizIndex=0;generalQuizScore=0;generalQuizAnswered=false;}catch(_){}
-    const title=document.querySelector('#quiz .quiz-general-title h1');const sub=document.querySelector('#quiz .quiz-general-title p');if(title)title.textContent=set.title;if(sub)sub.textContent='15 questions';
+    const title=document.querySelector('#quiz .quiz-general-title h1');const sub=document.querySelector('#quiz .quiz-general-title p');if(title)title.textContent=set.title;if(sub)sub.textContent=`${SESSION_SIZE} questions`;
     appGo('quiz'); const restart=fn('restartGeneralQuiz'); if(restart)restart();
   }
 
