@@ -7,7 +7,7 @@
 (function(){
   'use strict';
 
-  const VERSION='18.2';
+  const VERSION='18.3';
   const LOGIN_SCREEN_ID='login';
   const PUBLIC_SCREENS=new Set(['welcome','signup','login','reset-password']);
   const MIN_PASSWORD_LENGTH=8;
@@ -17,6 +17,17 @@
   let sessionReady=false;
   let originalGo=null;
   let goHookInstalled=false;
+
+  // Capture dès le départ l'intention de récupération, avant que Supabase
+  // puisse consommer ou nettoyer les paramètres de l'URL.
+  const initialAuthUrl=String(window.location.href||'');
+  const initialHash=String(window.location.hash||'');
+  const initialSearch=String(window.location.search||'');
+  const initialRecoveryIntent=
+    /(?:[?#&]type=recovery(?:&|$))/i.test(initialAuthUrl) ||
+    /(?:[?&]code=)/i.test(initialSearch) ||
+    /(?:[?&]token_hash=)/i.test(initialSearch);
+
 
   const $=id=>document.getElementById(id);
 
@@ -783,6 +794,40 @@
     };
   }
 
+  async function completeRecoveryReturnV183(){
+    try{
+      const url=new URL(window.location.href);
+      const code=url.searchParams.get('code');
+
+      if(code){
+        const {data,error}=await client.auth.exchangeCodeForSession(code);
+        if(error) throw error;
+        if(data?.session) session=data.session;
+      }else{
+        const {data}=await client.auth.getSession();
+        if(data?.session) session=data.session;
+      }
+
+      sessionReady=true;
+      safeGo('reset-password');
+
+      try{
+        history.replaceState(null,'',window.location.pathname);
+      }catch(_){}
+      return true;
+    }catch(error){
+      console.error('[Ostéo Pratik Auth] recovery return',error);
+      sessionReady=true;
+      safeGo('reset-password');
+      setStatus(
+        'authV181ResetStatus',
+        'Le lien de réinitialisation est invalide ou a expiré. Demandez un nouveau lien.',
+        'error'
+      );
+      return false;
+    }
+  }
+
   async function init(){
     injectStyles();
     createLoginScreen();
@@ -802,17 +847,14 @@
 
     try{
       await ensureSupabase();
-      const {data}=await client.auth.getSession();
-      session=data?.session||null;
-      sessionReady=true;
 
-      client.auth.onAuthStateChange(async(event,newSession)=>{
-        session=newSession||null;
+      // Installer l'écouteur AVANT getSession(): sinon Supabase peut
+      // consommer le lien de récupération et émettre l'événement trop tôt.
+      client.auth.onAuthStateChange((event,newSession)=>{
+        session=newSession||session||null;
         sessionReady=true;
 
         if(event==='PASSWORD_RECOVERY'){
-          // Supabase nous renvoie bien vers le site : c'est normal.
-          // On transforme cette arrivée en écran "Nouveau mot de passe".
           updateLockClass('reset-password');
           setTimeout(()=>safeGo('reset-password'),0);
           return;
@@ -829,20 +871,19 @@
       });
 
       bind();
-      updateLockClass(document.querySelector('.screen.active')?.id||'welcome');
 
-      // Les liens Supabase reviennent volontairement vers le site.
-      // Pour un mot de passe oublié, on ne doit PAS aller à l'accueil :
-      // on affiche l'écran qui permet de choisir le nouveau mot de passe.
-      const hash=String(location.hash||'');
-      const query=String(location.search||'');
-      const recoveryReturn=/type=recovery/i.test(hash) || /type=recovery/i.test(query);
+      if(initialRecoveryIntent){
+        await completeRecoveryReturnV183();
+      }else{
+        const {data}=await client.auth.getSession();
+        session=data?.session||null;
+        sessionReady=true;
+        updateLockClass(document.querySelector('.screen.active')?.id||'welcome');
 
-      if(recoveryReturn){
-        safeGo('reset-password');
-      }else if(session && hash && /access_token|refresh_token/i.test(hash)){
-        history.replaceState(null,'',location.pathname+location.search);
-        safeGo('home');
+        if(session && initialHash && /access_token|refresh_token/i.test(initialHash)){
+          try{history.replaceState(null,'',location.pathname+location.search);}catch(_){}
+          safeGo('home');
+        }
       }
     }catch(error){
       sessionReady=true;
