@@ -7,9 +7,9 @@
 (function(){
   'use strict';
 
-  const VERSION='18.0';
+  const VERSION='18.1';
   const LOGIN_SCREEN_ID='login';
-  const PUBLIC_SCREENS=new Set(['welcome','signup','login']);
+  const PUBLIC_SCREENS=new Set(['welcome','signup','login','reset-password']);
   const MIN_PASSWORD_LENGTH=8;
 
   let client=null;
@@ -272,6 +272,61 @@
         <button class="primary" type="button" id="authV18LoginButton">Se connecter</button>
         <button class="secondary" type="button" id="authV18GoSignup">Créer un compte</button>
         <button class="auth-v18-link" type="button" id="authV18ForgotPassword">Mot de passe oublié ?</button>
+      </article>
+    `;
+
+    const home=$('home');
+    if(home && home.parentNode) home.parentNode.insertBefore(section,home);
+    else document.querySelector('.app')?.appendChild(section);
+  }
+
+
+  function createResetPasswordScreen(){
+    if($('reset-password')) return;
+
+    const section=document.createElement('section');
+    section.id='reset-password';
+    section.className='screen signup-screen';
+    section.innerHTML=`
+      <header class="top">
+        <button class="icon round" type="button" id="authV181ResetBack">‹</button>
+        <div class="brand">
+          <h1 class="logo">Nouveau mot de passe</h1>
+          <p class="subtitle">Sécurisez votre compte</p>
+        </div>
+        <span></span>
+      </header>
+
+      <article class="signup-card">
+        <div class="pill-icon">◉</div>
+        <h2>Choisissez votre nouveau mot de passe</h2>
+        <p>Le lien reçu par email vous a identifié. Il reste maintenant à définir votre nouveau mot de passe.</p>
+
+        <label class="auth-v18-field">
+          <span>Nouveau mot de passe</span>
+          <div class="auth-v18-password-wrap">
+            <input id="authV181NewPassword" type="password" autocomplete="new-password"
+                   minlength="${MIN_PASSWORD_LENGTH}"
+                   placeholder="${MIN_PASSWORD_LENGTH} caractères minimum">
+            <button type="button" class="auth-v18-toggle-password" data-target="authV181NewPassword">◉</button>
+          </div>
+        </label>
+
+        <label class="auth-v18-field">
+          <span>Confirmer le mot de passe</span>
+          <div class="auth-v18-password-wrap">
+            <input id="authV181NewPassword2" type="password" autocomplete="new-password"
+                   minlength="${MIN_PASSWORD_LENGTH}"
+                   placeholder="Retapez votre mot de passe">
+            <button type="button" class="auth-v18-toggle-password" data-target="authV181NewPassword2">◉</button>
+          </div>
+        </label>
+
+        <div id="authV181ResetStatus" class="auth-v18-status" hidden></div>
+
+        <button class="primary" type="button" id="authV181SavePassword">
+          Enregistrer mon nouveau mot de passe
+        </button>
       </article>
     `;
 
@@ -566,6 +621,59 @@
     }
   }
 
+
+  async function saveNewPassword(){
+    const password=String($('authV181NewPassword')?.value||'');
+    const password2=String($('authV181NewPassword2')?.value||'');
+
+    if(password.length<MIN_PASSWORD_LENGTH){
+      setStatus(
+        'authV181ResetStatus',
+        `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`,
+        'error'
+      );
+      return;
+    }
+    if(password!==password2){
+      setStatus('authV181ResetStatus','Les deux mots de passe ne correspondent pas.','error');
+      return;
+    }
+
+    const button=$('authV181SavePassword');
+    setBusy(button,true,'Enregistrement…');
+    setStatus('authV181ResetStatus','');
+
+    try{
+      const {data,error}=await client.auth.updateUser({password});
+      if(error) throw error;
+
+      session=(await client.auth.getSession()).data?.session||session;
+      sessionReady=true;
+
+      setStatus(
+        'authV181ResetStatus',
+        'Votre nouveau mot de passe est enregistré. Vous êtes maintenant connecté.',
+        'ok'
+      );
+
+      // Retirer les paramètres du lien de récupération de la barre d'adresse.
+      try{
+        history.replaceState(null,'',location.pathname+location.search);
+      }catch(_){}
+
+      setTimeout(()=>safeGo('home'),700);
+    }catch(error){
+      console.error('[Ostéo Pratik Auth] password update',error);
+      setStatus(
+        'authV181ResetStatus',
+        'Impossible d’enregistrer le nouveau mot de passe. Demandez un nouveau lien.',
+        'error'
+      );
+    }finally{
+      setBusy(button,false);
+    }
+  }
+
   async function forgotPassword(){
     const email=String($('authV18LoginEmail')?.value||'').trim().toLowerCase();
     if(!email){
@@ -611,12 +719,17 @@
     $('authV18GoSignup')?.addEventListener('click',()=>safeGo('signup'));
     $('authV18LoginBack')?.addEventListener('click',()=>safeGo('welcome'));
     $('authV18ForgotPassword')?.addEventListener('click',forgotPassword);
+    $('authV181SavePassword')?.addEventListener('click',saveNewPassword);
+    $('authV181ResetBack')?.addEventListener('click',()=>safeGo('login'));
 
     $('authV18LoginPassword')?.addEventListener('keydown',e=>{
       if(e.key==='Enter') login();
     });
     $('signupPassword2')?.addEventListener('keydown',e=>{
       if(e.key==='Enter') signup();
+    });
+    $('authV181NewPassword2')?.addEventListener('keydown',e=>{
+      if(e.key==='Enter') saveNewPassword();
     });
 
     // Remplace l'ancienne fonction localeStorage appelée par l'ancien HTML.
@@ -634,6 +747,7 @@
   async function init(){
     injectStyles();
     createLoginScreen();
+    createResetPasswordScreen();
     prepareSignupScreen();
     prepareWelcome();
     installPasswordToggles();
@@ -656,6 +770,15 @@
       client.auth.onAuthStateChange(async(event,newSession)=>{
         session=newSession||null;
         sessionReady=true;
+
+        if(event==='PASSWORD_RECOVERY'){
+          // Supabase nous renvoie bien vers le site : c'est normal.
+          // On transforme cette arrivée en écran "Nouveau mot de passe".
+          updateLockClass('reset-password');
+          setTimeout(()=>safeGo('reset-password'),0);
+          return;
+        }
+
         updateLockClass(document.querySelector('.screen.active')?.id||'welcome');
 
         if(event==='SIGNED_IN' && session){
@@ -669,9 +792,16 @@
       bind();
       updateLockClass(document.querySelector('.screen.active')?.id||'welcome');
 
-      // Si un lien de confirmation Supabase nous ramène avec une session,
-      // l'utilisateur est maintenant autorisé.
-      if(session && location.hash && /access_token|refresh_token/i.test(location.hash)){
+      // Les liens Supabase reviennent volontairement vers le site.
+      // Pour un mot de passe oublié, on ne doit PAS aller à l'accueil :
+      // on affiche l'écran qui permet de choisir le nouveau mot de passe.
+      const hash=String(location.hash||'');
+      const query=String(location.search||'');
+      const recoveryReturn=/type=recovery/i.test(hash) || /type=recovery/i.test(query);
+
+      if(recoveryReturn){
+        safeGo('reset-password');
+      }else if(session && hash && /access_token|refresh_token/i.test(hash)){
         history.replaceState(null,'',location.pathname+location.search);
         safeGo('home');
       }
