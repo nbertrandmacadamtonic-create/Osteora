@@ -86,31 +86,53 @@
         font-size:15px;
         box-shadow:0 0 32px rgba(0,229,255,.18),0 12px 34px rgba(0,0,0,.30);
       }
-      .osteo-welcome-v161{
+      /* V17.2 : le bouton de relance appartient à la grille native
+         de l'écran d'entrée. Plus aucun positionnement absolu. */
+      .welcome-poster-actions #osteoReplayIntroButton{
         position:relative !important;
-        overflow-x:hidden !important;
+        inset:auto !important;
+        width:100% !important;
+        min-width:0 !important;
+        max-width:none !important;
+        min-height:48px !important;
+        margin:0 !important;
+        box-sizing:border-box !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        gap:9px !important;
+        padding:10px 14px !important;
+        border:1px solid rgba(0,229,255,.32) !important;
+        border-radius:18px !important;
+        color:#fff !important;
+        background:linear-gradient(135deg,rgba(0,229,255,.10),rgba(45,140,255,.08)) !important;
+        box-shadow:0 12px 28px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04) !important;
+        font-size:16px !important;
+        font-weight:900 !important;
+        line-height:1.15 !important;
+        white-space:nowrap !important;
+        overflow:hidden !important;
+        cursor:pointer !important;
+        z-index:3 !important;
       }
-      .osteo-welcome-v161 .osteo-welcome-action-v161{
-        font-size:clamp(15px,3.2vw,20px) !important;
+      .welcome-poster-actions #osteoReplayIntroButton span{
+        color:#00e5ff !important;
+        font-size:18px !important;
+        flex:0 0 auto;
       }
-      #osteoReplayIntroButton{
-        width:150px;
-        min-height:46px;
-        margin:0;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        gap:9px;
-        padding:10px 14px;
-        border:1px solid rgba(0,229,255,.28);
-        border-radius:18px;
-        color:#fff;
-        background:linear-gradient(135deg,rgba(0,229,255,.09),rgba(45,140,255,.07));
-        box-shadow:0 12px 28px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04);
-        font-weight:900;
-        cursor:pointer;
+
+      /* Restaurer les dimensions prévues par la page pour les 3 boutons natifs. */
+      #welcome .welcome-poster-actions .welcome-start,
+      #welcome .welcome-poster-actions .welcome-signup,
+      #welcome .welcome-poster-actions .welcome-login{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:none !important;
+        box-sizing:border-box !important;
+        white-space:normal !important;
+        overflow:hidden !important;
+        text-overflow:clip !important;
       }
-      #osteoReplayIntroButton span{color:#00e5ff;font-size:19px}
       @media(max-width:760px){
         #osteoPratikIntro video{
           width:100vw;
@@ -214,57 +236,14 @@
     });
   }
 
-  function fixWelcomeLayoutV161(target){
-    if(!target) return;
-
-    target.classList.add('osteo-welcome-v161');
-
-    const normalizeText=v=>String(v||'')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .toLowerCase().replace(/\s+/g,' ').trim();
-
-    const actions=[...target.querySelectorAll('button,a')].filter(el=>{
-      const txt=normalizeText(el.textContent);
-      return txt.includes('commencer') ||
-             txt.includes("s'inscrire") ||
-             txt.includes('s inscrire') ||
-             txt.includes("j'ai deja") ||
-             txt.includes('j ai deja') ||
-             txt.includes('deja un compte');
-    });
-
-    actions.forEach(el=>{
-      el.classList.add('osteo-welcome-action-v161');
-      el.style.setProperty('min-width','150px','important');
-      el.style.setProperty('width','150px','important');
-      el.style.setProperty('max-width','150px','important');
-      el.style.setProperty('box-sizing','border-box','important');
-      el.style.setProperty('white-space','normal','important');
-      el.style.setProperty('overflow','visible','important');
-      el.style.setProperty('text-overflow','clip','important');
-      el.style.setProperty('line-height','1.12','important');
-    });
-
-    target.querySelectorAll('img').forEach(img=>{
-      img.style.setProperty('max-width','100%','important');
-    });
-  }
-
   function installReplayButton(){
     ensureStyles();
 
-    const target=document.getElementById('welcome') ||
-      [...document.querySelectorAll('.screen,section,main,div')].find(el=>{
-        const txt=String(el.textContent||'')
-          .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-          .toLowerCase();
-        return txt.includes('commencer') &&
-               (txt.includes("s'inscrire") || txt.includes('s inscrire'));
-      });
-
+    const target=document.getElementById('welcome');
     if(!target) return;
 
-    fixWelcomeLayoutV161(target);
+    const actions=target.querySelector('.welcome-poster-actions');
+    if(!actions) return;
 
     let button=document.getElementById('osteoReplayIntroButton');
     if(!button){
@@ -276,41 +255,29 @@
 
     button.onclick=()=>showIntro({force:true,sound:true});
 
-    // Le bouton est volontairement placé AU-DESSUS de « Commencer ».
-    const candidates=[...target.querySelectorAll('button,a')].filter(el=>el!==button);
-    const commencer=candidates.find(el=>{
-      const txt=String(el.textContent||'')
-        .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-        .toLowerCase().trim();
-      return txt.includes('commencer');
-    });
-
-    if(commencer){
-      const targetRect=target.getBoundingClientRect();
-      const rect=commencer.getBoundingClientRect();
-      const top=Math.max(16,rect.top-targetRect.top-58);
-
-      button.style.setProperty('position','absolute','important');
-      button.style.setProperty('top',`${top}px`,'important');
-      button.style.setProperty('right','20px','important');
-      button.style.setProperty('left','auto','important');
-      button.style.setProperty('bottom','auto','important');
-      button.style.setProperty('width','150px','important');
-      button.style.setProperty('min-width','150px','important');
-      button.style.setProperty('max-width','150px','important');
-      button.style.setProperty('min-height','46px','important');
-      button.style.setProperty('z-index','30','important');
-
-      if(button.parentElement!==target) target.appendChild(button);
-    }else{
-      button.style.setProperty('position','absolute','important');
-      button.style.setProperty('right','20px','important');
-      button.style.setProperty('bottom','110px','important');
-      button.style.setProperty('width','150px','important');
-      button.style.setProperty('z-index','30','important');
-      if(button.parentElement!==target) target.appendChild(button);
+    // V17.2 : le bouton est le PREMIER élément de la grille,
+    // juste avant « Commencer », sans positionnement absolu.
+    if(button.parentElement!==actions || actions.firstElementChild!==button){
+      actions.insertBefore(button,actions.firstElementChild);
     }
+
+    // Nettoie d'éventuels styles inline laissés par l'ancienne version.
+    [
+      'position','top','right','left','bottom',
+      'width','min-width','max-width','min-height',
+      'z-index','white-space','overflow','line-height'
+    ].forEach(prop=>button.style.removeProperty(prop));
+
+    target.querySelectorAll('.welcome-start,.welcome-signup,.welcome-login').forEach(el=>{
+      [
+        'min-width','width','max-width','box-sizing',
+        'white-space','overflow','text-overflow','line-height'
+      ].forEach(prop=>el.style.removeProperty(prop));
+      el.classList.remove('osteo-welcome-action-v161');
+    });
+    target.classList.remove('osteo-welcome-v161');
   }
+
 
   window.OsteoPratikIntro={
     replay:()=>showIntro({force:true,sound:true}),
