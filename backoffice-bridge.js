@@ -991,6 +991,42 @@
     return bank.filter(q=>q.zone===set.zone && String(q.subzone||'').trim()===String(set.subzone||'').trim());
   }
 
+  function canonicalQuizSets(){
+    const source=Array.isArray(quizSets)?quizSets:[];
+    const wanted=[
+      {slug:'quiz-general',title:'Quiz général — Ostéopathie',kind:'general',zone:'Général',subzone:''},
+      {slug:'quiz-rachis',title:'Quiz Rachis',kind:'zone',zone:'Rachis',subzone:''},
+      {slug:'quiz-bassin',title:'Quiz Bassin',kind:'zone',zone:'Bassin',subzone:''},
+      {slug:'quiz-membres-superieurs',title:'Quiz Membres supérieurs',kind:'zone',zone:'Membres supérieurs',subzone:''},
+      {slug:'quiz-membres-inferieurs',title:'Quiz Membres inférieurs',kind:'zone',zone:'Membres inférieurs',subzone:''}
+    ];
+
+    return wanted.map(def=>{
+      // 1) priorité absolue au slug V17
+      let found=source.find(s=>String(s.slug||'')===def.slug);
+
+      // 2) sinon on récupère un ancien quiz équivalent pour éviter un écran vide
+      if(!found){
+        found=source.find(s=>{
+          if(def.kind==='general') return s.kind==='general' && (!s.zone || s.zone==='Général');
+          return s.kind==='zone' && String(s.zone||'')===def.zone;
+        });
+      }
+
+      // On force le libellé et le filtre canonique même si la ligne Supabase est ancienne.
+      return {
+        ...(found||{}),
+        slug:def.slug,
+        title:def.title,
+        kind:def.kind,
+        zone:def.zone,
+        subzone:def.subzone,
+        question_count:15,
+        status:'publie'
+      };
+    });
+  }
+
   function cardColor(set,i){
     if(set.kind==='general')return '#ffb020';
     const map={'Rachis':'#00e5ff','Bassin':'#ff9f43','Membres supérieurs':'#a855ff','Membres inférieurs':'#00e6a7'};
@@ -1008,7 +1044,7 @@
         .quiz-menu-title h1{margin:0;color:#fff;font-size:30px}.quiz-menu-title p{margin:8px 0 0;color:#aeb8cc;font-size:14px}
         .quiz-menu-grid{display:grid;gap:12px}.quiz-menu-card{position:relative;min-height:104px;padding:14px 56px 14px 76px;border-radius:22px;text-align:left;border:1px solid var(--qc);color:var(--qc);background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90))}
         .quiz-menu-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;border:1px solid currentColor;font-weight:950}
-        .quiz-menu-card strong{display:block;color:#fff;font-size:18px}.quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px}.quiz-menu-card em{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;border:1px solid currentColor;font-weight:950}.quiz-menu-card.disabled{opacity:.45}.quiz-menu-info{margin:14px auto 0;padding:14px;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035)}
+        .quiz-menu-card strong{display:block;color:#fff;font-size:18px;line-height:1.18;padding-right:4px;overflow-wrap:anywhere}.quiz-menu-card small{display:block;margin-top:5px;color:#c2ccdc;font-size:12px;line-height:1.25}.quiz-menu-card em{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-style:normal;border:1px solid currentColor;font-weight:950;background:rgba(4,14,30,.72)}.quiz-menu-card.disabled{opacity:.45}.quiz-menu-info{margin:14px auto 0;padding:14px;border-radius:20px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035)}
       `;document.head.appendChild(s);
     }
     return menu;
@@ -1016,7 +1052,7 @@
 
   function renderMenu(){
     const menu=buildMenu();
-    const sets=quizSets.length?quizSets:[{slug:'general',title:'Quiz général',kind:'general',zone:'',subzone:''}];
+    const sets=canonicalQuizSets();
     menu.innerHTML=`<header class="top"><button class="icon round" type="button" data-quiz-back>‹</button><div class="brand"><h1 class="logo">Tester</h1><p class="subtitle">Choisir un quiz</p></div><button class="icon" type="button" data-quiz-refresh>↻</button></header><div class="quiz-menu-title"><h1>Tester mes acquis</h1><p>15 questions par session</p></div><div class="quiz-menu-grid">${sets.map((s,i)=>{const n=available(s).length;return `<button class="quiz-menu-card ${n<15?'disabled':''}" style="--qc:${cardColor(s,i)}" type="button" data-quiz-slug="${s.slug}"><span class="quiz-menu-icon">15</span><strong>${s.title}</strong><small>${s.kind==='general'?'Toutes les zones':(s.subzone||s.zone||'')}</small><em>${n}</em></button>`;}).join('')}</div><article class="quiz-menu-info"><strong>Principe</strong><p>Chaque quiz tire 15 questions dans la banque selon son filtre.</p></article>`;
     menu.querySelector('[data-quiz-back]').onclick=()=>appGo('home');
     menu.querySelector('[data-quiz-refresh]').onclick=()=>loadData();
@@ -1029,7 +1065,7 @@
   }
 
   function startSet(slug){
-    const set=quizSets.find(s=>s.slug===slug)||{slug:'general',title:'Quiz général',kind:'general'};
+    const set=canonicalQuizSets().find(s=>s.slug===slug)||{slug:'quiz-general',title:'Quiz général — Ostéopathie',kind:'general',zone:'Général'};
     const pool=available(set); if(pool.length<SESSION_SIZE){const t=fn('toast');if(t)t(`Il faut au moins ${SESSION_SIZE} questions publiées pour « ${set.title} ».`);return;}
     const qs=pickSession(set); if(qs.length<SESSION_SIZE||!inject(qs))return; sessionMode=set.title;
     try{generalQuizIndex=0;generalQuizScore=0;generalQuizAnswered=false;}catch(_){}
