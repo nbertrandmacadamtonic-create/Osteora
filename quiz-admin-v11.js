@@ -67,7 +67,7 @@
   // --------------------------- QUIZ DEFINITIONS ---------------------------
   function questionCountForSet(set){
     if(!set) return 0;
-    if(set.kind==='general') return questions.filter(q=>q.status==='publie').length;
+    if(set.kind==='general') return questions.filter(q=>q.status==='publie' && q.zone==='Général').length;
     if(set.kind==='zone') return questions.filter(q=>q.status==='publie' && q.zone===set.zone).length;
     return questions.filter(q=>q.status==='publie' && q.zone===set.zone && String(q.subzone||'').trim()===String(set.subzone||'').trim()).length;
   }
@@ -240,7 +240,7 @@
     if(!source.length){status('quizStatusMessage','La banque source est introuvable.');return;}
 
     const payload=source.map((q,i)=>({
-      code:String(q.code||`general-${String(i+1).padStart(3,'0')}`),
+      code:String(q.code||`question-${String(i+1).padStart(3,'0')}`),
       zone:String(q.zone||'Général'),
       subzone:String(q.subzone||''),
       category:String(q.category||'Général'),
@@ -257,10 +257,37 @@
       return;
     }
 
-    status('quizStatusMessage',`Import / actualisation de ${payload.length} questions…`);
-    const {error}=await client.from(QUESTIONS_TABLE).upsert(payload,{onConflict:'code'});
-    if(error){status('quizStatusMessage','Erreur : '+error.message);return;}
-    status('quizStatusMessage',`${payload.length} questions officielles importées / actualisées.`,'ok');
+    let done=0;
+    status('quizStatusMessage',`Import / actualisation… 0/${payload.length}`);
+    for(let i=0;i<payload.length;i+=40){
+      const chunk=payload.slice(i,i+40);
+      const {error}=await client.from(QUESTIONS_TABLE).upsert(chunk,{onConflict:'code'});
+      if(error){status('quizStatusMessage',`Import interrompu à ${done} question(s) : ${error.message}`);return;}
+      done+=chunk.length;
+      status('quizStatusMessage',`Import / actualisation… ${done}/${payload.length}`);
+    }
+
+    const sets=Array.isArray(seed?.sets)?seed.sets:[];
+    for(const s of sets){
+      const {data:existing,error:findError}=await client.from(SETS_TABLE).select('id').eq('slug',s.slug).limit(1);
+      if(findError){status('quizStatusMessage','Questions importées, mais erreur de lecture des quiz : '+findError.message);return;}
+      const row={
+        slug:s.slug,
+        title:s.title,
+        kind:s.kind,
+        zone:s.zone||'',
+        subzone:s.subzone||'',
+        question_count:Number(s.question_count)||15,
+        status:s.status||'publie',
+        position:Number(s.position)||100
+      };
+      let result;
+      if(existing?.length) result=await client.from(SETS_TABLE).update(row).eq('id',existing[0].id);
+      else result=await client.from(SETS_TABLE).insert(row);
+      if(result.error){status('quizStatusMessage','Questions importées, mais erreur de création des quiz : '+result.error.message);return;}
+    }
+
+    status('quizStatusMessage',`${payload.length} questions importées / actualisées · ${sets.length} quiz prêts.`,'ok');
     await loadAll();
   }
 

@@ -1019,7 +1019,7 @@
   }
 
   function available(set){
-    if(set.kind==='general')return bank;
+    if(set.kind==='general')return bank.filter(q=>q.zone==='Général');
     if(set.kind==='zone')return bank.filter(q=>q.zone===set.zone);
     return bank.filter(q=>q.zone===set.zone && String(q.subzone||'').trim()===String(set.subzone||'').trim());
   }
@@ -1058,25 +1058,7 @@
 
   function inject(qs){try{if(typeof generalQuizQuestions==='undefined'||!Array.isArray(generalQuizQuestions))return false;generalQuizQuestions.splice(0,generalQuizQuestions.length,...qs.map(toLegacy));return true;}catch(e){console.warn(e);return false;}}
   function pickSession(set){
-    const pool=available(set);
-    if(set.kind!=='general') return shuffle(pool).slice(0,SESSION_SIZE);
-
-    const zones=shuffle(['Rachis','Bassin','Membres supérieurs','Membres inférieurs']);
-    const targets=[4,4,4,3];
-    const picked=[];
-    const used=new Set();
-
-    zones.forEach((zone,index)=>{
-      shuffle(pool.filter(q=>q.zone===zone)).slice(0,targets[index]).forEach(q=>{
-        picked.push(q); used.add(q.id ?? q.code);
-      });
-    });
-
-    if(picked.length<SESSION_SIZE){
-      const rest=shuffle(pool.filter(q=>!used.has(q.id ?? q.code)));
-      picked.push(...rest.slice(0,SESSION_SIZE-picked.length));
-    }
-    return shuffle(picked).slice(0,SESSION_SIZE);
+    return shuffle(available(set)).slice(0,SESSION_SIZE);
   }
 
   function startSet(slug){
