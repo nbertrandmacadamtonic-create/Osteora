@@ -7,7 +7,7 @@
 (function(){
   'use strict';
 
-  const VERSION='18.1';
+  const VERSION='18.2';
   const LOGIN_SCREEN_ID='login';
   const PUBLIC_SCREENS=new Set(['welcome','signup','login','reset-password']);
   const MIN_PASSWORD_LENGTH=8;
@@ -34,6 +34,18 @@
     return String(v??'').replace(/[&<>"']/g,c=>({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     }[c]));
+  }
+
+
+  function authRedirectUrl(){
+    try{
+      const url=new URL('.',window.location.href);
+      url.hash='';
+      url.search='';
+      return url.href;
+    }catch(_){
+      return window.location.origin+window.location.pathname;
+    }
   }
 
   function splitName(fullName){
@@ -554,7 +566,7 @@
         email,
         password,
         options:{
-          emailRedirectTo:window.location.origin+window.location.pathname,
+          emailRedirectTo:authRedirectUrl(),
           data:{
             full_name:name,
             first_name:names.first_name,
@@ -680,14 +692,41 @@
       setStatus('authV18LoginStatus','Entrez d’abord votre adresse email.','error');
       return;
     }
+
+    const redirectTo=authRedirectUrl();
+
     try{
-      const {error}=await client.auth.resetPasswordForEmail(email,{
-        redirectTo:window.location.origin+window.location.pathname
-      });
+      const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo});
       if(error) throw error;
-      setStatus('authV18LoginStatus','Email de réinitialisation envoyé.','ok');
-    }catch(_){
-      setStatus('authV18LoginStatus','Impossible d’envoyer l’email de réinitialisation.','error');
+
+      setStatus(
+        'authV18LoginStatus',
+        'Email de réinitialisation envoyé. Vérifiez aussi les courriers indésirables.',
+        'ok'
+      );
+    }catch(error){
+      const msg=String(error?.message||error||'Erreur inconnue');
+      console.error('[Ostéo Pratik Auth] reset password', {
+        message:msg,
+        status:error?.status,
+        code:error?.code,
+        redirectTo
+      });
+
+      let fr='Impossible d’envoyer l’email de réinitialisation.';
+      if(/rate|limit|too many/i.test(msg)){
+        fr='Trop de demandes ont été faites. Attendez environ 60 secondes puis réessayez.';
+      }else if(/redirect|url|allow/i.test(msg)){
+        fr='L’adresse de retour du site n’est pas autorisée dans Supabase. Vérifiez Authentication → URL Configuration.';
+      }else if(/smtp|email|mail/i.test(msg)){
+        fr='Supabase n’arrive pas à envoyer l’email. Vérifiez Authentication → Emails / SMTP.';
+      }
+
+      setStatus(
+        'authV18LoginStatus',
+        fr+' Détail Supabase : '+msg,
+        'error'
+      );
     }
   }
 
