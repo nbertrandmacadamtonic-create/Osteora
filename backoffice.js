@@ -633,8 +633,94 @@
     setTimeout(()=>document.querySelector('.editor-panel')?.scrollIntoView({behavior:'smooth',block:'start'}),30);
   }
 
+
+  /* === V15.8 · SYNCHRONISATION DU TEXTE GÉNÉRAL VERS LES 4 ÉTAPES === */
+  function normalizeHeadingV158(value){
+    return String(value||'')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+      .toUpperCase()
+      .replace(/[.:;]+$/,'')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+
+  function parseGeneralTechniqueTextV158(raw){
+    const lines=String(raw||'').replace(/\r\n?/g,'\n').split('\n');
+    const sections={};
+    let current=null;
+
+    const headingKey=(line)=>{
+      const h=normalizeHeadingV158(line);
+      if(h==='POSITION' || h==='POSITION DU PRATICIEN' || h==='POSITION PATIENT / PRATICIEN') return 'position';
+      if(h==='POSITION DES MAINS' || h==='POSITION DE LA MAIN' || h==='POSITION DES CONTACTS') return 'mains';
+      if(h==='BARRIERE MOTRICE' || h==='BARRIERE' || h==='MISE EN TENSION') return 'barriere';
+      if(h==='NORMALISATION' || h==='CORRECTION' || h==='GESTE DE CORRECTION') return 'normalisation';
+      return '';
+    };
+
+    lines.forEach(line=>{
+      const key=headingKey(line);
+      if(key){
+        current=key;
+        if(!sections[current]) sections[current]=[];
+        return;
+      }
+      if(current) sections[current].push(line);
+    });
+
+    Object.keys(sections).forEach(key=>{
+      sections[key]=sections[key].join('\n').trim();
+    });
+    return sections;
+  }
+
+  function syncGeneralTextIntoDetailStepsV158(){
+    const raw=$('fText')?.value || '';
+    const sections=parseGeneralTechniqueTextV158(raw);
+    const keys=Object.keys(sections).filter(k=>String(sections[k]||'').trim());
+
+    // Pas de structure reconnue : on ne touche pas aux étapes détaillées.
+    if(!keys.length) return false;
+
+    const findIndex=(wanted)=>{
+      return detailStepsDraft.findIndex(step=>{
+        const key=normalizeHeadingV158(step?.key||'').toLowerCase();
+        const label=normalizeHeadingV158(step?.label||'').toLowerCase();
+        if(wanted==='position') return (key.includes('position') || label.includes('position')) && !key.includes('main') && !label.includes('main');
+        if(wanted==='mains') return key.includes('main') || label.includes('main') || key.includes('contact') || label.includes('contact');
+        if(wanted==='barriere') return key.includes('bar') || label.includes('bar') || key.includes('tension') || label.includes('tension');
+        if(wanted==='normalisation') return key.includes('normal') || label.includes('normal') || key.includes('correction') || label.includes('correction');
+        return false;
+      });
+    };
+
+    const defaults={
+      position:{key:'position',logoKey:'position',logo:'',label:'Position',title:'Patient et praticien',body:'',photo:''},
+      mains:{key:'mains',logoKey:'mains',logo:'',label:'Position des mains',title:'Contacts et prises',body:'',photo:''},
+      barriere:{key:'barriere',logoKey:'barriere',logo:'',label:'Barrière motrice',title:'Mise en tension',body:'',photo:''},
+      normalisation:{key:'normalisation',logoKey:'normalisation',logo:'',label:'Normalisation',title:'Geste de correction',body:'',photo:''}
+    };
+
+    ['position','mains','barriere','normalisation'].forEach(key=>{
+      const body=String(sections[key]||'').trim();
+      if(!body) return;
+
+      let index=findIndex(key);
+      if(index<0){
+        detailStepsDraft.push(clone(defaults[key]));
+        index=detailStepsDraft.length-1;
+      }
+
+      // On change uniquement le texte : photos, logos, libellés et titres restent intacts.
+      detailStepsDraft[index].body=body;
+    });
+
+    return true;
+  }
+
   function formValue(){
     syncStepsFromDom();
+    syncGeneralTextIntoDetailStepsV158();
     const detail={
       source:$('fDetailSource').value.trim(),
       category:$('fDetailCategory').value.trim(),
