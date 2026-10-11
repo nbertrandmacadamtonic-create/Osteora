@@ -988,11 +988,12 @@
 
 
 
-/* === V15.5 · BOUTON UNIQUE TECHNIQUE + TEXTE + IMAGES === */
+/* === V15.7 · MONDE TECHNIQUE SÉPARÉ DU MONDE VIDÉO === */
 (function(){
   'use strict';
 
   let requestedTechniqueId = null;
+  let activeStepIndex = null;
 
   function fn(name){
     try{ if(typeof window[name] === 'function') return window[name]; }catch(_){}
@@ -1009,7 +1010,7 @@
       .replace(/'/g,'&#039;');
   }
 
-  function htmlText(value){
+  function bodyHtml(value){
     return esc(value).replace(/\r\n|\r|\n/g,'<br>');
   }
 
@@ -1081,10 +1082,10 @@
 
   function stepLabel(step,index){
     const key = normalize(step && step.key);
-    if(key.includes('position') && !key.includes('main')) return 'Position';
-    if(key.includes('main') || key.includes('contact')) return 'Position des mains';
-    if(key.includes('bar')) return 'Barrière motrice';
-    if(key.includes('normal')) return 'Normalisation';
+    if(index === 0) return 'Position du praticien';
+    if(key.includes('main') || key.includes('contact') || index === 1) return 'Position des mains';
+    if(key.includes('bar') || index === 2) return 'Barrière motrice';
+    if(key.includes('normal') || index === 3) return 'Normalisation';
     return String(step && (step.label || step.title) || ('Étape '+(index+1)));
   }
 
@@ -1125,278 +1126,479 @@
     return map[key] || '#00e5ff';
   }
 
-  function logoMarkup(step,index){
+  function logoMarkup(step,index,large=false){
     const src = stepLogo(step,index);
     const color = colorValue(stepColor(step,index));
+    const cls = large ? 'osteo-v157-step-logo large' : 'osteo-v157-step-logo';
     if(src){
-      return `<span class="osteo-v155-logo" style="--step-color:${color}"><img src="${esc(src)}" alt=""></span>`;
+      return `<span class="${cls}" style="--step-color:${color}"><img src="${esc(src)}" alt=""></span>`;
     }
-    return `<span class="osteo-v155-logo osteo-v155-logo-fallback" style="--step-color:${color}">${String(index+1).padStart(2,'0')}</span>`;
+    return `<span class="${cls} fallback" style="--step-color:${color}">${String(index+1).padStart(2,'0')}</span>`;
   }
 
   function installStyles(){
-    if(document.getElementById('osteoV155Styles')) return;
+    if(document.getElementById('osteoV157Styles')) return;
+
     const style=document.createElement('style');
-    style.id='osteoV155Styles';
+    style.id='osteoV157Styles';
     style.textContent=`
-      #player .video-premium-actions .osteo-v155-old-action{
+      #player .video-premium-actions .osteo-v157-old-action{
         display:none !important;
       }
-
       #player .video-premium-actions{
         grid-template-columns:1fr !important;
       }
-
-      #player .video-premium-actions .osteo-v155-master-btn{
+      #player .video-premium-actions .osteo-v157-open-world{
+        width:100% !important;
+        min-height:54px !important;
         display:flex !important;
         align-items:center !important;
         justify-content:center !important;
         gap:9px !important;
-        width:100% !important;
-        min-height:52px !important;
+        padding:10px 14px !important;
         border-radius:20px !important;
-        border:1px solid rgba(0,229,255,.34) !important;
-        background:linear-gradient(135deg,rgba(0,229,255,.10),rgba(45,140,255,.08)) !important;
         color:#fff !important;
+        border:1px solid rgba(0,229,255,.42) !important;
+        background:linear-gradient(135deg,rgba(0,229,255,.13),rgba(45,140,255,.10)) !important;
+        box-shadow:0 0 24px rgba(0,229,255,.10),inset 0 1px 0 rgba(255,255,255,.05) !important;
         font-weight:950 !important;
-        box-shadow:0 0 20px rgba(0,229,255,.08) !important;
+      }
+      #player .video-premium-actions .osteo-v157-open-world span{
+        color:#00e5ff;
+        font-size:19px;
       }
 
-      #player .video-premium-actions .osteo-v155-master-btn span{
-        font-size:18px;
+      /* Dans le monde vidéo on ne montre plus l'ancien bloc Étapes. */
+      #player > .steps{
+        display:none !important;
       }
 
-      #player .video-premium-actions #openVimeoDirectButton{
-        width:100% !important;
-      }
-
-      #player .steps.osteo-v155-panel{
-        padding:15px !important;
-        overflow:visible !important;
-      }
-
-      #player .steps.osteo-v155-panel > h3{
-        margin:0 0 12px !important;
-        font-size:20px !important;
-      }
-
-      .osteo-v155-cards{
-        display:grid;
-        gap:12px;
-      }
-
-      .osteo-v155-card{
-        padding:12px;
-        border-radius:20px;
-        border:1px solid rgba(170,205,225,.15);
+      #osteoTechniqueWorld{
         background:
-          radial-gradient(circle at 50% 0%,rgba(0,229,255,.055),transparent 44%),
-          rgba(255,255,255,.025);
+          radial-gradient(circle at 50% -4%,rgba(0,229,255,.15),transparent 34%),
+          linear-gradient(180deg,rgba(3,10,24,.76),rgba(3,8,22,.98));
       }
 
-      .osteo-v155-card-head{
-        display:flex;
+      .osteo-v157-top{
+        display:grid;
+        grid-template-columns:46px minmax(0,1fr) 46px;
         align-items:center;
         gap:10px;
-        margin-bottom:10px;
+        margin-bottom:12px;
+      }
+      .osteo-v157-back{
+        width:44px;height:44px;
+        border-radius:16px;
+        display:grid;place-items:center;
+        color:#dbe8fb;
+        border:1px solid rgba(255,255,255,.16);
+        background:rgba(255,255,255,.045);
+        font-size:24px;
+      }
+      .osteo-v157-title{
+        min-width:0;
+        text-align:center;
+      }
+      .osteo-v157-title strong{
+        display:block;
+        color:#fff;
+        font-size:20px;
+        line-height:1.1;
+      }
+      .osteo-v157-title small{
+        display:block;
+        margin-top:4px;
+        color:#8fa7c7;
+        font-size:11px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
 
-      .osteo-v155-card-head b{
+      .osteo-v157-intro{
+        margin:0 0 14px;
+        padding:13px 14px;
+        border-radius:20px;
+        color:#dbe8fb;
+        border:1px solid rgba(0,229,255,.18);
+        background:linear-gradient(145deg,rgba(10,29,55,.76),rgba(5,15,31,.84));
+        font-size:13px;
+        line-height:1.42;
+      }
+
+      .osteo-v157-menu{
+        display:grid;
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px;
+        margin-bottom:12px;
+      }
+      .osteo-v157-menu-btn{
+        min-height:116px;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:9px;
+        padding:12px 8px;
+        text-align:center;
+        border-radius:22px;
         color:#fff;
-        font-size:16px;
+        border:1px solid rgba(170,205,225,.16);
+        background:
+          radial-gradient(circle at 50% 20%,rgba(0,229,255,.08),transparent 52%),
+          rgba(7,20,39,.62);
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      }
+      .osteo-v157-menu-btn.active{
+        border-color:var(--menu-color,#00e5ff);
+        box-shadow:0 0 24px color-mix(in srgb,var(--menu-color,#00e5ff) 18%,transparent),inset 0 1px 0 rgba(255,255,255,.05);
+        background:
+          radial-gradient(circle at 50% 18%,color-mix(in srgb,var(--menu-color,#00e5ff) 15%,transparent),transparent 55%),
+          rgba(7,20,39,.72);
+      }
+      .osteo-v157-menu-btn strong{
+        font-size:13px;
         line-height:1.15;
       }
 
-      .osteo-v155-logo{
+      .osteo-v157-global{
+        grid-column:1 / -1;
+        min-height:74px;
+        flex-direction:row;
+        gap:12px;
+      }
+      .osteo-v157-global-icon{
         width:44px;height:44px;
-        flex:0 0 44px;
+        border-radius:50%;
         display:grid;place-items:center;
-        border-radius:14px;
-        border:1px solid color-mix(in srgb,var(--step-color) 56%,transparent);
-        background:color-mix(in srgb,var(--step-color) 10%,transparent);
-        box-shadow:0 0 16px color-mix(in srgb,var(--step-color) 16%,transparent);
-        overflow:hidden;
+        color:#00e5ff;
+        border:1px solid rgba(0,229,255,.38);
+        background:rgba(0,229,255,.09);
+        font-size:21px;
       }
 
-      .osteo-v155-logo img{
-        width:31px;height:31px;
+      .osteo-v157-step-logo{
+        width:46px;height:46px;
+        display:grid;place-items:center;
+        border-radius:15px;
+        flex:0 0 46px;
+        overflow:hidden;
+        border:1px solid color-mix(in srgb,var(--step-color) 58%,transparent);
+        background:color-mix(in srgb,var(--step-color) 10%,transparent);
+        box-shadow:0 0 18px color-mix(in srgb,var(--step-color) 15%,transparent);
+      }
+      .osteo-v157-step-logo.large{
+        width:54px;height:54px;
+      }
+      .osteo-v157-step-logo img{
+        width:33px;height:33px;
         object-fit:contain;
         display:block;
       }
-
-      .osteo-v155-logo-fallback{
+      .osteo-v157-step-logo.large img{
+        width:39px;height:39px;
+      }
+      .osteo-v157-step-logo.fallback{
         color:var(--step-color);
-        font-size:11px;
         font-weight:950;
+        font-size:11px;
       }
 
-      .osteo-v155-body{
+      .osteo-v157-content{
+        min-height:120px;
+        margin:12px 0 0;
+      }
+      .osteo-v157-placeholder{
+        padding:22px 16px;
+        text-align:center;
+        border-radius:22px;
+        color:#91a6c0;
+        border:1px dashed rgba(170,205,225,.18);
+        background:rgba(255,255,255,.02);
+        font-size:13px;
+        line-height:1.4;
+      }
+
+      .osteo-v157-card{
+        padding:13px;
+        border-radius:22px;
+        border:1px solid rgba(170,205,225,.16);
+        background:
+          radial-gradient(circle at 50% 0%,rgba(0,229,255,.055),transparent 44%),
+          linear-gradient(145deg,rgba(10,29,55,.78),rgba(5,15,31,.88));
+        box-shadow:0 16px 42px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.04);
+      }
+      .osteo-v157-card + .osteo-v157-card{
+        margin-top:11px;
+      }
+      .osteo-v157-card-head{
+        display:flex;
+        align-items:center;
+        gap:11px;
+        margin-bottom:10px;
+      }
+      .osteo-v157-card-head b{
+        color:#fff;
+        font-size:17px;
+        line-height:1.15;
+      }
+      .osteo-v157-card-body{
         color:#d7e1ef;
         font-size:14px;
-        line-height:1.52;
+        line-height:1.55;
       }
-
-      .osteo-v155-photo{
+      .osteo-v157-card img{
         display:block;
         width:100%;
-        max-height:360px;
-        margin:12px 0 0;
+        max-height:370px;
+        margin-top:12px;
         object-fit:contain;
-        border-radius:15px;
+        border-radius:16px;
         background:#020714;
         border:1px solid rgba(255,255,255,.08);
-        box-shadow:0 12px 28px rgba(0,0,0,.23);
+        box-shadow:0 12px 28px rgba(0,0,0,.24);
         cursor:zoom-in;
       }
-
-      .osteo-v155-source{
-        margin:11px 2px 0;
+      .osteo-v157-source{
+        margin:10px 2px 0;
         color:#7187a3;
         font-size:10.5px;
         line-height:1.3;
       }
 
-      .osteo-v155-empty{
-        color:#9fb0c5;
-        font-size:13px;
-        line-height:1.4;
+      @media(max-width:360px){
+        .osteo-v157-menu{
+          grid-template-columns:1fr;
+        }
+        .osteo-v157-global{
+          grid-column:auto;
+        }
       }
     `;
     document.head.appendChild(style);
   }
 
-  function hideOldButtons(player){
+  function hideLegacyPlayerActions(player){
     const actions=player.querySelector('.video-premium-actions');
     if(!actions) return null;
 
     actions.querySelectorAll('button').forEach(button=>{
       const onclick=String(button.getAttribute('onclick') || '');
       const label=normalize(button.textContent || '');
-      const hide =
+      const hide=
         onclick.includes('openTechniqueTextPage') ||
         onclick.includes('openTechniqueImagesPage') ||
         label.includes('texte de la technique') ||
-        label.includes('images associees');
-      button.classList.toggle('osteo-v155-old-action',hide);
+        label.includes('images associees') ||
+        label.includes('technique texte images') ||
+        label.includes('technique images texte');
+
+      button.classList.toggle('osteo-v157-old-action',hide);
     });
 
     return actions;
   }
 
-  function ensureMasterButton(player){
-    const actions=hideOldButtons(player);
-    if(!actions) return null;
+  function ensureOpenWorldButton(){
+    const player=document.getElementById('player');
+    if(!player) return;
 
-    let button=actions.querySelector('.osteo-v155-master-btn');
-    if(button) return button;
+    const actions=hideLegacyPlayerActions(player);
+    if(!actions) return;
 
-    button=document.createElement('button');
-    button.type='button';
-    button.className='secondary osteo-v155-master-btn';
-    button.innerHTML='<span>◉</span> Technique · Texte · Images';
+    let button=actions.querySelector('.osteo-v157-open-world');
+    if(!button){
+      button=document.createElement('button');
+      button.type='button';
+      button.className='secondary osteo-v157-open-world';
+      button.innerHTML='<span>◎</span> Technique · Images · Texte';
 
-    const vimeo=actions.querySelector('#openVimeoDirectButton');
-    if(vimeo) actions.insertBefore(button,vimeo);
-    else actions.appendChild(button);
+      const vimeo=actions.querySelector('#openVimeoDirectButton');
+      if(vimeo) actions.insertBefore(button,vimeo);
+      else actions.appendChild(button);
 
-    button.addEventListener('click',()=>{
-      renderCombined();
-      const panel=player.querySelector('.steps');
-      if(panel){
-        setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'start'}),40);
+      button.addEventListener('click',()=>{
+        renderWorld();
+        const go=fn('go');
+        if(typeof go==='function') go('osteoTechniqueWorld');
+        else{
+          document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='osteoTechniqueWorld'));
+        }
+      });
+    }
+  }
+
+  function ensureWorldScreen(){
+    let screen=document.getElementById('osteoTechniqueWorld');
+    if(screen) return screen;
+
+    const app=document.querySelector('.app') || document.body;
+    screen=document.createElement('section');
+    screen.id='osteoTechniqueWorld';
+    screen.className='screen';
+    screen.innerHTML=`
+      <div class="osteo-v157-top">
+        <button type="button" class="osteo-v157-back" aria-label="Retour à la vidéo">‹</button>
+        <div class="osteo-v157-title">
+          <strong>Technique</strong>
+          <small id="osteoV157TechniqueName">Fiche technique</small>
+        </div>
+        <div></div>
+      </div>
+
+      <div class="osteo-v157-intro">
+        Sélectionnez une étape pour afficher son texte et son image, ou ouvrez la technique globale.
+      </div>
+
+      <div class="osteo-v157-menu" id="osteoV157Menu"></div>
+      <div class="osteo-v157-content" id="osteoV157Content"></div>
+    `;
+
+    const bottom=app.querySelector('.bottom');
+    if(bottom) app.insertBefore(screen,bottom);
+    else app.appendChild(screen);
+
+    screen.querySelector('.osteo-v157-back').addEventListener('click',()=>{
+      const go=fn('go');
+      if(typeof go==='function') go('player');
+      else{
+        document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id==='player'));
       }
     });
 
-    return button;
+    return screen;
   }
 
-  function renderCombined(){
-    installStyles();
+  function setMenuActive(indexOrGlobal){
+    const screen=ensureWorldScreen();
+    screen.querySelectorAll('.osteo-v157-menu-btn').forEach(button=>{
+      const active=String(button.dataset.step)===String(indexOrGlobal);
+      button.classList.toggle('active',active);
+    });
+  }
 
-    const player=document.getElementById('player');
-    if(!player) return false;
+  function renderStepCard(step,index,detail){
+    const label=stepLabel(step,index);
+    const photo=String(step && step.photo || '').trim();
 
-    ensureMasterButton(player);
-
-    const panel=player.querySelector('.steps');
-    if(!panel) return false;
-
-    const t=getTechnique(requestedTechniqueId);
-    const detail=getDetail(t);
-    const steps=officialSteps(detail);
-
-    panel.classList.add('osteo-v155-panel');
-
-    if(!steps.length){
-      panel.innerHTML=`
-        <h3>Technique · Texte · Images</h3>
-        <p class="osteo-v155-empty">Les données détaillées de cette technique ne sont pas encore disponibles.</p>
-      `;
-      return false;
-    }
-
-    panel.innerHTML=`
-      <h3>Technique · Texte · Images</h3>
-      <div class="osteo-v155-cards">
-        ${steps.map((step,index)=>{
-          const label=stepLabel(step,index);
-          const photo=String(step.photo || '').trim();
-          return `
-            <article class="osteo-v155-card">
-              <div class="osteo-v155-card-head">
-                ${logoMarkup(step,index)}
-                <b>${esc(label)}</b>
-              </div>
-              <div class="osteo-v155-body">${htmlText(step.body || '')}</div>
-              ${photo ? `<img class="osteo-v155-photo" src="${esc(photo)}" alt="${esc(label)}" data-photo="${esc(photo)}" data-label="${esc(label)}">` : ''}
-            </article>
-          `;
-        }).join('')}
-      </div>
-      ${detail && detail.source ? `<div class="osteo-v155-source">${esc(detail.source)}</div>` : ''}
+    return `
+      <article class="osteo-v157-card">
+        <div class="osteo-v157-card-head">
+          ${logoMarkup(step,index,true)}
+          <b>${esc(label)}</b>
+        </div>
+        <div class="osteo-v157-card-body">${bodyHtml(step && step.body || '')}</div>
+        ${photo ? `<img class="osteo-v157-photo" src="${esc(photo)}" alt="${esc(label)}" data-photo="${esc(photo)}" data-label="${esc(label)}">` : ''}
+      </article>
     `;
+  }
 
-    panel.querySelectorAll('.osteo-v155-photo').forEach(img=>{
+  function bindPhotoZoom(container){
+    container.querySelectorAll('.osteo-v157-photo').forEach(img=>{
       img.addEventListener('click',()=>{
         const open=fn('openStepImage');
         if(typeof open==='function') open(img.dataset.photo,img.dataset.label);
       });
     });
-
-    return true;
   }
 
-  function installInitialState(){
+  function renderSelectedStep(index){
+    const t=getTechnique(requestedTechniqueId);
+    const detail=getDetail(t);
+    const steps=officialSteps(detail);
+    const content=document.getElementById('osteoV157Content');
+    if(!content || !steps[index]) return;
+
+    activeStepIndex=index;
+    setMenuActive(index);
+    content.innerHTML=
+      renderStepCard(steps[index],index,detail) +
+      (detail && detail.source ? `<div class="osteo-v157-source">${esc(detail.source)}</div>` : '');
+
+    bindPhotoZoom(content);
+    content.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function renderGlobal(){
+    const t=getTechnique(requestedTechniqueId);
+    const detail=getDetail(t);
+    const steps=officialSteps(detail);
+    const content=document.getElementById('osteoV157Content');
+    if(!content) return;
+
+    activeStepIndex='global';
+    setMenuActive('global');
+    content.innerHTML=
+      steps.map((step,index)=>renderStepCard(step,index,detail)).join('') +
+      (detail && detail.source ? `<div class="osteo-v157-source">${esc(detail.source)}</div>` : '');
+
+    bindPhotoZoom(content);
+    content.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function renderWorld(){
     installStyles();
+    const screen=ensureWorldScreen();
+    const t=getTechnique(requestedTechniqueId);
+    const detail=getDetail(t);
+    const steps=officialSteps(detail);
 
-    const player=document.getElementById('player');
-    if(!player) return;
+    const name=screen.querySelector('#osteoV157TechniqueName');
+    if(name) name.textContent=String(t && t.title || 'Fiche technique');
 
-    ensureMasterButton(player);
+    const menu=screen.querySelector('#osteoV157Menu');
+    const content=screen.querySelector('#osteoV157Content');
 
-    const panel=player.querySelector('.steps');
-    if(panel && !panel.dataset.osteoV155Initial){
-      panel.dataset.osteoV155Initial='1';
-      panel.classList.add('osteo-v155-panel');
-      panel.innerHTML=`
-        <h3>Technique</h3>
-        <p class="osteo-v155-empty">Clique sur « Technique · Texte · Images » pour afficher la fiche complète.</p>
-      `;
+    if(!steps.length){
+      menu.innerHTML='';
+      content.innerHTML='<div class="osteo-v157-placeholder">Les étapes détaillées de cette technique ne sont pas encore disponibles.</div>';
+      return;
     }
+
+    menu.innerHTML=
+      steps.map((step,index)=>{
+        const color=colorValue(stepColor(step,index));
+        return `
+          <button type="button" class="osteo-v157-menu-btn" data-step="${index}" style="--menu-color:${color}">
+            ${logoMarkup(step,index,true)}
+            <strong>${esc(stepLabel(step,index))}</strong>
+          </button>
+        `;
+      }).join('') +
+      `
+        <button type="button" class="osteo-v157-menu-btn osteo-v157-global" data-step="global" style="--menu-color:#00e5ff">
+          <span class="osteo-v157-global-icon">◎</span>
+          <strong>Technique globale</strong>
+        </button>
+      `;
+
+    menu.querySelectorAll('.osteo-v157-menu-btn').forEach(button=>{
+      button.addEventListener('click',()=>{
+        if(button.dataset.step==='global') renderGlobal();
+        else renderSelectedStep(Number(button.dataset.step));
+      });
+    });
+
+    activeStepIndex=null;
+    content.innerHTML='<div class="osteo-v157-placeholder">Choisissez une étape ci-dessus.</div>';
   }
 
   function hookOpenTechnique(){
     const original=fn('openTechnique');
-    if(typeof original!=='function' || original.__osteoV155Hook) return;
+    if(typeof original!=='function' || original.__osteoV157Hook) return;
 
     const wrapped=function(id){
       requestedTechniqueId=id;
+      activeStepIndex=null;
       const result=original.apply(this,arguments);
-      [0,60,180,500].forEach(delay=>setTimeout(installInitialState,delay));
+      [0,60,180,500].forEach(delay=>setTimeout(()=>{
+        ensureOpenWorldButton();
+        renderWorld();
+      },delay));
       return result;
     };
 
-    wrapped.__osteoV155Hook=true;
+    wrapped.__osteoV157Hook=true;
     wrapped.__osteoOriginal=original;
 
     try{
@@ -1409,18 +1611,17 @@
 
   let timer=null;
   function observe(){
-    if(window.__osteoV155Observer) return;
+    if(window.__osteoV157Observer) return;
 
-    window.__osteoV155Observer=new MutationObserver(()=>{
+    window.__osteoV157Observer=new MutationObserver(()=>{
       clearTimeout(timer);
       timer=setTimeout(()=>{
         hookOpenTechnique();
-        const player=document.getElementById('player');
-        if(player && player.classList.contains('active')) installInitialState();
+        ensureOpenWorldButton();
       },60);
     });
 
-    window.__osteoV155Observer.observe(document.documentElement,{
+    window.__osteoV157Observer.observe(document.documentElement,{
       subtree:true,
       childList:true,
       attributes:true,
@@ -1430,9 +1631,10 @@
 
   function install(){
     installStyles();
+    ensureWorldScreen();
+    ensureOpenWorldButton();
     hookOpenTechnique();
     observe();
-    installInitialState();
   }
 
   if(document.readyState==='loading'){
