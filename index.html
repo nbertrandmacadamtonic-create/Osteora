@@ -998,7 +998,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   top: 116px;
   width: 36px;
   height: 210px;
-  border-radius: 999px;
+border-radius: 999px;
 }
 
 .v-arm.left {
@@ -1997,8 +1997,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
     font-size: 9.6px !important;
     line-height: 1.14 !important;
   }
-
-  .video-zone-card.card-rachis { top: 112px !important; }
+.video-zone-card.card-rachis { top: 112px !important; }
   .video-zone-card.card-msup   { top: 210px !important; }
   .video-zone-card.card-bassin { top: 332px !important; }
   .video-zone-card.card-minf   { top: 446px !important; }
@@ -2997,8 +2996,7 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   .rachis-region-card.cervicales { top: 30px !important; }
   .rachis-region-card.dorsales { top: 164px !important; }
   .rachis-region-card.lombaires { top: 298px !important; }
-
-  .region-icon {
+.region-icon {
     width: 44px !important;
     height: 44px !important;
     font-size: 20px !important;
@@ -4998,7 +4996,6 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(circle
   font-size:15px;
   line-height:1.35;
 }
-
 .collection-summary{
   display:grid;
   grid-template-columns:54px minmax(0,1fr);
@@ -5997,7 +5994,6 @@ button[data-tech-id="12"]{
 .icon.round{
   font-size:30px !important;
 }
-
 /* Barre de menu : moins haute et moins massive */
 .bottom{
   left:18px !important;
@@ -6998,7 +6994,7 @@ button[data-tech-id="12"]{
   right:12px;
   z-index:99999;
   width:44px;
-  height:44px;
+height:44px;
   border-radius:50%;
   color:#fff;
   background:rgba(5,15,31,.78);
@@ -7998,7 +7994,7 @@ assets/icons/icon-profil.webp
       </div>
 
       <div class="stats-main-kpis">
-        <article>
+<article>
           <i>▷</i>
           <span>Vidéos vues entièrement</span>
           <strong id="statsVideos">0</strong>
@@ -8998,7 +8994,7 @@ const techniques = [
     "percent": 0,
     "icon": "1",
     "videoProvider": "vimeo",
-    "videoUrl": "https://player.vimeo.com/video/1204646802?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
+"videoUrl": "https://player.vimeo.com/video/1204646802?badge=0&autopause=0&player_id=0&app_id=58479&title=0&byline=0&portrait=0&dnt=1",
     "directVimeo": "https://vimeo.com/1204646802?share=copy&fl=sv&fe=ci",
     "vimeoId": "1204646802",
     "videoFile": "ra_B_24_respiratoire_1ere_cote_elevation_frontal.mp4",
@@ -9998,7 +9994,7 @@ const techniques = [
   {
     "id": 502,
     "title": "Dysfonction de la coxo-fémorale, en rotation externe, à droite",
-    "zone": "Membres inférieurs",
+"zone": "Membres inférieurs",
     "sub": "Hanche",
     "level": "Niveau intermédiaire",
     "status": "non vue",
@@ -10997,7 +10993,6 @@ function buildCustomVimeoUrl(url){
 let customVideoProvider = "html5";
 let customVideoIsPlaying = false;
 let customVideoMuted = false;
-
 function resetCustomVideoState(provider){
   customVideoProvider = provider || "html5";
   customVideoIsPlaying = false;
@@ -13998,7 +13993,7 @@ Embed utilisé : https://player.vimeo.com/video/540123060?h=eed12a4a77&title=0&b
 }
 
 #home .home-side-icon{
-  position:relative !important;
+position:relative !important;
   top:20px !important;
   bottom:auto !important;
   left:auto !important;
@@ -14998,7 +14993,7 @@ body.onboarding-open .bottom{
   inset:auto 0 0 0;
   height:54%;
   background:radial-gradient(circle at 50% 15%, rgba(0,229,255,.16), transparent 42%);
-  opacity:.7;
+opacity:.7;
   animation:welcomeGlowPulse 4.6s ease-in-out infinite;
 }
 
@@ -15997,8 +15992,7 @@ body.onboarding-open .bottom{
     padding-left:14px !important;
     padding-right:14px !important;
   }
-
-  #progress .stats-page-title{
+#progress .stats-page-title{
     min-height:128px !important;
   }
 
@@ -16997,8 +16991,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     font-size:11.4px !important;
     max-width:118px !important;
   }
-
-  #revision .revision-random strong{left:22px !important; top:106px !important;}
+#revision .revision-random strong{left:22px !important; top:106px !important;}
   #revision .revision-random small{left:22px !important; top:132px !important;}
 
   #revision .revision-zone strong{right:22px !important; top:106px !important;}
@@ -17998,7 +17991,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   gap:10px;
   margin:0 0 14px;
 }
-
 .catalogue-zone-mini{
   min-height:132px;
   border-radius:20px;
@@ -18998,7 +18990,7 @@ if(originalGoForQuizStats && !window.__quizStatsGoPatched){
   display:block;
   color:#ffb020;
   font-size:22px;
-  font-weight:950;
+font-weight:950;
   letter-spacing:-.035em;
 }
 
@@ -19998,7 +19990,7 @@ if(originalGoForHomogeneousTitlesV2 && !window.__homogeneousTitlesV2GoPatched){
 /* === LANCEMENT PROPRE : présentation conservée, images secondaires différées === */
 function lazyLoadScreenImages(screenId){
   const screen = document.getElementById(screenId);
-  if(!screen) return;
+if(!screen) return;
   screen.querySelectorAll("img[data-lazy-src]").forEach(img=>{
     if(!img.dataset.loaded){
       img.src = img.dataset.lazySrc;
@@ -20997,7 +20989,6 @@ if(typeof go === "function" && !window.__lazyImagesGoPatched){
   line-height:1 !important;
   font-weight:950 !important;
 }
-
 #player .custom-video-caption span{
   margin-top:4px !important;
   color:rgba(221,232,255,.74) !important;
@@ -21998,8 +21989,7 @@ if(!window.__osteoVimeoEventsPatched){
       return oldToggle.apply(this, arguments);
     };
   }
-
-  const oldStop = typeof window.stopCustomVideoPlayback === "function" ? window.stopCustomVideoPlayback : null;
+const oldStop = typeof window.stopCustomVideoPlayback === "function" ? window.stopCustomVideoPlayback : null;
   if(oldStop){
     window.stopCustomVideoPlayback = function(){
       const provider = (function(){ try{ return typeof customVideoProvider !== "undefined" ? customVideoProvider : "html5"; }catch(e){ return "html5"; } })();
@@ -22998,7 +22988,7 @@ if(!window.__osteoVimeoEventsPatched){
       var seconds = Number(payload && (payload.seconds || payload.currentTime));
       var duration = Number(payload && payload.duration);
       if((percent && percent >= 0.98) || (duration && seconds && seconds >= duration - 1.25)){
-        markViewedReliably(getCurrentTechniqueId(), 'vimeo-near-end-message');
+markViewedReliably(getCurrentTechniqueId(), 'vimeo-near-end-message');
       }
     }
   }
@@ -23998,7 +23988,7 @@ if(!window.__osteoVimeoEventsPatched){
         setTimeout(function(){ syncStatuses(); updateProgressZoneStats(); }, 250);
       }
       return result;
-    };
+};
     try{ go = window.go; }catch(e){}
   }
 
@@ -24626,6 +24616,326 @@ if(!window.__osteoVimeoEventsPatched){
 }
 </style>
 
-<script src="backoffice-bridge.js"></script>
+
+<script>
+/* === OSTEO PRATIK — STATUTS UTILISATEUR : VUE / A REVOIR / FAVORI === */
+(function(){
+  if(window.__osteoTechniqueUserStatesV1) return;
+  window.__osteoTechniqueUserStatesV1 = true;
+
+  var REVIEW_BASE_KEY = 'osteoPratikReviewTechniqueIdsV1';
+  var FAVORITE_BASE_KEY = 'osteoPratikFavoriteTechniqueIdsV1';
+
+  function currentUserScope(){
+    try{
+      var lead = JSON.parse(localStorage.getItem('osteoPratikLead') || 'null');
+      var identity = lead && (lead.email || lead.name);
+      if(identity) return encodeURIComponent(String(identity).trim().toLowerCase());
+    }catch(e){}
+    return 'local';
+  }
+
+  function scopedKey(base){
+    return base + ':' + currentUserScope();
+  }
+
+  function readIds(base){
+    try{
+      var raw = localStorage.getItem(scopedKey(base));
+      var arr = raw ? JSON.parse(raw) : [];
+      if(!Array.isArray(arr)) return [];
+      return Array.from(new Set(arr.map(Number).filter(Boolean)));
+    }catch(e){
+      return [];
+    }
+  }
+
+  function writeIds(base, ids){
+    try{
+      localStorage.setItem(scopedKey(base), JSON.stringify(Array.from(new Set(ids.map(Number).filter(Boolean)))));
+    }catch(e){}
+  }
+
+  function hasId(base, id){
+    var n = Number(id);
+    return !!n && readIds(base).indexOf(n) !== -1;
+  }
+
+  function toggleId(base, id){
+    var n = Number(id);
+    if(!n) return false;
+    var ids = readIds(base);
+    var pos = ids.indexOf(n);
+    var enabled;
+    if(pos === -1){
+      ids.push(n);
+      enabled = true;
+    }else{
+      ids.splice(pos, 1);
+      enabled = false;
+    }
+    writeIds(base, ids);
+    return enabled;
+  }
+
+  function getCurrentId(){
+    try{
+      if(typeof currentPlayerTechniqueId !== 'undefined') return Number(currentPlayerTechniqueId) || 0;
+    }catch(e){}
+    return 0;
+  }
+
+  function getTechnique(id){
+    var n = Number(id || getCurrentId());
+    try{
+      if(Array.isArray(techniques)) return techniques.find(function(t){ return Number(t.id) === n; }) || null;
+    }catch(e){}
+    try{
+      if(Array.isArray(window.techniques)) return window.techniques.find(function(t){ return Number(t.id) === n; }) || null;
+    }catch(e){}
+    return null;
+  }
+
+  function isViewed(t){
+    if(!t) return false;
+    if(String(t.status || '').toLowerCase() === 'vue') return true;
+    try{
+      if(typeof readViewedTechniqueIds === 'function'){
+        return readViewedTechniqueIds().map(Number).indexOf(Number(t.id)) !== -1;
+      }
+    }catch(e){}
+    try{
+      var strict = JSON.parse(localStorage.getItem('osteoPratikStrictViewedTechniqueIdsV2') || '[]');
+      return Array.isArray(strict) && strict.map(Number).indexOf(Number(t.id)) !== -1;
+    }catch(e){}
+    return false;
+  }
+
+  function isReview(id){ return hasId(REVIEW_BASE_KEY, id); }
+  function isFavorite(id){ return hasId(FAVORITE_BASE_KEY, id); }
+
+  function refreshLists(){
+    try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(e){}
+    try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(e){}
+    try{ if(typeof renderRevisionWheel === 'function' && document.getElementById('revisionWheel')?.classList.contains('active')) renderRevisionWheel(); }catch(e){}
+  }
+
+  function ensurePlayerActions(){
+    var chips = document.getElementById('playerChips');
+    if(!chips) return null;
+    var box = document.getElementById('techniqueUserStateActions');
+    if(box) return box;
+
+    box = document.createElement('div');
+    box.id = 'techniqueUserStateActions';
+    box.className = 'technique-user-state-actions';
+    box.innerHTML =
+      '<button id="techniqueViewedState" class="technique-state-btn viewed-state" type="button" disabled><span>○</span><strong>Non vue</strong></button>' +
+      '<button id="techniqueReviewState" class="technique-state-btn" type="button" onclick="toggleTechniqueReview()"><span>↻</span><strong>À revoir</strong></button>' +
+      '<button id="techniqueFavoriteState" class="technique-state-btn" type="button" onclick="toggleTechniqueFavorite()"><span>♡</span><strong>Favori</strong></button>';
+    chips.insertAdjacentElement('afterend', box);
+    return box;
+  }
+
+  function refreshHeaderFavorite(active){
+    var buttons = document.querySelectorAll('#player header.top > button:last-child, #techniqueDetail header.top > button:last-child');
+    buttons.forEach(function(btn){
+      btn.id = btn.closest('#player') ? 'playerFavoriteButton' : 'detailFavoriteButton';
+      btn.setAttribute('onclick', 'toggleTechniqueFavorite()');
+      btn.textContent = active ? '♥' : '♡';
+      btn.classList.toggle('is-favorite', !!active);
+      btn.setAttribute('aria-label', active ? 'Retirer des favoris' : 'Ajouter aux favoris');
+    });
+  }
+
+  function refreshPlayerStateUI(){
+    var id = getCurrentId();
+    var t = getTechnique(id);
+    if(!id || !t) return;
+
+    ensurePlayerActions();
+
+    var viewed = isViewed(t);
+    var review = isReview(id);
+    var favorite = isFavorite(id);
+
+    var viewedBtn = document.getElementById('techniqueViewedState');
+    var reviewBtn = document.getElementById('techniqueReviewState');
+    var favoriteBtn = document.getElementById('techniqueFavoriteState');
+
+    if(viewedBtn){
+      viewedBtn.classList.toggle('active', viewed);
+      viewedBtn.innerHTML = viewed
+        ? '<span>✓</span><strong>Vue</strong>'
+        : '<span>○</span><strong>Non vue</strong>';
+    }
+
+    if(reviewBtn){
+      reviewBtn.classList.toggle('active', review);
+      reviewBtn.setAttribute('aria-pressed', review ? 'true' : 'false');
+      reviewBtn.innerHTML = review
+        ? '<span>↻</span><strong>À revoir ✓</strong>'
+        : '<span>↻</span><strong>À revoir</strong>';
+    }
+
+    if(favoriteBtn){
+      favoriteBtn.classList.toggle('active', favorite);
+      favoriteBtn.setAttribute('aria-pressed', favorite ? 'true' : 'false');
+      favoriteBtn.innerHTML = favorite
+        ? '<span>♥</span><strong>Favori ✓</strong>'
+        : '<span>♡</span><strong>Favori</strong>';
+    }
+
+    refreshHeaderFavorite(favorite);
+  }
+
+  window.toggleTechniqueReview = function(id){
+    var n = Number(id || getCurrentId());
+    if(!n) return;
+    var active = toggleId(REVIEW_BASE_KEY, n);
+    refreshPlayerStateUI();
+    refreshLists();
+    try{ if(typeof toast === 'function') toast(active ? 'Technique ajoutée à « À revoir »' : 'Technique retirée de « À revoir »'); }catch(e){}
+  };
+
+  window.toggleTechniqueFavorite = function(id){
+    var n = Number(id || getCurrentId());
+    if(!n) return;
+    var active = toggleId(FAVORITE_BASE_KEY, n);
+    refreshPlayerStateUI();
+    refreshLists();
+    try{ if(typeof toast === 'function') toast(active ? 'Technique ajoutée aux favoris' : 'Technique retirée des favoris'); }catch(e){}
+  };
+
+  window.isTechniqueReview = isReview;
+  window.isTechniqueFavorite = isFavorite;
+  window.readReviewTechniqueIds = function(){ return readIds(REVIEW_BASE_KEY); };
+  window.readFavoriteTechniqueIds = function(){ return readIds(FAVORITE_BASE_KEY); };
+  window.refreshTechniqueUserStateUI = refreshPlayerStateUI;
+
+  function patchedStateLabel(t){
+    if(!t) return '<span>non vue ○</span>';
+    var id = Number(t.id);
+    var review = isReview(id);
+    var favorite = isFavorite(id);
+    var base;
+
+    if(review) base = '<span class="review">à revoir !</span>';
+    else if(isViewed(t)) base = '<span class="seen">vue ✓</span>';
+    else if(t.percent) base = '<b>' + Number(t.percent) + '%</b>';
+    else base = '<span>non vue ○</span>';
+
+    if(favorite) base += '<span class="tech-favorite-mark" title="Favori">★</span>';
+    return base;
+  }
+
+  try{
+    window.stateLabel = patchedStateLabel;
+    stateLabel = patchedStateLabel;
+  }catch(e){}
+
+  try{
+    var originalOpenTechnique = typeof window.openTechnique === 'function' ? window.openTechnique : null;
+    if(originalOpenTechnique){
+      window.openTechnique = function(id){
+        var result = originalOpenTechnique.apply(this, arguments);
+        setTimeout(refreshPlayerStateUI, 40);
+        setTimeout(refreshPlayerStateUI, 250);
+        return result;
+      };
+      try{ openTechnique = window.openTechnique; }catch(e){}
+    }
+  }catch(e){}
+
+  try{
+    var originalMarkViewed = typeof window.markTechniqueViewedAfterComplete === 'function' ? window.markTechniqueViewedAfterComplete : null;
+    if(originalMarkViewed){
+      window.markTechniqueViewedAfterComplete = function(id){
+        var result = originalMarkViewed.apply(this, arguments);
+        setTimeout(refreshPlayerStateUI, 20);
+        setTimeout(refreshLists, 40);
+        return result;
+      };
+      try{ markTechniqueViewedAfterComplete = window.markTechniqueViewedAfterComplete; }catch(e){}
+    }
+  }catch(e){}
+
+  function installStyles(){
+    if(document.getElementById('technique-user-state-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'technique-user-state-styles';
+    style.textContent = `
+      .technique-user-state-actions{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:8px;
+        margin:0 0 14px;
+      }
+      .technique-state-btn{
+        min-height:58px;
+        padding:8px 6px;
+        border-radius:17px;
+        border:1px solid rgba(255,255,255,.14);
+        background:rgba(255,255,255,.045);
+        color:#dbe8fb;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:4px;
+        font-size:12px;
+      }
+      .technique-state-btn span{font-size:20px;line-height:1}
+      .technique-state-btn strong{font-size:11px;line-height:1.1;white-space:nowrap}
+      .technique-state-btn.active{
+        color:var(--cyan,#00e5ff);
+        border-color:rgba(0,229,255,.54);
+        background:rgba(0,229,255,.11);
+        box-shadow:0 0 18px rgba(0,229,255,.10);
+      }
+      .technique-state-btn.viewed-state.active{
+        color:var(--green,#00e6a7);
+        border-color:rgba(0,230,167,.50);
+        background:rgba(0,230,167,.10);
+      }
+      #playerFavoriteButton.is-favorite,
+      #detailFavoriteButton.is-favorite{
+        color:#ffcf4a !important;
+        border-color:rgba(255,207,74,.55) !important;
+        background:rgba(255,207,74,.10) !important;
+      }
+      .tech-favorite-mark{
+        display:block;
+        margin-top:4px;
+        color:#ffcf4a;
+        font-size:15px;
+        line-height:1;
+      }
+      @media(max-width:380px){
+        .technique-user-state-actions{gap:6px}
+        .technique-state-btn{min-height:54px;padding:7px 4px}
+        .technique-state-btn strong{font-size:10.2px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  installStyles();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      installStyles();
+      ensurePlayerActions();
+      refreshPlayerStateUI();
+      refreshLists();
+    });
+  }else{
+    ensurePlayerActions();
+    refreshPlayerStateUI();
+    refreshLists();
+  }
+})();
+
+</script>
 </body>
 </html>
+
