@@ -1,20 +1,39 @@
 /* =========================================================
-   OSTÉO PRATIK V20.0 — RÔLE DU COMPTE
+   OSTÉO PRATIK V20.1 — RÔLE DU COMPTE
+   4 rôles : student / professional / other / admin
    Couche indépendante : ne modifie aucun écran de l'application.
    ========================================================= */
 (function(){
   'use strict';
 
-  const VERSION='20.0';
+  const VERSION='20.1';
+  const ALLOWED=new Set(['student','professional','other','admin']);
+  const LABELS={
+    student:'Étudiant',
+    professional:'Professionnel',
+    other:'Autre',
+    admin:'Administrateur',
+    anonymous:'Non connecté'
+  };
+
   let client=null;
   let session=null;
   let role='anonymous';
   let serial=0;
 
+  function normalizeRole(value){
+    const v=String(value||'student').toLowerCase();
+    return ALLOWED.has(v)?v:'student';
+  }
+
   function dispatch(){
     const detail={
       role,
+      roleLabel:LABELS[role]||LABELS.student,
       isAdmin:role==='admin',
+      isStudent:role==='student',
+      isProfessional:role==='professional',
+      isOther:role==='other',
       userId:session?.user?.id||null
     };
     try{document.documentElement.dataset.osteoRole=role;}catch(_){}
@@ -47,11 +66,11 @@
       const {data,error}=await client.rpc('osteo_get_my_role');
       if(error) throw error;
       if(run!==serial) return role;
-      role=String(data||'student').toLowerCase()==='admin'?'admin':'student';
+      role=normalizeRole(data);
       dispatch();
       return role;
     }catch(error){
-      console.warn('[Ostéo Pratik V20] Lecture du rôle impossible : rôle étudiant appliqué par sécurité.',error);
+      console.warn('[Ostéo Pratik V20.1] Lecture du rôle impossible : rôle étudiant appliqué par sécurité.',error);
       role=session?.user?.id?'student':'anonymous';
       dispatch();
       return role;
@@ -75,7 +94,11 @@
     version:VERSION,
     reload:loadRole,
     getRole:()=>role,
-    isAdmin:()=>role==='admin'
+    getRoleLabel:()=>LABELS[role]||LABELS.student,
+    isAdmin:()=>role==='admin',
+    isStudent:()=>role==='student',
+    isProfessional:()=>role==='professional',
+    isOther:()=>role==='other'
   };
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
