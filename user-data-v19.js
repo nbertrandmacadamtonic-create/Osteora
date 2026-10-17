@@ -1,5 +1,5 @@
 /* =========================================================
-   OSTÉO PRATIK V19.1 — SOCLE UTILISATEUR
+   OSTÉO PRATIK V19.2 — SOCLE UTILISATEUR
    Favoris + À revoir + dernière technique + progression + quiz/stats
 
    Objectif : chaque compte retrouve SES données sur tous ses appareils.
@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.1';
+  const VERSION='19.2';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -250,7 +250,7 @@
       stateRow=stateRes.data||null;
       applyAll();
     }catch(error){
-      console.warn('[Ostéo Pratik V19.1] Données utilisateur : cache local utilisé.',error);
+      console.warn('[Ostéo Pratik V19.2] Données utilisateur : cache local utilisé.',error);
     }finally{
       loading=false;
     }
@@ -395,7 +395,7 @@
       if(error) throw error;
       appToast(next?'Technique marquée « À revoir »':'Technique retirée de « À revoir »');
     }catch(error){
-      console.warn('[Ostéo Pratik V19.1] À revoir',error);
+      console.warn('[Ostéo Pratik V19.2] À revoir',error);
       row.review_needed=previous;
       saveCache(); updateStatusBars();
       appToast('Impossible de synchroniser « À revoir ».');
@@ -455,7 +455,7 @@
         appToast('Technique ajoutée aux favoris');
       }
     }catch(error){
-      console.warn('[Ostéo Pratik V19.1] Favoris',error);
+      console.warn('[Ostéo Pratik V19.2] Favoris',error);
       // Revenir à l'état serveur en cas d'échec.
       if(removing) favorites.add(id); else favorites.delete(id);
       saveCache(); updateHearts(); renderFavorites();
@@ -464,9 +464,24 @@
   }
 
   function openFavorite(id){
-    const t=techniqueById(id); if(!t) return;
-    const f=resolveFunction('openTechniqueFromCatalogue')||resolveFunction('openTechnique');
-    if(f){try{f(Number(t.id)||t.id);}catch(_){}}
+    const t=techniqueById(id);
+    if(!t){appToast('Technique introuvable.');return;}
+
+    try{
+      // Depuis Favoris, ouvrir directement la technique en conservant
+      // exactement le type de son identifiant (nombre ou texte).
+      // Le bouton retour du lecteur doit revenir à Favoris, pas à Zones.
+      window.__nextPlayerBackTarget='favorites';
+      const open=resolveFunction('openTechnique');
+      if(open){open(t.id);return;}
+
+      // Repli uniquement si le moteur direct n'est pas disponible.
+      const fallback=resolveFunction('openTechniqueFromCatalogue');
+      if(fallback) fallback(t.id);
+    }catch(error){
+      console.warn('[Ostéo Pratik V19.2] Ouverture favori',error);
+      appToast('Impossible d’ouvrir cette technique.');
+    }
   }
 
   function renderFavorites(){
@@ -511,7 +526,7 @@
     try{
       const {error}=await client.rpc('osteo_record_technique_open',{p_technique_id:String(t.id),p_title:String(t.title||''),p_zone:String(t.zone||''),p_subzone:String(t.sub||''),p_level:String(t.level||'')});
       if(error) throw error;
-    }catch(error){console.warn('[Ostéo Pratik V19.1] Dernière technique',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.2] Dernière technique',error);}
   }
 
   async function recordComplete(id){
@@ -527,7 +542,7 @@
       if(existing){Object.assign(existing,{status:'vue',percent:100,completed_at:existing.completed_at||now,updated_at:now});}
       else progressRows.push({user_id:userId,technique_id:String(t.id),title:t.title||'',zone:t.zone||'',subzone:t.sub||'',level:t.level||'',status:'vue',percent:100,opened_count:1,first_opened_at:now,last_opened_at:now,completed_at:now,updated_at:now});
       applyAll();
-    }catch(error){console.warn('[Ostéo Pratik V19.1] Technique terminée',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.2] Technique terminée',error);}
   }
 
   function readQuizResult(){
@@ -552,7 +567,7 @@
       if(error) throw error;
       stateRow={...(stateRow||{}),user_id:userId,last_quiz_title:q.title,last_quiz_score:q.score,last_quiz_total:q.total,last_quiz_percent:q.percent,last_quiz_at:new Date().toISOString()};
       applyStateToCompatibilityStorage(); saveCache();
-    }catch(error){console.warn('[Ostéo Pratik V19.1] Résultat quiz',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.2] Résultat quiz',error);}
   }
 
   function hook(name,after){
@@ -608,7 +623,7 @@
     updateStatusBars();
 
     client=await waitForAuthClient();
-    if(!client){console.warn('[Ostéo Pratik V19.1] Client Supabase indisponible.');return;}
+    if(!client){console.warn('[Ostéo Pratik V19.2] Client Supabase indisponible.');return;}
 
     client.auth.onAuthStateChange((event,newSession)=>{
       session=newSession||null;
