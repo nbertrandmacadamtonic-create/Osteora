@@ -1817,9 +1817,19 @@
 (function(){
   if(document.querySelector('script[data-osteo-auth-v18]')) return;
   const s=document.createElement('script');
-  s.src='auth-app-v18.js?v=18.0';
+  s.src='auth-app-v18.js?v=18.3';
   s.defer=true;
   s.dataset.osteoAuthV18='1';
+  (document.body||document.documentElement).appendChild(s);
+})();
+
+/* === V19.0 · SOCLE UTILISATEUR : FAVORIS + PROGRESSION + STATS === */
+(function(){
+  if(document.querySelector('script[data-osteo-user-data-v19]')) return;
+  const s=document.createElement('script');
+  s.src='user-data-v19.js?v=19.0';
+  s.defer=true;
+  s.dataset.osteoUserDataV19='1';
   (document.body||document.documentElement).appendChild(s);
 })();
 
