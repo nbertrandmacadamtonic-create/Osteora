@@ -1823,6 +1823,16 @@
   (document.body||document.documentElement).appendChild(s);
 })();
 
+/* === V20.0 · RÔLES UTILISATEUR : ÉTUDIANT / ADMINISTRATEUR === */
+(function(){
+  if(document.querySelector('script[data-osteo-user-role-v20]')) return;
+  const s=document.createElement('script');
+  s.src='user-role-v20.js?v=20.0';
+  s.defer=true;
+  s.dataset.osteoUserRoleV20='1';
+  (document.body||document.documentElement).appendChild(s);
+})();
+
 /* === V19.4 · SOCLE UTILISATEUR : FAVORIS + À REVOIR + PROGRESSION + STATS === */
 (function(){
   if(document.querySelector('script[data-osteo-user-data-v19]')) return;
