@@ -1,5 +1,5 @@
 /* =========================================================
-   OSTÉO PRATIK V19.2 — SOCLE UTILISATEUR
+   OSTÉO PRATIK V19.3 — SOCLE UTILISATEUR
    Favoris + À revoir + dernière technique + progression + quiz/stats
 
    Objectif : chaque compte retrouve SES données sur tous ses appareils.
@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.2';
+  const VERSION='19.3';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -31,6 +31,7 @@
   let loading=false;
   let loadSerial=0;
   let observer=null;
+  let seenHubMode='seen';
 
   const $=id=>document.getElementById(id);
 
@@ -181,6 +182,7 @@
     renderFavorites();
     updateHearts();
     updateStatusBars();
+    renderSeenHub();
   }
 
   function applyAll(){
@@ -250,7 +252,7 @@
       stateRow=stateRes.data||null;
       applyAll();
     }catch(error){
-      console.warn('[Ostéo Pratik V19.2] Données utilisateur : cache local utilisé.',error);
+      console.warn('[Ostéo Pratik V19.3] Données utilisateur : cache local utilisé.',error);
     }finally{
       loading=false;
     }
@@ -275,7 +277,22 @@
       .osteo-v19-statusbtn.is-viewed{color:#00e6a7;border-color:rgba(0,230,167,.38);background:rgba(0,230,167,.08)}
       .osteo-v19-statusbtn.is-review{color:#ffb020;border-color:rgba(255,176,32,.50);background:rgba(255,176,32,.10);box-shadow:0 0 18px rgba(255,176,32,.08)}
       .osteo-v19-statusbtn.is-favorite{color:#ff6f9b;border-color:rgba(255,95,145,.50);background:rgba(255,95,145,.10);box-shadow:0 0 18px rgba(255,95,145,.08)}
-      @media(max-width:360px){.osteo-v19-statusbar{gap:6px}.osteo-v19-statusbtn{font-size:10px;padding:7px 5px}}
+      #seenCollections .osteo-v19-seen-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+      #seenCollections .osteo-v19-seen-tab{min-height:46px;border-radius:16px;border:1px solid rgba(170,205,225,.18);background:rgba(255,255,255,.035);color:#aebbd0;font-size:12px;font-weight:950;display:flex;align-items:center;justify-content:center;gap:7px}
+      #seenCollections .osteo-v19-seen-tab b{min-width:22px;height:22px;padding:0 6px;border-radius:999px;display:grid;place-items:center;background:rgba(255,255,255,.06);font-size:10px}
+      #seenCollections .osteo-v19-seen-tab.active[data-mode="seen"]{color:#00e6a7;border-color:rgba(0,230,167,.42);background:rgba(0,230,167,.08);box-shadow:0 0 18px rgba(0,230,167,.08)}
+      #seenCollections .osteo-v19-seen-tab.active[data-mode="review"]{color:#ffb020;border-color:rgba(255,176,32,.52);background:rgba(255,176,32,.10);box-shadow:0 0 18px rgba(255,176,32,.09)}
+      #seenCollections .osteo-v19-review-panel{display:grid;gap:10px;margin:2px 0 18px}
+      #seenCollections .osteo-v19-review-summary{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,176,32,.28);background:rgba(255,176,32,.055)}
+      #seenCollections .osteo-v19-review-summary strong{color:#fff;font-size:14px}#seenCollections .osteo-v19-review-summary b{color:#ffb020;font-size:18px}
+      #seenCollections .osteo-v19-review-list{display:grid;gap:10px}
+      #seenCollections .osteo-v19-review-card{width:100%;display:grid;grid-template-columns:42px minmax(0,1fr) 34px;gap:11px;align-items:center;padding:12px;border-radius:20px;border:1px solid rgba(255,176,32,.23);background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));color:#fff;text-align:left}
+      #seenCollections .osteo-v19-review-card .mark{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:#ffb020;border:1px solid rgba(255,176,32,.38);background:rgba(255,176,32,.08);font-weight:950}
+      #seenCollections .osteo-v19-review-card strong{display:block;font-size:14px;line-height:1.2;color:#fff}#seenCollections .osteo-v19-review-card small{display:block;margin-top:5px;color:#9db0c8;font-size:11px;line-height:1.25}
+      #seenCollections .osteo-v19-review-card .arrow{color:#ffb020;font-size:22px;text-align:center}
+      #seenCollections .osteo-v19-review-empty{padding:28px 18px;border-radius:22px;border:1px dashed rgba(255,176,32,.28);background:rgba(255,176,32,.035);color:#9eacc0;text-align:center;line-height:1.45}
+      #seenCollections .osteo-v19-review-empty b{display:block;margin-bottom:7px;color:#fff;font-size:16px}
+      @media(max-width:360px){.osteo-v19-statusbar{gap:6px}.osteo-v19-statusbtn{font-size:10px;padding:7px 5px}#seenCollections .osteo-v19-seen-tab{font-size:11px}}
     `;
     document.head.appendChild(style);
   }
@@ -381,7 +398,7 @@
       row.review_needed=next;
       row.updated_at=now;
     }
-    saveCache(); updateStatusBars();
+    saveCache(); updateStatusBars(); renderSeenHub();
 
     try{
       const {error}=await client.rpc('osteo_set_technique_review',{
@@ -395,9 +412,9 @@
       if(error) throw error;
       appToast(next?'Technique marquée « À revoir »':'Technique retirée de « À revoir »');
     }catch(error){
-      console.warn('[Ostéo Pratik V19.2] À revoir',error);
+      console.warn('[Ostéo Pratik V19.3] À revoir',error);
       row.review_needed=previous;
-      saveCache(); updateStatusBars();
+      saveCache(); updateStatusBars(); renderSeenHub();
       appToast('Impossible de synchroniser « À revoir ».');
     }
   }
@@ -455,7 +472,7 @@
         appToast('Technique ajoutée aux favoris');
       }
     }catch(error){
-      console.warn('[Ostéo Pratik V19.2] Favoris',error);
+      console.warn('[Ostéo Pratik V19.3] Favoris',error);
       // Revenir à l'état serveur en cas d'échec.
       if(removing) favorites.add(id); else favorites.delete(id);
       saveCache(); updateHearts(); renderFavorites();
@@ -479,7 +496,7 @@
       const fallback=resolveFunction('openTechniqueFromCatalogue');
       if(fallback) fallback(t.id);
     }catch(error){
-      console.warn('[Ostéo Pratik V19.2] Ouverture favori',error);
+      console.warn('[Ostéo Pratik V19.3] Ouverture favori',error);
       appToast('Impossible d’ouvrir cette technique.');
     }
   }
@@ -514,6 +531,127 @@
     screen.appendChild(list);
   }
 
+  function viewedCount(){
+    return (progressRows||[]).filter(r=>r && (r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue')).length;
+  }
+
+  function reviewTechniques(){
+    return listTechniques()
+      .filter(t=>t&&isReview(t.id))
+      .sort((a,b)=>String(a.zone||'').localeCompare(String(b.zone||''),'fr') || String(a.sub||'').localeCompare(String(b.sub||''),'fr') || String(a.title||'').localeCompare(String(b.title||''),'fr'));
+  }
+
+  function openReviewTechnique(id){
+    const t=techniqueById(id);
+    if(!t){appToast('Technique introuvable.');return;}
+    try{
+      window.__nextPlayerBackTarget='seenCollections';
+      const open=resolveFunction('openTechnique');
+      if(open){open(t.id);return;}
+      const fallback=resolveFunction('openTechniqueFromCatalogue');
+      if(fallback) fallback(t.id);
+    }catch(error){
+      console.warn('[Ostéo Pratik V19.3] Ouverture À revoir',error);
+      appToast('Impossible d’ouvrir cette technique.');
+    }
+  }
+
+  function ensureSeenHub(){
+    const screen=$('seenCollections');
+    if(!screen) return null;
+
+    let tabs=$('osteoSeenReviewTabs');
+    if(!tabs){
+      tabs=document.createElement('div');
+      tabs.id='osteoSeenReviewTabs';
+      tabs.className='osteo-v19-seen-tabs';
+      tabs.innerHTML=`
+        <button type="button" class="osteo-v19-seen-tab" data-mode="seen">Déjà vues <b data-count-seen>0</b></button>
+        <button type="button" class="osteo-v19-seen-tab" data-mode="review">À revoir <b data-count-review>0</b></button>
+      `;
+      const title=screen.querySelector('.seen-album-title');
+      if(title) title.insertAdjacentElement('afterend',tabs);
+      else screen.querySelector('header.top')?.insertAdjacentElement('afterend',tabs) || screen.prepend(tabs);
+
+      tabs.querySelectorAll('[data-mode]').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          seenHubMode=btn.dataset.mode==='review'?'review':'seen';
+          renderSeenHub();
+        });
+      });
+    }
+
+    let panel=$('osteoReviewPanel');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='osteoReviewPanel';
+      panel.className='osteo-v19-review-panel';
+      const grid=$('collectionGrid');
+      if(grid) grid.insertAdjacentElement('beforebegin',panel);
+      else screen.appendChild(panel);
+    }
+    return {screen,tabs,panel};
+  }
+
+  function renderSeenHub(){
+    const ui=ensureSeenHub();
+    if(!ui) return;
+    const {screen,tabs,panel}=ui;
+    const items=reviewTechniques();
+    const seenCount=viewedCount();
+
+    const seenBadge=tabs.querySelector('[data-count-seen]');
+    const reviewBadge=tabs.querySelector('[data-count-review]');
+    if(seenBadge) seenBadge.textContent=String(seenCount);
+    if(reviewBadge) reviewBadge.textContent=String(items.length);
+    tabs.querySelectorAll('[data-mode]').forEach(btn=>btn.classList.toggle('active',btn.dataset.mode===seenHubMode));
+
+    const summary=screen.querySelector('.collection-summary');
+    const quick=screen.querySelector('.quick-cervical-orange');
+    const grid=$('collectionGrid');
+    const albumTitle=screen.querySelector('.seen-album-title');
+
+    if(seenHubMode==='seen'){
+      if(summary) summary.style.display='';
+      if(quick) quick.style.display='';
+      if(grid) grid.style.display='';
+      panel.style.display='none';
+      if(albumTitle){
+        const h=albumTitle.querySelector('h1');
+        const p=albumTitle.querySelector('p');
+        if(h) h.textContent='Collections';
+        if(p) p.textContent='Chaque zone devient une famille de cartes. Les techniques non vues restent grisées.';
+      }
+      return;
+    }
+
+    if(summary) summary.style.display='none';
+    if(quick) quick.style.display='none';
+    if(grid) grid.style.display='none';
+    panel.style.display='grid';
+    if(albumTitle){
+      const h=albumTitle.querySelector('h1');
+      const p=albumTitle.querySelector('p');
+      if(h) h.textContent='À revoir';
+      if(p) p.textContent='Toutes les techniques que vous avez marquées pour les retravailler.';
+    }
+
+    if(!items.length){
+      panel.innerHTML='<div class="osteo-v19-review-empty"><b>✓ Rien à revoir</b>Marquez une technique « À revoir » pour la retrouver ici.</div>';
+      return;
+    }
+
+    panel.innerHTML=`
+      <div class="osteo-v19-review-summary"><strong>Techniques à retravailler</strong><b>${items.length}</b></div>
+      <div class="osteo-v19-review-list">
+        ${items.map(t=>`<button type="button" class="osteo-v19-review-card" data-review-technique="${esc(t.id)}"><span class="mark">↻</span><span><strong>${esc(t.title||'Technique')}</strong><small>${esc([t.zone,t.sub,t.level].filter(Boolean).join(' · '))}</small></span><span class="arrow">›</span></button>`).join('')}
+      </div>
+    `;
+    panel.querySelectorAll('[data-review-technique]').forEach(btn=>{
+      btn.addEventListener('click',()=>openReviewTechnique(btn.dataset.reviewTechnique));
+    });
+  }
+
   async function recordOpen(id){
     const s=await ensureSession(); if(!s?.user?.id||!id) return;
     const t=techniqueById(id); if(!t) return;
@@ -526,7 +664,7 @@
     try{
       const {error}=await client.rpc('osteo_record_technique_open',{p_technique_id:String(t.id),p_title:String(t.title||''),p_zone:String(t.zone||''),p_subzone:String(t.sub||''),p_level:String(t.level||'')});
       if(error) throw error;
-    }catch(error){console.warn('[Ostéo Pratik V19.2] Dernière technique',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.3] Dernière technique',error);}
   }
 
   async function recordComplete(id){
@@ -542,7 +680,7 @@
       if(existing){Object.assign(existing,{status:'vue',percent:100,completed_at:existing.completed_at||now,updated_at:now});}
       else progressRows.push({user_id:userId,technique_id:String(t.id),title:t.title||'',zone:t.zone||'',subzone:t.sub||'',level:t.level||'',status:'vue',percent:100,opened_count:1,first_opened_at:now,last_opened_at:now,completed_at:now,updated_at:now});
       applyAll();
-    }catch(error){console.warn('[Ostéo Pratik V19.2] Technique terminée',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.3] Technique terminée',error);}
   }
 
   function readQuizResult(){
@@ -567,7 +705,7 @@
       if(error) throw error;
       stateRow={...(stateRow||{}),user_id:userId,last_quiz_title:q.title,last_quiz_score:q.score,last_quiz_total:q.total,last_quiz_percent:q.percent,last_quiz_at:new Date().toISOString()};
       applyStateToCompatibilityStorage(); saveCache();
-    }catch(error){console.warn('[Ostéo Pratik V19.2] Résultat quiz',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.3] Résultat quiz',error);}
   }
 
   function hook(name,after){
@@ -601,6 +739,7 @@
         updateHearts();
         updateStatusBars();
         if($('favorites')?.classList.contains('active')) renderFavorites();
+        if($('seenCollections')?.classList.contains('active')) renderSeenHub();
       },60);
     });
     observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
@@ -621,9 +760,10 @@
     installObserver();
     prepareHeart(getHeart('player')); prepareHeart(getHeart('techniqueDetail'));
     updateStatusBars();
+    renderSeenHub();
 
     client=await waitForAuthClient();
-    if(!client){console.warn('[Ostéo Pratik V19.2] Client Supabase indisponible.');return;}
+    if(!client){console.warn('[Ostéo Pratik V19.3] Client Supabase indisponible.');return;}
 
     client.auth.onAuthStateChange((event,newSession)=>{
       session=newSession||null;
@@ -635,7 +775,7 @@
     });
 
     await loadUserData();
-    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();},ms));
+    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();renderSeenHub();},ms));
   }
 
   window.OSTEO_USER_DATA_V19={
@@ -645,6 +785,7 @@
     toggleFavorite:t=>toggleFavorite(t),
     isReview:id=>isReview(id),
     toggleReview:t=>toggleReview(t),
+    renderSeenHub,
     recordOpen,
     recordComplete,
     recordQuiz
@@ -652,5 +793,5 @@
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
   else install();
-  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(()=>{installHooks();loadUserData();updateStatusBars();},120));
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(()=>{installHooks();loadUserData();updateStatusBars();renderSeenHub();},120));
 })();
