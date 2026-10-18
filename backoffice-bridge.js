@@ -1833,21 +1833,21 @@
   (document.body||document.documentElement).appendChild(s);
 })();
 
-/* === V19.4 · SOCLE UTILISATEUR : FAVORIS + À REVOIR + PROGRESSION + STATS === */
+/* === V19.8 · SOCLE UTILISATEUR : FAVORIS + À REVOIR + PROGRESSION + STATS === */
 (function(){
   if(document.querySelector('script[data-osteo-user-data-v19]')) return;
   const s=document.createElement('script');
-  s.src='user-data-v19.js?v=19.7';
+  s.src='user-data-v19.js?v=19.8';
   s.defer=true;
   s.dataset.osteoUserDataV19='1';
   (document.body||document.documentElement).appendChild(s);
 })();
 
-/* === V19.7 · À REVOIR : OUVERTURE VIDÉO FIABLE + SUPPRESSION === */
+/* === V19.8 · À REVOIR : VIDÉO + SUPPRESSION + STABILITÉ BUREAU === */
 (function(){
   'use strict';
 
-  const VERSION='19.7';
+  const VERSION='19.8';
   const SNAPSHOT_KEY='osteoRA.backoffice.snapshot.v1';
   const videoSnapshot=new Map();
   let observer=null;
@@ -2110,11 +2110,28 @@
 
   function installObserver(){
     if(observer) return;
-    observer=new MutationObserver(()=>{
+
+    const panel=document.getElementById('osteoReviewPanel');
+    const target=panel || document.getElementById('seenCollections');
+    if(!target) return;
+
+    observer=new MutationObserver(mutations=>{
+      // Une nouvelle liste peut être recréée après ajout/suppression de « À revoir ».
+      // On ne surveille plus tout le document : uniquement ce panneau.
+      const needsPatch=mutations.some(m=>
+        m.type==='childList' &&
+        [...m.addedNodes].some(node=>
+          node && node.nodeType===1 &&
+          (node.matches?.('.osteo-v19-review-card[data-review-technique], .osteo-v19-review-list') ||
+           node.querySelector?.('.osteo-v19-review-card[data-review-technique]'))
+        )
+      );
+      if(!needsPatch) return;
       clearTimeout(patchTimer);
-      patchTimer=setTimeout(patchCards,35);
+      patchTimer=setTimeout(patchCards,25);
     });
-    observer.observe(document.documentElement,{subtree:true,childList:true});
+
+    observer.observe(target,{subtree:true,childList:true});
   }
 
   function install(){
@@ -2133,5 +2150,5 @@
 
   [250,700,1500,2800].forEach(ms=>setTimeout(patchCards,ms));
 
-  window.OSTEO_REVIEW_V19_7={version:VERSION,open:openReviewVideo,remove:removeReview,refresh:patchCards};
+  window.OSTEO_REVIEW_V19_8={version:VERSION,open:openReviewVideo,remove:removeReview,refresh:patchCards};
 })();

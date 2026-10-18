@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.4';
+  const VERSION='19.8';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -251,7 +251,7 @@
       stateRow=stateRes.data||null;
       applyAll();
     }catch(error){
-      console.warn('[Ostéo Pratik V19.4] Données utilisateur : cache local utilisé.',error);
+      console.warn('[Ostéo Pratik V19.8] Données utilisateur : cache local utilisé.',error);
     }finally{
       loading=false;
     }
@@ -411,7 +411,7 @@
       if(error) throw error;
       appToast(next?'Technique marquée « À revoir »':'Technique retirée de « À revoir »');
     }catch(error){
-      console.warn('[Ostéo Pratik V19.4] À revoir',error);
+      console.warn('[Ostéo Pratik V19.8] À revoir',error);
       row.review_needed=previous;
       saveCache(); updateStatusBars(); renderSeenHub();
       appToast('Impossible de synchroniser « À revoir ».');
@@ -471,7 +471,7 @@
         appToast('Technique ajoutée aux favoris');
       }
     }catch(error){
-      console.warn('[Ostéo Pratik V19.4] Favoris',error);
+      console.warn('[Ostéo Pratik V19.8] Favoris',error);
       // Revenir à l'état serveur en cas d'échec.
       if(removing) favorites.add(id); else favorites.delete(id);
       saveCache(); updateHearts(); renderFavorites();
@@ -495,7 +495,7 @@
       const fallback=resolveFunction('openTechniqueFromCatalogue');
       if(fallback) fallback(t.id);
     }catch(error){
-      console.warn('[Ostéo Pratik V19.4] Ouverture favori',error);
+      console.warn('[Ostéo Pratik V19.8] Ouverture favori',error);
       appToast('Impossible d’ouvrir cette technique.');
     }
   }
@@ -550,7 +550,7 @@
       const fallback=resolveFunction('openTechniqueFromCatalogue');
       if(fallback) fallback(t.id);
     }catch(error){
-      console.warn('[Ostéo Pratik V19.4] Ouverture À revoir',error);
+      console.warn('[Ostéo Pratik V19.8] Ouverture À revoir',error);
       appToast('Impossible d’ouvrir cette technique.');
     }
   }
@@ -672,7 +672,7 @@
     try{
       const {error}=await client.rpc('osteo_record_technique_open',{p_technique_id:String(t.id),p_title:String(t.title||''),p_zone:String(t.zone||''),p_subzone:String(t.sub||''),p_level:String(t.level||'')});
       if(error) throw error;
-    }catch(error){console.warn('[Ostéo Pratik V19.4] Dernière technique',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.8] Dernière technique',error);}
   }
 
   async function recordComplete(id){
@@ -688,7 +688,7 @@
       if(existing){Object.assign(existing,{status:'vue',percent:100,completed_at:existing.completed_at||now,updated_at:now});}
       else progressRows.push({user_id:userId,technique_id:String(t.id),title:t.title||'',zone:t.zone||'',subzone:t.sub||'',level:t.level||'',status:'vue',percent:100,opened_count:1,first_opened_at:now,last_opened_at:now,completed_at:now,updated_at:now});
       applyAll();
-    }catch(error){console.warn('[Ostéo Pratik V19.4] Technique terminée',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.8] Technique terminée',error);}
   }
 
   function readQuizResult(){
@@ -713,7 +713,7 @@
       if(error) throw error;
       stateRow={...(stateRow||{}),user_id:userId,last_quiz_title:q.title,last_quiz_score:q.score,last_quiz_total:q.total,last_quiz_percent:q.percent,last_quiz_at:new Date().toISOString()};
       applyStateToCompatibilityStorage(); saveCache();
-    }catch(error){console.warn('[Ostéo Pratik V19.4] Résultat quiz',error);}
+    }catch(error){console.warn('[Ostéo Pratik V19.8] Résultat quiz',error);}
   }
 
   function hook(name,after){
@@ -740,7 +740,26 @@
   function installObserver(){
     if(observer) return;
     let timer=null;
-    observer=new MutationObserver(()=>{
+
+    /*
+      V19.8 — stabilité bureau
+      Ne plus écouter les mutations childList. renderSeenHub() modifie lui-même
+      le DOM de #seenCollections ; l'ancien observer voyait cette modification
+      puis rappelait renderSeenHub(), ce qui créait une boucle de rendu visible
+      sous forme de tremblement sur ordinateur.
+
+      On observe uniquement les changements de classe des écrans (navigation).
+    */
+    observer=new MutationObserver(mutations=>{
+      const screenChanged=mutations.some(m=>
+        m.type==='attributes' &&
+        m.attributeName==='class' &&
+        m.target &&
+        m.target.classList &&
+        m.target.classList.contains('screen')
+      );
+      if(!screenChanged) return;
+
       clearTimeout(timer);
       timer=setTimeout(()=>{
         installHooks();
@@ -748,9 +767,14 @@
         updateStatusBars();
         if($('favorites')?.classList.contains('active')) renderFavorites();
         if($('seenCollections')?.classList.contains('active')) renderSeenHub();
-      },60);
+      },40);
     });
-    observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+
+    observer.observe(document.documentElement,{
+      subtree:true,
+      attributes:true,
+      attributeFilter:['class']
+    });
   }
 
   async function waitForAuthClient(){
@@ -771,7 +795,7 @@
     renderSeenHub();
 
     client=await waitForAuthClient();
-    if(!client){console.warn('[Ostéo Pratik V19.4] Client Supabase indisponible.');return;}
+    if(!client){console.warn('[Ostéo Pratik V19.8] Client Supabase indisponible.');return;}
 
     client.auth.onAuthStateChange((event,newSession)=>{
       session=newSession||null;
