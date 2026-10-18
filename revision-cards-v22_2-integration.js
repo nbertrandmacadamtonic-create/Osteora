@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-6
+   Version 22.2-app-7
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-6';
+  const VERSION = '22.2-app-7';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1442,4 +1442,82 @@
     restart:restartTesterQuiz,
     readReviewData
   };
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — BYPASS ANCIEN MENU QUIZ V11
+   Version tester-1.1
+   --------------------------------------------------------------
+   L'ancien backoffice-bridge crée un écran #quizMenu et intercepte
+   les clics vers go('quiz'). On le contourne pour lancer directement
+   le nouveau quiz basé sur les techniques réellement vues.
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoTesterBypassOldQuizMenu) return;
+  window.__osteoTesterBypassOldQuizMenu = true;
+
+  function launchTester(){
+    try{
+      const oldMenu=document.getElementById('quizMenu');
+      if(oldMenu){
+        oldMenu.classList.remove('active');
+        oldMenu.style.display='none';
+      }
+    }catch(_){}
+
+    try{
+      if(typeof window.go==='function'){
+        window.go('quiz');
+      }else if(typeof go==='function'){
+        go('quiz');
+      }
+    }catch(_){}
+
+    try{
+      if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.start==='function'){
+        setTimeout(()=>window.OSTEO_TESTER.start(),30);
+      }
+    }catch(_){}
+
+    return false;
+  }
+
+  // Remplace le point d'entrée public de l'ancien menu.
+  window.showQuizMenuV9=launchTester;
+
+  /*
+    L'ancien bridge a déjà attaché ses propres addEventListener.
+    Un listener en phase de capture passe avant eux et bloque
+    l'ouverture de #quizMenu.
+  */
+  document.addEventListener('click',function(event){
+    const el=event.target && event.target.closest
+      ? event.target.closest('[data-quiz-menu-intercepted="1"]')
+      : null;
+
+    if(!el) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    launchTester();
+  },true);
+
+  function cleanup(){
+    const menu=document.getElementById('quizMenu');
+    if(menu){
+      menu.classList.remove('active');
+      menu.style.display='none';
+      menu.setAttribute('aria-hidden','true');
+    }
+  }
+
+  cleanup();
+  document.addEventListener('DOMContentLoaded',cleanup,{once:true});
+  [100,500,1200].forEach(ms=>setTimeout(cleanup,ms));
+
+  window.OSTEO_TESTER_OPEN=launchTester;
 })();
