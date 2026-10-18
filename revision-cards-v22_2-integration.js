@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-4
+   Version 22.2-app-5
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-4';
+  const VERSION = '22.2-app-5';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -244,6 +244,26 @@
         background:rgba(255,255,255,.05) !important;
         border-color:rgba(255,255,255,.12) !important;
       }
+
+      /* Vignettes de l'album : vraie photo issue de la carte V22.2 */
+      .play-card .card-image{
+        overflow:hidden !important;
+      }
+      .play-card .card-image img.op22-menu-thumb{
+        display:block !important;
+        width:100% !important;
+        height:100% !important;
+        object-fit:cover !important;
+        object-position:center center !important;
+        opacity:1;
+      }
+      .play-card.locked .card-image img.op22-menu-thumb{
+        filter:grayscale(1) brightness(.42) contrast(.92) !important;
+        opacity:.52 !important;
+      }
+      .play-card.op22-menu-thumbnail-ready .card-fallback{
+        display:none !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -266,7 +286,70 @@
     }
   }
 
+  function hydrateSeenCardThumbnails(){
+    const grid=document.getElementById('seenCardGrid');
+    if(!grid) return;
+
+    ensureDependencies().then(()=>{
+      const baseApi=window.OSTEO_PLAYING_CARDS_V22;
+      const premiumApi=window.OSTEO_PLAYING_CARDS_V22_2;
+      if(!baseApi || typeof baseApi.model!=='function') return;
+
+      grid.querySelectorAll('.play-card[data-tech-id]').forEach(card=>{
+        const id=toId(card.dataset.techId);
+        const t=getTechnique(id);
+        if(!t) return;
+
+        const ref=resolveRef(t,premiumApi);
+        if(!ref) return;
+
+        let model=null;
+        try{ model=baseApi.model(ref); }catch(_){ model=null; }
+        const photo=model?.frontPhoto;
+        if(!photo) return;
+
+        const box=card.querySelector('.card-image');
+        if(!box) return;
+
+        let img=box.querySelector('img');
+        if(!img){
+          img=document.createElement('img');
+          box.prepend(img);
+        }
+
+        img.classList.add('op22-menu-thumb');
+        img.src=photo;
+        img.alt=t.title||'Technique ostéopathique';
+        img.loading='lazy';
+        img.style.display='block';
+
+        const fallback=box.querySelector('.card-fallback');
+        if(fallback) fallback.style.display='none';
+
+        card.classList.add('op22-menu-thumbnail-ready');
+      });
+    }).catch(err=>{
+      console.warn('[Ostéo Pratik] Vignettes V22.2 indisponibles',err);
+    });
+  }
+
   function wrapExistingRenderers(){
+    try{
+      if(typeof renderSeenCards === 'function' && !renderSeenCards.__op22ThumbWrapped){
+        const original = renderSeenCards;
+        const wrapped = function(){
+          syncTechniqueStatuses();
+          const result = original.apply(this,arguments);
+          hydrateSeenCardThumbnails();
+          setTimeout(hydrateSeenCardThumbnails,80);
+          return result;
+        };
+        wrapped.__op22ThumbWrapped = true;
+        renderSeenCards = wrapped;
+        window.renderSeenCards = wrapped;
+      }
+    }catch(_){}
+
     try{
       if(typeof renderSeenCollections === 'function' && !renderSeenCollections.__op22CleanWrapped){
         const original = renderSeenCollections;
@@ -689,6 +772,7 @@
 
     try{ if(typeof renderSeenCollections==='function') renderSeenCollections(); }catch(_){}
     try{ if(typeof renderRevisionWheel==='function') renderRevisionWheel(); }catch(_){}
+    hydrateSeenCardThumbnails();
   }
 
   document.addEventListener('keydown',e=>{
