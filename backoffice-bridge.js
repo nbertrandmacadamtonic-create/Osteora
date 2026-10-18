@@ -1843,3 +1843,12 @@
   (document.body||document.documentElement).appendChild(s);
 })();
 
+/* === V19.5 · CORRECTIF À REVOIR -> BONNE VIDÉO === */
+(function(){
+  if(document.querySelector('script[data-osteo-review-video-v195]')) return;
+  const s=document.createElement('script');
+  s.src='review-video-link-v19_5.js?v=19.5';
+  s.defer=true;
+  s.dataset.osteoReviewVideoV195='1';
+  (document.body||document.documentElement).appendChild(s);
+})();
