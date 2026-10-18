@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-2
+   Version 22.2-app-4
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-3';
+  const VERSION = '22.2-app-4';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -499,22 +499,26 @@
     return common / Math.max(sa.size,sb.size,1);
   }
 
-  function resolveRef(t,api){
-    if(!t || !api) return null;
+  function resolveRef(t,premiumApi){
+    if(!t) return null;
+
+    // La recherche des techniques appartient au moteur V22 de base.
+    // V22.2 ne fait que l'habillage graphique premium et le rendu.
+    const baseApi=window.OSTEO_PLAYING_CARDS_V22;
+    if(!baseApi) return null;
 
     let official=[];
     try{
-      official=typeof api.techniques==='function' ? api.techniques() : [];
+      official=typeof baseApi.techniques==='function' ? baseApi.techniques() : [];
     }catch(_){
       official=[];
     }
 
     /*
-      IMPORTANT :
-      le catalogue de l'application utilise videoSourceRow,
-      tandis que la base des cartes utilise sourceRow.
-      Dans la base actuelle : sourceRow = videoSourceRow - 1.
-      Ex. catalogue 81 -> carte officielle 80.
+      Le catalogue principal utilise videoSourceRow,
+      la base des cartes utilise sourceRow.
+      Dans le catalogue actuel, la correspondance est généralement :
+      sourceRow = videoSourceRow - 1.
     */
     const videoRow=Number(t.videoSourceRow);
     const sourceRow=Number(t.sourceRow);
@@ -530,24 +534,23 @@
       if(hit) return hit;
     }
 
-    // Slug explicite si la technique en possède déjà un.
+    // Slug explicite.
     if(t.slug){
       const hit=official.find(item=>String(item?.slug||'')===String(t.slug));
       if(hit) return hit;
       try{
-        const found=api.find(t.slug);
+        const found=baseApi.find(t.slug);
         if(found) return found;
       }catch(_){}
     }
 
-    // Correspondance exacte après normalisation des variantes typographiques.
+    // Titre exact après normalisation.
     const exact=official.find(item=>
       normalizeCardTitle(item?.title)===normalizeCardTitle(t.title)
     );
     if(exact) return exact;
 
-    // Dernier filet de sécurité : meilleure correspondance de titre,
-    // en privilégiant la même zone / sous-zone.
+    // Meilleure correspondance dans la même zone/sous-zone.
     const sameArea=official.filter(item=>{
       const sameZone=!t.zone || !item?.zone || String(item.zone)===String(t.zone);
       const sameSub=!t.sub || !item?.sub || String(item.sub)===String(t.sub);
@@ -566,15 +569,19 @@
       }
     }
 
-    // 0,48 évite les faux positifs mais absorbe les différences
-    // "énergie musculaire" / "(E.M.)", parenthèses, accents, etc.
     if(best && bestScore>=0.48) return best;
 
-    // Compatibilité avec le moteur V22 pour les cas déjà directement reconnus.
-    const candidates=[t.title,String(t.id??'')].filter(Boolean);
+    // Dernier secours : moteur V22 natif.
+    const candidates=[
+      t.title,
+      t.slug,
+      Number.isFinite(videoRow) && videoRow>1 ? String(videoRow-1) : '',
+      Number.isFinite(sourceRow) && sourceRow>0 ? String(sourceRow) : ''
+    ].filter(Boolean);
+
     for(const ref of candidates){
       try{
-        const found=api.find(ref);
+        const found=baseApi.find(ref);
         if(found) return found;
       }catch(_){}
     }
@@ -607,7 +614,7 @@
     const ref=resolveRef(t,api);
     if(!ref){
       console.warn('[Ostéo Pratik] Correspondance V22.2 introuvable',t);
-      toastSafe('Carte en cours de synchronisation');
+      toastSafe('Carte introuvable dans la base V22');
       return;
     }
 
