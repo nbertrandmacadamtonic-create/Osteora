@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-9
+   Version 22.2-app-10
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-9';
+  const VERSION = '22.2-app-10';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -529,6 +529,7 @@
         <div id="op22AppCardStage"></div>
         <div class="op22-app-actions">
           <button class="op22-app-secondary" type="button" id="op22AppFlipBtn">Retourner la carte</button>
+          <button class="op22-app-secondary" type="button" id="op22AppTestBtn">Me tester · 4 questions</button>
           <button class="op22-app-primary" type="button" id="op22AppVideoBtn">Voir la vidéo</button>
         </div>
       </div>
@@ -543,6 +544,22 @@
     overlay.querySelector('#op22AppFlipBtn').addEventListener('click',()=>{
       overlay.querySelector('.op22-card')?.classList.toggle('is-flipped');
     });
+    overlay.querySelector('#op22AppTestBtn').addEventListener('click',()=>{
+      const id=currentTechniqueId;
+      closePremiumCard();
+      try{
+        if(typeof window.go==='function') window.go('quiz');
+        else if(typeof go==='function') go('quiz');
+      }catch(_){}
+      setTimeout(()=>{
+        try{
+          if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startTechnique==='function'){
+            window.OSTEO_TESTER.startTechnique(id);
+          }
+        }catch(_){}
+      },30);
+    });
+
     overlay.querySelector('#op22AppVideoBtn').addEventListener('click',()=>{
       const id=currentTechniqueId;
       closePremiumCard();
@@ -841,6 +858,8 @@
   };
 
   let sessionFilterZone='';
+  let sessionTechniqueId=0;
+  let sessionTechniqueTitle='';
 
   let session={
     questions:[],
@@ -1179,6 +1198,13 @@
       return;
     }
 
+    if(String(zoneFilter).startsWith('__TECHNIQUE__:')){
+      if(title) title.textContent='Me tester sur cette technique';
+      if(sub) sub.textContent=sessionTechniqueTitle || '4 questions sur la carte';
+      if(headerSub) headerSub.textContent='4 questions · une technique';
+      return;
+    }
+
     if(title) title.textContent=zoneFilter ? 'Quiz '+zoneFilter : 'Quiz de mes techniques vues';
     if(sub) sub.textContent=zoneFilter
       ? 'Uniquement parmi mes techniques déjà vues'
@@ -1387,6 +1413,68 @@
     }catch(_){}
   }
 
+  async function startTechniqueQuiz(techniqueId){
+    const id=Number(techniqueId)||0;
+    const appTechnique=getTechniques().find(t=>Number(t?.id)===id) || null;
+
+    if(!appTechnique){
+      console.warn('[Ostéo Pratik] Technique introuvable pour le quiz',techniqueId);
+      return;
+    }
+
+    const viewed=new Set(readViewedIds());
+    if(!viewed.has(id)){
+      console.warn('[Ostéo Pratik] Technique non vue : quiz refusé',id);
+      return;
+    }
+
+    sessionTechniqueId=id;
+    sessionTechniqueTitle=String(appTechnique.title||'Technique');
+    sessionFilterZone='__TECHNIQUE__:'+id;
+    updateStaticQuizCopy(sessionFilterZone);
+
+    try{
+      const baseApi=await waitForCards();
+      const allOfficial=baseApi.techniques()||[];
+      const official=findOfficialTechnique(appTechnique,baseApi);
+
+      if(!official){
+        throw new Error('Fiche officielle introuvable');
+      }
+
+      const questions=STEP_ORDER
+        .map(key=>buildQuestion(appTechnique,official,key,allOfficial))
+        .filter(Boolean);
+
+      /*
+        Une carte pédagogique doit produire exactement quatre questions :
+        Position, mains, barrière motrice, normalisation.
+      */
+      if(questions.length!==4){
+        throw new Error('Les 4 rubriques de la carte ne sont pas disponibles');
+      }
+
+      session={
+        questions,
+        index:0,
+        score:0,
+        answered:false,
+        answers:[]
+      };
+
+      renderTesterQuiz();
+    }catch(err){
+      console.warn('[Ostéo Pratik] Quiz de carte',err);
+      try{
+        if(typeof toast==='function'){
+          toast('Quiz indisponible pour cette carte');
+        }else if(typeof window.toast==='function'){
+          window.toast('Quiz indisponible pour cette carte');
+        }
+      }catch(_){}
+    }
+  }
+
   function readGeneralOsteopathyBank(){
     let bank=[];
 
@@ -1455,6 +1543,8 @@
   }
 
   async function startGeneralOsteopathySession(){
+    sessionTechniqueId=0;
+    sessionTechniqueTitle='';
     sessionFilterZone='__GENERAL__';
     updateStaticQuizCopy(sessionFilterZone);
 
@@ -1491,6 +1581,8 @@
   }
 
   async function startTesterSession(zoneFilter=''){
+    sessionTechniqueId=0;
+    sessionTechniqueTitle='';
     sessionFilterZone=String(zoneFilter||'');
     updateStaticQuizCopy(sessionFilterZone);
 
@@ -1510,7 +1602,9 @@
   }
 
   function restartTesterQuiz(){
-    if(sessionFilterZone==='__GENERAL__'){
+    if(String(sessionFilterZone).startsWith('__TECHNIQUE__:') && sessionTechniqueId){
+      startTechniqueQuiz(sessionTechniqueId);
+    }else if(sessionFilterZone==='__GENERAL__'){
       startGeneralOsteopathySession();
     }else{
       startTesterSession(sessionFilterZone);
@@ -1561,6 +1655,7 @@
     start:startTesterSession,
     startZone:startTesterSession,
     startGeneral:startGeneralOsteopathySession,
+    startTechnique:startTechniqueQuiz,
     restart:restartTesterQuiz,
     viewedIds:readViewedIds,
     readReviewData
@@ -1859,4 +1954,132 @@
       setTimeout(rewireTesterEntries,30);
     }
   });
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — BOUTON « ME TESTER » SUR LES CARTES DÉJÀ VUES
+   Version card-test-1.0
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoSeenCardTestButtonsV1) return;
+  window.__osteoSeenCardTestButtonsV1=true;
+
+  function openTechniqueQuiz(id,event){
+    if(event){
+      event.preventDefault();
+      event.stopPropagation();
+      if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
+    }
+
+    try{
+      if(typeof window.go==='function') window.go('quiz');
+      else if(typeof go==='function') go('quiz');
+    }catch(_){}
+
+    setTimeout(()=>{
+      try{
+        if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startTechnique==='function'){
+          window.OSTEO_TESTER.startTechnique(Number(id));
+        }
+      }catch(_){}
+    },30);
+
+    return false;
+  }
+
+  function ensureStyles(){
+    if(document.getElementById('opSeenCardTestStyles')) return;
+
+    const style=document.createElement('style');
+    style.id='opSeenCardTestStyles';
+    style.textContent=`
+      #seenCardGrid .op-card-test-button{
+        margin-top:7px;
+        width:100%;
+        min-height:34px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:7px;
+        border-radius:12px;
+        border:1px solid rgba(0,229,255,.35);
+        background:rgba(0,229,255,.08);
+        color:#68ecff;
+        font-size:10.5px;
+        font-weight:950;
+        line-height:1.1;
+        cursor:pointer;
+      }
+      #seenCardGrid .op-card-test-button:hover{
+        background:rgba(0,229,255,.14);
+      }
+      #seenCardGrid .play-card.locked .op-card-test-button{
+        display:none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function installButtons(){
+    ensureStyles();
+
+    const grid=document.getElementById('seenCardGrid');
+    if(!grid) return;
+
+    grid.querySelectorAll('.play-card[data-tech-id]').forEach(card=>{
+      if(card.classList.contains('locked')) return;
+      if(card.querySelector('.op-card-test-button')) return;
+
+      const id=Number(card.dataset.techId)||0;
+      if(!id) return;
+
+      const target=
+        card.querySelector('.card-front > div:last-child') ||
+        card.querySelector('.card-front');
+
+      if(!target) return;
+
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='op-card-test-button';
+      button.innerHTML='<span>✓</span><strong>Me tester · 4 questions</strong>';
+      button.addEventListener('click',event=>openTechniqueQuiz(id,event),true);
+      target.appendChild(button);
+    });
+  }
+
+  function wrapSeenCards(){
+    try{
+      if(typeof renderSeenCards==='function' && !renderSeenCards.__opCardTestWrapped){
+        const original=renderSeenCards;
+        const wrapped=function(){
+          const result=original.apply(this,arguments);
+          installButtons();
+          setTimeout(installButtons,60);
+          return result;
+        };
+        wrapped.__opCardTestWrapped=true;
+        renderSeenCards=wrapped;
+        window.renderSeenCards=wrapped;
+      }
+    }catch(_){}
+  }
+
+  wrapSeenCards();
+  installButtons();
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    wrapSeenCards();
+    installButtons();
+  },{once:true});
+
+  [100,500,1200].forEach(ms=>setTimeout(()=>{
+    wrapSeenCards();
+    installButtons();
+  },ms));
+
+  window.OSTEO_OPEN_TECHNIQUE_QUIZ=openTechniqueQuiz;
 })();
