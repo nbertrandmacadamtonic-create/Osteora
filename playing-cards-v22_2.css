@@ -1,0 +1,139 @@
+/* OSTÉO PRATIK V22.2 — RECTO PREMIUM ÉPURÉ */
+.op22-card.op222-upgraded .op22-front{
+  border:1.5px solid rgba(73,226,249,.88);
+  box-shadow:0 0 0 1px rgba(0,216,255,.07),0 0 28px rgba(0,205,255,.27),inset 0 0 32px rgba(0,170,255,.07);
+}
+
+/* Photo réelle : quasi naturelle, seulement légèrement refroidie */
+.op22-card.op222-upgraded .op22-front-photo{
+  inset:0;
+  background:#08121c;
+}
+.op22-card.op222-upgraded .op22-front-photo>img{
+  width:100%;height:100%;object-fit:cover;
+  filter:brightness(.94) contrast(1.05) saturate(.90);
+  transform:scale(1.018);
+}
+.op22-card.op222-upgraded .op22-photo-filter{
+  background:
+    linear-gradient(120deg,rgba(0,190,225,.055),rgba(0,73,130,.01) 46%,transparent 72%),
+    linear-gradient(180deg,rgba(1,9,18,.04) 0%,rgba(1,9,18,0) 45%,rgba(1,9,18,.18) 58%,rgba(1,9,18,.76) 78%,rgba(1,8,16,.98) 100%);
+  box-shadow:none;
+}
+
+/* Logo transparent officiel, sans rectangle */
+.op22-card.op222-upgraded .op22-logo{
+  left:24px;top:21px;width:178px;height:58px;max-height:none;
+  object-fit:contain;object-position:left center;
+  background:transparent!important;
+  filter:drop-shadow(0 1px 8px rgba(0,0,0,.42));
+  z-index:35;
+}
+.op22-card.op222-upgraded .op22-code{
+  right:21px;top:23px;z-index:36;
+  min-width:82px;
+  padding:7px 12px;
+  border-width:1px;
+  border-color:rgba(131,244,255,.68);
+  border-radius:13px;
+  background:rgba(2,13,24,.47);
+  backdrop-filter:blur(8px);
+  box-shadow:none;
+  font-size:20px;
+}
+
+/* Anatomie = hologramme libre, sans cartouche */
+.op22-card.op222-upgraded .op22-zone-hologram{
+  left:23px;top:103px;width:105px;height:150px;
+  overflow:visible;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+  mix-blend-mode:screen;
+  opacity:.68;
+  z-index:24;
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
+  mask-image:linear-gradient(180deg,#000 0%,#000 72%,transparent 100%);
+}
+.op22-card.op222-upgraded .op22-zone-hologram:before{
+  content:"";
+  position:absolute;inset:14px 1px 20px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,229,255,.12),rgba(0,229,255,0) 68%);
+  pointer-events:none;
+}
+.op22-card.op222-upgraded .op22-zone-hologram img{
+  position:relative;width:100%;height:100%;
+  object-fit:contain;
+  border-radius:0;
+  opacity:1;
+  filter:saturate(1.32) contrast(1.10) brightness(1.06) drop-shadow(0 0 12px rgba(0,229,255,.23));
+  mix-blend-mode:screen;
+}
+
+/* Bas : aucun cartouche, seulement le dégradé de la photo */
+.op22-card.op222-upgraded .op22-front-copy{
+  left:28px;right:28px;bottom:37px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+  text-align:left;
+  z-index:38;
+}
+.op22-card.op222-upgraded .op22-zone-pill,
+.op22-card.op222-upgraded .op22-sub,
+.op22-card.op222-upgraded .op22-meta{
+  display:none!important;
+}
+
+.op22-card.op222-upgraded .op222-kicker{
+  margin:0 0 8px;
+  color:#82efff;
+  font-size:11px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  text-shadow:0 1px 8px rgba(0,0,0,.78);
+}
+.op22-card.op222-upgraded .op22-front h2{
+  margin:0;
+  max-width:100%;
+  font-size:24px;
+  line-height:1.02;
+  font-weight:950;
+  letter-spacing:-.025em;
+  text-align:left;
+  text-transform:uppercase;
+  text-wrap:balance;
+  text-shadow:0 2px 15px rgba(0,0,0,.95);
+}
+.op22-card.op222-upgraded .op222-meta-line{
+  margin-top:11px;
+  padding-top:10px;
+  padding-right:36px;
+  border-top:1px solid rgba(131,244,255,.20);
+  color:#cfe3ec;
+  font-size:9.7px;
+  line-height:1.25;
+  font-weight:700;
+  text-shadow:0 1px 7px rgba(0,0,0,.82);
+}
+.op22-card.op222-upgraded .op22-flip{z-index:75}
+
+/* Verso : structure V22 conservée ; seul le vrai logo transparent est utilisé */
+.op22-card.op222-upgraded .op22-back .op22-logo{
+  width:118px;height:43px;top:16px;left:19px;
+}
+
+@media(max-width:700px){
+  .op22-card.op222-upgraded .op22-logo{width:158px}
+  .op22-card.op222-upgraded .op22-zone-hologram{left:20px;top:96px;width:90px;height:132px}
+  .op22-card.op222-upgraded .op22-front h2{font-size:21px}
+  .op22-card.op222-upgraded .op222-meta-line{font-size:9px}
+}
