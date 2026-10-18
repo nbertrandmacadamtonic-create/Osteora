@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-2';
+  const VERSION = '22.2-app-3';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -472,19 +472,113 @@
     return overlay;
   }
 
-  function resolveRef(t,api){
-    const candidates=[
-      t?.slug,
-      t?.sourceRow,
-      t?.title,
-      String(t?.id??'')
-    ].filter(v=>v!==undefined && v!==null && String(v).trim());
+  function normalizeCardTitle(value){
+    return String(value||'')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .replace(/[’']/g,' ')
+      .replace(/\benergie\s+musculaire\b/gi,' EM ')
+      .replace(/\be\.?\s*m\.?\b/gi,' EM ')
+      .replace(/[^a-zA-Z0-9]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toLowerCase();
+  }
 
-    for(const ref of candidates){
+  function titleScore(a,b){
+    const na=normalizeCardTitle(a);
+    const nb=normalizeCardTitle(b);
+    if(!na || !nb) return 0;
+    if(na===nb) return 1000;
+    if(na.includes(nb) || nb.includes(na)) return 900;
+
+    const sa=new Set(na.split(' ').filter(Boolean));
+    const sb=new Set(nb.split(' ').filter(Boolean));
+    let common=0;
+    sa.forEach(token=>{ if(sb.has(token)) common++; });
+    return common / Math.max(sa.size,sb.size,1);
+  }
+
+  function resolveRef(t,api){
+    if(!t || !api) return null;
+
+    let official=[];
+    try{
+      official=typeof api.techniques==='function' ? api.techniques() : [];
+    }catch(_){
+      official=[];
+    }
+
+    /*
+      IMPORTANT :
+      le catalogue de l'application utilise videoSourceRow,
+      tandis que la base des cartes utilise sourceRow.
+      Dans la base actuelle : sourceRow = videoSourceRow - 1.
+      Ex. catalogue 81 -> carte officielle 80.
+    */
+    const videoRow=Number(t.videoSourceRow);
+    const sourceRow=Number(t.sourceRow);
+
+    const rowCandidates=[
+      Number.isFinite(videoRow) && videoRow>1 ? videoRow-1 : 0,
+      Number.isFinite(sourceRow) && sourceRow>0 ? sourceRow : 0,
+      Number.isFinite(videoRow) && videoRow>0 ? videoRow : 0
+    ].filter(Boolean);
+
+    for(const row of rowCandidates){
+      const hit=official.find(item=>Number(item?.sourceRow)===Number(row));
+      if(hit) return hit;
+    }
+
+    // Slug explicite si la technique en possède déjà un.
+    if(t.slug){
+      const hit=official.find(item=>String(item?.slug||'')===String(t.slug));
+      if(hit) return hit;
       try{
-        if(api?.find?.(ref)) return ref;
+        const found=api.find(t.slug);
+        if(found) return found;
       }catch(_){}
     }
+
+    // Correspondance exacte après normalisation des variantes typographiques.
+    const exact=official.find(item=>
+      normalizeCardTitle(item?.title)===normalizeCardTitle(t.title)
+    );
+    if(exact) return exact;
+
+    // Dernier filet de sécurité : meilleure correspondance de titre,
+    // en privilégiant la même zone / sous-zone.
+    const sameArea=official.filter(item=>{
+      const sameZone=!t.zone || !item?.zone || String(item.zone)===String(t.zone);
+      const sameSub=!t.sub || !item?.sub || String(item.sub)===String(t.sub);
+      return sameZone && sameSub;
+    });
+
+    const pool=sameArea.length ? sameArea : official;
+    let best=null;
+    let bestScore=0;
+
+    for(const item of pool){
+      const score=titleScore(t.title,item?.title);
+      if(score>bestScore){
+        best=item;
+        bestScore=score;
+      }
+    }
+
+    // 0,48 évite les faux positifs mais absorbe les différences
+    // "énergie musculaire" / "(E.M.)", parenthèses, accents, etc.
+    if(best && bestScore>=0.48) return best;
+
+    // Compatibilité avec le moteur V22 pour les cas déjà directement reconnus.
+    const candidates=[t.title,String(t.id??'')].filter(Boolean);
+    for(const ref of candidates){
+      try{
+        const found=api.find(ref);
+        if(found) return found;
+      }catch(_){}
+    }
+
     return null;
   }
 
@@ -513,7 +607,7 @@
     const ref=resolveRef(t,api);
     if(!ref){
       console.warn('[Ostéo Pratik] Correspondance V22.2 introuvable',t);
-      toastSafe('Carte V22.2 introuvable pour cette technique');
+      toastSafe('Carte en cours de synchronisation');
       return;
     }
 
