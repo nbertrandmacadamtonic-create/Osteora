@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-8
+   Version 22.2-app-9
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-8';
+  const VERSION = '22.2-app-9';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1172,10 +1172,17 @@
     const sub=document.querySelector('#quiz .quiz-general-title p');
     const headerSub=document.getElementById('quizSubtitle');
 
-    if(title) title.textContent=zoneFilter ? 'Quiz '+zoneFilter : 'Tester mes acquis';
+    if(zoneFilter==='__GENERAL__'){
+      if(title) title.textContent='Quiz général — Ostéopathie';
+      if(sub) sub.textContent='Bases, principes et culture ostéopathique';
+      if(headerSub) headerSub.textContent='Ostéopathie générale';
+      return;
+    }
+
+    if(title) title.textContent=zoneFilter ? 'Quiz '+zoneFilter : 'Quiz de mes techniques vues';
     if(sub) sub.textContent=zoneFilter
       ? 'Uniquement parmi mes techniques déjà vues'
-      : 'Quiz des techniques déjà vues';
+      : 'Toutes mes techniques déjà vues';
     if(headerSub) headerSub.textContent=zoneFilter || 'Techniques vues';
   }
 
@@ -1380,6 +1387,109 @@
     }catch(_){}
   }
 
+  function readGeneralOsteopathyBank(){
+    let bank=[];
+
+    try{
+      if(Array.isArray(window.OSTEO_QUESTION_BANK)){
+        bank=window.OSTEO_QUESTION_BANK.filter(q=>
+          String(q?.zone||'')==='Général' &&
+          (!q?.status || String(q.status)==='publie')
+        );
+      }
+    }catch(_){}
+
+    // Secours : ancien quiz général embarqué dans index.html.
+    if(!bank.length){
+      try{
+        if(typeof generalQuizQuestions!=='undefined' && Array.isArray(generalQuizQuestions)){
+          bank=generalQuizQuestions
+            .filter(q=>String(q?.id||'').startsWith('general_'))
+            .map(q=>({
+              id:q.id,
+              code:q.id,
+              zone:'Général',
+              category:q.category||'Général',
+              question:q.question,
+              answers:Array.isArray(q.answers)?q.answers.slice(0,4):[],
+              correct:Number(q.correct)||0,
+              explanation:q.explanation||''
+            }));
+        }
+      }catch(_){}
+    }
+
+    return bank;
+  }
+
+  function mapGeneralQuestion(q,index){
+    const answers=Array.isArray(q?.answers)?q.answers.slice(0,4):[];
+    if(answers.length!==4) return null;
+
+    const correct=Number(q?.correct);
+    if(!Number.isInteger(correct) || correct<0 || correct>3) return null;
+
+    return {
+      id:String(q?.code||q?.id||('general_'+(index+1))),
+      techniqueId:0,
+      techniqueTitle:'Ostéopathie générale',
+      category:String(q?.category||'Général'),
+      key:'general',
+      question:String(q?.question||''),
+      answers:answers.map(String),
+      correct,
+      explanation:String(q?.explanation||answers[correct]||'')
+    };
+  }
+
+  async function waitForGeneralBank(timeout=3500){
+    const started=Date.now();
+
+    while(Date.now()-started<timeout){
+      const bank=readGeneralOsteopathyBank();
+      if(bank.length>=15) return bank;
+      await new Promise(r=>setTimeout(r,100));
+    }
+
+    return readGeneralOsteopathyBank();
+  }
+
+  async function startGeneralOsteopathySession(){
+    sessionFilterZone='__GENERAL__';
+    updateStaticQuizCopy(sessionFilterZone);
+
+    try{
+      const bank=await waitForGeneralBank();
+      const questions=shuffle(
+        bank.map(mapGeneralQuestion).filter(Boolean)
+      ).slice(0,15);
+
+      session={
+        questions,
+        index:0,
+        score:0,
+        answered:false,
+        answers:[]
+      };
+
+      if(!questions.length){
+        const q=document.getElementById('quizQuestionText');
+        const a=document.getElementById('quizAnswers');
+        const c=document.getElementById('quizQuestionCounter');
+        const cat=document.getElementById('quizQuestionCategory');
+        if(c) c.textContent='Quiz indisponible';
+        if(cat) cat.textContent='Général';
+        if(q) q.textContent='La banque du quiz général n’est pas encore disponible.';
+        if(a) a.innerHTML='';
+        return;
+      }
+
+      renderTesterQuiz();
+    }catch(err){
+      console.warn('[Ostéo Pratik] Quiz général',err);
+    }
+  }
+
   async function startTesterSession(zoneFilter=''){
     sessionFilterZone=String(zoneFilter||'');
     updateStaticQuizCopy(sessionFilterZone);
@@ -1400,7 +1510,11 @@
   }
 
   function restartTesterQuiz(){
-    startTesterSession(sessionFilterZone);
+    if(sessionFilterZone==='__GENERAL__'){
+      startGeneralOsteopathySession();
+    }else{
+      startTesterSession(sessionFilterZone);
+    }
   }
 
   function installOverrides(){
@@ -1446,6 +1560,7 @@
     version:VERSION,
     start:startTesterSession,
     startZone:startTesterSession,
+    startGeneral:startGeneralOsteopathySession,
     restart:restartTesterQuiz,
     viewedIds:readViewedIds,
     readReviewData
@@ -1592,21 +1707,40 @@
         <button class="icon round" type="button" data-op-tester-back>‹</button>
         <div class="brand">
           <h1 class="logo">Tester</h1>
-          <p class="subtitle">À partir de « Déjà vues »</p>
+          <p class="subtitle">Quiz général et techniques vues</p>
         </div>
         <button class="icon" type="button" data-op-tester-refresh>↻</button>
       </header>
 
       <div class="op-tester-summary">
         <h1>Tester mes acquis</h1>
-        <p>Les questions portent uniquement sur les techniques que vous avez déjà visionnées.</p>
+        <p>Choisissez entre les connaissances générales en ostéopathie et vos techniques déjà visionnées.</p>
         <span class="op-tester-seen-count">
-          ${allViewed.length} technique${allViewed.length>1?'s':''} testable${allViewed.length>1?'s':''}
-          · ${allQuestions} question${allQuestions>1?'s':''} possible${allQuestions>1?'s':''}
+          ${allViewed.length} technique${allViewed.length>1?'s':''} déjà vue${allViewed.length>1?'s':''}
+          · ${allQuestions} question${allQuestions>1?'s':''} technique${allQuestions>1?'s':''} possible${allQuestions>1?'s':''}
         </span>
       </div>
 
       <div class="op-tester-grid">
+        <button class="op-tester-card"
+                style="--qc:#ffb020"
+                type="button"
+                data-op-general="1">
+          <span class="op-q-icon">15</span>
+          <strong>Quiz général — Ostéopathie</strong>
+          <small>Bases, principes et culture ostéopathique</small>
+          <em>${(()=>{
+            try{
+              return Array.isArray(window.OSTEO_QUESTION_BANK)
+                ? window.OSTEO_QUESTION_BANK.filter(q=>String(q?.zone||'')==='Général').length
+                : 15;
+            }catch(_){ return 15; }
+          })()}</em>
+        </button>
+
+        <div style="margin:6px 2px 0;color:#c8d4e7;font-size:13px;font-weight:900;">
+          Mes techniques déjà vues
+        </div>
         ${ZONES.map(zone=>{
           const n=viewedTechniques(zone.key).length;
           const q=possibleQuestionCount(zone.key);
@@ -1628,6 +1762,22 @@
 
     menu.querySelector('[data-op-tester-back]').onclick=()=>appGo('home');
     menu.querySelector('[data-op-tester-refresh]').onclick=()=>renderMenu();
+
+    const generalButton=menu.querySelector('[data-op-general]');
+    if(generalButton){
+      generalButton.onclick=()=>{
+        const quizBack=document.querySelector('#quiz .top .icon.round');
+        if(quizBack){
+          quizBack.setAttribute('onclick',"window.OSTEO_TESTER_MENU(); return false;");
+        }
+
+        appGo('quiz');
+
+        if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startGeneral==='function'){
+          setTimeout(()=>window.OSTEO_TESTER.startGeneral(),30);
+        }
+      };
+    }
 
     menu.querySelectorAll('[data-op-zone]').forEach(button=>{
       button.onclick=()=>{
