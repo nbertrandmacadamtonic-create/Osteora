@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-5
+   Version 22.2-app-6
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-5';
+  const VERSION = '22.2-app-6';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -797,5 +797,649 @@
     ready:ensureDependencies,
     viewed:readViewed,
     refresh
+  };
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — TESTER MES ACQUIS
+   Version tester-1.0
+   --------------------------------------------------------------
+   Quiz généré automatiquement depuis les cartes V22 :
+   - uniquement les techniques réellement vues
+   - Position
+   - Position des mains
+   - Barrière motrice
+   - Normalisation
+   - jusqu'à 12 questions par session
+   - erreurs mémorisées pour le futur mode "À revoir"
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoTesterV1Installed) return;
+  window.__osteoTesterV1Installed = true;
+
+  const VERSION='tester-1.0';
+  const REVIEW_KEY='osteoPratikTechniqueReviewV1';
+  const SESSION_KEY='osteoPratikTesterSessionV1';
+  const LAST_QUIZ_KEY='osteoPratikLastQuiz';
+  const STEP_ORDER=['position','mains','barriere','normalisation'];
+
+  const STEP_LABELS={
+    position:'Position',
+    mains:'Position des mains',
+    barriere:'Barrière motrice',
+    normalisation:'Normalisation'
+  };
+
+  const STEP_QUESTIONS={
+    position:'quelle proposition correspond à la position de départ ?',
+    mains:'quelle proposition décrit correctement la position des mains ?',
+    barriere:'quelle proposition correspond à la barrière motrice ?',
+    normalisation:'quelle proposition correspond à la normalisation ?'
+  };
+
+  let session={
+    questions:[],
+    index:0,
+    score:0,
+    answered:false,
+    answers:[]
+  };
+
+  function esc(v){
+    return String(v==null?'':v).replace(/[&<>"']/g,c=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c]));
+  }
+
+  function norm(v){
+    return String(v||'')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .replace(/[’']/g,' ')
+      .replace(/\benergie\s+musculaire\b/gi,' em ')
+      .replace(/\be\.?\s*m\.?\b/gi,' em ')
+      .replace(/[^a-zA-Z0-9]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toLowerCase();
+  }
+
+  function shuffle(values){
+    const a=values.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  function getTechniques(){
+    try{
+      if(typeof techniques!=='undefined' && Array.isArray(techniques)) return techniques;
+    }catch(_){}
+    return Array.isArray(window.techniques)?window.techniques:[];
+  }
+
+  function readViewedIds(){
+    try{
+      if(window.OSTEO_REVISION_CARDS_V22_2 &&
+         typeof window.OSTEO_REVISION_CARDS_V22_2.viewed==='function'){
+        return window.OSTEO_REVISION_CARDS_V22_2.viewed().map(Number).filter(Boolean);
+      }
+    }catch(_){}
+
+    try{
+      if(typeof readViewedTechniqueIds==='function'){
+        return readViewedTechniqueIds().map(Number).filter(Boolean);
+      }
+    }catch(_){}
+
+    try{
+      const raw=localStorage.getItem('osteoPratikViewedTechniqueIdsCleanV1');
+      const ids=raw?JSON.parse(raw):[];
+      return Array.isArray(ids)?ids.map(Number).filter(Boolean):[];
+    }catch(_){
+      return [];
+    }
+  }
+
+  function readReviewData(){
+    try{
+      const raw=localStorage.getItem(REVIEW_KEY);
+      const data=raw?JSON.parse(raw):{};
+      return data && typeof data==='object' ? data : {};
+    }catch(_){
+      return {};
+    }
+  }
+
+  function writeReviewData(data){
+    try{ localStorage.setItem(REVIEW_KEY,JSON.stringify(data)); }catch(_){}
+  }
+
+  function recordTechniqueResult(techniqueId,isCorrect){
+    const id=String(Number(techniqueId)||'');
+    if(!id) return;
+
+    const data=readReviewData();
+    const item=data[id] || {
+      errors:0,
+      successes:0,
+      correctStreak:0,
+      needsReview:false,
+      updatedAt:null
+    };
+
+    if(isCorrect){
+      item.successes=(Number(item.successes)||0)+1;
+      item.correctStreak=(Number(item.correctStreak)||0)+1;
+      if(item.correctStreak>=2) item.needsReview=false;
+    }else{
+      item.errors=(Number(item.errors)||0)+1;
+      item.correctStreak=0;
+      item.needsReview=true;
+    }
+
+    item.updatedAt=new Date().toISOString();
+    data[id]=item;
+    writeReviewData(data);
+  }
+
+  function waitForCards(timeout=12000){
+    return new Promise((resolve,reject)=>{
+      const started=Date.now();
+
+      async function tick(){
+        const base=window.OSTEO_PLAYING_CARDS_V22;
+        if(base && typeof base.techniques==='function'){
+          return resolve(base);
+        }
+
+        try{
+          if(window.OSTEO_REVISION_CARDS_V22_2 &&
+             typeof window.OSTEO_REVISION_CARDS_V22_2.ready==='function'){
+            await window.OSTEO_REVISION_CARDS_V22_2.ready();
+            if(window.OSTEO_PLAYING_CARDS_V22) return resolve(window.OSTEO_PLAYING_CARDS_V22);
+          }
+        }catch(_){}
+
+        if(Date.now()-started>timeout){
+          return reject(new Error('Base des cartes V22 indisponible'));
+        }
+        setTimeout(tick,80);
+      }
+
+      tick();
+    });
+  }
+
+  function titleScore(a,b){
+    const na=norm(a);
+    const nb=norm(b);
+    if(!na || !nb) return 0;
+    if(na===nb) return 1000;
+    if(na.includes(nb)||nb.includes(na)) return 900;
+
+    const sa=new Set(na.split(' ').filter(Boolean));
+    const sb=new Set(nb.split(' ').filter(Boolean));
+    let common=0;
+    sa.forEach(token=>{if(sb.has(token)) common++;});
+    return common/Math.max(sa.size,sb.size,1);
+  }
+
+  function findOfficialTechnique(appTechnique,baseApi){
+    if(!appTechnique || !baseApi) return null;
+
+    let official=[];
+    try{ official=baseApi.techniques()||[]; }catch(_){ official=[]; }
+
+    const videoRow=Number(appTechnique.videoSourceRow);
+    const sourceRow=Number(appTechnique.sourceRow);
+
+    const rows=[
+      Number.isFinite(videoRow)&&videoRow>1?videoRow-1:0,
+      Number.isFinite(sourceRow)&&sourceRow>0?sourceRow:0,
+      Number.isFinite(videoRow)&&videoRow>0?videoRow:0
+    ].filter(Boolean);
+
+    for(const row of rows){
+      const hit=official.find(t=>Number(t?.sourceRow)===row);
+      if(hit) return hit;
+    }
+
+    if(appTechnique.slug){
+      const hit=official.find(t=>String(t?.slug||'')===String(appTechnique.slug));
+      if(hit) return hit;
+    }
+
+    const exact=official.find(t=>norm(t?.title)===norm(appTechnique.title));
+    if(exact) return exact;
+
+    const sameArea=official.filter(t=>
+      (!appTechnique.zone || !t?.zone || String(t.zone)===String(appTechnique.zone)) &&
+      (!appTechnique.sub || !t?.sub || String(t.sub)===String(appTechnique.sub))
+    );
+
+    const pool=sameArea.length?sameArea:official;
+    let best=null;
+    let bestScore=0;
+
+    pool.forEach(t=>{
+      const score=titleScore(appTechnique.title,t?.title);
+      if(score>bestScore){
+        best=t;
+        bestScore=score;
+      }
+    });
+
+    return bestScore>=0.48?best:null;
+  }
+
+  function stepMap(t){
+    const out={};
+    (t?.detail?.steps||[]).forEach(s=>{
+      if(s?.key) out[String(s.key).toLowerCase()]=s;
+    });
+    return out;
+  }
+
+  function patientPosition(text){
+    const raw=String(text||'').replace(/\r/g,' ').replace(/\s+/g,' ').trim();
+    if(!raw) return '';
+
+    const patient=raw.match(/(?:PATIENT|SUJET)\s+(.+?)(?=\s+PRATICIEN\b|$)/i);
+    if(patient && patient[1]) return patient[1].trim();
+
+    return raw;
+  }
+
+  function concise(text,key,maxLen=185){
+    let value=String(text||'').replace(/\r/g,' ').replace(/\s+/g,' ').trim();
+    if(!value) return '';
+
+    if(key==='position') value=patientPosition(value);
+
+    value=value
+      .replace(/^(?:PATIENT|SUJET|PRATICIEN)\s*/i,'')
+      .replace(/\s+/g,' ')
+      .trim();
+
+    if(value.length<=maxLen) return value;
+
+    const short=value.slice(0,maxLen);
+    const last=Math.max(short.lastIndexOf('. '),short.lastIndexOf('; '),short.lastIndexOf(', '),short.lastIndexOf(' '));
+    return (last>90?short.slice(0,last):short).trim()+'…';
+  }
+
+  function getStepAnswer(official,key){
+    const steps=stepMap(official);
+    return concise(steps[key]?.body||'',key);
+  }
+
+  function buildDistractors(correct,official,key,allOfficial){
+    const preferred=allOfficial.filter(t=>
+      t!==official &&
+      t?.zone===official?.zone &&
+      t?.sub===official?.sub
+    );
+
+    const secondary=allOfficial.filter(t=>
+      t!==official &&
+      t?.zone===official?.zone &&
+      !preferred.includes(t)
+    );
+
+    const remaining=allOfficial.filter(t=>
+      t!==official &&
+      !preferred.includes(t) &&
+      !secondary.includes(t)
+    );
+
+    const pool=[...shuffle(preferred),...shuffle(secondary),...shuffle(remaining)];
+    const out=[];
+    const used=new Set([norm(correct)]);
+
+    for(const t of pool){
+      const candidate=getStepAnswer(t,key);
+      const n=norm(candidate);
+      if(!candidate || !n || used.has(n)) continue;
+      used.add(n);
+      out.push(candidate);
+      if(out.length===3) break;
+    }
+
+    return out;
+  }
+
+  function buildQuestion(appTechnique,official,key,allOfficial){
+    const correctAnswer=getStepAnswer(official,key);
+    if(!correctAnswer) return null;
+
+    const distractors=buildDistractors(correctAnswer,official,key,allOfficial);
+    if(distractors.length<3) return null;
+
+    const options=shuffle([
+      {text:correctAnswer,correct:true},
+      ...distractors.map(text=>({text,correct:false}))
+    ]);
+
+    const correct=options.findIndex(o=>o.correct);
+
+    return {
+      id:'tech_'+String(appTechnique.id)+'_'+key,
+      techniqueId:Number(appTechnique.id),
+      techniqueTitle:String(appTechnique.title||official.title||'Technique'),
+      category:STEP_LABELS[key],
+      key,
+      question:'Pour « '+String(appTechnique.title||official.title||'cette technique')+' », '+STEP_QUESTIONS[key],
+      answers:options.map(o=>o.text),
+      correct,
+      explanation:correctAnswer
+    };
+  }
+
+  async function buildQuestions(){
+    const baseApi=await waitForCards();
+    const allOfficial=baseApi.techniques()||[];
+    const viewed=new Set(readViewedIds());
+
+    const viewedTechniques=getTechniques().filter(t=>viewed.has(Number(t.id)));
+    const questions=[];
+
+    viewedTechniques.forEach(appTechnique=>{
+      const official=findOfficialTechnique(appTechnique,baseApi);
+      if(!official) return;
+
+      STEP_ORDER.forEach(key=>{
+        const q=buildQuestion(appTechnique,official,key,allOfficial);
+        if(q) questions.push(q);
+      });
+    });
+
+    return shuffle(questions).slice(0,12);
+  }
+
+  function updateStaticQuizCopy(){
+    const title=document.querySelector('#quiz .quiz-general-title h1');
+    const sub=document.querySelector('#quiz .quiz-general-title p');
+    const headerSub=document.getElementById('quizSubtitle');
+
+    if(title) title.textContent='Tester mes acquis';
+    if(sub) sub.textContent='Quiz des techniques déjà vues';
+    if(headerSub) headerSub.textContent='Techniques vues';
+  }
+
+  function setResultDenominator(total){
+    const span=document.querySelector('#quizResult .quiz-result-score span');
+    if(span) span.textContent='/ '+total;
+  }
+
+  function showEmptyQuiz(){
+    updateStaticQuizCopy();
+
+    const card=document.querySelector('#quiz .quiz-general-card');
+    const result=document.getElementById('quizResult');
+    const feedback=document.getElementById('quizFeedback');
+    const question=document.getElementById('quizQuestionText');
+    const answers=document.getElementById('quizAnswers');
+    const counter=document.getElementById('quizQuestionCounter');
+    const category=document.getElementById('quizQuestionCategory');
+    const progress=document.getElementById('quizProgressBar');
+
+    if(card) card.style.display='block';
+    if(result) result.style.display='none';
+    if(feedback) feedback.style.display='none';
+    if(counter) counter.textContent='Aucune question';
+    if(category) category.textContent='À débloquer';
+    if(question) question.textContent='Regardez d’abord une technique en entier pour débloquer le quiz.';
+    if(answers){
+      answers.innerHTML=`<button class="quiz-answer-button" type="button" onclick="go('videoMap')"><span>▶</span><strong>Voir les techniques</strong></button>`;
+    }
+    if(progress) progress.style.width='0%';
+  }
+
+  function renderTesterQuiz(){
+    updateStaticQuizCopy();
+
+    if(!session.questions.length){
+      showEmptyQuiz();
+      return;
+    }
+
+    const q=session.questions[session.index];
+    if(!q) return;
+
+    session.answered=false;
+
+    const card=document.querySelector('#quiz .quiz-general-card');
+    const result=document.getElementById('quizResult');
+    const feedback=document.getElementById('quizFeedback');
+    const subtitle=document.getElementById('quizSubtitle');
+    const counter=document.getElementById('quizQuestionCounter');
+    const category=document.getElementById('quizQuestionCategory');
+    const question=document.getElementById('quizQuestionText');
+    const answers=document.getElementById('quizAnswers');
+    const progress=document.getElementById('quizProgressBar');
+
+    if(card) card.style.display='block';
+    if(result) result.style.display='none';
+    if(feedback) feedback.style.display='none';
+    if(subtitle) subtitle.textContent='Question '+(session.index+1)+' / '+session.questions.length;
+    if(counter) counter.textContent='Question '+(session.index+1)+' / '+session.questions.length;
+    if(category) category.textContent=q.category;
+    if(question) question.textContent=q.question;
+    if(progress) progress.style.width=((session.index/session.questions.length)*100)+'%';
+
+    if(answers){
+      answers.innerHTML=q.answers.map((answer,i)=>
+        '<button class="quiz-answer-button" onclick="answerGeneralQuiz('+i+')">'+
+          '<span>'+String.fromCharCode(65+i)+'</span>'+
+          '<strong>'+esc(answer)+'</strong>'+
+        '</button>'
+      ).join('');
+    }
+
+    setResultDenominator(session.questions.length);
+  }
+
+  function answerTesterQuiz(answerIndex){
+    if(session.answered) return;
+
+    const q=session.questions[session.index];
+    if(!q) return;
+
+    session.answered=true;
+
+    const isCorrect=Number(answerIndex)===Number(q.correct);
+    if(isCorrect) session.score++;
+
+    recordTechniqueResult(q.techniqueId,isCorrect);
+
+    session.answers.push({
+      questionId:q.id,
+      techniqueId:q.techniqueId,
+      correct:isCorrect,
+      selected:Number(answerIndex),
+      expected:Number(q.correct)
+    });
+
+    const buttons=document.querySelectorAll('#quizAnswers .quiz-answer-button');
+    buttons.forEach((btn,i)=>{
+      btn.disabled=true;
+      if(i===q.correct) btn.classList.add('right');
+      if(i===Number(answerIndex) && !isCorrect) btn.classList.add('wrong');
+    });
+
+    const feedback=document.getElementById('quizFeedback');
+    const title=document.getElementById('quizFeedbackTitle');
+    const text=document.getElementById('quizFeedbackText');
+    const next=document.getElementById('quizNextButton');
+
+    if(feedback) feedback.style.display='block';
+    if(title) title.textContent=isCorrect?'Bonne réponse !':'À revoir';
+    if(text){
+      text.textContent=isCorrect
+        ? q.explanation
+        : 'Réponse correcte : '+q.explanation;
+    }
+    if(next){
+      next.textContent=session.index===session.questions.length-1
+        ? 'Voir le résultat'
+        : 'Question suivante';
+    }
+
+    try{
+      localStorage.setItem(SESSION_KEY,JSON.stringify({
+        index:session.index,
+        score:session.score,
+        total:session.questions.length,
+        answers:session.answers,
+        date:new Date().toISOString()
+      }));
+    }catch(_){}
+  }
+
+  function nextTesterQuiz(){
+    if(!session.questions.length) return;
+
+    if(session.index<session.questions.length-1){
+      session.index++;
+      renderTesterQuiz();
+      const quiz=document.getElementById('quiz');
+      if(quiz) quiz.scrollTop=0;
+    }else{
+      finishTesterQuiz();
+    }
+  }
+
+  function finishTesterQuiz(){
+    if(!session.questions.length){
+      showEmptyQuiz();
+      return;
+    }
+
+    const total=session.questions.length;
+    const percent=Math.round((session.score/total)*100);
+    const wrongIds=[...new Set(
+      session.answers
+        .filter(a=>!a.correct)
+        .map(a=>Number(a.techniqueId))
+        .filter(Boolean)
+    )];
+
+    const card=document.querySelector('#quiz .quiz-general-card');
+    const feedback=document.getElementById('quizFeedback');
+    const result=document.getElementById('quizResult');
+    const score=document.getElementById('quizFinalScore');
+    const title=document.getElementById('quizResultTitle');
+    const text=document.getElementById('quizResultText');
+    const progress=document.getElementById('quizProgressBar');
+
+    if(card) card.style.display='none';
+    if(feedback) feedback.style.display='none';
+    if(result) result.style.display='block';
+    if(score) score.textContent=session.score;
+    if(progress) progress.style.width='100%';
+    setResultDenominator(total);
+
+    if(title){
+      title.textContent=percent>=80?'Très bon niveau':percent>=60?'Bonne base':'À renforcer';
+    }
+
+    if(text){
+      text.textContent='Score : '+session.score+' / '+total+' soit '+percent+' %. '+
+        (wrongIds.length
+          ? wrongIds.length+' technique'+(wrongIds.length>1?'s':'')+' à revoir.'
+          : 'Toutes les réponses sont justes.');
+    }
+
+    try{
+      localStorage.setItem(LAST_QUIZ_KEY,JSON.stringify({
+        category:'techniques',
+        score:session.score,
+        total,
+        percent,
+        wrongTechniqueIds:wrongIds,
+        techniqueIds:[...new Set(session.questions.map(q=>q.techniqueId))],
+        date:new Date().toISOString()
+      }));
+    }catch(_){}
+
+    try{
+      if(typeof updateQuizStats==='function') updateQuizStats();
+    }catch(_){}
+  }
+
+  async function startTesterSession(){
+    updateStaticQuizCopy();
+
+    try{
+      session={
+        questions:await buildQuestions(),
+        index:0,
+        score:0,
+        answered:false,
+        answers:[]
+      };
+      renderTesterQuiz();
+    }catch(err){
+      console.warn('[Ostéo Pratik] Tester',err);
+      showEmptyQuiz();
+    }
+  }
+
+  function restartTesterQuiz(){
+    startTesterSession();
+  }
+
+  function installOverrides(){
+    window.renderGeneralQuiz=renderTesterQuiz;
+    window.answerGeneralQuiz=answerTesterQuiz;
+    window.nextGeneralQuiz=nextTesterQuiz;
+    window.finishGeneralQuiz=finishTesterQuiz;
+    window.restartGeneralQuiz=restartTesterQuiz;
+
+    try{ renderGeneralQuiz=renderTesterQuiz; }catch(_){}
+    try{ answerGeneralQuiz=answerTesterQuiz; }catch(_){}
+    try{ nextGeneralQuiz=nextTesterQuiz; }catch(_){}
+    try{ finishGeneralQuiz=finishTesterQuiz; }catch(_){}
+    try{ restartGeneralQuiz=restartTesterQuiz; }catch(_){}
+
+    if(!window.__osteoTesterGoWrapped){
+      const previous=typeof window.go==='function'?window.go:null;
+      if(previous){
+        window.__osteoTesterGoWrapped=true;
+        window.go=function(id){
+          const result=previous.apply(this,arguments);
+          if(id==='quiz') setTimeout(startTesterSession,60);
+          return result;
+        };
+        try{ go=window.go; }catch(_){}
+      }
+    }
+  }
+
+  installOverrides();
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>{
+      installOverrides();
+      startTesterSession();
+    },{once:true});
+  }else{
+    startTesterSession();
+  }
+
+  // Réinstalle les overrides après les derniers patchs asynchrones éventuels.
+  [150,600,1500].forEach(delay=>setTimeout(installOverrides,delay));
+
+  window.OSTEO_TESTER={
+    version:VERSION,
+    start:startTesterSession,
+    restart:restartTesterQuiz,
+    readReviewData
   };
 })();
