@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-7
+   Version 22.2-app-8
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-7';
+  const VERSION = '22.2-app-8';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -840,6 +840,8 @@
     normalisation:'quelle proposition correspond à la normalisation ?'
   };
 
+  let sessionFilterZone='';
+
   let session={
     questions:[],
     index:0,
@@ -1141,12 +1143,15 @@
     };
   }
 
-  async function buildQuestions(){
+  async function buildQuestions(zoneFilter=''){
     const baseApi=await waitForCards();
     const allOfficial=baseApi.techniques()||[];
     const viewed=new Set(readViewedIds());
 
-    const viewedTechniques=getTechniques().filter(t=>viewed.has(Number(t.id)));
+    const viewedTechniques=getTechniques().filter(t=>
+      viewed.has(Number(t.id)) &&
+      (!zoneFilter || String(t.zone||'')===String(zoneFilter))
+    );
     const questions=[];
 
     viewedTechniques.forEach(appTechnique=>{
@@ -1162,14 +1167,16 @@
     return shuffle(questions).slice(0,12);
   }
 
-  function updateStaticQuizCopy(){
+  function updateStaticQuizCopy(zoneFilter=''){
     const title=document.querySelector('#quiz .quiz-general-title h1');
     const sub=document.querySelector('#quiz .quiz-general-title p');
     const headerSub=document.getElementById('quizSubtitle');
 
-    if(title) title.textContent='Tester mes acquis';
-    if(sub) sub.textContent='Quiz des techniques déjà vues';
-    if(headerSub) headerSub.textContent='Techniques vues';
+    if(title) title.textContent=zoneFilter ? 'Quiz '+zoneFilter : 'Tester mes acquis';
+    if(sub) sub.textContent=zoneFilter
+      ? 'Uniquement parmi mes techniques déjà vues'
+      : 'Quiz des techniques déjà vues';
+    if(headerSub) headerSub.textContent=zoneFilter || 'Techniques vues';
   }
 
   function setResultDenominator(total){
@@ -1178,7 +1185,7 @@
   }
 
   function showEmptyQuiz(){
-    updateStaticQuizCopy();
+    updateStaticQuizCopy(sessionFilterZone);
 
     const card=document.querySelector('#quiz .quiz-general-card');
     const result=document.getElementById('quizResult');
@@ -1202,7 +1209,7 @@
   }
 
   function renderTesterQuiz(){
-    updateStaticQuizCopy();
+    updateStaticQuizCopy(sessionFilterZone);
 
     if(!session.questions.length){
       showEmptyQuiz();
@@ -1373,12 +1380,13 @@
     }catch(_){}
   }
 
-  async function startTesterSession(){
-    updateStaticQuizCopy();
+  async function startTesterSession(zoneFilter=''){
+    sessionFilterZone=String(zoneFilter||'');
+    updateStaticQuizCopy(sessionFilterZone);
 
     try{
       session={
-        questions:await buildQuestions(),
+        questions:await buildQuestions(sessionFilterZone),
         index:0,
         score:0,
         answered:false,
@@ -1392,7 +1400,7 @@
   }
 
   function restartTesterQuiz(){
-    startTesterSession();
+    startTesterSession(sessionFilterZone);
   }
 
   function installOverrides(){
@@ -1413,9 +1421,7 @@
       if(previous){
         window.__osteoTesterGoWrapped=true;
         window.go=function(id){
-          const result=previous.apply(this,arguments);
-          if(id==='quiz') setTimeout(startTesterSession,60);
-          return result;
+          return previous.apply(this,arguments);
         };
         try{ go=window.go; }catch(_){}
       }
@@ -1439,85 +1445,268 @@
   window.OSTEO_TESTER={
     version:VERSION,
     start:startTesterSession,
+    startZone:startTesterSession,
     restart:restartTesterQuiz,
+    viewedIds:readViewedIds,
     readReviewData
   };
 })();
 
 
 /* ==============================================================
-   OSTÉO PRATIK — BYPASS ANCIEN MENU QUIZ V11
-   Version tester-1.1
+   OSTÉO PRATIK — MENU TESTER LIÉ À « DÉJÀ VUES »
+   Version tester-menu-2.0
    --------------------------------------------------------------
-   L'ancien backoffice-bridge crée un écran #quizMenu et intercepte
-   les clics vers go('quiz'). On le contourne pour lancer directement
-   le nouveau quiz basé sur les techniques réellement vues.
+   - Toutes les techniques : uniquement les techniques vues
+   - Rachis / Bassin / Membres supérieurs / Membres inférieurs
+   - Une zone sans technique vue reste indisponible
+   - Le nombre de questions dépend du nombre de techniques vues
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoTesterBypassOldQuizMenu) return;
-  window.__osteoTesterBypassOldQuizMenu = true;
+  if(window.__osteoTesterSeenMenuV2) return;
+  window.__osteoTesterSeenMenuV2=true;
 
-  function launchTester(){
+  const ZONES=[
+    {key:'', label:'Toutes les techniques', short:'Toutes les zones', color:'#ffb020'},
+    {key:'Rachis', label:'Quiz Rachis', short:'Rachis', color:'#00e5ff'},
+    {key:'Bassin', label:'Quiz Bassin', short:'Bassin', color:'#ff9f43'},
+    {key:'Membres supérieurs', label:'Quiz Membres supérieurs', short:'Membres supérieurs', color:'#a855ff'},
+    {key:'Membres inférieurs', label:'Quiz Membres inférieurs', short:'Membres inférieurs', color:'#00e6a7'}
+  ];
+
+  function toastSafe(message){
     try{
-      const oldMenu=document.getElementById('quizMenu');
-      if(oldMenu){
-        oldMenu.classList.remove('active');
-        oldMenu.style.display='none';
+      if(typeof toast==='function') return toast(message);
+      if(typeof window.toast==='function') return window.toast(message);
+    }catch(_){}
+  }
+
+  function appGo(id){
+    try{
+      if(typeof window.go==='function') return window.go(id);
+      if(typeof go==='function') return go(id);
+    }catch(_){}
+  }
+
+  function getTechniques(){
+    try{
+      if(typeof techniques!=='undefined' && Array.isArray(techniques)) return techniques;
+    }catch(_){}
+    return Array.isArray(window.techniques)?window.techniques:[];
+  }
+
+  function viewedIds(){
+    try{
+      if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.viewedIds==='function'){
+        return window.OSTEO_TESTER.viewedIds().map(Number).filter(Boolean);
       }
     }catch(_){}
 
     try{
-      if(typeof window.go==='function'){
-        window.go('quiz');
-      }else if(typeof go==='function'){
-        go('quiz');
+      if(window.OSTEO_REVISION_CARDS_V22_2 &&
+         typeof window.OSTEO_REVISION_CARDS_V22_2.viewed==='function'){
+        return window.OSTEO_REVISION_CARDS_V22_2.viewed().map(Number).filter(Boolean);
       }
     }catch(_){}
 
-    try{
-      if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.start==='function'){
-        setTimeout(()=>window.OSTEO_TESTER.start(),30);
-      }
-    }catch(_){}
+    return [];
+  }
 
+  function viewedTechniques(zone=''){
+    const seen=new Set(viewedIds());
+    return getTechniques().filter(t=>
+      seen.has(Number(t.id)) &&
+      (!zone || String(t.zone||'')===String(zone))
+    );
+  }
+
+  function possibleQuestionCount(zone=''){
+    return Math.min(12,viewedTechniques(zone).length*4);
+  }
+
+  function ensureMenu(){
+    let menu=document.getElementById('quizMenu');
+    if(!menu){
+      menu=document.createElement('section');
+      menu.id='quizMenu';
+      menu.className='screen quiz-menu-screen';
+      const quiz=document.getElementById('quiz');
+      if(quiz?.parentNode) quiz.parentNode.insertBefore(menu,quiz);
+      else document.body.appendChild(menu);
+    }
+
+    if(!document.getElementById('opTesterSeenMenuStyles')){
+      const style=document.createElement('style');
+      style.id='opTesterSeenMenuStyles';
+      style.textContent=`
+        #quizMenu .op-tester-summary{
+          margin:12px 0 14px;padding:16px 18px;border-radius:24px;
+          border:1px solid rgba(0,229,255,.22);
+          background:linear-gradient(145deg,rgba(10,29,55,.86),rgba(5,15,31,.92))
+        }
+        #quizMenu .op-tester-summary h1{margin:0;color:#fff;font-size:30px;line-height:1.05}
+        #quizMenu .op-tester-summary p{margin:7px 0 0;color:#b8c4d8;font-size:14px;line-height:1.35}
+        #quizMenu .op-tester-seen-count{
+          margin-top:11px;display:inline-flex;align-items:center;min-height:30px;padding:0 11px;
+          border-radius:999px;border:1px solid rgba(0,229,255,.30);color:#35e4ff;
+          background:rgba(0,229,255,.07);font-weight:900;font-size:12px
+        }
+        #quizMenu .op-tester-grid{display:grid;gap:12px}
+        #quizMenu .op-tester-card{
+          position:relative;min-height:104px;padding:15px 62px 15px 76px;
+          border-radius:22px;text-align:left;border:1px solid var(--qc);
+          color:var(--qc);background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.92))
+        }
+        #quizMenu .op-tester-card strong{display:block;color:#fff;font-size:18px;line-height:1.15}
+        #quizMenu .op-tester-card small{display:block;margin-top:6px;color:#c2ccdc;font-size:12px}
+        #quizMenu .op-tester-card .op-q-icon{
+          position:absolute;left:14px;top:50%;transform:translateY(-50%);
+          width:48px;height:48px;border-radius:50%;display:grid;place-items:center;
+          border:1px solid currentColor;font-weight:950
+        }
+        #quizMenu .op-tester-card em{
+          position:absolute;right:14px;top:50%;transform:translateY(-50%);
+          min-width:36px;height:36px;padding:0 8px;border-radius:999px;display:grid;place-items:center;
+          font-style:normal;border:1px solid currentColor;font-weight:950;background:rgba(4,14,30,.72)
+        }
+        #quizMenu .op-tester-card.disabled{opacity:.40}
+      `;
+      document.head.appendChild(style);
+    }
+
+    return menu;
+  }
+
+  function renderMenu(){
+    const menu=ensureMenu();
+    const allViewed=viewedTechniques();
+    const allQuestions=possibleQuestionCount();
+
+    menu.style.display='';
+    menu.removeAttribute('aria-hidden');
+
+    menu.innerHTML=`
+      <header class="top">
+        <button class="icon round" type="button" data-op-tester-back>‹</button>
+        <div class="brand">
+          <h1 class="logo">Tester</h1>
+          <p class="subtitle">À partir de « Déjà vues »</p>
+        </div>
+        <button class="icon" type="button" data-op-tester-refresh>↻</button>
+      </header>
+
+      <div class="op-tester-summary">
+        <h1>Tester mes acquis</h1>
+        <p>Les questions portent uniquement sur les techniques que vous avez déjà visionnées.</p>
+        <span class="op-tester-seen-count">
+          ${allViewed.length} technique${allViewed.length>1?'s':''} testable${allViewed.length>1?'s':''}
+          · ${allQuestions} question${allQuestions>1?'s':''} possible${allQuestions>1?'s':''}
+        </span>
+      </div>
+
+      <div class="op-tester-grid">
+        ${ZONES.map(zone=>{
+          const n=viewedTechniques(zone.key).length;
+          const q=possibleQuestionCount(zone.key);
+          const disabled=n===0;
+          return `
+            <button class="op-tester-card ${disabled?'disabled':''}"
+                    style="--qc:${zone.color}"
+                    type="button"
+                    data-op-zone="${zone.key}">
+              <span class="op-q-icon">${q}</span>
+              <strong>${zone.label}</strong>
+              <small>${n} technique${n>1?'s':''} déjà vue${n>1?'s':''}</small>
+              <em>${n}</em>
+            </button>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    menu.querySelector('[data-op-tester-back]').onclick=()=>appGo('home');
+    menu.querySelector('[data-op-tester-refresh]').onclick=()=>renderMenu();
+
+    menu.querySelectorAll('[data-op-zone]').forEach(button=>{
+      button.onclick=()=>{
+        const zone=button.dataset.opZone||'';
+        const n=viewedTechniques(zone).length;
+
+        if(!n){
+          toastSafe('Aucune technique déjà vue dans cette zone.');
+          return;
+        }
+
+        const quizBack=document.querySelector('#quiz .top .icon.round');
+        if(quizBack){
+          quizBack.setAttribute('onclick',"window.OSTEO_TESTER_MENU(); return false;");
+        }
+
+        appGo('quiz');
+
+        if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startZone==='function'){
+          setTimeout(()=>window.OSTEO_TESTER.startZone(zone),30);
+        }
+      };
+    });
+  }
+
+  function showMenu(event){
+    if(event){
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    renderMenu();
+    appGo('quizMenu');
     return false;
   }
 
-  // Remplace le point d'entrée public de l'ancien menu.
-  window.showQuizMenuV9=launchTester;
-
   /*
-    L'ancien bridge a déjà attaché ses propres addEventListener.
-    Un listener en phase de capture passe avant eux et bloque
-    l'ouverture de #quizMenu.
+    L'ancien bridge a attaché des listeners aux boutons Tester.
+    On clone ces boutons : le clone garde le graphisme mais perd les anciens listeners.
   */
-  document.addEventListener('click',function(event){
-    const el=event.target && event.target.closest
-      ? event.target.closest('[data-quiz-menu-intercepted="1"]')
-      : null;
+  function rewireTesterEntries(){
+    document.querySelectorAll('[data-quiz-menu-intercepted="1"]').forEach(old=>{
+      if(old.dataset.opTesterRewired==='1') return;
 
-    if(!el) return;
+      const clone=old.cloneNode(true);
+      clone.removeAttribute('data-quiz-menu-intercepted');
+      clone.dataset.opTesterRewired='1';
+      clone.removeAttribute('onclick');
+      clone.addEventListener('click',showMenu);
+      old.replaceWith(clone);
+    });
 
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
-    launchTester();
-  },true);
-
-  function cleanup(){
-    const menu=document.getElementById('quizMenu');
-    if(menu){
-      menu.classList.remove('active');
-      menu.style.display='none';
-      menu.setAttribute('aria-hidden','true');
-    }
+    // Sécurité pour le bouton principal d'accueil.
+    document.querySelectorAll('.home-orbit .orbit-card.quiz').forEach(btn=>{
+      if(btn.dataset.opTesterRewired==='1') return;
+      btn.removeAttribute('onclick');
+      btn.dataset.opTesterRewired='1';
+      btn.addEventListener('click',showMenu);
+    });
   }
 
-  cleanup();
-  document.addEventListener('DOMContentLoaded',cleanup,{once:true});
-  [100,500,1200].forEach(ms=>setTimeout(cleanup,ms));
+  // L'ancien #quizMenu peut être rerendu par le bridge : on le remplace à chaque ouverture.
+  window.showQuizMenuV9=showMenu;
+  window.OSTEO_TESTER_MENU=showMenu;
 
-  window.OSTEO_TESTER_OPEN=launchTester;
+  function install(){
+    rewireTesterEntries();
+    renderMenu();
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,500,1300].forEach(ms=>setTimeout(()=>{
+    rewireTesterEntries();
+  },ms));
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      setTimeout(rewireTesterEntries,30);
+    }
+  });
 })();
