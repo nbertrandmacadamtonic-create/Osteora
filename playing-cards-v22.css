@@ -1,0 +1,31 @@
+/* OSTÉO PRATIK V22 — carte high-tech */
+:root{--op22-cyan:#00d8ff;--op22-blue:#087fd7;--op22-bg:#020914;--op22-ink:#061521;--op22-white:#f8fbff}
+*{box-sizing:border-box}
+.op22-card{width:min(430px,94vw);aspect-ratio:.69;perspective:1800px;margin:auto}
+.op22-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.75,.2,1)}
+.op22-card.is-flipped .op22-inner{transform:rotateY(180deg)}
+.op22-face{position:absolute;inset:0;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,#061827,#010812);color:#fff;border:2px solid var(--op22-cyan);box-shadow:0 0 0 2px rgba(0,216,255,.13),0 0 31px rgba(0,205,255,.48),inset 0 0 35px rgba(0,170,255,.16);backface-visibility:hidden}
+.op22-face:after{content:"";position:absolute;inset:10px;border-radius:21px;border:1px solid rgba(105,231,255,.46);pointer-events:none;z-index:40}
+.op22-logo{position:absolute;z-index:12;left:23px;top:22px;width:145px;max-height:58px;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 8px rgba(0,207,255,.35))}
+.op22-code{position:absolute;z-index:14;right:19px;top:20px;padding:7px 12px;border:2px solid var(--op22-cyan);border-radius:12px;background:rgba(1,14,24,.90);font-weight:950;font-size:21px;box-shadow:0 0 13px rgba(0,210,255,.23)}
+.op22-front-photo{position:absolute;inset:0 0 34% 0;background:#031321;overflow:hidden}
+.op22-front-photo>img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.68) contrast(1.2) saturate(1.18) hue-rotate(-4deg);transform:scale(1.025)}
+.op22-photo-filter{position:absolute;inset:0;background:radial-gradient(circle at 58% 43%,rgba(0,227,255,.04) 0,rgba(0,115,192,.15) 47%,rgba(0,15,29,.55) 100%),linear-gradient(180deg,rgba(0,107,173,.20),rgba(0,29,51,.03) 48%,rgba(1,8,15,.98) 100%);box-shadow:inset 0 0 55px rgba(0,215,255,.23)}
+.op22-zone-hologram{position:absolute;z-index:8;left:18px;top:90px;width:118px;height:180px;border-radius:22px;overflow:hidden;background:rgba(0,18,32,.28);border:1px solid rgba(0,216,255,.38);box-shadow:0 0 20px rgba(0,216,255,.16);mix-blend-mode:screen}
+.op22-zone-hologram img{width:100%;height:100%;object-fit:cover;filter:saturate(1.6) contrast(1.14) brightness(.85);opacity:.82}
+.op22-front-copy{position:absolute;z-index:16;left:20px;right:20px;bottom:21px;text-align:center}
+.op22-zone-pill{display:inline-flex;min-width:200px;justify-content:center;padding:6px 28px;border:1.5px solid var(--op22-cyan);border-radius:999px;background:rgba(2,18,29,.93);color:var(--op22-cyan);font-size:16px;font-weight:950;text-transform:uppercase;box-shadow:0 0 14px rgba(0,216,255,.18)}
+.op22-front h2{margin:12px auto 3px;max-width:390px;font-size:25px;line-height:1.03;font-weight:950;text-transform:uppercase;text-wrap:balance;text-shadow:0 2px 11px #000}
+.op22-sub{margin:7px 0 14px;color:var(--op22-cyan);font-size:15px;font-weight:900;letter-spacing:.16em;text-transform:uppercase}
+.op22-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.op22-meta>div{padding:9px 6px;border:1px solid rgba(0,216,255,.88);border-radius:11px;background:rgba(2,18,29,.91);min-width:0}
+.op22-meta span{display:block;color:var(--op22-cyan);font-weight:950;font-size:10px;text-transform:uppercase;margin-bottom:4px}.op22-meta b{display:block;font-size:10px;line-height:1.16}
+.op22-flip{position:absolute;z-index:50;right:13px;bottom:12px;width:36px;height:36px;border-radius:50%;border:1px solid var(--op22-cyan);background:#062034;color:#fff;font-size:20px;cursor:pointer;box-shadow:0 0 14px rgba(0,216,255,.38)}
+.op22-back{transform:rotateY(180deg);padding:68px 13px 16px}
+.op22-logo-back{width:108px;top:17px;left:20px}
+.op22-back-header{text-align:center;margin:0 55px 11px}.op22-back-header h2{margin:0;font-size:16px;line-height:1.04;text-transform:uppercase;font-weight:950}.op22-back-header>div{color:var(--op22-cyan);font-weight:900;letter-spacing:.13em;text-transform:uppercase;font-size:11px;margin-top:4px}
+.op22-steps{display:flex;flex-direction:column;gap:7px}.op22-step{display:grid;grid-template-columns:48px minmax(0,1fr) 105px;gap:8px;align-items:center;min-height:105px;padding:7px;border-radius:13px;background:#f7fafc;color:var(--op22-ink);box-shadow:inset 0 0 0 1px rgba(6,96,146,.14)}
+.op22-step-icon{display:grid;place-items:center}.op22-step-icon img{width:43px;height:43px;object-fit:contain;border-radius:9px}.op22-step-text{min-width:0}.op22-step h3{margin:0 0 4px;font-size:10.8px;line-height:1.05;text-transform:uppercase;font-weight:950;color:#0766c5}.op22-step p{margin:0;font-size:8.3px;line-height:1.2}.op22-step-photo{width:105px;height:80px;object-fit:cover;border-radius:9px;border:1px solid #11bde7}
+.op22-back-footer{display:flex;gap:8px;margin-top:8px;padding-right:43px}.op22-back-chip{flex:1;border:1px solid rgba(0,216,255,.63);border-radius:9px;background:#071d2c;padding:6px 8px}.op22-back-chip span{display:block;color:var(--op22-cyan);font-size:8.8px;font-weight:950;text-transform:uppercase}.op22-back-chip b{font-size:10px}
+.op22-viewer{width:100%}.op22-toolbar{max-width:850px;margin:0 auto 20px;display:grid;grid-template-columns:minmax(220px,1fr) 180px 42px auto 42px;gap:8px;align-items:center}.op22-toolbar input,.op22-toolbar select,.op22-toolbar button{height:42px;border:1px solid rgba(0,216,255,.42);border-radius:12px;background:#071827;color:#fff;padding:0 12px}.op22-toolbar button{font-size:24px;padding:0;cursor:pointer}.op22-counter{text-align:center;color:#bdefff;font-weight:800;min-width:80px}.op22-stage{min-height:620px;display:grid;place-items:center}.op22-error,.op22-empty{padding:20px;color:#ffd4dd}
+@media(max-width:700px){.op22-toolbar{grid-template-columns:1fr 1fr 40px auto 40px}.op22-search{grid-column:1/-1}.op22-zone-hologram{width:92px;height:145px}.op22-step{grid-template-columns:44px minmax(0,1fr) 90px}.op22-step-photo{width:90px;height:72px}.op22-step p{font-size:7.9px}}
