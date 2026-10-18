@@ -1,0 +1,23 @@
+/* OSTÉO PRATIK V22.1 — recto premium, verso V22 conservé */
+.op22-card.op221-upgraded .op22-front{border:1.5px solid rgba(68,231,255,.96);box-shadow:0 0 0 1px rgba(0,216,255,.12),0 0 36px rgba(0,205,255,.40),inset 0 0 48px rgba(0,170,255,.10)}
+.op22-card.op221-upgraded .op22-front:before{content:"";position:absolute;inset:0;z-index:7;pointer-events:none;opacity:.14;background-image:linear-gradient(rgba(0,229,255,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.18) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:linear-gradient(180deg,#000 0%,transparent 55%);mask-image:linear-gradient(180deg,#000 0%,transparent 55%)}
+.op22-card.op221-upgraded .op22-front-photo{inset:0;background:#031321}
+.op22-card.op221-upgraded .op22-front-photo>img{filter:brightness(.84) contrast(1.16) saturate(.70) sepia(.05) hue-rotate(154deg);transform:scale(1.04)}
+.op22-card.op221-upgraded .op22-photo-filter{background:linear-gradient(115deg,rgba(0,229,255,.15),rgba(0,75,145,.02) 42%,rgba(2,9,20,.15) 68%),radial-gradient(circle at 72% 28%,rgba(90,237,255,.13),transparent 30%),linear-gradient(180deg,rgba(0,8,18,.12) 0%,rgba(0,8,18,0) 32%,rgba(1,10,20,.25) 54%,rgba(1,8,17,.96) 77%,#020914 100%);box-shadow:inset 0 0 70px rgba(0,215,255,.13)}
+.op22-card.op221-upgraded .op22-logo{left:22px;top:19px;width:158px;height:56px;max-height:none;object-fit:contain;object-position:left center;background:transparent!important;filter:drop-shadow(0 0 9px rgba(0,222,255,.44));z-index:30}
+.op22-card.op221-upgraded .op22-code{right:19px;top:20px;background:rgba(2,14,26,.72);backdrop-filter:blur(9px);border-width:1.5px;z-index:31}
+.op22-card.op221-upgraded .op22-zone-hologram{left:23px;top:105px;width:108px;height:145px;border-radius:22px;background:rgba(1,16,29,.25);border:1px solid rgba(86,230,255,.48);box-shadow:0 0 25px rgba(0,220,255,.19),inset 0 0 24px rgba(0,220,255,.08);backdrop-filter:blur(6px);mix-blend-mode:normal;z-index:25}
+.op22-card.op221-upgraded .op22-zone-hologram:before{content:"";position:absolute;width:76px;height:76px;left:16px;top:37px;border-radius:50%;border:1px solid rgba(103,241,255,.25);box-shadow:0 0 18px rgba(0,229,255,.14);z-index:1}
+.op22-card.op221-upgraded .op22-zone-hologram img{position:absolute;left:7px;top:24px;width:94px;height:100px;object-fit:cover;border-radius:15px;filter:saturate(1.42) contrast(1.12) brightness(.96) drop-shadow(0 0 12px rgba(0,229,255,.34));opacity:.89;mix-blend-mode:screen;z-index:2}
+.op22-card.op221-upgraded .op221-zone-label{position:absolute;z-index:4;left:9px;top:8px;color:rgba(183,248,255,.82);font-size:7.5px;font-weight:950;letter-spacing:.18em}
+.op22-card.op221-upgraded .op22-front-copy{left:19px;right:19px;bottom:20px;padding:27px 16px 14px;border-radius:22px;background:linear-gradient(180deg,rgba(5,20,35,.60),rgba(2,12,23,.91));border:1px solid rgba(68,221,245,.22);box-shadow:0 -12px 38px rgba(0,11,24,.36);backdrop-filter:blur(14px);text-align:left;z-index:32}
+.op22-card.op221-upgraded .op22-zone-pill{min-width:104px;padding:5px 14px;border:1px solid rgba(58,232,255,.76);background:rgba(2,24,38,.67);font-size:11px;letter-spacing:.08em}
+.op22-card.op221-upgraded .op22-front h2{margin:10px 0 3px;max-width:100%;font-size:22px;line-height:1.01;letter-spacing:-.02em;text-align:left;text-wrap:balance}
+.op22-card.op221-upgraded .op22-sub{margin:8px 0 13px;font-size:12px;letter-spacing:.18em;text-align:left}
+.op22-card.op221-upgraded .op22-meta{gap:7px}
+.op22-card.op221-upgraded .op22-meta>div{padding:8px 6px 9px;background:rgba(2,18,29,.71);border-color:rgba(0,216,255,.56);text-align:center}
+.op22-card.op221-upgraded .op22-meta span{font-size:8.5px}.op22-card.op221-upgraded .op22-meta b{font-size:9.2px;line-height:1.15}
+.op22-card.op221-upgraded .op22-flip{z-index:70}
+/* verso : logo transparent uniquement, contenu et structure V22 inchangés */
+.op22-card.op221-upgraded .op22-back .op22-logo{width:114px;height:44px;top:15px;left:18px}
+@media(max-width:700px){.op22-card.op221-upgraded .op22-zone-hologram{width:94px;height:132px;left:18px;top:98px}.op22-card.op221-upgraded .op22-zone-hologram img{width:80px;height:89px}.op22-card.op221-upgraded .op22-front h2{font-size:20px}}
