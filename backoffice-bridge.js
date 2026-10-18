@@ -1837,18 +1837,301 @@
 (function(){
   if(document.querySelector('script[data-osteo-user-data-v19]')) return;
   const s=document.createElement('script');
-  s.src='user-data-v19.js?v=19.4';
+  s.src='user-data-v19.js?v=19.7';
   s.defer=true;
   s.dataset.osteoUserDataV19='1';
   (document.body||document.documentElement).appendChild(s);
 })();
 
-/* === V19.5 · CORRECTIF À REVOIR -> BONNE VIDÉO === */
+/* === V19.7 · À REVOIR : OUVERTURE VIDÉO FIABLE + SUPPRESSION === */
 (function(){
-  if(document.querySelector('script[data-osteo-review-video-v195]')) return;
-  const s=document.createElement('script');
-  s.src='review-video-link-v19_5.js?v=19.5';
-  s.defer=true;
-  s.dataset.osteoReviewVideoV195='1';
-  (document.body||document.documentElement).appendChild(s);
+  'use strict';
+
+  const VERSION='19.7';
+  const SNAPSHOT_KEY='osteoRA.backoffice.snapshot.v1';
+  const videoSnapshot=new Map();
+  let observer=null;
+  let patchTimer=null;
+
+  function fn(name){
+    try{ if(typeof window[name]==='function') return window[name]; }catch(_){ }
+    try{ return eval('typeof '+name+'==="function" ? '+name+' : null'); }catch(_){ }
+    return null;
+  }
+
+  function listTechniques(){
+    try{
+      const list=eval('typeof techniques!=="undefined" ? techniques : null');
+      if(Array.isArray(list)) return list;
+    }catch(_){ }
+    try{ if(Array.isArray(window.techniques)) return window.techniques; }catch(_){ }
+    return [];
+  }
+
+  function byId(id){
+    return listTechniques().find(t=>String(t && t.id)===String(id))||null;
+  }
+
+  function captureVideoSnapshot(){
+    listTechniques().forEach(t=>{
+      if(!t || t.id==null) return;
+      const key=String(t.id);
+      const data={};
+      [
+        'videoProvider','videoUrl','video','vimeoUrl','directVimeo','vimeoId',
+        'mp4Url','videoMp4','localVideo','videoFile','videoName','videoSourceRow'
+      ].forEach(k=>{
+        if(t[k]!=null && String(t[k]).trim()!=='') data[k]=t[k];
+      });
+      if(Object.keys(data).length) videoSnapshot.set(key,data);
+    });
+
+    // Repli : le bridge central conserve une copie des techniques intégrées
+    // avant leur éventuel remplacement par Supabase.
+    try{
+      const arr=JSON.parse(localStorage.getItem(SNAPSHOT_KEY)||'[]');
+      if(Array.isArray(arr)) arr.forEach(t=>{
+        if(!t || t.id==null) return;
+        const key=String(t.id);
+        const data=videoSnapshot.get(key)||{};
+        [
+          'videoProvider','videoUrl','video','vimeoUrl','directVimeo','vimeoId',
+          'mp4Url','videoMp4','localVideo','videoFile','videoName','videoSourceRow'
+        ].forEach(k=>{
+          if((data[k]==null || data[k]==='') && t[k]!=null && String(t[k]).trim()!=='') data[k]=t[k];
+        });
+        if(Object.keys(data).length) videoSnapshot.set(key,data);
+      });
+    }catch(_){ }
+  }
+
+  function normalizeVimeoUrl(value){
+    const raw=String(value||'').trim();
+    if(!raw) return '';
+    try{
+      const u=new URL(raw,window.location.href);
+      const host=String(u.hostname||'').toLowerCase();
+      if(host==='player.vimeo.com' || host.endsWith('.player.vimeo.com')) return u.toString();
+      if(host==='vimeo.com' || host.endsWith('.vimeo.com')){
+        const parts=u.pathname.split('/').filter(Boolean);
+        const index=parts.findIndex(p=>/^\d+$/.test(p));
+        if(index>=0){
+          const out=new URL('https://player.vimeo.com/video/'+parts[index]);
+          const h=u.searchParams.get('h') || (parts[index+1] && /^[A-Za-z0-9_-]+$/.test(parts[index+1]) ? parts[index+1] : '');
+          if(h) out.searchParams.set('h',h);
+          return out.toString();
+        }
+      }
+    }catch(_){ }
+    return raw;
+  }
+
+  function hydrateVideo(t){
+    if(!t) return t;
+    const saved=videoSnapshot.get(String(t.id));
+    if(saved){
+      [
+        'videoProvider','videoUrl','video','vimeoUrl','directVimeo','vimeoId',
+        'mp4Url','videoMp4','localVideo','videoFile','videoName','videoSourceRow'
+      ].forEach(k=>{
+        if((t[k]==null || String(t[k]).trim()==='') && saved[k]!=null && String(saved[k]).trim()!=='') t[k]=saved[k];
+      });
+    }
+
+    const raw=String(t.videoUrl||t.video||t.vimeoUrl||t.directVimeo||t.mp4Url||t.videoMp4||t.localVideo||'').trim();
+    if(/vimeo\.com/i.test(raw)){
+      t.videoUrl=normalizeVimeoUrl(raw);
+      t.videoProvider='vimeo';
+    }else if(raw && (/\.mp4(?:[?#].*)?$/i.test(raw) || /^assets\//i.test(raw) || /^\/Osteora\/assets\//i.test(raw))){
+      t.mp4Url=raw;
+      if(String(t.videoProvider||'').toLowerCase()==='vimeo') t.videoProvider='';
+    }
+    return t;
+  }
+
+  function callOpenTechnique(nativeId){
+    let open=fn('openTechnique');
+    if(typeof open==='function'){
+      open(nativeId);
+      return true;
+    }
+
+    // Repli global : utile lorsque le navigateur n'expose pas la fonction
+    // exactement de la même manière entre mobile et ordinateur.
+    try{
+      return !!Function('id','if(typeof openTechnique==="function"){openTechnique(id);return true;}return false;')(nativeId);
+    }catch(_){ }
+
+    const fallback=fn('openTechniqueFromCatalogue');
+    if(typeof fallback==='function'){
+      fallback(nativeId);
+      return true;
+    }
+    return false;
+  }
+
+  function openReviewVideo(id){
+    const t=hydrateVideo(byId(id));
+    if(!t){
+      const toast=fn('toast');
+      if(toast) toast('Technique introuvable.');
+      return;
+    }
+
+    window.__nextPlayerBackTarget='seenCollections';
+    const ok=callOpenTechnique(t.id);
+    if(!ok){
+      const toast=fn('toast');
+      if(toast) toast('Impossible d’ouvrir la vidéo.');
+      return;
+    }
+
+    // Vérification visuelle non destructive : le titre du lecteur doit
+    // correspondre à la technique sélectionnée et le lecteur doit être visible.
+    setTimeout(()=>{
+      const title=document.getElementById('playerTitle');
+      if(title) title.textContent=String(t.title||title.textContent||'Technique');
+      const player=document.getElementById('player');
+      if(player && !player.classList.contains('active')){
+        const go=fn('go');
+        if(typeof go==='function') go('player');
+      }
+    },60);
+  }
+
+  async function removeReview(id,button){
+    const t=byId(id);
+    if(!t) return;
+    if(button){ button.disabled=true; button.textContent='…'; }
+
+    try{
+      const api=window.OSTEO_USER_DATA_V19;
+      if(api && typeof api.toggleReview==='function'){
+        await api.toggleReview(t);
+        return;
+      }
+
+      // Repli direct Supabase si l'API utilisateur n'est pas encore exposée.
+      const client=window.OSTEO_APP_AUTH_CLIENT;
+      if(!client) throw new Error('Client indisponible');
+      const {data}=await client.auth.getSession();
+      if(!data?.session?.user?.id) throw new Error('Session indisponible');
+
+      const {error}=await client.rpc('osteo_set_technique_review',{
+        p_technique_id:String(t.id),
+        p_review:false,
+        p_title:String(t.title||''),
+        p_zone:String(t.zone||''),
+        p_subzone:String(t.sub||''),
+        p_level:String(t.level||'')
+      });
+      if(error) throw error;
+
+      if(api && typeof api.reload==='function') await api.reload();
+      const toast=fn('toast');
+      if(toast) toast('Technique retirée de « À revoir »');
+    }catch(error){
+      console.warn('[Ostéo Pratik V19.7] Suppression À revoir',error);
+      if(button){ button.disabled=false; button.textContent='Retirer'; }
+      const toast=fn('toast');
+      if(toast) toast('Impossible de retirer cette technique.');
+    }
+  }
+
+  function injectStyles(){
+    if(document.getElementById('osteoReviewV197Styles')) return;
+    const style=document.createElement('style');
+    style.id='osteoReviewV197Styles';
+    style.textContent=`
+      #seenCollections .osteo-v197-review-row{
+        width:100%;display:grid;grid-template-columns:minmax(0,1fr) 70px;gap:8px;align-items:stretch;
+      }
+      #seenCollections .osteo-v197-review-open{
+        min-width:0;width:100%;display:grid;grid-template-columns:42px minmax(0,1fr) 28px;gap:11px;align-items:center;
+        padding:12px;border-radius:20px;border:1px solid rgba(255,176,32,.23);
+        background:linear-gradient(145deg,rgba(10,29,55,.82),rgba(5,15,31,.90));color:#fff;text-align:left;
+      }
+      #seenCollections .osteo-v197-review-open .mark{
+        width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:#ffb020;
+        border:1px solid rgba(255,176,32,.38);background:rgba(255,176,32,.08);font-weight:950;
+      }
+      #seenCollections .osteo-v197-review-open strong{display:block;font-size:14px;line-height:1.2;color:#fff}
+      #seenCollections .osteo-v197-review-open small{display:block;margin-top:5px;color:#9db0c8;font-size:11px;line-height:1.25}
+      #seenCollections .osteo-v197-review-open .arrow{color:#ffb020;font-size:22px;text-align:center}
+      #seenCollections .osteo-v197-review-remove{
+        min-width:0;border-radius:18px;border:1px solid rgba(255,95,95,.34);background:rgba(255,95,95,.07);
+        color:#ff8a8a;font-size:10px;font-weight:900;line-height:1.05;padding:7px 5px;
+      }
+      #seenCollections .osteo-v197-review-remove:hover{background:rgba(255,95,95,.13);border-color:rgba(255,95,95,.55)}
+      #seenCollections .osteo-v197-review-remove:disabled{opacity:.55}
+      @media(max-width:390px){
+        #seenCollections .osteo-v197-review-row{grid-template-columns:minmax(0,1fr) 58px;gap:6px}
+        #seenCollections .osteo-v197-review-remove{font-size:9px;padding:6px 3px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function patchCards(){
+    injectStyles();
+    captureVideoSnapshot();
+
+    document.querySelectorAll('#seenCollections .osteo-v19-review-card[data-review-technique]').forEach(old=>{
+      const id=old.dataset.reviewTechnique;
+      const title=old.querySelector('strong')?.textContent?.trim()||'Technique';
+      const meta=old.querySelector('small')?.textContent?.trim()||'';
+
+      const row=document.createElement('article');
+      row.className='osteo-v197-review-row';
+      row.dataset.reviewId=String(id||'');
+      row.innerHTML=`
+        <button type="button" class="osteo-v197-review-open" aria-label="Voir la vidéo : ${String(title).replace(/"/g,'&quot;')}">
+          <span class="mark">↻</span>
+          <span><strong></strong><small></small></span>
+          <span class="arrow">›</span>
+        </button>
+        <button type="button" class="osteo-v197-review-remove" aria-label="Retirer de À revoir">Retirer</button>
+      `;
+      row.querySelector('strong').textContent=title;
+      row.querySelector('small').textContent=meta;
+      row.querySelector('.osteo-v197-review-open').addEventListener('click',e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        openReviewVideo(id);
+      });
+      row.querySelector('.osteo-v197-review-remove').addEventListener('click',async e=>{
+        e.preventDefault();
+        e.stopPropagation();
+        await removeReview(id,e.currentTarget);
+      });
+      old.replaceWith(row);
+    });
+  }
+
+  function installObserver(){
+    if(observer) return;
+    observer=new MutationObserver(()=>{
+      clearTimeout(patchTimer);
+      patchTimer=setTimeout(patchCards,35);
+    });
+    observer.observe(document.documentElement,{subtree:true,childList:true});
+  }
+
+  function install(){
+    captureVideoSnapshot();
+    patchCards();
+    installObserver();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
+  else install();
+
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(()=>{
+    captureVideoSnapshot();
+    patchCards();
+  },80));
+
+  [250,700,1500,2800].forEach(ms=>setTimeout(patchCards,ms));
+
+  window.OSTEO_REVIEW_V19_7={version:VERSION,open:openReviewVideo,remove:removeReview,refresh:patchCards};
 })();
