@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-14
+   Version 22.2-app-15
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-14';
+  const VERSION = '22.2-app-15';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -2674,6 +2674,200 @@
 
   window.OSTEO_WHEEL_TEXT_FIX = {
     version:'14.0',
+    refresh:install
+  };
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — APP15 · CENTRE DE ROUE
+   --------------------------------------------------------------
+   - titre complet, non tronqué
+   - centre lisible sur plusieurs lignes
+   - TAP déplacé sur un petit cercle extérieur
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoWheelCenterApp15) return;
+  window.__osteoWheelCenterApp15=true;
+
+  function ensureStyles(){
+    if(document.getElementById('opWheelCenterStylesApp15')) return;
+
+    const style=document.createElement('style');
+    style.id='opWheelCenterStylesApp15';
+    style.textContent=`
+      /* Le cercle central garde uniquement le titre */
+      #revisionWheelDisc .wheel-core{
+        width:126px !important;
+        height:126px !important;
+        padding:10px !important;
+        overflow:visible !important;
+      }
+
+      #wheelTicker{
+        width:104px !important;
+        max-width:104px !important;
+        min-height:0 !important;
+        padding:0 !important;
+        display:block !important;
+        color:#fff !important;
+        font-size:10.2px !important;
+        line-height:1.02 !important;
+        font-weight:950 !important;
+        letter-spacing:-.025em !important;
+        text-align:center !important;
+        white-space:normal !important;
+        word-break:normal !important;
+        overflow-wrap:break-word !important;
+
+        /* Annule les anciennes coupures */
+        overflow:visible !important;
+        text-overflow:clip !important;
+        -webkit-line-clamp:unset !important;
+        -webkit-box-orient:unset !important;
+        max-height:none !important;
+      }
+
+      /* Le badge TAP sort du cercle central */
+      #revisionWheelDisc .wheel-core::after{
+        content:"TAP" !important;
+        position:absolute !important;
+        width:34px !important;
+        height:34px !important;
+        right:-29px !important;
+        bottom:10px !important;
+        left:auto !important;
+
+        display:grid !important;
+        place-items:center !important;
+
+        border-radius:50% !important;
+        border:1px solid rgba(0,229,255,.62) !important;
+        background:
+          radial-gradient(circle at 35% 30%,rgba(255,255,255,.10),transparent 34%),
+          rgba(3,18,34,.96) !important;
+
+        color:#6cecff !important;
+        font-size:7px !important;
+        line-height:1 !important;
+        font-weight:950 !important;
+        letter-spacing:.08em !important;
+        text-transform:uppercase !important;
+
+        box-shadow:
+          0 0 18px rgba(0,229,255,.20),
+          inset 0 1px 0 rgba(255,255,255,.08) !important;
+
+        transform:none !important;
+        z-index:5 !important;
+      }
+
+      /* Le badge disparaît pendant/après le tirage */
+      #revisionWheelDisc.spinning .wheel-core::after,
+      #revisionWheelDisc.selected .wheel-core::after{
+        opacity:0 !important;
+        pointer-events:none !important;
+      }
+
+      @media(max-width:430px){
+        #revisionWheelDisc .wheel-core{
+          width:122px !important;
+          height:122px !important;
+          padding:9px !important;
+        }
+
+        #wheelTicker{
+          width:101px !important;
+          max-width:101px !important;
+          font-size:9.8px !important;
+          line-height:1.01 !important;
+        }
+
+        #revisionWheelDisc .wheel-core::after{
+          width:32px !important;
+          height:32px !important;
+          right:-27px !important;
+          bottom:9px !important;
+          font-size:6.5px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function restoreFullTicker(){
+    const ticker=document.getElementById('wheelTicker');
+    if(!ticker) return;
+
+    /*
+      APP14 raccourcissait le texte au centre.
+      Ici on réinjecte le titre complet de la technique sélectionnée
+      dès que la roue a fini son tirage.
+    */
+    try{
+      const disc=document.getElementById('revisionWheelDisc');
+      if(disc?.classList.contains('selected') &&
+         typeof getSelectedWheelTechnique==='function'){
+        const t=getSelectedWheelTechnique();
+        if(t?.title) ticker.textContent=String(t.title);
+      }
+    }catch(_){}
+  }
+
+  function install(){
+    ensureStyles();
+    restoreFullTicker();
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,400,1000,1800].forEach(ms=>setTimeout(install,ms));
+
+  // Après un tirage, APP14 peut encore raccourcir le texte :
+  // on restaure le titre complet à la fin de l'animation.
+  try{
+    if(typeof spinRevisionWheel==='function' && !spinRevisionWheel.__app15CenterWrapped){
+      const original=spinRevisionWheel;
+      const wrapped=function(){
+        const result=original.apply(this,arguments);
+        [3250,3350,3500].forEach(ms=>setTimeout(()=>{
+          restoreFullTicker();
+          try{
+            if(window.OSTEO_WHEEL_TEXT_FIX?.refresh){
+              window.OSTEO_WHEEL_TEXT_FIX.refresh();
+            }
+          }catch(_){}
+        },ms));
+        return result;
+      };
+      wrapped.__app15CenterWrapped=true;
+      spinRevisionWheel=wrapped;
+      window.spinRevisionWheel=wrapped;
+    }
+  }catch(_){}
+
+  const observer=new MutationObserver(()=>{
+    const disc=document.getElementById('revisionWheelDisc');
+    if(disc?.classList.contains('selected')){
+      setTimeout(restoreFullTicker,20);
+    }
+  });
+
+  function observe(){
+    const disc=document.getElementById('revisionWheelDisc');
+    if(disc && !disc.__op15Observed){
+      observer.observe(disc,{attributes:true,attributeFilter:['class']});
+      disc.__op15Observed=true;
+    }
+  }
+
+  observe();
+  setTimeout(observe,500);
+
+  window.OSTEO_WHEEL_CENTER_V15={
+    version:'15.0',
     refresh:install
   };
 })();
