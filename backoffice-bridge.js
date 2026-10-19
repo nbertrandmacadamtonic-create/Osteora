@@ -304,7 +304,7 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — BRIDGE ROUE APP16
+   OSTÉO PRATIK — BRIDGE ROUE APP17
    --------------------------------------------------------------
    Correctif autonome chargé depuis le bridge : aucun changement
    de index.html n'est nécessaire.
@@ -312,13 +312,33 @@
 (function(){
   'use strict';
 
-  if(window.__osteoWheelBridgeApp16) return;
-  window.__osteoWheelBridgeApp16=true;
+  if(window.__osteoWheelBridgeApp17) return;
+  window.__osteoWheelBridgeApp17=true;
+
+  function techniqueCatalog(){
+    // Dans index.html, `techniques` est un const global lexical : il n'est pas
+    // garanti qu'il soit exposé sous window.techniques.
+    try{
+      if(typeof techniques!=='undefined' && Array.isArray(techniques)){
+        return techniques;
+      }
+    }catch(_){}
+    return Array.isArray(window.techniques) ? window.techniques : [];
+  }
+
+  function albumUnlockChecker(){
+    try{
+      if(typeof isTechniqueUnlocked==='function') return isTechniqueUnlocked;
+    }catch(_){}
+    return typeof window.isTechniqueUnlocked==='function'
+      ? window.isTechniqueUnlocked
+      : null;
+  }
 
   function albumList(){
     try{
-      const all=Array.isArray(window.techniques) ? window.techniques : [];
-      const unlocked=window.isTechniqueUnlocked;
+      const all=techniqueCatalog();
+      const unlocked=albumUnlockChecker();
       if(all.length && typeof unlocked==='function'){
         return all
           .filter(t=>{
@@ -348,8 +368,7 @@
   }
 
   function installAlbumSource(){
-    if(!Array.isArray(window.techniques) ||
-       typeof window.isTechniqueUnlocked!=='function') return;
+    if(!techniqueCatalog().length || !albumUnlockChecker()) return;
 
     const source=function(){ return albumList(); };
     source.__opAlbumSourceApp16=true;
@@ -468,8 +487,8 @@
 
   [0,100,400,1000,1800,3200,4600].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_WHEEL_BRIDGE_APP16={
-    version:'16.0',
+  window.OSTEO_WHEEL_BRIDGE_APP17={
+    version:'17.0',
     refresh:install,
     syncCount,
     restoreTitle:restoreFullTitle
