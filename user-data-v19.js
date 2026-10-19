@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.9';
+  const VERSION='19.10';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -150,22 +150,36 @@
     }
   }
 
+  function isViewedRow(r){
+    return !!(r && (
+      r.completed_at ||
+      Number(r.percent)>=100 ||
+      String(r.status||'').toLowerCase()==='vue'
+    ));
+  }
+
+  function viewedTechniqueIdSet(){
+    return new Set((progressRows||[])
+      .filter(isViewedRow)
+      .map(r=>String(r.technique_id||''))
+      .filter(Boolean));
+  }
+
   function applyProgressToTechniques(){
-    const byId=new Map((progressRows||[]).map(r=>[String(r.technique_id),r]));
     listTechniques().forEach(t=>{
-      const r=byId.get(String(t.id));
+      const r=progressRowFor(t.id);
       if(r){
-        t.status=String(r.status||'non vue');
-        t.percent=Math.max(0,Math.min(100,Number(r.percent)||0));
+        const viewed=isViewed(t.id);
+        t.status=viewed?'vue':String(r.status||'non vue');
+        t.percent=viewed?100:Math.max(0,Math.min(100,Number(r.percent)||0));
       }else{
         t.status='non vue';
         t.percent=0;
       }
     });
 
-    const viewed=(progressRows||[])
-      .filter(r=>r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue')
-      .map(r=>Number(r.technique_id))
+    const viewed=[...viewedTechniqueIdSet()]
+      .map(Number)
       .filter(Boolean);
     writeViewedIds(viewed);
   }
@@ -298,24 +312,27 @@
     document.head.appendChild(style);
   }
 
+  function progressRowsFor(id){
+    return (progressRows||[]).filter(r=>String(r.technique_id)===String(id));
+  }
+
   function progressRowFor(id){
-    return (progressRows||[]).find(r=>String(r.technique_id)===String(id))||null;
+    const rows=progressRowsFor(id);
+    return rows.find(isViewedRow) || rows[0] || null;
   }
 
   function isViewed(id){
-    const r=progressRowFor(id);
-    return !!(r && (r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue'));
+    return progressRowsFor(id).some(isViewedRow);
   }
 
   function isReview(id){
-    const r=progressRowFor(id);
-    return !!(r && r.review_needed===true);
+    return isViewed(id) && progressRowsFor(id).some(r=>r?.review_needed===true);
   }
 
   async function cleanupInvalidReviews(){
     const invalid=(progressRows||[]).filter(r=>
       r?.review_needed===true &&
-      !(r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue')
+      !isViewed(r.technique_id)
     );
     if(!invalid.length) return;
 
@@ -413,7 +430,7 @@
     if(!s?.user?.id){appToast('Connectez-vous pour enregistrer « À revoir ».');return;}
 
     const id=String(t.id);
-    let row=progressRowFor(id);
+    let row=progressRowsFor(id).find(r=>r?.review_needed===true) || progressRowFor(id);
     const previous=!!row?.review_needed;
     const next=!previous;
     const now=new Date().toISOString();
@@ -567,7 +584,7 @@
   }
 
   function viewedCount(){
-    return (progressRows||[]).filter(r=>r && (r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue')).length;
+    return viewedTechniqueIdSet().size;
   }
 
   function reviewTechniques(){
