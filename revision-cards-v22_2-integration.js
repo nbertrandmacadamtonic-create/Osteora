@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-18
+   Version 22.2-app-20
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-18';
+  const VERSION = '22.2-app-20';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -89,19 +89,26 @@
     return clean;
   }
 
+  function accountViewedIds(){
+    const api=window.OSTEO_USER_DATA_V19;
+    if(!api || typeof api.isViewed!=='function') return null;
+    return uniqueValid(getTechniques()
+      .filter(t=>{
+        try{ return !!api.isViewed(t.id); }catch(_){ return false; }
+      })
+      .map(t=>t.id));
+  }
+
   function readViewed(){
+    // Une fois user-data chargé, Supabase est l'unique source de vérité.
+    const account=accountViewedIds();
+    if(account) return writeViewed(account);
+
     const clean = readArray(CLEAN_KEY);
+    if(clean) return writeViewed(clean);
+
     const strict = readArray(STRICT_KEY) || [];
     const legacy = readArray(LEGACY_KEY) || [];
-
-    /*
-      Ne jamais recopier CLEAN avant d'avoir lu STRICT/LEGACY : la progression
-      du compte peut arriver dans ces clés un peu avant CLEAN. L'ancien ordre
-      écrasait alors par exemple 3 techniques distantes avec 2 techniques locales.
-    */
-    if(clean){
-      return writeViewed([...clean,...strict,...legacy]);
-    }
 
     // Première migration seulement : retire les anciens déblocages de démonstration.
     const migrated = [...strict,...legacy]
@@ -121,7 +128,12 @@
   }
 
   function cleanIsTechniqueUnlocked(t){
-    return !!(t && viewedSet().has(toId(t.id)));
+    if(!t) return false;
+    const api=window.OSTEO_USER_DATA_V19;
+    if(api && typeof api.isViewed==='function'){
+      try{ return !!api.isViewed(t.id); }catch(_){}
+    }
+    return viewedSet().has(toId(t.id));
   }
 
   function syncTechniqueStatuses(){
@@ -842,12 +854,11 @@
 
   function mergeAccountViewedIntoClean(){
     const clean = readArray(CLEAN_KEY) || [];
-    const strict = readArray(STRICT_KEY) || [];
-    const legacy = readArray(LEGACY_KEY) || [];
+    const account = accountViewedIds();
 
-    // Une progression distante valide apparaît dans STRICT/LEGACY via V19.
-    // On fusionne au lieu d'écraser pour ne jamais perdre une vue locale récente.
-    const merged = uniqueValid([...clean,...strict,...legacy]);
+    // Supabase gagne toujours. Sans API centrale prête, on conserve seulement CLEAN
+    // et on ne réinjecte jamais les anciennes clés STRICT/LEGACY.
+    const merged = account===null ? uniqueValid(clean) : account;
 
     const before = JSON.stringify(uniqueValid(clean));
     const after = JSON.stringify(merged);
@@ -865,10 +876,14 @@
       try{ if(typeof updateProgressZoneStats==='function') updateProgressZoneStats(); }catch(_){}
       hydrateSeenCardThumbnails();
 
-      console.info('[Ostéo Pratik] Progression compte synchronisée :',merged.length,'technique(s) vue(s)');
+      console.info('[Ostéo Pratik] Progression Supabase appliquée :',merged.length,'technique(s) vue(s)');
     }
 
-    // Corrige aussi un libellé obsolète lorsqu'aucun nouvel ID n'a été fusionné.
+    // Redessine même sans changement de stockage : l'ancien HTML peut encore
+    // montrer les cartes de démonstration rendues avant le chargement Supabase.
+    syncTechniqueStatuses();
+    try{ if(typeof renderSeenCollections==='function') renderSeenCollections(); }catch(_){}
+    try{ if(typeof renderRevisionWheel==='function') renderRevisionWheel(); }catch(_){}
     syncWheelUnlockedLabel();
     return merged;
   }
