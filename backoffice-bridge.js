@@ -2345,3 +2345,118 @@
 
   window.OSTEO_REVIEW_V19_8={version:VERSION,open:openReviewVideo,remove:removeReview,refresh:patchCards};
 })();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — GARDE « À REVOIR » APP19
+   --------------------------------------------------------------
+   « À revoir » est un sous-ensemble de « Déjà vues » : une technique
+   non vue ne peut ni activer le bouton ni apparaître dans la liste.
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoReviewViewedGuardApp19) return;
+  window.__osteoReviewViewedGuardApp19=true;
+
+  const VIEWED_KEYS=[
+    'osteoPratikViewedTechniqueIdsCleanV1',
+    'osteoPratikStrictViewedTechniqueIdsV2',
+    'osteoPratikViewedTechniqueIds'
+  ];
+
+  function viewedIds(){
+    const ids=new Set();
+    VIEWED_KEYS.forEach(key=>{
+      try{
+        const value=JSON.parse(localStorage.getItem(key)||'[]');
+        if(Array.isArray(value)) value.forEach(id=>{
+          const n=Number(id);
+          if(n>0) ids.add(String(n));
+        });
+      }catch(_){}
+    });
+    return ids;
+  }
+
+  function statusBarIsViewed(reviewButton){
+    const viewButton=reviewButton
+      ?.closest('.osteo-v19-statusbar')
+      ?.querySelector('.osteo-v19-view');
+    return !!(viewButton && (
+      viewButton.classList.contains('is-viewed') ||
+      /^vue\s*✓?$/i.test(String(viewButton.textContent||'').trim())
+    ));
+  }
+
+  function guardButtons(){
+    document.querySelectorAll('.osteo-v19-statusbar .osteo-v19-review').forEach(button=>{
+      const allowed=statusBarIsViewed(button);
+      button.disabled=!allowed;
+      button.setAttribute('aria-disabled',allowed?'false':'true');
+      button.title=allowed
+        ? 'Ajouter ou retirer cette technique de « À revoir »'
+        : 'Visionnez entièrement la technique avant de l’ajouter à « À revoir »';
+      button.classList.toggle('op-review-locked',!allowed);
+    });
+  }
+
+  function filterReviewList(){
+    const viewed=viewedIds();
+    document.querySelectorAll(
+      '#seenCollections [data-review-technique], #seenCollections [data-review-id]'
+    ).forEach(card=>{
+      const id=String(Number(card.dataset.reviewTechnique||card.dataset.reviewId||0)||'');
+      if(id && !viewed.has(id)) card.remove();
+    });
+
+    const total=document.querySelectorAll(
+      '#seenCollections .osteo-v197-review-row[data-review-id], '+
+      '#seenCollections .osteo-v19-review-card[data-review-technique]'
+    ).length;
+    document.querySelectorAll(
+      '#seenCollections .osteo-v19-seen-tab[data-mode="review"] b, '+
+      '#seenCollections .osteo-v19-review-summary b'
+    ).forEach(el=>{ el.textContent=String(total); });
+  }
+
+  function refresh(){
+    guardButtons();
+    filterReviewList();
+  }
+
+  // Capture avant le gestionnaire de user-data-v19 : aucune ligne à 0 % n'est créée.
+  document.addEventListener('click',event=>{
+    const button=event.target?.closest?.('.osteo-v19-statusbar .osteo-v19-review');
+    if(!button || statusBarIsViewed(button)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    try{
+      const toast=typeof window.toast==='function' ? window.toast : null;
+      if(toast) toast('Visionnez entièrement cette technique avant de l’ajouter à « À revoir ».');
+    }catch(_){}
+    refresh();
+  },true);
+
+  const observer=new MutationObserver(()=>{
+    clearTimeout(window.__opReviewGuardTimerApp19);
+    window.__opReviewGuardTimerApp19=setTimeout(refresh,30);
+  });
+
+  function install(){
+    refresh();
+    if(document.body && !document.body.__opReviewGuardObservedApp19){
+      observer.observe(document.body,{subtree:true,childList:true});
+      document.body.__opReviewGuardObservedApp19=true;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(refresh,100));
+  window.addEventListener('storage',event=>{
+    if(VIEWED_KEYS.includes(String(event?.key||''))) setTimeout(refresh,50);
+  });
+  [0,150,500,1200,2500,4500].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_REVIEW_VIEWED_GUARD_APP19={version:'19.0',refresh};
+})();
