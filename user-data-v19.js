@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.8';
+  const VERSION='19.9';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -18,6 +18,7 @@
   const LAST_PRACTICE_KEY='osteoPratikLastPractice';
   const LAST_QUIZ_KEY='osteoPratikLastQuiz';
   const VIEWED_KEYS=[
+    'osteoPratikViewedTechniqueIdsCleanV1',
     'osteoPratikStrictViewedTechniqueIdsV2',
     'osteoPratikViewedTechniqueIds'
   ];
@@ -249,9 +250,10 @@
       favorites=new Set((favRes.data||[]).map(r=>String(r.technique_id)));
       progressRows=progressRes.data||[];
       stateRow=stateRes.data||null;
+      await cleanupInvalidReviews();
       applyAll();
     }catch(error){
-      console.warn('[Ostéo Pratik V19.8] Données utilisateur : cache local utilisé.',error);
+      console.warn('[Ostéo Pratik V19.9] Données utilisateur : cache local utilisé.',error);
     }finally{
       loading=false;
     }
@@ -308,6 +310,27 @@
   function isReview(id){
     const r=progressRowFor(id);
     return !!(r && r.review_needed===true);
+  }
+
+  async function cleanupInvalidReviews(){
+    const invalid=(progressRows||[]).filter(r=>
+      r?.review_needed===true &&
+      !(r.completed_at || Number(r.percent)>=100 || String(r.status||'').toLowerCase()==='vue')
+    );
+    if(!invalid.length) return;
+
+    invalid.forEach(r=>{ r.review_needed=false; });
+    saveCache();
+
+    if(!client || !userId) return;
+    await Promise.allSettled(invalid.map(r=>client.rpc('osteo_set_technique_review',{
+      p_technique_id:String(r.technique_id),
+      p_review:false,
+      p_title:String(r.title||''),
+      p_zone:String(r.zone||''),
+      p_subzone:String(r.subzone||''),
+      p_level:String(r.level||'')
+    })));
   }
 
   function ensureStatusBar(container){
@@ -368,6 +391,11 @@
     viewBtn.classList.toggle('is-viewed',viewed);
     reviewBtn.textContent=review?'✓ À revoir':'À revoir';
     reviewBtn.classList.toggle('is-review',review);
+    reviewBtn.disabled=!viewed && !review;
+    reviewBtn.setAttribute('aria-disabled',reviewBtn.disabled?'true':'false');
+    reviewBtn.title=reviewBtn.disabled
+      ? 'Visionnez entièrement cette technique avant de l’ajouter à « À revoir »'
+      : 'Ajouter ou retirer cette technique de « À revoir »';
     favBtn.textContent=favorite?'♥ Favori':'♡ Favori';
     favBtn.classList.toggle('is-favorite',favorite);
   }
@@ -389,6 +417,14 @@
     const previous=!!row?.review_needed;
     const next=!previous;
     const now=new Date().toISOString();
+
+    // « À revoir » est obligatoirement un sous-ensemble de « Déjà vues ».
+    // Une ancienne entrée invalide peut toujours être retirée, mais jamais créée.
+    if(next && !isViewed(id)){
+      appToast('Visionnez entièrement cette technique avant de l’ajouter à « À revoir ».');
+      updateStatusBars();
+      return;
+    }
 
     if(!row){
       row={user_id:userId,technique_id:id,title:t.title||'',zone:t.zone||'',subzone:t.sub||'',level:t.level||'',status:'en cours',percent:0,opened_count:1,first_opened_at:now,last_opened_at:now,completed_at:null,updated_at:now,review_needed:next};
@@ -536,7 +572,7 @@
 
   function reviewTechniques(){
     return listTechniques()
-      .filter(t=>t&&isReview(t.id))
+      .filter(t=>t&&isViewed(t.id)&&isReview(t.id))
       .sort((a,b)=>String(a.zone||'').localeCompare(String(b.zone||''),'fr') || String(a.sub||'').localeCompare(String(b.sub||''),'fr') || String(a.title||'').localeCompare(String(b.title||''),'fr'));
   }
 
@@ -816,6 +852,7 @@
     isFavorite:id=>favorites.has(String(id)),
     toggleFavorite:t=>toggleFavorite(t),
     isReview:id=>isReview(id),
+    isViewed:id=>isViewed(id),
     toggleReview:t=>toggleReview(t),
     renderSeenHub,
     recordOpen,
