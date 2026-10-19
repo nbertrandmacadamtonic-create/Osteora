@@ -315,7 +315,29 @@
   if(window.__osteoWheelBridgeApp16) return;
   window.__osteoWheelBridgeApp16=true;
 
+  function albumList(){
+    try{
+      const all=Array.isArray(window.techniques) ? window.techniques : [];
+      const unlocked=window.isTechniqueUnlocked;
+      if(all.length && typeof unlocked==='function'){
+        return all
+          .filter(t=>{
+            try{ return !!unlocked(t); }catch(_){ return false; }
+          })
+          .sort((a,b)=>
+            String(a?.zone || '').localeCompare(String(b?.zone || '')) ||
+            String(a?.sub || '').localeCompare(String(b?.sub || '')) ||
+            Number(a?.id || 0)-Number(b?.id || 0)
+          );
+      }
+    }catch(_){}
+    return [];
+  }
+
   function viewedList(){
+    // Reproduit en priorité le filtre exact employé par l'album « Déjà vues ».
+    const album=albumList();
+    if(album.length) return album;
     try{
       if(typeof window.getViewedTechniquesForWheel==='function'){
         const list=window.getViewedTechniquesForWheel();
@@ -323,6 +345,16 @@
       }
     }catch(_){}
     return [];
+  }
+
+  function installAlbumSource(){
+    if(!Array.isArray(window.techniques) ||
+       typeof window.isTechniqueUnlocked!=='function') return;
+
+    const source=function(){ return albumList(); };
+    source.__opAlbumSourceApp16=true;
+    window.getViewedTechniquesForWheel=source;
+    try{ getViewedTechniquesForWheel=source; }catch(_){}
   }
 
   function selectedTechnique(){
@@ -418,6 +450,7 @@
 
   function install(){
     ensureStyles();
+    installAlbumSource();
     wrapRenderer();
     observeWheel();
     syncCount();
