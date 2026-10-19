@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-10
+   Version 22.2-app-11
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -13,7 +13,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-10';
+  const VERSION = '22.2-app-11';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1958,128 +1958,40 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — BOUTON « ME TESTER » SUR LES CARTES DÉJÀ VUES
-   Version card-test-1.0
+   OSTÉO PRATIK — APP11 · CARTE PLEINE IMAGE
+   --------------------------------------------------------------
+   Dans « Déjà vues », aucune action ne réduit la vignette.
+   « Me tester · 4 questions » reste uniquement dans la carte
+   V22.2 ouverte en grand.
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoSeenCardTestButtonsV1) return;
-  window.__osteoSeenCardTestButtonsV1=true;
+  function cleanSeenCardButtons(){
+    document.querySelectorAll('#seenCardGrid .op-card-test-button')
+      .forEach(btn=>btn.remove());
+  }
 
-  function openTechniqueQuiz(id,event){
-    if(event){
-      event.preventDefault();
-      event.stopPropagation();
-      if(typeof event.stopImmediatePropagation==='function') event.stopImmediatePropagation();
-    }
+  function install(){
+    cleanSeenCardButtons();
 
     try{
-      if(typeof window.go==='function') window.go('quiz');
-      else if(typeof go==='function') go('quiz');
-    }catch(_){}
-
-    setTimeout(()=>{
-      try{
-        if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startTechnique==='function'){
-          window.OSTEO_TESTER.startTechnique(Number(id));
-        }
-      }catch(_){}
-    },30);
-
-    return false;
-  }
-
-  function ensureStyles(){
-    if(document.getElementById('opSeenCardTestStyles')) return;
-
-    const style=document.createElement('style');
-    style.id='opSeenCardTestStyles';
-    style.textContent=`
-      #seenCardGrid .op-card-test-button{
-        margin-top:7px;
-        width:100%;
-        min-height:34px;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        gap:7px;
-        border-radius:12px;
-        border:1px solid rgba(0,229,255,.35);
-        background:rgba(0,229,255,.08);
-        color:#68ecff;
-        font-size:10.5px;
-        font-weight:950;
-        line-height:1.1;
-        cursor:pointer;
-      }
-      #seenCardGrid .op-card-test-button:hover{
-        background:rgba(0,229,255,.14);
-      }
-      #seenCardGrid .play-card.locked .op-card-test-button{
-        display:none !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function installButtons(){
-    ensureStyles();
-
-    const grid=document.getElementById('seenCardGrid');
-    if(!grid) return;
-
-    grid.querySelectorAll('.play-card[data-tech-id]').forEach(card=>{
-      if(card.classList.contains('locked')) return;
-      if(card.querySelector('.op-card-test-button')) return;
-
-      const id=Number(card.dataset.techId)||0;
-      if(!id) return;
-
-      const target=
-        card.querySelector('.card-front > div:last-child') ||
-        card.querySelector('.card-front');
-
-      if(!target) return;
-
-      const button=document.createElement('button');
-      button.type='button';
-      button.className='op-card-test-button';
-      button.innerHTML='<span>✓</span><strong>Me tester · 4 questions</strong>';
-      button.addEventListener('click',event=>openTechniqueQuiz(id,event),true);
-      target.appendChild(button);
-    });
-  }
-
-  function wrapSeenCards(){
-    try{
-      if(typeof renderSeenCards==='function' && !renderSeenCards.__opCardTestWrapped){
+      if(typeof renderSeenCards==='function' && !renderSeenCards.__op11CleanWrapped){
         const original=renderSeenCards;
         const wrapped=function(){
           const result=original.apply(this,arguments);
-          installButtons();
-          setTimeout(installButtons,60);
+          cleanSeenCardButtons();
+          setTimeout(cleanSeenCardButtons,40);
           return result;
         };
-        wrapped.__opCardTestWrapped=true;
+        wrapped.__op11CleanWrapped=true;
         renderSeenCards=wrapped;
         window.renderSeenCards=wrapped;
       }
     }catch(_){}
   }
 
-  wrapSeenCards();
-  installButtons();
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    wrapSeenCards();
-    installButtons();
-  },{once:true});
-
-  [100,500,1200].forEach(ms=>setTimeout(()=>{
-    wrapSeenCards();
-    installButtons();
-  },ms));
-
-  window.OSTEO_OPEN_TECHNIQUE_QUIZ=openTechniqueQuiz;
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,400,1000].forEach(ms=>setTimeout(install,ms));
 })();
