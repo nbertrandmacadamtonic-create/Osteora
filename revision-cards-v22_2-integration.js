@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-12
+   Version 22.2-app-13
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-12';
+  const VERSION = '22.2-app-13';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -2075,4 +2075,448 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   [100,400,1000].forEach(ms=>setTimeout(install,ms));
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — APP13 · ROUE V2
+   --------------------------------------------------------------
+   Après le tirage :
+   - Voir la carte
+   - Voir la vidéo
+   - Écouter (piste audio de la vidéo, image masquée)
+   - Me tester · 4 questions
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoWheelV2App13) return;
+  window.__osteoWheelV2App13=true;
+
+  let audioPlayer=null;
+  let audioTechniqueId=0;
+
+  function toastSafe(message){
+    try{
+      if(typeof toast==='function') return toast(message);
+      if(typeof window.toast==='function') return window.toast(message);
+    }catch(_){}
+  }
+
+  function selectedTechnique(){
+    try{
+      if(typeof getSelectedWheelTechnique==='function'){
+        return getSelectedWheelTechnique();
+      }
+    }catch(_){}
+    return null;
+  }
+
+  function ensureVimeoApi(){
+    if(window.Vimeo && window.Vimeo.Player) return Promise.resolve();
+
+    return new Promise((resolve,reject)=>{
+      let script=document.querySelector('script[src*="player.vimeo.com/api/player.js"]');
+      if(script){
+        const started=Date.now();
+        (function wait(){
+          if(window.Vimeo && window.Vimeo.Player) return resolve();
+          if(Date.now()-started>10000) return reject(new Error('API Vimeo indisponible'));
+          setTimeout(wait,80);
+        })();
+        return;
+      }
+
+      script=document.createElement('script');
+      script.src='https://player.vimeo.com/api/player.js';
+      script.async=true;
+      script.onload=()=>resolve();
+      script.onerror=()=>reject(new Error('API Vimeo indisponible'));
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureAudioOverlay(){
+    let overlay=document.getElementById('opWheelAudioOverlay');
+    if(overlay) return overlay;
+
+    const style=document.createElement('style');
+    style.id='opWheelAudioStylesApp13';
+    style.textContent=`
+      #revisionWheel .wheel-actions-choice{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+      }
+      #revisionWheel .wheel-actions-choice .wheel-spin-button{
+        grid-column:1 / -1;
+      }
+      #revisionWheel .wheel-test-button{
+        border-color:rgba(168,85,255,.48) !important;
+        color:#d6b7ff !important;
+        background:rgba(168,85,255,.08) !important;
+      }
+
+      #opWheelAudioOverlay{
+        position:fixed;inset:0;z-index:2147482500;
+        display:none;align-items:center;justify-content:center;
+        padding:18px;background:rgba(1,7,14,.92);
+        backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      }
+      #opWheelAudioOverlay.is-open{display:flex}
+      #opWheelAudioOverlay .op-audio-shell{
+        width:min(460px,94vw);
+        border:1px solid rgba(0,229,255,.30);
+        border-radius:26px;
+        padding:20px;
+        background:
+          radial-gradient(circle at 50% 5%,rgba(0,229,255,.11),transparent 34%),
+          linear-gradient(145deg,rgba(8,27,50,.98),rgba(3,12,27,.98));
+        box-shadow:0 28px 90px rgba(0,0,0,.45);
+      }
+      #opWheelAudioOverlay .op-audio-head{
+        display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+      }
+      #opWheelAudioOverlay .op-audio-head small{
+        display:block;color:#5feaff;font-size:11px;font-weight:900;
+        text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;
+      }
+      #opWheelAudioOverlay .op-audio-head strong{
+        display:block;color:#fff;font-size:19px;line-height:1.15;
+      }
+      #opWheelAudioOverlay .op-audio-close{
+        flex:0 0 auto;width:40px;height:40px;border-radius:50%;
+        border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.05);
+        color:#fff;font-size:24px;cursor:pointer;
+      }
+      #opWheelAudioOverlay .op-audio-visual{
+        height:150px;margin:18px 0;border-radius:22px;
+        display:grid;place-items:center;
+        border:1px solid rgba(0,229,255,.18);
+        background:
+          radial-gradient(circle,rgba(0,229,255,.12),transparent 44%),
+          rgba(0,229,255,.025);
+      }
+      #opWheelAudioOverlay .op-audio-disc{
+        width:84px;height:84px;border-radius:50%;
+        border:1px solid rgba(0,229,255,.55);
+        display:grid;place-items:center;color:#54e8ff;font-size:34px;
+        box-shadow:0 0 38px rgba(0,229,255,.15);
+      }
+      #opWheelAudioOverlay.is-playing .op-audio-disc{
+        animation:opAudioPulse 1.45s ease-in-out infinite;
+      }
+      @keyframes opAudioPulse{
+        0%,100%{transform:scale(1);box-shadow:0 0 25px rgba(0,229,255,.12)}
+        50%{transform:scale(1.08);box-shadow:0 0 48px rgba(0,229,255,.28)}
+      }
+      #opWheelAudioOverlay .op-audio-status{
+        color:#b9c8db;text-align:center;font-size:12px;margin:-6px 0 15px;
+      }
+      #opWheelAudioOverlay .op-audio-actions{
+        display:grid;grid-template-columns:1fr 1fr;gap:9px;
+      }
+      #opWheelAudioOverlay .op-audio-actions button{
+        min-height:46px;border-radius:14px;font-weight:900;cursor:pointer;
+      }
+      #opWheelAudioOverlay .op-audio-play{
+        color:#00141d;border:1px solid #69eaff;
+        background:linear-gradient(135deg,#78efff,#20c8e7);
+      }
+      #opWheelAudioOverlay .op-audio-secondary{
+        color:#e5faff;border:1px solid rgba(104,233,255,.35);
+        background:rgba(3,20,34,.75);
+      }
+      #opWheelAudioIframeWrap{
+        position:absolute !important;
+        width:1px !important;height:1px !important;
+        overflow:hidden !important;opacity:.001 !important;
+        pointer-events:none !important;left:-9999px !important;top:-9999px !important;
+      }
+      @media(max-width:480px){
+        #opWheelAudioOverlay .op-audio-actions{grid-template-columns:1fr}
+      }
+    `;
+    document.head.appendChild(style);
+
+    overlay=document.createElement('div');
+    overlay.id='opWheelAudioOverlay';
+    overlay.setAttribute('aria-hidden','true');
+    overlay.innerHTML=`
+      <div class="op-audio-shell" role="dialog" aria-modal="true" aria-label="Révision audio">
+        <div class="op-audio-head">
+          <div>
+            <small>Révision audio</small>
+            <strong id="opWheelAudioTitle">Technique</strong>
+          </div>
+          <button class="op-audio-close" type="button" aria-label="Fermer">×</button>
+        </div>
+
+        <div class="op-audio-visual">
+          <div class="op-audio-disc">♫</div>
+        </div>
+
+        <div class="op-audio-status" id="opWheelAudioStatus">Prêt à écouter</div>
+
+        <div class="op-audio-actions">
+          <button class="op-audio-play" type="button" id="opWheelAudioPlay">▶ Lecture</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioRestart">↺ Recommencer</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioCard">Voir la carte</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioVideo">Voir la vidéo</button>
+        </div>
+
+        <div id="opWheelAudioIframeWrap"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('.op-audio-close').addEventListener('click',closeAudio);
+    overlay.addEventListener('click',e=>{
+      if(e.target===overlay) closeAudio();
+    });
+
+    overlay.querySelector('#opWheelAudioPlay').addEventListener('click',async()=>{
+      if(!audioPlayer) return;
+      try{
+        const paused=await audioPlayer.getPaused();
+        if(paused){
+          await audioPlayer.play();
+        }else{
+          await audioPlayer.pause();
+        }
+      }catch(_){}
+    });
+
+    overlay.querySelector('#opWheelAudioRestart').addEventListener('click',async()=>{
+      if(!audioPlayer) return;
+      try{
+        await audioPlayer.setCurrentTime(0);
+        await audioPlayer.play();
+      }catch(_){}
+    });
+
+    overlay.querySelector('#opWheelAudioCard').addEventListener('click',()=>{
+      closeAudio();
+      if(typeof window.openSelectedWheelCard==='function') window.openSelectedWheelCard();
+    });
+
+    overlay.querySelector('#opWheelAudioVideo').addEventListener('click',()=>{
+      closeAudio();
+      if(typeof window.openSelectedWheelVideo==='function') window.openSelectedWheelVideo();
+    });
+
+    return overlay;
+  }
+
+  async function closeAudio(){
+    const overlay=document.getElementById('opWheelAudioOverlay');
+    try{
+      if(audioPlayer) await audioPlayer.pause();
+    }catch(_){}
+    if(overlay){
+      overlay.classList.remove('is-open','is-playing');
+      overlay.setAttribute('aria-hidden','true');
+    }
+  }
+
+  async function openWheelAudio(){
+    const t=selectedTechnique();
+    if(!t){
+      toastSafe('Lancez d’abord la roue');
+      return;
+    }
+
+    if(!(t.videoUrl || t.vimeoId)){
+      toastSafe('Aucune piste vidéo disponible pour cette technique');
+      return;
+    }
+
+    const overlay=ensureAudioOverlay();
+    const title=overlay.querySelector('#opWheelAudioTitle');
+    const status=overlay.querySelector('#opWheelAudioStatus');
+    const playBtn=overlay.querySelector('#opWheelAudioPlay');
+    const wrap=overlay.querySelector('#opWheelAudioIframeWrap');
+
+    if(title) title.textContent=t.title||'Technique';
+    if(status) status.textContent='Chargement de la piste audio…';
+    if(playBtn) playBtn.textContent='▶ Lecture';
+
+    overlay.classList.add('is-open');
+    overlay.setAttribute('aria-hidden','false');
+
+    try{
+      if(audioPlayer){
+        try{ await audioPlayer.unload(); }catch(_){}
+        audioPlayer=null;
+      }
+
+      await ensureVimeoApi();
+
+      const src = t.videoUrl
+        ? String(t.videoUrl)
+        : 'https://player.vimeo.com/video/'+encodeURIComponent(String(t.vimeoId));
+
+      const joiner=src.includes('?')?'&':'?';
+      const iframe=document.createElement('iframe');
+      iframe.id='opWheelAudioIframe';
+      iframe.src=src+joiner+'controls=0&title=0&byline=0&portrait=0&autoplay=0&dnt=1';
+      iframe.allow='autoplay; fullscreen; picture-in-picture';
+      iframe.setAttribute('title','Lecture audio Ostéo Pratik');
+
+      wrap.innerHTML='';
+      wrap.appendChild(iframe);
+
+      audioPlayer=new window.Vimeo.Player(iframe);
+      audioTechniqueId=Number(t.id)||0;
+
+      audioPlayer.on('play',()=>{
+        overlay.classList.add('is-playing');
+        if(status) status.textContent='Lecture en cours';
+        if(playBtn) playBtn.textContent='❚❚ Pause';
+      });
+
+      audioPlayer.on('pause',()=>{
+        overlay.classList.remove('is-playing');
+        if(status) status.textContent='En pause';
+        if(playBtn) playBtn.textContent='▶ Lecture';
+      });
+
+      audioPlayer.on('ended',()=>{
+        overlay.classList.remove('is-playing');
+        if(status) status.textContent='Lecture terminée';
+        if(playBtn) playBtn.textContent='▶ Réécouter';
+      });
+
+      audioPlayer.ready().then(()=>{
+        if(status) status.textContent='Prêt à écouter';
+      }).catch(()=>{});
+
+    }catch(err){
+      console.warn('[Ostéo Pratik] Audio roue',err);
+      if(status) status.textContent='Audio indisponible';
+      toastSafe('Impossible de charger l’audio de cette technique');
+    }
+  }
+
+  function openWheelQuiz(){
+    const t=selectedTechnique();
+    if(!t){
+      toastSafe('Lancez d’abord la roue');
+      return;
+    }
+
+    try{
+      if(typeof window.go==='function') window.go('quiz');
+      else if(typeof go==='function') go('quiz');
+    }catch(_){}
+
+    setTimeout(()=>{
+      if(window.OSTEO_TESTER && typeof window.OSTEO_TESTER.startTechnique==='function'){
+        window.OSTEO_TESTER.startTechnique(Number(t.id));
+      }else{
+        toastSafe('Quiz de la technique indisponible');
+      }
+    },40);
+  }
+
+  function ensureWheelButtons(){
+    const actions=document.querySelector('#revisionWheel .wheel-actions-choice');
+    if(!actions) return;
+
+    const voice=document.getElementById('wheelVoiceButton');
+    if(voice){
+      voice.textContent='Écouter';
+      voice.setAttribute('onclick','openSelectedWheelVoice()');
+      voice.classList.add('wheel-audio-button');
+    }
+
+    let test=document.getElementById('wheelTestButton');
+    if(!test){
+      test=document.createElement('button');
+      test.id='wheelTestButton';
+      test.type='button';
+      test.className='secondary wheel-choice-button wheel-test-button';
+      test.textContent='Me tester · 4 questions';
+      test.disabled=true;
+      test.setAttribute('onclick','openSelectedWheelQuiz()');
+
+      const video=document.getElementById('wheelVideoButton');
+      if(video) actions.insertBefore(test,video.nextSibling);
+      else actions.appendChild(test);
+    }
+
+    syncTestButtonState();
+  }
+
+  function syncTestButtonState(){
+    const test=document.getElementById('wheelTestButton');
+    const card=document.getElementById('wheelCardButton');
+    if(!test) return;
+
+    const ready=!!(card && !card.disabled && selectedTechnique());
+    test.disabled=!ready;
+    test.classList.toggle('ready',ready);
+  }
+
+  function installOverrides(){
+    window.openSelectedWheelVoice=openWheelAudio;
+    window.openSelectedWheelQuiz=openWheelQuiz;
+    try{ openSelectedWheelVoice=openWheelAudio; }catch(_){}
+    try{ openSelectedWheelQuiz=openWheelQuiz; }catch(_){}
+
+    ensureWheelButtons();
+
+    try{
+      if(typeof renderRevisionWheel==='function' && !renderRevisionWheel.__app13WheelWrapped){
+        const original=renderRevisionWheel;
+        const wrapped=function(){
+          const result=original.apply(this,arguments);
+          ensureWheelButtons();
+          syncTestButtonState();
+          setTimeout(syncTestButtonState,50);
+          return result;
+        };
+        wrapped.__app13WheelWrapped=true;
+        renderRevisionWheel=wrapped;
+        window.renderRevisionWheel=wrapped;
+      }
+    }catch(_){}
+
+    try{
+      if(typeof spinRevisionWheel==='function' && !spinRevisionWheel.__app13WheelWrapped){
+        const original=spinRevisionWheel;
+        const wrapped=function(){
+          ensureWheelButtons();
+          const test=document.getElementById('wheelTestButton');
+          if(test){test.disabled=true;test.classList.remove('ready');}
+          const result=original.apply(this,arguments);
+          [500,1500,3300,3500].forEach(ms=>setTimeout(syncTestButtonState,ms));
+          return result;
+        };
+        wrapped.__app13WheelWrapped=true;
+        spinRevisionWheel=wrapped;
+        window.spinRevisionWheel=wrapped;
+      }
+    }catch(_){}
+  }
+
+  installOverrides();
+  document.addEventListener('DOMContentLoaded',installOverrides,{once:true});
+  [150,600,1400].forEach(ms=>setTimeout(installOverrides,ms));
+
+  // Suit aussi les changements disabled du bouton Carte.
+  const observer=new MutationObserver(()=>{
+    ensureWheelButtons();
+    syncTestButtonState();
+  });
+  const startObserve=()=>{
+    const card=document.getElementById('wheelCardButton');
+    if(card) observer.observe(card,{attributes:true,attributeFilter:['disabled','class']});
+  };
+  startObserve();
+  setTimeout(startObserve,600);
+
+  window.OSTEO_WHEEL_V2={
+    version:'13.0',
+    audio:openWheelAudio,
+    quiz:openWheelQuiz
+  };
 })();
