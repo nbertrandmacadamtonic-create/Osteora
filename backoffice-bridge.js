@@ -2476,3 +2476,172 @@
 
   window.OSTEO_REVIEW_VIEWED_GUARD_APP19={version:'19.0',refresh};
 })();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP22
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoVideoFullscreenApp22) return;
+  window.__osteoVideoFullscreenApp22=true;
+
+  function elements(){
+    return {
+      box:document.getElementById('videoBox'),
+      video:document.getElementById('video'),
+      iframe:document.getElementById('vimeoPlayer')
+    };
+  }
+
+  function visible(element){
+    if(!element) return false;
+    const style=getComputedStyle(element);
+    return style.display!=='none' && style.visibility!=='hidden';
+  }
+
+  function setViewportHeight(){
+    const height=Math.round(window.visualViewport?.height || window.innerHeight || 0);
+    if(height>0) document.documentElement.style.setProperty('--op-video-fullscreen-height',height+'px');
+  }
+
+  function enterVisualFullscreen(){
+    const {box}=elements();
+    if(!box) return;
+    setViewportHeight();
+    box.classList.add('app-fullscreen-video','op-mobile-video-fullscreen');
+    document.body.classList.add('video-fullscreen-open');
+    document.documentElement.classList.add('op-video-fullscreen-open');
+  }
+
+  function leaveVisualFullscreen(){
+    const {box}=elements();
+    box?.classList.remove('app-fullscreen-video','op-mobile-video-fullscreen');
+    document.body.classList.remove('video-fullscreen-open');
+    document.documentElement.classList.remove('op-video-fullscreen-open');
+    document.documentElement.style.removeProperty('--op-video-fullscreen-height');
+  }
+
+  function requestElementFullscreen(element){
+    if(!element) return null;
+    try{
+      if(typeof element.requestFullscreen==='function') return element.requestFullscreen();
+      if(typeof element.webkitRequestFullscreen==='function') return element.webkitRequestFullscreen();
+    }catch(_){}
+    return null;
+  }
+
+  function open(){
+    const {box,video,iframe}=elements();
+    if(!box) return;
+
+    // Safari iPhone accepte surtout le plein écran natif de l'élément vidéo.
+    if(visible(video) && typeof video.webkitEnterFullscreen==='function'){
+      try{
+        video.webkitEnterFullscreen();
+        return;
+      }catch(_){}
+    }
+
+    const target=visible(iframe) ? iframe : box;
+    const request=requestElementFullscreen(target);
+    enterVisualFullscreen();
+
+    if(request && typeof request.catch==='function'){
+      request.catch(()=>enterVisualFullscreen());
+    }
+  }
+
+  function close(){
+    const {video}=elements();
+    try{
+      if(video && typeof video.webkitExitFullscreen==='function' && video.webkitDisplayingFullscreen){
+        video.webkitExitFullscreen();
+      }
+    }catch(_){}
+
+    try{
+      if(document.fullscreenElement && typeof document.exitFullscreen==='function'){
+        const result=document.exitFullscreen();
+        if(result?.catch) result.catch(()=>{});
+      }else if(document.webkitFullscreenElement && typeof document.webkitExitFullscreen==='function'){
+        document.webkitExitFullscreen();
+      }
+    }catch(_){}
+    leaveVisualFullscreen();
+  }
+
+  function ensureStyles(){
+    if(document.getElementById('opVideoFullscreenStylesApp22')) return;
+    const style=document.createElement('style');
+    style.id='opVideoFullscreenStylesApp22';
+    style.textContent=`
+      html.op-video-fullscreen-open,
+      html.op-video-fullscreen-open body{
+        overflow:hidden !important;
+        overscroll-behavior:none !important;
+      }
+      #videoBox.op-mobile-video-fullscreen{
+        position:fixed !important;
+        inset:0 !important;
+        width:100vw !important;
+        height:var(--op-video-fullscreen-height,100dvh) !important;
+        min-height:0 !important;
+        max-height:none !important;
+        padding:0 !important;
+        margin:0 !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:#000 !important;
+        z-index:2147483646 !important;
+      }
+      #videoBox.op-mobile-video-fullscreen video,
+      #videoBox.op-mobile-video-fullscreen iframe{
+        width:100vw !important;
+        height:var(--op-video-fullscreen-height,100dvh) !important;
+        min-height:0 !important;
+        max-height:none !important;
+        object-fit:contain !important;
+        border-radius:0 !important;
+        background:#000 !important;
+      }
+      #videoBox.op-mobile-video-fullscreen #closeFullscreenVideo{
+        display:grid !important;
+        place-items:center !important;
+        position:fixed !important;
+        top:calc(10px + env(safe-area-inset-top,0px)) !important;
+        right:calc(10px + env(safe-area-inset-right,0px)) !important;
+        z-index:2147483647 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function install(){
+    ensureStyles();
+    window.openVideoFullscreen=open;
+    window.closeVideoFullscreen=close;
+    try{ openVideoFullscreen=open; }catch(_){}
+    try{ closeVideoFullscreen=close; }catch(_){}
+  }
+
+  window.visualViewport?.addEventListener('resize',()=>{
+    if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
+  });
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{
+    if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
+  },120));
+  document.addEventListener('fullscreenchange',()=>{
+    if(!document.fullscreenElement) leaveVisualFullscreen();
+  });
+  document.addEventListener('webkitfullscreenchange',()=>{
+    if(!document.webkitFullscreenElement) leaveVisualFullscreen();
+  });
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,500,1200].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_VIDEO_FULLSCREEN_APP22={version:'22.0',open,close,refresh:install};
+})();
