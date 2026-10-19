@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-16
+   Version 22.2-app-18
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-16';
+  const VERSION = '22.2-app-18';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -91,13 +91,19 @@
 
   function readViewed(){
     const clean = readArray(CLEAN_KEY);
-    if(clean) return writeViewed(clean);
-
-    // Première migration : on conserve les anciennes techniques éventuellement
-    // réellement vues, mais on retire les deux IDs qui avaient été imposés
-    // uniquement pour les démonstrations de cartes.
     const strict = readArray(STRICT_KEY) || [];
     const legacy = readArray(LEGACY_KEY) || [];
+
+    /*
+      Ne jamais recopier CLEAN avant d'avoir lu STRICT/LEGACY : la progression
+      du compte peut arriver dans ces clés un peu avant CLEAN. L'ancien ordre
+      écrasait alors par exemple 3 techniques distantes avec 2 techniques locales.
+    */
+    if(clean){
+      return writeViewed([...clean,...strict,...legacy]);
+    }
+
+    // Première migration seulement : retire les anciens déblocages de démonstration.
     const migrated = [...strict,...legacy]
       .map(toId)
       .filter(id=>id && !OLD_DEMO_IDS.has(id));
