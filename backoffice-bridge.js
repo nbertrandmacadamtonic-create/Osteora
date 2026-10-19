@@ -304,7 +304,7 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — BRIDGE ROUE APP17
+   OSTÉO PRATIK — BRIDGE ROUE APP21
    --------------------------------------------------------------
    Correctif autonome chargé depuis le bridge : aucun changement
    de index.html n'est nécessaire.
@@ -312,8 +312,8 @@
 (function(){
   'use strict';
 
-  if(window.__osteoWheelBridgeApp17) return;
-  window.__osteoWheelBridgeApp17=true;
+  if(window.__osteoWheelBridgeApp21) return;
+  window.__osteoWheelBridgeApp21=true;
 
   function techniqueCatalog(){
     // Dans index.html, `techniques` est un const global lexical : il n'est pas
@@ -338,6 +338,20 @@
   function albumList(){
     try{
       const all=techniqueCatalog();
+      const account=window.OSTEO_USER_DATA_V19;
+      if(all.length && account && typeof account.isViewed==='function'){
+        return all
+          .filter(t=>{
+            try{ return !!account.isViewed(t.id); }catch(_){ return false; }
+          })
+          .sort((a,b)=>
+            String(a?.zone || '').localeCompare(String(b?.zone || '')) ||
+            String(a?.sub || '').localeCompare(String(b?.sub || '')) ||
+            Number(a?.id || 0)-Number(b?.id || 0)
+          );
+      }
+
+      // Repli uniquement avant l'initialisation de la couche Supabase.
       const unlocked=albumUnlockChecker();
       if(all.length && typeof unlocked==='function'){
         return all
@@ -368,7 +382,9 @@
   }
 
   function installAlbumSource(){
-    if(!techniqueCatalog().length || !albumUnlockChecker()) return;
+    const account=window.OSTEO_USER_DATA_V19;
+    if(!techniqueCatalog().length ||
+       !account || typeof account.isViewed!=='function') return;
 
     const source=function(){ return albumList(); };
     source.__opAlbumSourceApp16=true;
@@ -487,8 +503,8 @@
 
   [0,100,400,1000,1800,3200,4600].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_WHEEL_BRIDGE_APP17={
-    version:'17.0',
+  window.OSTEO_WHEEL_BRIDGE_APP21={
+    version:'21.0',
     refresh:install,
     syncCount,
     restoreTitle:restoreFullTitle
@@ -2344,4 +2360,292 @@
   [250,700,1500,2800].forEach(ms=>setTimeout(patchCards,ms));
 
   window.OSTEO_REVIEW_V19_8={version:VERSION,open:openReviewVideo,remove:removeReview,refresh:patchCards};
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — GARDE « À REVOIR » APP19
+   --------------------------------------------------------------
+   « À revoir » est un sous-ensemble de « Déjà vues » : une technique
+   non vue ne peut ni activer le bouton ni apparaître dans la liste.
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoReviewViewedGuardApp19) return;
+  window.__osteoReviewViewedGuardApp19=true;
+
+  const VIEWED_KEYS=[
+    'osteoPratikViewedTechniqueIdsCleanV1',
+    'osteoPratikStrictViewedTechniqueIdsV2',
+    'osteoPratikViewedTechniqueIds'
+  ];
+
+  function viewedIds(){
+    const ids=new Set();
+    VIEWED_KEYS.forEach(key=>{
+      try{
+        const value=JSON.parse(localStorage.getItem(key)||'[]');
+        if(Array.isArray(value)) value.forEach(id=>{
+          const n=Number(id);
+          if(n>0) ids.add(String(n));
+        });
+      }catch(_){}
+    });
+    return ids;
+  }
+
+  function statusBarIsViewed(reviewButton){
+    const viewButton=reviewButton
+      ?.closest('.osteo-v19-statusbar')
+      ?.querySelector('.osteo-v19-view');
+    return !!(viewButton && (
+      viewButton.classList.contains('is-viewed') ||
+      /^vue\s*✓?$/i.test(String(viewButton.textContent||'').trim())
+    ));
+  }
+
+  function guardButtons(){
+    document.querySelectorAll('.osteo-v19-statusbar .osteo-v19-review').forEach(button=>{
+      const allowed=statusBarIsViewed(button);
+      button.disabled=!allowed;
+      button.setAttribute('aria-disabled',allowed?'false':'true');
+      button.title=allowed
+        ? 'Ajouter ou retirer cette technique de « À revoir »'
+        : 'Visionnez entièrement la technique avant de l’ajouter à « À revoir »';
+      button.classList.toggle('op-review-locked',!allowed);
+    });
+  }
+
+  function filterReviewList(){
+    const viewed=viewedIds();
+    document.querySelectorAll(
+      '#seenCollections [data-review-technique], #seenCollections [data-review-id]'
+    ).forEach(card=>{
+      const id=String(Number(card.dataset.reviewTechnique||card.dataset.reviewId||0)||'');
+      if(id && !viewed.has(id)) card.remove();
+    });
+
+    const total=document.querySelectorAll(
+      '#seenCollections .osteo-v197-review-row[data-review-id], '+
+      '#seenCollections .osteo-v19-review-card[data-review-technique]'
+    ).length;
+    document.querySelectorAll(
+      '#seenCollections .osteo-v19-seen-tab[data-mode="review"] b, '+
+      '#seenCollections .osteo-v19-review-summary b'
+    ).forEach(el=>{ el.textContent=String(total); });
+  }
+
+  function refresh(){
+    guardButtons();
+    filterReviewList();
+  }
+
+  // Capture avant le gestionnaire de user-data-v19 : aucune ligne à 0 % n'est créée.
+  document.addEventListener('click',event=>{
+    const button=event.target?.closest?.('.osteo-v19-statusbar .osteo-v19-review');
+    if(!button || statusBarIsViewed(button)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    try{
+      const toast=typeof window.toast==='function' ? window.toast : null;
+      if(toast) toast('Visionnez entièrement cette technique avant de l’ajouter à « À revoir ».');
+    }catch(_){}
+    refresh();
+  },true);
+
+  const observer=new MutationObserver(()=>{
+    clearTimeout(window.__opReviewGuardTimerApp19);
+    window.__opReviewGuardTimerApp19=setTimeout(refresh,30);
+  });
+
+  function install(){
+    refresh();
+    if(document.body && !document.body.__opReviewGuardObservedApp19){
+      observer.observe(document.body,{subtree:true,childList:true});
+      document.body.__opReviewGuardObservedApp19=true;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(refresh,100));
+  window.addEventListener('storage',event=>{
+    if(VIEWED_KEYS.includes(String(event?.key||''))) setTimeout(refresh,50);
+  });
+  [0,150,500,1200,2500,4500].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_REVIEW_VIEWED_GUARD_APP19={version:'19.0',refresh};
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP23
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoVideoFullscreenApp23) return;
+  window.__osteoVideoFullscreenApp23=true;
+
+  function elements(){
+    return {
+      box:document.getElementById('videoBox'),
+      video:document.getElementById('video'),
+      iframe:document.getElementById('vimeoPlayer')
+    };
+  }
+
+  function visible(element){
+    if(!element) return false;
+    const style=getComputedStyle(element);
+    return style.display!=='none' && style.visibility!=='hidden';
+  }
+
+  function setViewportHeight(){
+    const height=Math.round(window.visualViewport?.height || window.innerHeight || 0);
+    if(height>0) document.documentElement.style.setProperty('--op-video-fullscreen-height',height+'px');
+  }
+
+  function enterVisualFullscreen(){
+    const {box}=elements();
+    if(!box) return;
+    setViewportHeight();
+    box.classList.add('app-fullscreen-video','op-mobile-video-fullscreen');
+    document.body.classList.add('video-fullscreen-open');
+    document.documentElement.classList.add('op-video-fullscreen-open');
+  }
+
+  function leaveVisualFullscreen(){
+    const {box}=elements();
+    box?.classList.remove('app-fullscreen-video','op-mobile-video-fullscreen');
+    document.body.classList.remove('video-fullscreen-open');
+    document.documentElement.classList.remove('op-video-fullscreen-open');
+    document.documentElement.style.removeProperty('--op-video-fullscreen-height');
+  }
+
+  function requestElementFullscreen(element){
+    if(!element) return null;
+    try{
+      if(typeof element.requestFullscreen==='function') return element.requestFullscreen();
+      if(typeof element.webkitRequestFullscreen==='function') return element.webkitRequestFullscreen();
+    }catch(_){}
+    return null;
+  }
+
+  function open(){
+    const {box,video,iframe}=elements();
+    if(!box) return;
+
+    // Safari iPhone accepte surtout le plein écran natif de l'élément vidéo.
+    if(visible(video) && typeof video.webkitEnterFullscreen==='function'){
+      try{
+        video.webkitEnterFullscreen();
+        return;
+      }catch(_){}
+    }
+
+    // Le conteneur garde le bouton de fermeture et impose le bon ratio à Vimeo.
+    const request=requestElementFullscreen(box);
+    enterVisualFullscreen();
+
+    if(request && typeof request.catch==='function'){
+      request.catch(()=>enterVisualFullscreen());
+    }
+  }
+
+  function close(){
+    const {video}=elements();
+    try{
+      if(video && typeof video.webkitExitFullscreen==='function' && video.webkitDisplayingFullscreen){
+        video.webkitExitFullscreen();
+      }
+    }catch(_){}
+
+    try{
+      if(document.fullscreenElement && typeof document.exitFullscreen==='function'){
+        const result=document.exitFullscreen();
+        if(result?.catch) result.catch(()=>{});
+      }else if(document.webkitFullscreenElement && typeof document.webkitExitFullscreen==='function'){
+        document.webkitExitFullscreen();
+      }
+    }catch(_){}
+    leaveVisualFullscreen();
+  }
+
+  function ensureStyles(){
+    if(document.getElementById('opVideoFullscreenStylesApp22')) return;
+    const style=document.createElement('style');
+    style.id='opVideoFullscreenStylesApp22';
+    style.textContent=`
+      html.op-video-fullscreen-open,
+      html.op-video-fullscreen-open body{
+        overflow:hidden !important;
+        overscroll-behavior:none !important;
+      }
+      #videoBox.op-mobile-video-fullscreen{
+        position:fixed !important;
+        inset:0 !important;
+        width:100vw !important;
+        height:var(--op-video-fullscreen-height,100dvh) !important;
+        min-height:0 !important;
+        max-height:none !important;
+        padding:0 !important;
+        margin:0 !important;
+        border:0 !important;
+        border-radius:0 !important;
+        background:#000 !important;
+        z-index:2147483646 !important;
+        display:grid !important;
+        place-items:center !important;
+        overflow:hidden !important;
+      }
+      #videoBox.op-mobile-video-fullscreen video,
+      #videoBox.op-mobile-video-fullscreen iframe{
+        width:min(100vw,calc(var(--op-video-fullscreen-height,100dvh) * 16 / 9)) !important;
+        height:min(var(--op-video-fullscreen-height,100dvh),calc(100vw * 9 / 16)) !important;
+        min-height:0 !important;
+        max-height:none !important;
+        aspect-ratio:16 / 9 !important;
+        object-fit:contain !important;
+        border-radius:0 !important;
+        background:#000 !important;
+      }
+      #videoBox.op-mobile-video-fullscreen #closeFullscreenVideo{
+        display:grid !important;
+        place-items:center !important;
+        position:fixed !important;
+        top:calc(10px + env(safe-area-inset-top,0px)) !important;
+        right:calc(10px + env(safe-area-inset-right,0px)) !important;
+        z-index:2147483647 !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function install(){
+    ensureStyles();
+    window.openVideoFullscreen=open;
+    window.closeVideoFullscreen=close;
+    try{ openVideoFullscreen=open; }catch(_){}
+    try{ closeVideoFullscreen=close; }catch(_){}
+  }
+
+  window.visualViewport?.addEventListener('resize',()=>{
+    if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
+  });
+  window.addEventListener('orientationchange',()=>setTimeout(()=>{
+    if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
+  },120));
+  document.addEventListener('fullscreenchange',()=>{
+    if(!document.fullscreenElement) leaveVisualFullscreen();
+  });
+  document.addEventListener('webkitfullscreenchange',()=>{
+    if(!document.webkitFullscreenElement) leaveVisualFullscreen();
+  });
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,500,1200].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_VIDEO_FULLSCREEN_APP23={version:'23.0',open,close,refresh:install};
 })();
