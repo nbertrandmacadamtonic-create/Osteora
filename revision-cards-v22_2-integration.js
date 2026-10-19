@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-11
+   Version 22.2-app-12
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -9,11 +9,12 @@
    - supprime l'ancien bouton orange C2-C6 et l'ancien texte de test
    - empêche l'ancienne carte orange de se rouvrir
    - ouvre exclusivement la carte V22.2 Premium
+   - APP12 : synchronise les cartes « Déjà vues » entre appareils
    ============================================================== */
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-11';
+  const VERSION = '22.2-app-12';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -807,12 +808,92 @@
     console.warn('[Ostéo Pratik] Préchargement V22.2 différé',err);
   });
 
+
+  /* === APP12 · SYNCHRONISATION MULTI-APPAREILS ===
+     user-data-v19 récupère la progression du compte Supabase dans les
+     clés STRICT/LEGACY. APP11 utilisait d'abord CLEAN : sur un nouvel
+     appareil, CLEAN pouvait rester vide et bloquer les cartes malgré
+     un compteur « Déjà vues » correct.
+     Ici on fusionne automatiquement les IDs synchronisés du compte
+     dans CLEAN, puis on redessine Collections / Roue / Stats.
+  */
+  let accountSyncBusy=false;
+
+  function mergeAccountViewedIntoClean(){
+    const clean = readArray(CLEAN_KEY) || [];
+    const strict = readArray(STRICT_KEY) || [];
+    const legacy = readArray(LEGACY_KEY) || [];
+
+    // Une progression distante valide apparaît dans STRICT/LEGACY via V19.
+    // On fusionne au lieu d'écraser pour ne jamais perdre une vue locale récente.
+    const merged = uniqueValid([...clean,...strict,...legacy]);
+
+    const before = JSON.stringify(uniqueValid(clean));
+    const after = JSON.stringify(merged);
+
+    if(before !== after){
+      writeViewed(merged);
+      syncTechniqueStatuses();
+
+      try{ if(typeof renderTechniques==='function') renderTechniques(); }catch(_){}
+      try{ if(typeof renderSeenCollections==='function') renderSeenCollections(); }catch(_){}
+      try{ if(typeof renderSeenCards==='function') renderSeenCards(); }catch(_){}
+      try{ if(typeof renderRevisionWheel==='function') renderRevisionWheel(); }catch(_){}
+      try{ if(typeof updateZoneStats==='function') updateZoneStats(); }catch(_){}
+      try{ if(typeof updateProgressZoneStats==='function') updateProgressZoneStats(); }catch(_){}
+      hydrateSeenCardThumbnails();
+
+      console.info('[Ostéo Pratik] Progression compte synchronisée :',merged.length,'technique(s) vue(s)');
+    }
+
+    return merged;
+  }
+
+  async function syncAccountViewed(){
+    if(accountSyncBusy) return readViewed();
+    accountSyncBusy=true;
+
+    try{
+      // Demande d'abord à la couche utilisateur de recharger la progression du compte.
+      const userData=window.OSTEO_USER_DATA_V19;
+      if(userData && typeof userData.reload==='function'){
+        try{ await userData.reload(); }catch(_){}
+      }
+
+      // Laisse le temps aux écritures de compatibilité STRICT/LEGACY de se faire.
+      await new Promise(resolve=>setTimeout(resolve,80));
+      return mergeAccountViewedIntoClean();
+    }finally{
+      accountSyncBusy=false;
+    }
+  }
+
+  // Plusieurs passages car l'authentification et Supabase chargent après l'interface.
+  [250,700,1400,2600,4500].forEach(delay=>{
+    setTimeout(()=>{
+      mergeAccountViewedIntoClean();
+      if(delay===1400 || delay===4500) syncAccountViewed();
+    },delay);
+  });
+
+  // Re-synchronise aussi lors des événements utiles du compte / catalogue.
+  window.addEventListener('osteo-central-data-loaded',()=>{
+    setTimeout(syncAccountViewed,120);
+  });
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      setTimeout(syncAccountViewed,120);
+    }
+  });
+
   window.OSTEO_REVISION_CARDS_V22_2={
     version:VERSION,
     open:openPremiumCard,
     close:closePremiumCard,
     ready:ensureDependencies,
     viewed:readViewed,
+    syncAccount:syncAccountViewed,
     refresh
   };
 })();
