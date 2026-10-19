@@ -303,6 +303,147 @@
 })();
 
 
+/* ==============================================================
+   OSTÉO PRATIK — BRIDGE ROUE APP16
+   --------------------------------------------------------------
+   Correctif autonome chargé depuis le bridge : aucun changement
+   de index.html n'est nécessaire.
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoWheelBridgeApp16) return;
+  window.__osteoWheelBridgeApp16=true;
+
+  function viewedList(){
+    try{
+      if(typeof window.getViewedTechniquesForWheel==='function'){
+        const list=window.getViewedTechniquesForWheel();
+        if(Array.isArray(list)) return list;
+      }
+    }catch(_){}
+    return [];
+  }
+
+  function selectedTechnique(){
+    try{
+      if(typeof window.getSelectedWheelTechnique==='function'){
+        return window.getSelectedWheelTechnique() || null;
+      }
+    }catch(_){}
+    return null;
+  }
+
+  function syncCount(){
+    const count=document.getElementById('wheelCount');
+    if(!count) return;
+    const total=viewedList().length;
+    count.textContent=total + (total===1
+      ? ' technique débloquée'
+      : ' techniques débloquées');
+  }
+
+  function restoreFullTitle(){
+    const disc=document.getElementById('revisionWheelDisc');
+    const ticker=document.getElementById('wheelTicker');
+    if(!disc || !ticker || !disc.classList.contains('selected')) return;
+    const selected=selectedTechnique();
+    const title=String(selected?.title || '').trim();
+    if(title && ticker.textContent!==title) ticker.textContent=title;
+  }
+
+  function ensureStyles(){
+    if(document.getElementById('opWheelBridgeStylesApp16')) return;
+    const style=document.createElement('style');
+    style.id='opWheelBridgeStylesApp16';
+    style.textContent=`
+      #revisionWheelDisc .wheel-core::after{
+        right:-38px !important;
+        top:50% !important;
+        bottom:auto !important;
+        transform:translateY(-50%) !important;
+      }
+      #revisionWheelDisc.selected #wheelTicker{
+        display:block !important;
+        opacity:1 !important;
+        white-space:normal !important;
+        overflow:visible !important;
+        text-overflow:clip !important;
+        -webkit-line-clamp:unset !important;
+        max-height:none !important;
+      }
+      @media(max-width:430px){
+        #revisionWheelDisc .wheel-core::after{
+          right:-34px !important;
+          top:50% !important;
+          bottom:auto !important;
+          transform:translateY(-50%) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function observeWheel(){
+    const disc=document.getElementById('revisionWheelDisc');
+    const ticker=document.getElementById('wheelTicker');
+    if(disc && !disc.__opBridgeObservedApp16){
+      const observer=new MutationObserver(()=>{
+        syncCount();
+        restoreFullTitle();
+        setTimeout(restoreFullTitle,30);
+      });
+      observer.observe(disc,{attributes:true,attributeFilter:['class','style']});
+      if(ticker) observer.observe(ticker,{childList:true,characterData:true,subtree:true});
+      disc.__opBridgeObservedApp16=true;
+    }
+  }
+
+  function wrapRenderer(){
+    try{
+      const current=window.renderRevisionWheel;
+      if(typeof current==='function' && !current.__opBridgeApp16){
+        const wrapped=function(){
+          const result=current.apply(this,arguments);
+          syncCount();
+          restoreFullTitle();
+          return result;
+        };
+        wrapped.__opBridgeApp16=true;
+        window.renderRevisionWheel=wrapped;
+        try{ renderRevisionWheel=wrapped; }catch(_){}
+      }
+    }catch(_){}
+  }
+
+  function install(){
+    ensureStyles();
+    wrapRenderer();
+    observeWheel();
+    syncCount();
+    restoreFullTitle();
+  }
+
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.addEventListener('osteo-central-data-loaded',()=>setTimeout(install,100));
+  window.addEventListener('storage',event=>{
+    if(/ViewedTechniqueIds/i.test(String(event?.key || ''))) setTimeout(install,50);
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') setTimeout(install,80);
+  });
+
+  [0,100,400,1000,1800,3200,4600].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_WHEEL_BRIDGE_APP16={
+    version:'16.0',
+    refresh:install,
+    syncCount,
+    restoreTitle:restoreFullTitle
+  };
+})();
+
+
 
 /*
   Ostéo RA / Ostéo Pratik — Bridge central Supabase V5

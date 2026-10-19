@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-15
+   Version 22.2-app-16
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-15';
+  const VERSION = '22.2-app-16';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -150,6 +150,7 @@
     try{ if(typeof renderTechniques === 'function') renderTechniques(); }catch(_){}
     try{ if(typeof renderSeenCollections === 'function') renderSeenCollections(); }catch(_){}
     try{ if(typeof renderRevisionWheel === 'function') renderRevisionWheel(); }catch(_){}
+    syncWheelUnlockedLabel();
     try{ if(typeof updateZoneStats === 'function') updateZoneStats(); }catch(_){}
   }
 
@@ -162,6 +163,17 @@
         String(a.sub||'').localeCompare(String(b.sub||'')) ||
         toId(a.id)-toId(b.id)
       );
+  }
+
+  function syncWheelUnlockedLabel(){
+    const count = document.getElementById('wheelCount');
+    if(!count) return;
+
+    // Même source que la roue et l'album « Déjà vues ».
+    const total = cleanViewedTechniquesForWheel().length;
+    count.textContent = total + (total === 1
+      ? ' technique débloquée'
+      : ' techniques débloquées');
   }
 
   function installCleanProgressLogic(){
@@ -371,7 +383,9 @@
         const original = renderRevisionWheel;
         const wrapped = function(){
           syncTechniqueStatuses();
-          return original.apply(this,arguments);
+          const result = original.apply(this,arguments);
+          syncWheelUnlockedLabel();
+          return result;
         };
         wrapped.__op22CleanWrapped = true;
         renderRevisionWheel = wrapped;
@@ -790,6 +804,7 @@
 
     try{ if(typeof renderSeenCollections==='function') renderSeenCollections(); }catch(_){}
     try{ if(typeof renderRevisionWheel==='function') renderRevisionWheel(); }catch(_){}
+    syncWheelUnlockedLabel();
     hydrateSeenCardThumbnails();
   }
 
@@ -839,6 +854,7 @@
       try{ if(typeof renderSeenCollections==='function') renderSeenCollections(); }catch(_){}
       try{ if(typeof renderSeenCards==='function') renderSeenCards(); }catch(_){}
       try{ if(typeof renderRevisionWheel==='function') renderRevisionWheel(); }catch(_){}
+      syncWheelUnlockedLabel();
       try{ if(typeof updateZoneStats==='function') updateZoneStats(); }catch(_){}
       try{ if(typeof updateProgressZoneStats==='function') updateProgressZoneStats(); }catch(_){}
       hydrateSeenCardThumbnails();
@@ -846,6 +862,8 @@
       console.info('[Ostéo Pratik] Progression compte synchronisée :',merged.length,'technique(s) vue(s)');
     }
 
+    // Corrige aussi un libellé obsolète lorsqu'aucun nouvel ID n'a été fusionné.
+    syncWheelUnlockedLabel();
     return merged;
   }
 
@@ -2598,7 +2616,20 @@
 
   function formatCurrentTickerText(){
     const ticker=document.getElementById('wheelTicker');
+    const disc=document.getElementById('revisionWheelDisc');
     if(!ticker) return;
+
+    // Après le tirage, APP14 ne doit plus retronquer le titre restauré par APP15.
+    try{
+      if(disc?.classList.contains('selected') &&
+         typeof getSelectedWheelTechnique==='function'){
+        const selected=getSelectedWheelTechnique();
+        if(selected?.title){
+          ticker.textContent=String(selected.title);
+          return;
+        }
+      }
+    }catch(_){}
 
     const text=String(ticker.textContent || '').trim();
     if(!text) return;
@@ -2736,8 +2767,9 @@
         position:absolute !important;
         width:34px !important;
         height:34px !important;
-        right:-29px !important;
-        bottom:10px !important;
+        right:-38px !important;
+        top:50% !important;
+        bottom:auto !important;
         left:auto !important;
 
         display:grid !important;
@@ -2760,7 +2792,7 @@
           0 0 18px rgba(0,229,255,.20),
           inset 0 1px 0 rgba(255,255,255,.08) !important;
 
-        transform:none !important;
+        transform:translateY(-50%) !important;
         z-index:5 !important;
       }
 
@@ -2788,8 +2820,10 @@
         #revisionWheelDisc .wheel-core::after{
           width:32px !important;
           height:32px !important;
-          right:-27px !important;
-          bottom:9px !important;
+          right:-34px !important;
+          top:50% !important;
+          bottom:auto !important;
+          transform:translateY(-50%) !important;
           font-size:6.5px !important;
         }
       }
@@ -2832,7 +2866,7 @@
       const original=spinRevisionWheel;
       const wrapped=function(){
         const result=original.apply(this,arguments);
-        [3250,3350,3500].forEach(ms=>setTimeout(()=>{
+        [3250,3350,3500,3800].forEach(ms=>setTimeout(()=>{
           restoreFullTicker();
           try{
             if(window.OSTEO_WHEEL_TEXT_FIX?.refresh){
