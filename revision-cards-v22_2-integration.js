@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-13
+   Version 22.2-app-14
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-13';
+  const VERSION = '22.2-app-14';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -2518,5 +2518,162 @@
     version:'13.0',
     audio:openWheelAudio,
     quiz:openWheelQuiz
+  };
+})();
+
+
+/* ==============================================================
+   OSTÉO PRATIK — APP14 · TEXTE CENTRAL DE LA ROUE
+   --------------------------------------------------------------
+   Objectif :
+   - texte plus lisible au centre
+   - rotation plus propre pendant l'animation
+   - arrêt final à l'horizontale
+   ============================================================== */
+(function(){
+  'use strict';
+
+  if(window.__osteoWheelCenterTextFixApp14) return;
+  window.__osteoWheelCenterTextFixApp14 = true;
+
+  function ensureStyles(){
+    if(document.getElementById('opWheelTextFixStylesApp14')) return;
+
+    const style=document.createElement('style');
+    style.id='opWheelTextFixStylesApp14';
+    style.textContent=`
+      #revisionWheelDisc .wheel-core{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+
+      #wheelTicker{
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        width:90px !important;
+        max-width:90px !important;
+        min-height:60px !important;
+        margin:0 auto !important;
+        padding:0 2px !important;
+        text-align:center !important;
+        white-space:normal !important;
+        text-wrap:balance !important;
+        word-break:normal !important;
+        overflow-wrap:anywhere !important;
+        line-height:1.04 !important;
+        font-size:12px !important;
+        font-weight:900 !important;
+        letter-spacing:.01em !important;
+        transform:rotate(var(--op-wheel-ticker-rotation, 0deg)) !important;
+        transform-origin:center center !important;
+        transition:transform 120ms linear, opacity 180ms ease !important;
+      }
+
+      #revisionWheelDisc.spinning #wheelTicker{
+        opacity:.96;
+      }
+
+      #revisionWheelDisc.selected #wheelTicker{
+        opacity:1;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function extractAngle(transformText){
+    const text=String(transformText||'');
+    const m=text.match(/rotate\(([-\d.]+)deg\)/i);
+    if(m) return Number(m[1]) || 0;
+    return 0;
+  }
+
+  function shortenCenterText(value){
+    const clean=String(value||'').replace(/\s+/g,' ').trim();
+    if(!clean) return 'Appuyez ici';
+    if(clean.length <= 26) return clean;
+    return clean.slice(0, 24).trim() + '…';
+  }
+
+  function formatCurrentTickerText(){
+    const ticker=document.getElementById('wheelTicker');
+    if(!ticker) return;
+
+    const text=String(ticker.textContent || '').trim();
+    if(!text) return;
+    ticker.textContent = shortenCenterText(text);
+  }
+
+  function applyCounterRotation(){
+    const disc=document.getElementById('revisionWheelDisc');
+    const ticker=document.getElementById('wheelTicker');
+    if(!disc || !ticker) return;
+
+    const inlineAngle = extractAngle(disc.style.transform);
+    const angle = inlineAngle || extractAngle(getComputedStyle(disc).transform);
+    ticker.style.setProperty('--op-wheel-ticker-rotation', (-angle) + 'deg');
+
+    formatCurrentTickerText();
+  }
+
+  function observeDisc(){
+    const disc=document.getElementById('revisionWheelDisc');
+    if(!disc || disc.__opWheelObserverApp14) return;
+
+    const obs=new MutationObserver(()=>{
+      applyCounterRotation();
+      setTimeout(applyCounterRotation,30);
+    });
+
+    obs.observe(disc,{attributes:true,attributeFilter:['style','class']});
+    disc.__opWheelObserverApp14 = obs;
+  }
+
+  function install(){
+    ensureStyles();
+    observeDisc();
+    applyCounterRotation();
+    setTimeout(applyCounterRotation,40);
+    setTimeout(applyCounterRotation,180);
+  }
+
+  // On recadre aussi le texte juste après les fonctions de roue existantes.
+  try{
+    if(typeof renderRevisionWheel==='function' && !renderRevisionWheel.__app14TextWrapped){
+      const original=renderRevisionWheel;
+      const wrapped=function(){
+        const result=original.apply(this,arguments);
+        install();
+        [30,120,260].forEach(ms=>setTimeout(applyCounterRotation,ms));
+        return result;
+      };
+      wrapped.__app14TextWrapped=true;
+      renderRevisionWheel=wrapped;
+      window.renderRevisionWheel=wrapped;
+    }
+  }catch(_){}
+
+  try{
+    if(typeof spinRevisionWheel==='function' && !spinRevisionWheel.__app14TextWrapped){
+      const original=spinRevisionWheel;
+      const wrapped=function(){
+        const result=original.apply(this,arguments);
+        [30,120,300,700,1200,1800,2600,3300,3500].forEach(ms=>setTimeout(applyCounterRotation,ms));
+        return result;
+      };
+      wrapped.__app14TextWrapped=true;
+      spinRevisionWheel=wrapped;
+      window.spinRevisionWheel=wrapped;
+    }
+  }catch(_){}
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  [100,500,1200].forEach(ms=>setTimeout(install,ms));
+
+  window.OSTEO_WHEEL_TEXT_FIX = {
+    version:'14.0',
+    refresh:install
   };
 })();
