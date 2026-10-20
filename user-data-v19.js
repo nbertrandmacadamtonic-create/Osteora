@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.12';
+  const VERSION='19.13';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -203,6 +203,7 @@
     updateHearts();
     updateStatusBars();
     renderSeenHub();
+    renderCoreStats();
     renderLearningStats();
   }
 
@@ -812,7 +813,17 @@
       if(!current){byId.set(id,row);return;}
       const currentDate=Date.parse(current.updated_at||current.last_quiz_answer_at||0)||0;
       const nextDate=Date.parse(row.updated_at||row.last_quiz_answer_at||0)||0;
-      if(nextDate>currentDate) byId.set(id,row);
+      const newer=nextDate>currentDate?row:current;
+      const older=newer===row?current:row;
+      byId.set(id,{
+        ...older,
+        ...newer,
+        completed_at:newer.completed_at||older.completed_at||null,
+        percent:Math.max(Number(newer.percent)||0,Number(older.percent)||0),
+        status:(isViewedRow(newer)||isViewedRow(older))?'vue':(newer.status||older.status),
+        card_open_count:Math.max(Number(newer.card_open_count)||0,Number(older.card_open_count)||0),
+        card_opened_at:newer.card_opened_at||older.card_opened_at||null
+      });
     });
     return [...byId.values()];
   }
@@ -940,6 +951,60 @@
         <div class="op-history">${historyHtml||'<div class="op-history-empty">Aucun quiz enregistré pour le moment.</div>'}</div>
       </article>
     `;
+  }
+
+  function renderCoreStats(){
+    const rows=uniqueProgressRows();
+    const videos=viewedTechniqueIdSet().size;
+    const sheets=rows.filter(row=>
+      isViewedRow(row) &&
+      (row?.card_opened_at || Number(row?.card_open_count)>0)
+    ).length;
+    const total=listTechniques().length;
+
+    const setText=(id,value)=>{const el=$(id);if(el) el.textContent=String(value);};
+    setText('statsVideos',videos);
+    setText('statsVideosTotal','/ '+total);
+    setText('statsSheets',sheets);
+    setText('statsSheetsTotal','/ '+total);
+  }
+
+  async function recordCardOpen(techniqueId){
+    const id=String(Number(techniqueId)||'');
+    if(!id) return false;
+    const s=await ensureSession();
+    if(!s?.user?.id || !isViewed(id)) return false;
+
+    const row=progressRowFor(id);
+    if(!row) return false;
+    const previousCount=Number(row.card_open_count)||0;
+    const previousDate=row.card_opened_at||null;
+    const now=new Date().toISOString();
+
+    row.card_open_count=previousCount+1;
+    row.card_opened_at=now;
+    row.updated_at=now;
+    saveCache();
+    renderCoreStats();
+
+    try{
+      const {data,error}=await client.rpc('osteo_record_technique_card_open',{
+        p_technique_id:id
+      });
+      if(error) throw error;
+      const saved=Array.isArray(data)?data[0]:data;
+      if(saved && typeof saved==='object') Object.assign(row,saved);
+      saveCache();
+      renderCoreStats();
+      return true;
+    }catch(error){
+      row.card_open_count=previousCount;
+      row.card_opened_at=previousDate;
+      saveCache();
+      renderCoreStats();
+      console.warn('[Ostéo Pratik V19.13] Consultation de fiche non synchronisée.',error);
+      return false;
+    }
   }
 
   async function recordOpen(id){
@@ -1072,6 +1137,12 @@
         updateStatusBars();
         if($('favorites')?.classList.contains('active')) renderFavorites();
         if($('seenCollections')?.classList.contains('active')) renderSeenHub();
+        if($('progress')?.classList.contains('active')){
+          renderCoreStats();
+          renderLearningStats();
+          setTimeout(renderCoreStats,80);
+          setTimeout(renderCoreStats,320);
+        }
       },40);
     });
 
@@ -1127,6 +1198,7 @@
     renderSeenHub,
     recordOpen,
     recordComplete,
+    recordCardOpen,
     recordQuiz,
     recordQuizSummary,
     renderLearningStats

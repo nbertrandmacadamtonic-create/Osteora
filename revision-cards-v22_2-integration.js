@@ -770,6 +770,15 @@
     document.body.style.overflow='hidden';
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden','false');
+
+    // V19.13 : une fiche est comptée comme consultée uniquement après son
+    // affichage réussi, puis synchronisée avec le compte Supabase.
+    try{
+      const userData=window.OSTEO_USER_DATA_V19;
+      if(userData && typeof userData.recordCardOpen==='function'){
+        Promise.resolve(userData.recordCardOpen(t.id)).catch(()=>{});
+      }
+    }catch(_){}
   }
 
   function closePremiumCard(){
