@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.10';
+  const VERSION='19.11';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -33,6 +33,7 @@
   let loadSerial=0;
   let observer=null;
   let seenHubMode='seen';
+  let quizAnswerQueue=Promise.resolve();
 
   const $=id=>document.getElementById(id);
 
@@ -471,6 +472,85 @@
     }
   }
 
+  async function recordTechniqueQuizAnswerNow(techniqueId,isCorrect){
+    const id=String(Number(techniqueId)||'');
+    if(!id) return false;
+
+    const s=await ensureSession();
+    if(!s?.user?.id) return false;
+
+    // Le quiz technique est réservé aux techniques vues. Cette garde empêche
+    // également une ancienne session locale d'écrire un état incohérent.
+    if(!isViewed(id)) return false;
+
+    const t=techniqueById(id);
+    const row=progressRowFor(id);
+    if(!row) return false;
+
+    const previous={
+      review_needed:!!row.review_needed,
+      quiz_errors:Number(row.quiz_errors)||0,
+      quiz_successes:Number(row.quiz_successes)||0,
+      quiz_correct_streak:Number(row.quiz_correct_streak)||0,
+      mastered:!!row.mastered,
+      last_quiz_answer_at:row.last_quiz_answer_at||null,
+      updated_at:row.updated_at||null
+    };
+
+    const now=new Date().toISOString();
+    if(isCorrect){
+      row.quiz_successes=previous.quiz_successes+1;
+      row.quiz_correct_streak=previous.quiz_correct_streak+1;
+      if(row.quiz_correct_streak>=2){
+        row.review_needed=false;
+        row.mastered=true;
+      }
+    }else{
+      row.quiz_errors=previous.quiz_errors+1;
+      row.quiz_correct_streak=0;
+      row.review_needed=true;
+      row.mastered=false;
+    }
+    row.last_quiz_answer_at=now;
+    row.updated_at=now;
+    saveCache();
+    updateStatusBars();
+    renderSeenHub();
+
+    try{
+      const {data,error}=await client.rpc('osteo_record_technique_quiz_answer',{
+        p_technique_id:id,
+        p_correct:!!isCorrect
+      });
+      if(error) throw error;
+
+      const saved=Array.isArray(data)?data[0]:data;
+      if(saved && typeof saved==='object') Object.assign(row,saved);
+      else await loadUserData();
+
+      saveCache();
+      updateStatusBars();
+      renderSeenHub();
+      return true;
+    }catch(error){
+      Object.assign(row,previous);
+      saveCache();
+      updateStatusBars();
+      renderSeenHub();
+      console.warn('[Ostéo Pratik V19.11] Résultat technique non synchronisé.',error);
+      return false;
+    }
+  }
+
+  function recordTechniqueQuizAnswer(techniqueId,isCorrect){
+    // Les réponses sont envoyées dans leur ordre exact, même si l'utilisateur
+    // enchaîne rapidement les questions.
+    quizAnswerQueue=quizAnswerQueue
+      .catch(()=>false)
+      .then(()=>recordTechniqueQuizAnswerNow(techniqueId,isCorrect));
+    return quizAnswerQueue;
+  }
+
   function getHeart(screenId){
     const header=$(screenId)?.querySelector('header.top');
     if(!header) return null;
@@ -871,6 +951,7 @@
     isReview:id=>isReview(id),
     isViewed:id=>isViewed(id),
     toggleReview:t=>toggleReview(t),
+    recordTechniqueQuizAnswer,
     renderSeenHub,
     recordOpen,
     recordComplete,
