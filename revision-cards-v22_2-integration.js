@@ -2964,3 +2964,98 @@
     refresh:install
   };
 })();
+
+/* =========================================================
+   OSTÉO PRATIK — APP21 · LISIBILITÉ DES ACTIONS SOUS LA ROUE
+   Dégradé distinct par action, sans modification fonctionnelle.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoWheelActionsGradientApp21) return;
+  window.__osteoWheelActionsGradientApp21=true;
+
+  function install(){
+    if(document.getElementById('opWheelActionsGradientApp21')) return;
+    const style=document.createElement('style');
+    style.id='opWheelActionsGradientApp21';
+    style.textContent=`
+      #revisionWheel .wheel-actions-choice{
+        gap:12px !important;
+      }
+      #revisionWheel .wheel-actions-choice .wheel-choice-button{
+        position:relative !important;
+        overflow:hidden !important;
+        min-height:58px !important;
+        padding:0 14px !important;
+        border-width:1px !important;
+        border-style:solid !important;
+        color:#fff !important;
+        font-weight:950 !important;
+        line-height:1.15 !important;
+        text-shadow:0 1px 3px rgba(0,0,0,.55) !important;
+        transition:transform .18s ease,filter .18s ease,box-shadow .18s ease !important;
+      }
+      #revisionWheel .wheel-actions-choice .wheel-choice-button::before{
+        content:"";
+        position:absolute;
+        inset:0;
+        pointer-events:none;
+        background:linear-gradient(180deg,rgba(255,255,255,.15),transparent 46%,rgba(0,0,0,.09));
+      }
+      #revisionWheel #wheelCardButton{
+        border-color:rgba(67,216,255,.58) !important;
+        background:linear-gradient(135deg,#0879a5 0%,#075a91 48%,#243fa2 100%) !important;
+        box-shadow:0 9px 24px rgba(0,151,210,.18) !important;
+      }
+      #revisionWheel #wheelVoiceButton{
+        border-color:rgba(44,239,198,.56) !important;
+        background:linear-gradient(135deg,#087f7c 0%,#08726e 48%,#08605f 100%) !important;
+        box-shadow:0 9px 24px rgba(0,205,170,.16) !important;
+      }
+      #revisionWheel #wheelVideoButton{
+        border-color:rgba(255,184,73,.62) !important;
+        background:linear-gradient(135deg,#b86613 0%,#a34825 52%,#863246 100%) !important;
+        box-shadow:0 9px 24px rgba(255,139,45,.16) !important;
+      }
+      #revisionWheel #wheelTestButton{
+        border-color:rgba(205,132,255,.62) !important;
+        background:linear-gradient(135deg,#7d3ab5 0%,#6232a4 50%,#3d3ba6 100%) !important;
+        box-shadow:0 9px 24px rgba(151,82,235,.18) !important;
+      }
+      #revisionWheel .wheel-actions-choice .wheel-choice-button:disabled{
+        opacity:.48 !important;
+        color:rgba(234,241,250,.78) !important;
+        filter:saturate(.48) brightness(.67) !important;
+        box-shadow:none !important;
+        cursor:not-allowed !important;
+      }
+      #revisionWheel .wheel-actions-choice .wheel-choice-button.ready,
+      #revisionWheel .wheel-actions-choice .wheel-choice-button:not(:disabled){
+        opacity:1 !important;
+        filter:none !important;
+      }
+      @media(hover:hover){
+        #revisionWheel .wheel-actions-choice .wheel-choice-button:not(:disabled):hover{
+          transform:translateY(-2px) !important;
+          filter:brightness(1.09) !important;
+        }
+      }
+      #revisionWheel .wheel-actions-choice .wheel-choice-button:not(:disabled):active{
+        transform:translateY(0) scale(.985) !important;
+      }
+      @media(max-width:380px){
+        #revisionWheel .wheel-actions-choice .wheel-choice-button{
+          min-height:54px !important;
+          padding:0 10px !important;
+          font-size:13px !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  setTimeout(install,500);
+  window.OSTEO_WHEEL_ACTIONS_GRADIENT_APP21={version:'21.0',refresh:install};
+})();
