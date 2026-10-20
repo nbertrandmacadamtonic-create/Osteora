@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.17';
+  const VERSION='19.18';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -834,6 +834,7 @@
       const total=Number(row?.total ?? row?.quiz_total ?? 0)||0;
       const percent=Number(row?.percent ?? row?.quiz_percent ?? (total?Math.round(score*100/total):0))||0;
       return {
+        id:row?.id||null,
         title:String(row?.quiz_title||row?.title||row?.category||'Quiz Ostéo Pratik'),
         score,total,percent,
         date:row?.created_at||row?.completed_at||row?.quiz_at||row?.updated_at||null
@@ -849,7 +850,33 @@
         date:stateRow.last_quiz_at||stateRow.updated_at||null
       });
     }
-    return values.sort((a,b)=>(Date.parse(b.date||0)||0)-(Date.parse(a.date||0)||0));
+    const sorted=values.sort((a,b)=>(Date.parse(b.date||0)||0)-(Date.parse(a.date||0)||0));
+    const accepted=[];
+    const ids=new Set();
+    sorted.forEach(row=>{
+      if(row.id && ids.has(String(row.id))) return;
+      const rowDate=Date.parse(row.date||0)||0;
+      const duplicate=accepted.some(previous=>{
+        const previousDate=Date.parse(previous.date||0)||0;
+        return rowDate>0 && previousDate>0 &&
+          Math.abs(previousDate-rowDate)<8000 &&
+          previous.score===row.score &&
+          previous.total===row.total &&
+          previous.percent===row.percent;
+      });
+      if(duplicate) return;
+      if(row.id) ids.add(String(row.id));
+      accepted.push(row);
+    });
+    return accepted;
+  }
+
+  function isMiniQuiz(row){
+    return Number(row?.total)===4 || /^quiz technique\b/i.test(String(row?.title||''));
+  }
+
+  function isQuizSuccess(row){
+    return Number(row?.percent)>= (isMiniQuiz(row)?75:60);
   }
 
   function formatStatsDate(value){
@@ -890,6 +917,10 @@
         #osteoLearningStatsV1912 .op-history-row b{color:#00e5ff;font-size:13px}
         #osteoLearningStatsV1912 .op-history-row small{color:#8196b1;font-size:10px}
         #osteoLearningStatsV1912 .op-history-empty{padding:15px;text-align:center;color:#8fa5bf;font-size:12px}
+        #osteoLearningStatsV1912 .op-quiz-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}
+        #osteoLearningStatsV1912 .op-quiz-type{padding:11px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+        #osteoLearningStatsV1912 .op-quiz-type strong{display:block;color:#fff;font-size:12px}
+        #osteoLearningStatsV1912 .op-quiz-type span{display:block;margin-top:5px;color:#8fa5bf;font-size:10px;line-height:1.3}
         #progress .stats-quiz-layout.op-stats-empty-mode{display:flex!important;align-items:center!important;justify-content:center!important;min-height:210px!important;padding:22px!important}
         #progress .stats-quiz-layout.op-stats-empty-mode .stats-chart{display:none!important}
         #progress .stats-quiz-layout.op-stats-empty-mode .stats-quiz-score{position:static!important;width:100%!important;max-width:310px!important;min-width:0!important;margin:0 auto!important;padding:22px 18px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;border:1px dashed rgba(0,229,255,.24)!important;border-radius:20px!important;background:rgba(0,229,255,.035)!important}
@@ -930,6 +961,11 @@
     const average=history.length
       ? Math.round(history.reduce((sum,row)=>sum+row.percent,0)/history.length)
       : 0;
+    const generalHistory=history.filter(row=>!isMiniQuiz(row));
+    const miniHistory=history.filter(isMiniQuiz);
+    const averageFor=values=>values.length
+      ? Math.round(values.reduce((sum,row)=>sum+row.percent,0)/values.length)
+      : 0;
 
     const zones=['Rachis','Membres supérieurs','Membres inférieurs','Bassin'];
     const zoneHtml=zones.map(zone=>{
@@ -954,6 +990,10 @@
           <div class="op-learning-kpi review"><b>${reviewRows.length}</b><span>Techniques à revoir</span></div>
           <div class="op-learning-kpi"><b>${history.length}</b><span>Quiz enregistrés</span></div>
           <div class="op-learning-kpi"><b>${average}%</b><span>Taux de réussite moyen</span></div>
+        </div>
+        <div class="op-quiz-types">
+          <div class="op-quiz-type"><strong>Quiz généraux</strong><span>${generalHistory.length} terminé${generalHistory.length>1?'s':''} · moyenne ${averageFor(generalHistory)}%</span></div>
+          <div class="op-quiz-type"><strong>Mini-quiz techniques</strong><span>${miniHistory.length} terminé${miniHistory.length>1?'s':''} · moyenne ${averageFor(miniHistory)}%</span></div>
         </div>
       </article>
       <article class="op-learning-card">
@@ -986,7 +1026,7 @@
     if(sheetsLabel) sheetsLabel.textContent='Cartes consultées';
 
     const history=normalizedQuizResults();
-    const successful=history.filter(row=>row.percent>=60).length;
+    const successful=history.filter(isQuizSuccess).length;
     setText('statsQuiz',history.length?successful+'/'+history.length:'—');
     setText('statsQuizDetail',history.length
       ? successful+' quiz réussi'+(successful>1?'s':'')+' sur '+history.length
@@ -1197,7 +1237,10 @@
     };
     if(!q.total) return;
 
-    const signature=[q.title,q.score,q.total,q.percent].join('|');
+    // Le titre peut être différent entre l'ancien hook et le nouveau quiz alors
+    // qu'ils décrivent le même résultat. Score + total + pourcentage suffisent
+    // pour bloquer ce doublon pendant les trois secondes de fin de session.
+    const signature=[q.score,q.total,q.percent].join('|');
     const nowMs=Date.now();
     if(signature===lastQuizSaveSignature && nowMs-lastQuizSaveAt<3000) return;
     lastQuizSaveSignature=signature;
