@@ -1087,6 +1087,21 @@
     item.updatedAt=new Date().toISOString();
     data[id]=item;
     writeReviewData(data);
+
+    // V19.11 : Supabase devient aussi la source de vérité pour les résultats
+    // par technique. Une erreur active « À revoir » ; deux bonnes réponses
+    // consécutives le retirent et marquent la technique comme maîtrisée.
+    const sync=()=>{
+      const api=window.OSTEO_USER_DATA_V19;
+      if(!api || typeof api.recordTechniqueQuizAnswer!=='function') return false;
+      try{
+        Promise.resolve(api.recordTechniqueQuizAnswer(id,!!isCorrect)).catch(()=>{});
+        return true;
+      }catch(_){
+        return false;
+      }
+    };
+    if(!sync()) setTimeout(sync,250);
   }
 
   function waitForCards(timeout=12000){
