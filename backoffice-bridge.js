@@ -2479,13 +2479,13 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP25
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP26
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoVideoFullscreenApp25) return;
-  window.__osteoVideoFullscreenApp25=true;
+  if(window.__osteoVideoFullscreenApp26) return;
+  window.__osteoVideoFullscreenApp26=true;
 
   function isIOS(){
     return /iPad|iPhone|iPod/i.test(navigator.userAgent||'') ||
@@ -2633,6 +2633,24 @@
       html.op-video-fullscreen-open body{
         overflow:hidden !important;
         overscroll-behavior:none !important;
+        background:#000 !important;
+      }
+      html.op-video-fullscreen-open body::before{
+        content:"" !important;
+        position:fixed !important;
+        inset:0 !important;
+        z-index:2147483645 !important;
+        background:#000 !important;
+        pointer-events:none !important;
+      }
+      html.op-video-fullscreen-open #player > *:not(#videoBox),
+      html.op-video-fullscreen-open .bottom,
+      html.op-video-fullscreen-open #player .custom-video-controls,
+      html.op-video-fullscreen-open #player .video-premium-actions,
+      html.op-video-fullscreen-open #player .steps{
+        visibility:hidden !important;
+        opacity:0 !important;
+        pointer-events:none !important;
       }
       #videoBox.op-mobile-video-fullscreen{
         position:fixed !important;
@@ -2661,6 +2679,15 @@
         object-fit:contain !important;
         border-radius:0 !important;
         background:#000 !important;
+      }
+      #videoBox.op-mobile-video-fullscreen .custom-video-overlay,
+      #videoBox.op-mobile-video-fullscreen #customVideoOverlay,
+      #videoBox.op-mobile-video-fullscreen .custom-video-caption,
+      #videoBox.op-mobile-video-fullscreen .custom-video-play-big{
+        display:none !important;
+        visibility:hidden !important;
+        opacity:0 !important;
+        pointer-events:none !important;
       }
       #videoBox.op-mobile-video-fullscreen #closeFullscreenVideo{
         display:grid !important;
@@ -2720,5 +2747,5 @@
   document.addEventListener('DOMContentLoaded',install,{once:true});
   [100,500,1200].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_VIDEO_FULLSCREEN_APP25={version:'25.0',open,close,refresh:install};
+  window.OSTEO_VIDEO_FULLSCREEN_APP26={version:'26.0',open,close,refresh:install};
 })();
