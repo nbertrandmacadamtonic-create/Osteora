@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.16';
+  const VERSION='19.17';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -897,6 +897,13 @@
         #progress .stats-quiz-layout.op-stats-empty-mode .stats-quiz-score p{margin:0!important;color:#fff!important;font-size:16px!important;font-weight:900!important}
         #progress .stats-quiz-layout.op-stats-empty-mode .stats-quiz-score em{display:block!important;margin:9px 0 0!important;padding:0!important;border:0!important;background:none!important;color:#91a7c1!important;font-size:12px!important;font-style:normal!important;line-height:1.4!important}
         #progress .stats-quiz-layout.op-stats-empty-mode .stats-quiz-score em small{display:block!important;margin:0!important;color:inherit!important;font-size:inherit!important}
+        #progress .stats-quiz-layout.op-stats-live-mode{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:12px!important;padding:14px 0 0!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-chart{display:block!important;width:100%!important;min-width:0!important;margin:0!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score{position:static!important;width:100%!important;min-width:0!important;margin:0!important;padding:13px 15px!important;display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:13px!important;align-items:center!important;text-align:left!important;border:1px solid rgba(0,229,255,.18)!important;border-radius:18px!important;background:rgba(0,229,255,.035)!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score strong{grid-row:1/3!important;margin:0!important;font-size:31px!important;line-height:1!important;color:#fff!important;white-space:nowrap!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score p{margin:0!important;color:#dce7f5!important;font-size:12px!important;font-weight:900!important;line-height:1.25!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score em{display:block!important;margin:3px 0 0!important;padding:0!important;border:0!important;background:none!important;color:#35e6a7!important;font-size:11px!important;font-style:normal!important;line-height:1.25!important}
+        #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score em small{display:inline!important;margin-left:5px!important;color:#8196b1!important;font-size:10px!important}
       `;
       document.head.appendChild(style);
     }
@@ -985,6 +992,38 @@
       ? successful+' quiz réussi'+(successful>1?'s':'')+' sur '+history.length
       : 'Aucun quiz terminé');
     renderQuizPerformance(history);
+    renderLastQuizCard(history);
+  }
+
+  function renderLastQuizCard(history){
+    const card=document.querySelector('#progress .stats-last-practice');
+    if(!card) return;
+    const latest=Array.isArray(history)&&history.length?history[0]:null;
+    const label=card.querySelector('div > small');
+    const title=card.querySelector('div > strong');
+    const detail=card.querySelector('div > span');
+    const bar=card.querySelector('.bar i');
+    const points=card.querySelector(':scope > b');
+    const button=card.querySelector(':scope > button');
+
+    if(!latest){
+      if(label) label.textContent='Dernier quiz terminé';
+      if(title) title.textContent='Aucun quiz enregistré';
+      if(detail) detail.textContent='Lancez un quiz pour commencer';
+      if(bar) bar.style.width='0%';
+      if(points) points.innerHTML='—<small>score</small>';
+      return;
+    }
+
+    if(label) label.textContent='Dernier quiz terminé';
+    if(title) title.textContent=latest.title;
+    if(detail) detail.textContent=latest.score+' / '+latest.total+' · '+latest.percent+'% de réussite';
+    if(bar) bar.style.width=Math.max(0,Math.min(100,latest.percent))+'%';
+    if(points) points.innerHTML=latest.percent+'<small>%</small>';
+    if(button){
+      button.setAttribute('onclick',"go('quizMenu')");
+      button.setAttribute('aria-label','Ouvrir les quiz');
+    }
   }
 
   function renderQuizPerformance(source){
@@ -1000,6 +1039,7 @@
     svg.querySelectorAll('circle').forEach(node=>node.remove());
 
     if(!history.length){
+      card.classList.remove('op-stats-live-mode');
       card.classList.add('op-stats-empty-mode');
       if(line) line.setAttribute('points','');
       labels.innerHTML='';
@@ -1013,6 +1053,7 @@
     }
 
     card.classList.remove('op-stats-empty-mode');
+    card.classList.add('op-stats-live-mode');
     const caption=scoreBox.querySelector('p');
     if(caption) caption.textContent='taux de réussite moyen';
 
@@ -1277,7 +1318,7 @@
     });
 
     await loadUserData();
-    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();renderSeenHub();},ms));
+    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();renderSeenHub();renderCoreStats();renderLearningStats();},ms));
   }
 
   window.OSTEO_USER_DATA_V19={
