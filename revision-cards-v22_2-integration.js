@@ -2172,6 +2172,9 @@
 
   let audioPlayer=null;
   let audioTechniqueId=0;
+  let audioTechnique=null;
+  let audioRate=1;
+  let audioShuffle=false;
 
   function toastSafe(message){
     try{
@@ -2187,6 +2190,26 @@
       }
     }catch(_){}
     return null;
+  }
+
+  function audioTechniques(){
+    try{
+      if(typeof getViewedTechniquesForWheel==='function'){
+        return (getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+      }
+    }catch(_){ }
+    return [];
+  }
+
+  function adjacentAudioTechnique(direction){
+    const list=audioTechniques();
+    if(!list.length) return null;
+    if(audioShuffle&&list.length>1){
+      const candidates=list.filter(t=>String(t.id)!==String(audioTechniqueId));
+      return candidates[Math.floor(Math.random()*candidates.length)]||list[0];
+    }
+    const index=Math.max(0,list.findIndex(t=>String(t.id)===String(audioTechniqueId)));
+    return list[(index+direction+list.length)%list.length];
   }
 
   function ensureVimeoApi(){
@@ -2291,7 +2314,17 @@
       #opWheelAudioOverlay .op-audio-actions{
         display:grid;grid-template-columns:1fr 1fr;gap:9px;
       }
+      #opWheelAudioOverlay .op-audio-transport{
+        display:grid;grid-template-columns:56px minmax(0,1fr) 56px;gap:9px;margin-bottom:9px;
+      }
+      #opWheelAudioOverlay .op-audio-options{
+        display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:9px;
+      }
       #opWheelAudioOverlay .op-audio-actions button{
+        min-height:46px;border-radius:14px;font-weight:900;cursor:pointer;
+      }
+      #opWheelAudioOverlay .op-audio-transport button,
+      #opWheelAudioOverlay .op-audio-options button{
         min-height:46px;border-radius:14px;font-weight:900;cursor:pointer;
       }
       #opWheelAudioOverlay .op-audio-play{
@@ -2302,6 +2335,10 @@
         color:#e5faff;border:1px solid rgba(104,233,255,.35);
         background:rgba(3,20,34,.75);
       }
+      #opWheelAudioOverlay .op-audio-option-active{
+        color:#001d1c !important;border-color:#41efca !important;
+        background:linear-gradient(135deg,#73f4da,#24caaa) !important;
+      }
       #opWheelAudioIframeWrap{
         position:absolute !important;
         width:1px !important;height:1px !important;
@@ -2309,7 +2346,10 @@
         pointer-events:none !important;left:-9999px !important;top:-9999px !important;
       }
       @media(max-width:480px){
-        #opWheelAudioOverlay .op-audio-actions{grid-template-columns:1fr}
+        #opWheelAudioOverlay .op-audio-shell{padding:16px}
+        #opWheelAudioOverlay .op-audio-visual{height:128px}
+        #opWheelAudioOverlay .op-audio-actions{grid-template-columns:1fr 1fr}
+        #opWheelAudioOverlay .op-audio-options{grid-template-columns:1fr 1fr 1fr}
       }
     `;
     document.head.appendChild(style);
@@ -2333,9 +2373,19 @@
 
         <div class="op-audio-status" id="opWheelAudioStatus">Prêt à écouter</div>
 
-        <div class="op-audio-actions">
+        <div class="op-audio-transport">
+          <button class="op-audio-secondary" type="button" id="opWheelAudioPrevious" aria-label="Technique précédente">◀</button>
           <button class="op-audio-play" type="button" id="opWheelAudioPlay">▶ Lecture</button>
-          <button class="op-audio-secondary" type="button" id="opWheelAudioRestart">↺ Recommencer</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioNext" aria-label="Technique suivante">▶</button>
+        </div>
+
+        <div class="op-audio-options">
+          <button class="op-audio-secondary" type="button" id="opWheelAudioRestart">↺ Début</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioSpeed">×1</button>
+          <button class="op-audio-secondary" type="button" id="opWheelAudioShuffle">Aléatoire</button>
+        </div>
+
+        <div class="op-audio-actions">
           <button class="op-audio-secondary" type="button" id="opWheelAudioCard">Voir la carte</button>
           <button class="op-audio-secondary" type="button" id="opWheelAudioVideo">Voir la vidéo</button>
         </div>
@@ -2370,14 +2420,39 @@
       }catch(_){}
     });
 
+    overlay.querySelector('#opWheelAudioPrevious').addEventListener('click',()=>{
+      const t=adjacentAudioTechnique(-1);
+      if(t) openWheelAudio(t,true);
+    });
+
+    overlay.querySelector('#opWheelAudioNext').addEventListener('click',()=>{
+      const t=adjacentAudioTechnique(1);
+      if(t) openWheelAudio(t,true);
+    });
+
+    overlay.querySelector('#opWheelAudioSpeed').addEventListener('click',async event=>{
+      audioRate=audioRate===1?1.25:1;
+      event.currentTarget.textContent='×'+String(audioRate).replace('.',',');
+      event.currentTarget.classList.toggle('op-audio-option-active',audioRate!==1);
+      try{if(audioPlayer) await audioPlayer.setPlaybackRate(audioRate);}catch(_){
+        toastSafe('Cette vidéo ne permet pas de changer la vitesse');
+      }
+    });
+
+    overlay.querySelector('#opWheelAudioShuffle').addEventListener('click',event=>{
+      audioShuffle=!audioShuffle;
+      event.currentTarget.classList.toggle('op-audio-option-active',audioShuffle);
+      event.currentTarget.textContent=audioShuffle?'Aléatoire ✓':'Aléatoire';
+    });
+
     overlay.querySelector('#opWheelAudioCard').addEventListener('click',()=>{
       closeAudio();
-      if(typeof window.openSelectedWheelCard==='function') window.openSelectedWheelCard();
+      if(audioTechniqueId&&typeof window.openFullCard==='function') window.openFullCard(audioTechniqueId);
     });
 
     overlay.querySelector('#opWheelAudioVideo').addEventListener('click',()=>{
       closeAudio();
-      if(typeof window.openSelectedWheelVideo==='function') window.openSelectedWheelVideo();
+      if(audioTechniqueId&&typeof window.openTechnique==='function') window.openTechnique(audioTechniqueId);
     });
 
     return overlay;
@@ -2394,8 +2469,8 @@
     }
   }
 
-  async function openWheelAudio(){
-    const t=selectedTechnique();
+  async function openWheelAudio(technique,autoplay){
+    const t=technique&&typeof technique==='object'?technique:selectedTechnique();
     if(!t){
       toastSafe('Lancez d’abord la roue');
       return;
@@ -2443,6 +2518,7 @@
 
       audioPlayer=new window.Vimeo.Player(iframe);
       audioTechniqueId=Number(t.id)||0;
+      audioTechnique=t;
 
       audioPlayer.on('play',()=>{
         overlay.classList.add('is-playing');
@@ -2460,10 +2536,16 @@
         overlay.classList.remove('is-playing');
         if(status) status.textContent='Lecture terminée';
         if(playBtn) playBtn.textContent='▶ Réécouter';
+        const next=adjacentAudioTechnique(1);
+        if(next) setTimeout(()=>openWheelAudio(next,true),350);
       });
 
-      audioPlayer.ready().then(()=>{
+      audioPlayer.ready().then(async()=>{
+        try{await audioPlayer.setPlaybackRate(audioRate);}catch(_){ }
         if(status) status.textContent='Prêt à écouter';
+        if(autoplay){
+          try{await audioPlayer.play();}catch(_){ }
+        }
       }).catch(()=>{});
 
     }catch(err){
@@ -2594,7 +2676,9 @@
   window.OSTEO_WHEEL_V2={
     version:'13.0',
     audio:openWheelAudio,
-    quiz:openWheelQuiz
+    quiz:openWheelQuiz,
+    nextAudio:()=>{const t=adjacentAudioTechnique(1);if(t) return openWheelAudio(t,true);},
+    previousAudio:()=>{const t=adjacentAudioTechnique(-1);if(t) return openWheelAudio(t,true);}
   };
 })();
 
