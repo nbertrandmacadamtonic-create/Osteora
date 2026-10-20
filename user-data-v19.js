@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.13';
+  const VERSION='19.14';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -967,6 +967,9 @@
     setText('statsVideosTotal','/ '+total);
     setText('statsSheets',sheets);
     setText('statsSheetsTotal','/ '+total);
+
+    const sheetsLabel=$('statsSheets')?.closest('article')?.querySelector('span');
+    if(sheetsLabel) sheetsLabel.textContent='Cartes consultées';
   }
 
   async function recordCardOpen(techniqueId){
