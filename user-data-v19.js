@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.18';
+  const VERSION='19.19';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -891,6 +891,8 @@
     const screen=$('progress');
     if(!screen) return null;
 
+    const groups=ensureStatsHierarchy();
+
     if(!$('osteoLearningStatsV1912Styles')){
       const style=document.createElement('style');
       style.id='osteoLearningStatsV1912Styles';
@@ -935,6 +937,30 @@
         #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score p{margin:0!important;color:#dce7f5!important;font-size:12px!important;font-weight:900!important;line-height:1.25!important}
         #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score em{display:block!important;margin:3px 0 0!important;padding:0!important;border:0!important;background:none!important;color:#35e6a7!important;font-size:11px!important;font-style:normal!important;line-height:1.25!important}
         #progress .stats-quiz-layout.op-stats-live-mode .stats-quiz-score em small{display:inline!important;margin-left:5px!important;color:#8196b1!important;font-size:10px!important}
+        #progress .op-stats-group{display:grid;gap:13px;margin:16px 0 22px}
+        #progress .op-stats-group-title{display:flex;align-items:center;gap:10px;margin:2px 3px 0;color:#fff;font-size:19px;font-weight:950;line-height:1.1}
+        #progress .op-stats-group-title::before{content:'';width:5px;height:24px;border-radius:99px;background:#00e5ff;box-shadow:0 0 14px rgba(0,229,255,.48)}
+        #progress .op-stats-group[data-group="learning"] .op-stats-group-title::before{background:#35e6a7;box-shadow:0 0 14px rgba(53,230,167,.45)}
+        #progress .op-stats-group[data-group="quiz"] .op-stats-group-title::before{background:#a855ff;box-shadow:0 0 14px rgba(168,85,255,.45)}
+        #progress .op-stats-group > .stats-global-card,#progress .op-stats-group > .stats-two-grid,#progress .op-stats-group > .stats-quiz-card,#progress .op-stats-group > .stats-last-practice{margin-top:0!important;margin-bottom:0!important}
+        #progress #opQuizStatsSummaryV1919,#progress #opQuizHistoryV1919{padding:16px;border-radius:22px;border:1px solid rgba(0,229,255,.18);background:linear-gradient(145deg,rgba(10,29,55,.88),rgba(5,15,31,.94));box-shadow:0 18px 45px rgba(0,0,0,.18)}
+        #progress #opQuizStatsSummaryV1919 .op-learning-head,#progress #opQuizHistoryV1919 .op-learning-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+        #progress #opQuizStatsSummaryV1919 .op-learning-head strong,#progress #opQuizHistoryV1919 .op-learning-head strong{color:#fff;font-size:17px}
+        #progress #opQuizStatsSummaryV1919 .op-learning-head small,#progress #opQuizHistoryV1919 .op-learning-head small{color:#8fa5bf;font-size:11px}
+        #progress #opQuizStatsSummaryV1919 .op-learning-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+        #progress #opQuizStatsSummaryV1919 .op-learning-kpi{min-width:0;padding:12px;border-radius:17px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035)}
+        #progress #opQuizStatsSummaryV1919 .op-learning-kpi b{display:block;color:#fff;font-size:24px;line-height:1}
+        #progress #opQuizStatsSummaryV1919 .op-learning-kpi span{display:block;margin-top:6px;color:#9db0c8;font-size:11px;line-height:1.25}
+        #progress #opQuizStatsSummaryV1919 .op-quiz-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:11px}
+        #progress #opQuizStatsSummaryV1919 .op-quiz-type{padding:11px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+        #progress #opQuizStatsSummaryV1919 .op-quiz-type strong{display:block;color:#fff;font-size:12px}
+        #progress #opQuizStatsSummaryV1919 .op-quiz-type span{display:block;margin-top:5px;color:#8fa5bf;font-size:10px;line-height:1.3}
+        #progress #opQuizHistoryV1919 .op-history{display:grid;gap:8px}
+        #progress #opQuizHistoryV1919 .op-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 12px;padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
+        #progress #opQuizHistoryV1919 .op-history-row strong{min-width:0;color:#fff;font-size:12px;overflow-wrap:anywhere}
+        #progress #opQuizHistoryV1919 .op-history-row b{color:#00e5ff;font-size:13px}
+        #progress #opQuizHistoryV1919 .op-history-row small{color:#8196b1;font-size:10px}
+        #progress #opQuizHistoryV1919 .op-history-empty{padding:15px;text-align:center;color:#8fa5bf;font-size:12px}
       `;
       document.head.appendChild(style);
     }
@@ -943,16 +969,58 @@
     if(!panel){
       panel=document.createElement('section');
       panel.id='osteoLearningStatsV1912';
-      const global=screen.querySelector('.stats-global-card');
-      if(global) global.insertAdjacentElement('afterend',panel);
-      else screen.appendChild(panel);
+      groups?.learning?.appendChild(panel);
     }
     return panel;
+  }
+
+  function ensureStatsHierarchy(){
+    const screen=$('progress');
+    if(!screen) return null;
+    const existing={
+      global:$('opStatsGroupGlobal'),
+      learning:$('opStatsGroupLearning'),
+      quiz:$('opStatsGroupQuiz')
+    };
+    if(existing.global&&existing.learning&&existing.quiz) return existing;
+
+    const globalCard=screen.querySelector(':scope > .stats-global-card');
+    const twoGrids=[...screen.querySelectorAll(':scope > .stats-two-grid')];
+    const quizCards=[...screen.querySelectorAll(':scope > .stats-quiz-card')];
+    const lastQuiz=screen.querySelector(':scope > .stats-last-practice');
+
+    const makeGroup=(id,label,key)=>{
+      const group=document.createElement('section');
+      group.id=id;
+      group.className='op-stats-group';
+      group.dataset.group=key;
+      group.innerHTML='<h2 class="op-stats-group-title">'+label+'</h2>';
+      return group;
+    };
+    const global=makeGroup('opStatsGroupGlobal','Progression globale','global');
+    const learning=makeGroup('opStatsGroupLearning','Apprentissage','learning');
+    const quiz=makeGroup('opStatsGroupQuiz','Quiz','quiz');
+    const anchor=screen.querySelector('.stats-page-title');
+    if(anchor){
+      anchor.insertAdjacentElement('afterend',quiz);
+      anchor.insertAdjacentElement('afterend',learning);
+      anchor.insertAdjacentElement('afterend',global);
+    }else{
+      screen.append(global,learning,quiz);
+    }
+
+    if(globalCard) global.appendChild(globalCard);
+    if(twoGrids[0]) global.appendChild(twoGrids[0]);
+    if(twoGrids[1]) learning.appendChild(twoGrids[1]);
+    quizCards.forEach(card=>quiz.appendChild(card));
+    if(lastQuiz) quiz.appendChild(lastQuiz);
+    return {global,learning,quiz};
   }
 
   function renderLearningStats(){
     const panel=ensureLearningStatsPanel();
     if(!panel) return;
+    const groups=ensureStatsHierarchy();
 
     const rows=uniqueProgressRows().filter(isViewedRow);
     const masteredRows=rows.filter(row=>row?.mastered===true);
@@ -988,23 +1056,44 @@
         <div class="op-learning-kpis">
           <div class="op-learning-kpi mastered"><b>${masteredRows.length}</b><span>Techniques maîtrisées</span></div>
           <div class="op-learning-kpi review"><b>${reviewRows.length}</b><span>Techniques à revoir</span></div>
-          <div class="op-learning-kpi"><b>${history.length}</b><span>Quiz enregistrés</span></div>
-          <div class="op-learning-kpi"><b>${average}%</b><span>Taux de réussite moyen</span></div>
-        </div>
-        <div class="op-quiz-types">
-          <div class="op-quiz-type"><strong>Quiz généraux</strong><span>${generalHistory.length} terminé${generalHistory.length>1?'s':''} · moyenne ${averageFor(generalHistory)}%</span></div>
-          <div class="op-quiz-type"><strong>Mini-quiz techniques</strong><span>${miniHistory.length} terminé${miniHistory.length>1?'s':''} · moyenne ${averageFor(miniHistory)}%</span></div>
         </div>
       </article>
       <article class="op-learning-card">
         <div class="op-learning-head"><strong>Maîtrise par zone</strong><small>Parmi les techniques vues</small></div>
         ${zoneHtml}
       </article>
-      <article class="op-learning-card">
-        <div class="op-learning-head"><strong>Derniers quiz</strong><small>5 derniers résultats</small></div>
-        <div class="op-history">${historyHtml||'<div class="op-history-empty">Aucun quiz enregistré pour le moment.</div>'}</div>
-      </article>
     `;
+
+    if(groups?.quiz){
+      let summary=$('opQuizStatsSummaryV1919');
+      if(!summary){
+        summary=document.createElement('article');
+        summary.id='opQuizStatsSummaryV1919';
+        summary.className='op-learning-card';
+        groups.quiz.querySelector('.op-stats-group-title')?.insertAdjacentElement('afterend',summary);
+      }
+      summary.innerHTML=`
+        <div class="op-learning-head"><strong>Vue d’ensemble des quiz</strong><small>Données Supabase</small></div>
+        <div class="op-learning-kpis">
+          <div class="op-learning-kpi"><b>${history.length}</b><span>Quiz enregistrés</span></div>
+          <div class="op-learning-kpi"><b>${average}%</b><span>Taux de réussite moyen</span></div>
+        </div>
+        <div class="op-quiz-types">
+          <div class="op-quiz-type"><strong>Quiz généraux</strong><span>${generalHistory.length} terminé${generalHistory.length>1?'s':''} · moyenne ${averageFor(generalHistory)}%</span></div>
+          <div class="op-quiz-type"><strong>Mini-quiz techniques</strong><span>${miniHistory.length} terminé${miniHistory.length>1?'s':''} · moyenne ${averageFor(miniHistory)}%</span></div>
+        </div>`;
+
+      let historyCard=$('opQuizHistoryV1919');
+      if(!historyCard){
+        historyCard=document.createElement('article');
+        historyCard.id='opQuizHistoryV1919';
+        historyCard.className='op-learning-card';
+        groups.quiz.appendChild(historyCard);
+      }
+      historyCard.innerHTML=`
+        <div class="op-learning-head"><strong>Derniers quiz</strong><small>5 derniers résultats</small></div>
+        <div class="op-history">${historyHtml||'<div class="op-history-empty">Aucun quiz enregistré pour le moment.</div>'}</div>`;
+    }
   }
 
   function renderCoreStats(){

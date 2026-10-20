@@ -2042,11 +2042,11 @@
   (document.body||document.documentElement).appendChild(s);
 })();
 
-/* === V19.18 · SOCLE UTILISATEUR : FAVORIS + À REVOIR + PROGRESSION + STATS === */
+/* === V19.19 · SOCLE UTILISATEUR : FAVORIS + À REVOIR + PROGRESSION + STATS === */
 (function(){
   if(document.querySelector('script[data-osteo-user-data-v19]')) return;
   const s=document.createElement('script');
-  s.src='user-data-v19.js?v=19.18';
+  s.src='user-data-v19.js?v=19.19';
   s.defer=true;
   s.dataset.osteoUserDataV19='1';
   (document.body||document.documentElement).appendChild(s);
