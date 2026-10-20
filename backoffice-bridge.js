@@ -2479,13 +2479,13 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP26
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP27
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoVideoFullscreenApp26) return;
-  window.__osteoVideoFullscreenApp26=true;
+  if(window.__osteoVideoFullscreenApp27) return;
+  window.__osteoVideoFullscreenApp27=true;
 
   function isIOS(){
     return /iPad|iPhone|iPod/i.test(navigator.userAgent||'') ||
@@ -2544,8 +2544,12 @@
   function requestElementFullscreen(element){
     if(!element) return null;
     try{
-      if(typeof element.requestFullscreen==='function') return element.requestFullscreen();
-      if(typeof element.webkitRequestFullscreen==='function') return element.webkitRequestFullscreen();
+      if(typeof element.requestFullscreen==='function'){
+        return Promise.resolve(element.requestFullscreen());
+      }
+      if(typeof element.webkitRequestFullscreen==='function'){
+        return Promise.resolve(element.webkitRequestFullscreen());
+      }
     }catch(_){}
     return null;
   }
@@ -2574,22 +2578,27 @@
       }catch(_){}
     }
 
-    // Vimeo : un seul appui sur le bouton Ostéo déclenche son vrai plein écran.
-    // Sur iPhone en portrait, Vimeo ne pivote pas toujours : rotation contrôlée.
-    if(visible(iframe) && isIOS() && isPortrait()){
-      enterIOSLandscapeFullscreen();
-      return;
-    }
-
-    const vimeoRequest=requestVimeoFullscreen(iframe);
-    if(vimeoRequest){
-      if(typeof vimeoRequest.catch==='function'){
-        vimeoRequest.catch(()=>{
-          const fallback=requestElementFullscreen(box);
-          enterVisualFullscreen();
-          if(fallback?.catch) fallback.catch(()=>enterVisualFullscreen());
+    // Vimeo : cible directement l'iframe, comme le bouton à quatre flèches Vimeo.
+    if(visible(iframe)){
+      const direct=requestElementFullscreen(iframe);
+      if(direct){
+        direct.catch(()=>{
+          const apiRequest=requestVimeoFullscreen(iframe);
+          if(apiRequest?.catch) apiRequest.catch(()=>{});
         });
+        return;
       }
+
+      const apiRequest=requestVimeoFullscreen(iframe);
+      if(apiRequest){
+        if(apiRequest?.catch) apiRequest.catch(()=>{});
+        return;
+      }
+
+      try{
+        const toast=typeof window.toast==='function' ? window.toast : null;
+        if(toast) toast('Utilisez le bouton plein écran du lecteur Vimeo.');
+      }catch(_){}
       return;
     }
 
@@ -2747,5 +2756,5 @@
   document.addEventListener('DOMContentLoaded',install,{once:true});
   [100,500,1200].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_VIDEO_FULLSCREEN_APP26={version:'26.0',open,close,refresh:install};
+  window.OSTEO_VIDEO_FULLSCREEN_APP27={version:'27.0',open,close,refresh:install};
 })();
