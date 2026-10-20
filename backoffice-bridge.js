@@ -2479,13 +2479,13 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP23
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP24
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoVideoFullscreenApp23) return;
-  window.__osteoVideoFullscreenApp23=true;
+  if(window.__osteoVideoFullscreenApp24) return;
+  window.__osteoVideoFullscreenApp24=true;
 
   function elements(){
     return {
@@ -2532,6 +2532,18 @@
     return null;
   }
 
+  function requestVimeoFullscreen(iframe){
+    if(!iframe || !visible(iframe) ||
+       !window.Vimeo || typeof window.Vimeo.Player!=='function') return null;
+    try{
+      const player=new window.Vimeo.Player(iframe);
+      if(typeof player.requestFullscreen!=='function') return null;
+      return player.requestFullscreen();
+    }catch(_){
+      return null;
+    }
+  }
+
   function open(){
     const {box,video,iframe}=elements();
     if(!box) return;
@@ -2544,12 +2556,28 @@
       }catch(_){}
     }
 
-    // Le conteneur garde le bouton de fermeture et impose le bon ratio à Vimeo.
-    const request=requestElementFullscreen(box);
-    enterVisualFullscreen();
+    // Vimeo : un seul appui sur le bouton Ostéo déclenche son vrai plein écran.
+    const vimeoRequest=requestVimeoFullscreen(iframe);
+    if(vimeoRequest){
+      if(typeof vimeoRequest.catch==='function'){
+        vimeoRequest.catch(()=>{
+          const fallback=requestElementFullscreen(box);
+          enterVisualFullscreen();
+          if(fallback?.catch) fallback.catch(()=>enterVisualFullscreen());
+        });
+      }
+      return;
+    }
+
+    // Vidéo HTML5/Android : plein écran natif de la vidéo, puis repli du conteneur.
+    const target=visible(video) ? video : box;
+    const request=requestElementFullscreen(target);
+    if(target===box) enterVisualFullscreen();
 
     if(request && typeof request.catch==='function'){
       request.catch(()=>enterVisualFullscreen());
+    }else if(!request){
+      enterVisualFullscreen();
     }
   }
 
@@ -2647,5 +2675,5 @@
   document.addEventListener('DOMContentLoaded',install,{once:true});
   [100,500,1200].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_VIDEO_FULLSCREEN_APP23={version:'23.0',open,close,refresh:install};
+  window.OSTEO_VIDEO_FULLSCREEN_APP24={version:'24.0',open,close,refresh:install};
 })();
