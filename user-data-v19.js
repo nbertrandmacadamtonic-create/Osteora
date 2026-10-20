@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.14';
+  const VERSION='19.15';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -970,6 +970,83 @@
 
     const sheetsLabel=$('statsSheets')?.closest('article')?.querySelector('span');
     if(sheetsLabel) sheetsLabel.textContent='Cartes consultées';
+
+    const history=normalizedQuizResults();
+    const successful=history.filter(row=>row.percent>=60).length;
+    setText('statsQuiz',history.length?successful+'/'+history.length:'—');
+    setText('statsQuizDetail',history.length
+      ? successful+' quiz réussi'+(successful>1?'s':'')+' sur '+history.length
+      : 'Aucun quiz terminé');
+    renderQuizPerformance(history);
+  }
+
+  function renderQuizPerformance(source){
+    const card=document.querySelector('#progress .stats-quiz-card .stats-quiz-layout');
+    if(!card) return;
+    const history=(Array.isArray(source)?source:normalizedQuizResults()).slice(0,7).reverse();
+    const svg=card.querySelector('.stats-chart svg');
+    const labels=card.querySelector('.stats-chart-labels');
+    const scoreBox=card.querySelector('.stats-quiz-score');
+    if(!svg || !labels || !scoreBox) return;
+
+    const line=svg.querySelector('polyline');
+    svg.querySelectorAll('circle').forEach(node=>node.remove());
+
+    if(!history.length){
+      if(line) line.setAttribute('points','');
+      labels.innerHTML='<span>Aucun quiz</span>';
+      const strong=scoreBox.querySelector('strong');
+      const trend=scoreBox.querySelector('em');
+      if(strong) strong.innerHTML='—';
+      if(trend) trend.innerHTML='Terminez un quiz<small>pour suivre votre progression</small>';
+      return;
+    }
+
+    const count=history.length;
+    const points=history.map((row,index)=>{
+      const x=count===1?160:10+(300*index/(count-1));
+      const y=135-(Math.max(0,Math.min(100,row.percent))*1.05);
+      return {x,y,row};
+    });
+    if(line) line.setAttribute('points',points.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' '));
+
+    const ns='http://www.w3.org/2000/svg';
+    points.forEach(point=>{
+      const circle=document.createElementNS(ns,'circle');
+      circle.setAttribute('cx',point.x.toFixed(1));
+      circle.setAttribute('cy',point.y.toFixed(1));
+      circle.setAttribute('r','5');
+      circle.setAttribute('aria-label',point.row.percent+'%');
+      svg.appendChild(circle);
+    });
+
+    labels.innerHTML=history.map(row=>{
+      const date=row.date?new Date(row.date):null;
+      const label=date && !Number.isNaN(date.getTime())
+        ? String(date.getDate()).padStart(2,'0')+'/'+String(date.getMonth()+1).padStart(2,'0')
+        : '—';
+      return '<span>'+label+'</span>';
+    }).join('');
+
+    const average=Math.round(history.reduce((sum,row)=>sum+row.percent,0)/history.length);
+    const strong=scoreBox.querySelector('strong');
+    if(strong) strong.innerHTML=average+'<span>%</span>';
+
+    const recent=history.slice(-3);
+    const previous=history.slice(Math.max(0,history.length-6),Math.max(0,history.length-3));
+    const recentAverage=Math.round(recent.reduce((sum,row)=>sum+row.percent,0)/recent.length);
+    const previousAverage=previous.length
+      ? Math.round(previous.reduce((sum,row)=>sum+row.percent,0)/previous.length)
+      : null;
+    const trend=scoreBox.querySelector('em');
+    if(trend){
+      if(previousAverage==null){
+        trend.innerHTML=history.length+' résultat'+(history.length>1?'s':'')+'<small>enregistré'+(history.length>1?'s':'')+'</small>';
+      }else{
+        const delta=recentAverage-previousAverage;
+        trend.innerHTML=(delta>=0?'↥ +':'↧ ')+delta+'%<small>3 derniers quiz vs précédents</small>';
+      }
+    }
   }
 
   async function recordCardOpen(techniqueId){
