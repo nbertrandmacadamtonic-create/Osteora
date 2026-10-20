@@ -9,7 +9,7 @@
 (function(){
   'use strict';
 
-  const VERSION='19.11';
+  const VERSION='19.12';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
@@ -28,12 +28,15 @@
   let userId=null;
   let favorites=new Set();
   let progressRows=[];
+  let quizResults=[];
   let stateRow=null;
   let loading=false;
   let loadSerial=0;
   let observer=null;
   let seenHubMode='seen';
   let quizAnswerQueue=Promise.resolve();
+  let lastQuizSaveSignature='';
+  let lastQuizSaveAt=0;
 
   const $=id=>document.getElementById(id);
 
@@ -88,6 +91,7 @@
     try{
       localStorage.setItem(cacheKey('favorites'),JSON.stringify([...favorites]));
       localStorage.setItem(cacheKey('progress'),JSON.stringify(progressRows||[]));
+      localStorage.setItem(cacheKey('quiz-results'),JSON.stringify(quizResults||[]));
       localStorage.setItem(cacheKey('state'),JSON.stringify(stateRow||null));
     }catch(_){}
   }
@@ -98,6 +102,7 @@
       return {
         favorites:JSON.parse(localStorage.getItem(cacheKey('favorites'))||'[]'),
         progress:JSON.parse(localStorage.getItem(cacheKey('progress'))||'[]'),
+        quizResults:JSON.parse(localStorage.getItem(cacheKey('quiz-results'))||'[]'),
         state:JSON.parse(localStorage.getItem(cacheKey('state'))||'null')
       };
     }catch(_){return null;}
@@ -198,6 +203,7 @@
     updateHearts();
     updateStatusBars();
     renderSeenHub();
+    renderLearningStats();
   }
 
   function applyAll(){
@@ -210,6 +216,7 @@
   function clearVisibleUserData(){
     favorites=new Set();
     progressRows=[];
+    quizResults=[];
     stateRow=null;
     writeViewedIds([]);
     try{localStorage.removeItem(LAST_PRACTICE_KEY);}catch(_){}
@@ -247,14 +254,16 @@
       if(cache){
         favorites=new Set(Array.isArray(cache.favorites)?cache.favorites.map(String):[]);
         progressRows=Array.isArray(cache.progress)?cache.progress:[];
+        quizResults=Array.isArray(cache.quizResults)?cache.quizResults:[];
         stateRow=cache.state||null;
         applyAll();
       }
 
-      const [favRes,progressRes,stateRes]=await Promise.all([
+      const [favRes,progressRes,stateRes,quizRes]=await Promise.all([
         client.from(T_FAVORITES).select('technique_id,created_at').eq('user_id',userId).order('created_at',{ascending:false}),
         client.from(T_PROGRESS).select('*').eq('user_id',userId).order('updated_at',{ascending:false}),
-        client.from(T_STATE).select('*').eq('user_id',userId).maybeSingle()
+        client.from(T_STATE).select('*').eq('user_id',userId).maybeSingle(),
+        client.from(T_QUIZ).select('*').eq('user_id',userId).limit(100)
       ]);
 
       if(favRes.error) throw favRes.error;
@@ -265,6 +274,7 @@
       favorites=new Set((favRes.data||[]).map(r=>String(r.technique_id)));
       progressRows=progressRes.data||[];
       stateRow=stateRes.data||null;
+      quizResults=quizRes.error ? [] : (quizRes.data||[]);
       await cleanupInvalidReviews();
       applyAll();
     }catch(error){
@@ -793,6 +803,145 @@
     });
   }
 
+  function uniqueProgressRows(){
+    const byId=new Map();
+    (progressRows||[]).forEach(row=>{
+      const id=String(row?.technique_id||'');
+      if(!id) return;
+      const current=byId.get(id);
+      if(!current){byId.set(id,row);return;}
+      const currentDate=Date.parse(current.updated_at||current.last_quiz_answer_at||0)||0;
+      const nextDate=Date.parse(row.updated_at||row.last_quiz_answer_at||0)||0;
+      if(nextDate>currentDate) byId.set(id,row);
+    });
+    return [...byId.values()];
+  }
+
+  function normalizedQuizResults(){
+    const values=(quizResults||[]).map(row=>{
+      const score=Number(row?.score ?? row?.quiz_score ?? 0)||0;
+      const total=Number(row?.total ?? row?.quiz_total ?? 0)||0;
+      const percent=Number(row?.percent ?? row?.quiz_percent ?? (total?Math.round(score*100/total):0))||0;
+      return {
+        title:String(row?.quiz_title||row?.title||row?.category||'Quiz Ostéo Pratik'),
+        score,total,percent,
+        date:row?.created_at||row?.completed_at||row?.quiz_at||row?.updated_at||null
+      };
+    }).filter(row=>row.total>0);
+
+    if(!values.length && stateRow?.last_quiz_total){
+      values.push({
+        title:String(stateRow.last_quiz_title||'Quiz Ostéo Pratik'),
+        score:Number(stateRow.last_quiz_score)||0,
+        total:Number(stateRow.last_quiz_total)||0,
+        percent:Number(stateRow.last_quiz_percent)||0,
+        date:stateRow.last_quiz_at||stateRow.updated_at||null
+      });
+    }
+    return values.sort((a,b)=>(Date.parse(b.date||0)||0)-(Date.parse(a.date||0)||0));
+  }
+
+  function formatStatsDate(value){
+    const date=value?new Date(value):null;
+    if(!date || Number.isNaN(date.getTime())) return 'Date inconnue';
+    try{
+      return new Intl.DateTimeFormat('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}).format(date);
+    }catch(_){return date.toLocaleDateString();}
+  }
+
+  function ensureLearningStatsPanel(){
+    const screen=$('progress');
+    if(!screen) return null;
+
+    if(!$('osteoLearningStatsV1912Styles')){
+      const style=document.createElement('style');
+      style.id='osteoLearningStatsV1912Styles';
+      style.textContent=`
+        #osteoLearningStatsV1912{display:grid;gap:12px;margin:14px auto;width:100%;max-width:760px}
+        #osteoLearningStatsV1912 .op-learning-card{padding:16px;border-radius:22px;border:1px solid rgba(0,229,255,.18);background:linear-gradient(145deg,rgba(10,29,55,.88),rgba(5,15,31,.94));box-shadow:0 18px 45px rgba(0,0,0,.18)}
+        #osteoLearningStatsV1912 .op-learning-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+        #osteoLearningStatsV1912 .op-learning-head strong{color:#fff;font-size:17px}
+        #osteoLearningStatsV1912 .op-learning-head small{color:#8fa5bf;font-size:11px}
+        #osteoLearningStatsV1912 .op-learning-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+        #osteoLearningStatsV1912 .op-learning-kpi{min-width:0;padding:12px;border-radius:17px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035)}
+        #osteoLearningStatsV1912 .op-learning-kpi b{display:block;color:#fff;font-size:24px;line-height:1}
+        #osteoLearningStatsV1912 .op-learning-kpi span{display:block;margin-top:6px;color:#9db0c8;font-size:11px;line-height:1.25}
+        #osteoLearningStatsV1912 .op-learning-kpi.mastered b{color:#35e6a7}
+        #osteoLearningStatsV1912 .op-learning-kpi.review b{color:#ffb020}
+        #osteoLearningStatsV1912 .op-zone-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 10px;align-items:center;margin-top:11px}
+        #osteoLearningStatsV1912 .op-zone-row span{color:#dce7f5;font-size:12px;font-weight:800}
+        #osteoLearningStatsV1912 .op-zone-row em{color:#8fa5bf;font-size:11px;font-style:normal}
+        #osteoLearningStatsV1912 .op-zone-bar{grid-column:1/-1;height:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
+        #osteoLearningStatsV1912 .op-zone-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#00e5ff,#35e6a7)}
+        #osteoLearningStatsV1912 .op-history{display:grid;gap:8px}
+        #osteoLearningStatsV1912 .op-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 12px;padding:11px 12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
+        #osteoLearningStatsV1912 .op-history-row strong{min-width:0;color:#fff;font-size:12px;overflow-wrap:anywhere}
+        #osteoLearningStatsV1912 .op-history-row b{color:#00e5ff;font-size:13px}
+        #osteoLearningStatsV1912 .op-history-row small{color:#8196b1;font-size:10px}
+        #osteoLearningStatsV1912 .op-history-empty{padding:15px;text-align:center;color:#8fa5bf;font-size:12px}
+      `;
+      document.head.appendChild(style);
+    }
+
+    let panel=$('osteoLearningStatsV1912');
+    if(!panel){
+      panel=document.createElement('section');
+      panel.id='osteoLearningStatsV1912';
+      const global=screen.querySelector('.stats-global-card');
+      if(global) global.insertAdjacentElement('afterend',panel);
+      else screen.appendChild(panel);
+    }
+    return panel;
+  }
+
+  function renderLearningStats(){
+    const panel=ensureLearningStatsPanel();
+    if(!panel) return;
+
+    const rows=uniqueProgressRows().filter(isViewedRow);
+    const masteredRows=rows.filter(row=>row?.mastered===true);
+    const reviewRows=rows.filter(row=>row?.review_needed===true);
+    const history=normalizedQuizResults();
+    const average=history.length
+      ? Math.round(history.reduce((sum,row)=>sum+row.percent,0)/history.length)
+      : 0;
+
+    const zones=['Rachis','Membres supérieurs','Membres inférieurs','Bassin'];
+    const zoneHtml=zones.map(zone=>{
+      const zoneRows=rows.filter(row=>String(row?.zone||'')===zone);
+      const mastered=zoneRows.filter(row=>row?.mastered===true).length;
+      const percent=zoneRows.length?Math.round(mastered*100/zoneRows.length):0;
+      return `<div class="op-zone-row"><span>${esc(zone)}</span><em>${mastered}/${zoneRows.length} maîtrisée${mastered>1?'s':''}</em><div class="op-zone-bar"><i style="width:${percent}%"></i></div></div>`;
+    }).join('');
+
+    const historyHtml=history.slice(0,5).map(row=>`
+      <div class="op-history-row">
+        <strong>${esc(row.title)}</strong><b>${row.percent}%</b>
+        <small>${esc(formatStatsDate(row.date))}</small><small>${row.score} / ${row.total}</small>
+      </div>
+    `).join('');
+
+    panel.innerHTML=`
+      <article class="op-learning-card">
+        <div class="op-learning-head"><strong>Apprentissage intelligent</strong><small>Synchronisé avec votre compte</small></div>
+        <div class="op-learning-kpis">
+          <div class="op-learning-kpi mastered"><b>${masteredRows.length}</b><span>Techniques maîtrisées</span></div>
+          <div class="op-learning-kpi review"><b>${reviewRows.length}</b><span>Techniques à revoir</span></div>
+          <div class="op-learning-kpi"><b>${history.length}</b><span>Quiz enregistrés</span></div>
+          <div class="op-learning-kpi"><b>${average}%</b><span>Taux de réussite moyen</span></div>
+        </div>
+      </article>
+      <article class="op-learning-card">
+        <div class="op-learning-head"><strong>Maîtrise par zone</strong><small>Parmi les techniques vues</small></div>
+        ${zoneHtml}
+      </article>
+      <article class="op-learning-card">
+        <div class="op-learning-head"><strong>Derniers quiz</strong><small>5 derniers résultats</small></div>
+        <div class="op-history">${historyHtml||'<div class="op-history-empty">Aucun quiz enregistré pour le moment.</div>'}</div>
+      </article>
+    `;
+  }
+
   async function recordOpen(id){
     const s=await ensureSession(); if(!s?.user?.id||!id) return;
     const t=techniqueById(id); if(!t) return;
@@ -838,15 +987,38 @@
     return {title,score,total,percent:total?Math.round(score*100/total):0};
   }
 
-  async function recordQuiz(){
+  async function recordQuizSummary(summary){
     const s=await ensureSession(); if(!s?.user?.id) return;
-    const q=readQuizResult(); if(!q.total) return;
+    const q={
+      title:String(summary?.title||summary?.category||'Quiz Ostéo Pratik'),
+      score:Number(summary?.score)||0,
+      total:Number(summary?.total)||0,
+      percent:Number(summary?.percent)||0
+    };
+    if(!q.total) return;
+
+    const signature=[q.title,q.score,q.total,q.percent].join('|');
+    const nowMs=Date.now();
+    if(signature===lastQuizSaveSignature && nowMs-lastQuizSaveAt<3000) return;
+    lastQuizSaveSignature=signature;
+    lastQuizSaveAt=nowMs;
+
     try{
       const {error}=await client.rpc('osteo_record_quiz_result',{p_quiz_title:q.title,p_score:q.score,p_total:q.total,p_percent:q.percent});
       if(error) throw error;
-      stateRow={...(stateRow||{}),user_id:userId,last_quiz_title:q.title,last_quiz_score:q.score,last_quiz_total:q.total,last_quiz_percent:q.percent,last_quiz_at:new Date().toISOString()};
+      const savedAt=new Date().toISOString();
+      stateRow={...(stateRow||{}),user_id:userId,last_quiz_title:q.title,last_quiz_score:q.score,last_quiz_total:q.total,last_quiz_percent:q.percent,last_quiz_at:savedAt};
+      quizResults.unshift({quiz_title:q.title,score:q.score,total:q.total,percent:q.percent,created_at:savedAt});
       applyStateToCompatibilityStorage(); saveCache();
-    }catch(error){console.warn('[Ostéo Pratik V19.8] Résultat quiz',error);}
+      renderLearningStats();
+    }catch(error){
+      lastQuizSaveSignature='';
+      console.warn('[Ostéo Pratik V19.12] Résultat quiz',error);
+    }
+  }
+
+  async function recordQuiz(){
+    return recordQuizSummary(readQuizResult());
   }
 
   function hook(name,after){
@@ -955,7 +1127,9 @@
     renderSeenHub,
     recordOpen,
     recordComplete,
-    recordQuiz
+    recordQuiz,
+    recordQuizSummary,
+    renderLearningStats
   };
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});

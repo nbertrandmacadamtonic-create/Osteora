@@ -1544,6 +1544,20 @@
     }catch(_){}
 
     try{
+      const api=window.OSTEO_USER_DATA_V19;
+      if(api && typeof api.recordQuizSummary==='function'){
+        Promise.resolve(api.recordQuizSummary({
+          title:sessionTechniqueTitle
+            ? 'Quiz technique — '+sessionTechniqueTitle
+            : (sessionFilterZone?'Quiz '+sessionFilterZone:'Quiz de mes techniques vues'),
+          score:session.score,
+          total,
+          percent
+        })).catch(()=>{});
+      }
+    }catch(_){}
+
+    try{
       if(typeof updateQuizStats==='function') updateQuizStats();
     }catch(_){}
   }
