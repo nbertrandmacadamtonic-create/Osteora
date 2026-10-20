@@ -9,11 +9,12 @@
 (function(){
   'use strict';
 
-  const VERSION='19.19';
+  const VERSION='19.20';
   const T_FAVORITES='osteo_user_favorites';
   const T_STATE='osteo_user_state';
   const T_PROGRESS='osteo_user_technique_progress';
   const T_QUIZ='osteo_user_quiz_results';
+  const T_ACTIVITY='osteo_user_activity_days';
 
   const LAST_PRACTICE_KEY='osteoPratikLastPractice';
   const LAST_QUIZ_KEY='osteoPratikLastQuiz';
@@ -29,6 +30,7 @@
   let favorites=new Set();
   let progressRows=[];
   let quizResults=[];
+  let activityDays=[];
   let stateRow=null;
   let loading=false;
   let loadSerial=0;
@@ -92,6 +94,7 @@
       localStorage.setItem(cacheKey('favorites'),JSON.stringify([...favorites]));
       localStorage.setItem(cacheKey('progress'),JSON.stringify(progressRows||[]));
       localStorage.setItem(cacheKey('quiz-results'),JSON.stringify(quizResults||[]));
+      localStorage.setItem(cacheKey('activity-days'),JSON.stringify(activityDays||[]));
       localStorage.setItem(cacheKey('state'),JSON.stringify(stateRow||null));
     }catch(_){}
   }
@@ -103,6 +106,7 @@
         favorites:JSON.parse(localStorage.getItem(cacheKey('favorites'))||'[]'),
         progress:JSON.parse(localStorage.getItem(cacheKey('progress'))||'[]'),
         quizResults:JSON.parse(localStorage.getItem(cacheKey('quiz-results'))||'[]'),
+        activityDays:JSON.parse(localStorage.getItem(cacheKey('activity-days'))||'[]'),
         state:JSON.parse(localStorage.getItem(cacheKey('state'))||'null')
       };
     }catch(_){return null;}
@@ -205,6 +209,7 @@
     renderSeenHub();
     renderCoreStats();
     renderLearningStats();
+    renderActivityStats();
   }
 
   function applyAll(){
@@ -218,6 +223,7 @@
     favorites=new Set();
     progressRows=[];
     quizResults=[];
+    activityDays=[];
     stateRow=null;
     writeViewedIds([]);
     try{localStorage.removeItem(LAST_PRACTICE_KEY);}catch(_){}
@@ -256,15 +262,17 @@
         favorites=new Set(Array.isArray(cache.favorites)?cache.favorites.map(String):[]);
         progressRows=Array.isArray(cache.progress)?cache.progress:[];
         quizResults=Array.isArray(cache.quizResults)?cache.quizResults:[];
+        activityDays=Array.isArray(cache.activityDays)?cache.activityDays:[];
         stateRow=cache.state||null;
         applyAll();
       }
 
-      const [favRes,progressRes,stateRes,quizRes]=await Promise.all([
+      const [favRes,progressRes,stateRes,quizRes,activityRes]=await Promise.all([
         client.from(T_FAVORITES).select('technique_id,created_at').eq('user_id',userId).order('created_at',{ascending:false}),
         client.from(T_PROGRESS).select('*').eq('user_id',userId).order('updated_at',{ascending:false}),
         client.from(T_STATE).select('*').eq('user_id',userId).maybeSingle(),
-        client.from(T_QUIZ).select('*').eq('user_id',userId).limit(100)
+        client.from(T_QUIZ).select('*').eq('user_id',userId).limit(100),
+        client.from(T_ACTIVITY).select('*').eq('user_id',userId).order('activity_date',{ascending:false}).limit(400)
       ]);
 
       if(favRes.error) throw favRes.error;
@@ -276,6 +284,7 @@
       progressRows=progressRes.data||[];
       stateRow=stateRes.data||null;
       quizResults=quizRes.error ? [] : (quizRes.data||[]);
+      activityDays=activityRes.error ? [] : (activityRes.data||[]);
       await cleanupInvalidReviews();
       applyAll();
     }catch(error){
@@ -1124,6 +1133,92 @@
     renderLastQuizCard(history);
   }
 
+  function localDateKey(date){
+    const d=date instanceof Date?date:new Date(date||Date.now());
+    if(Number.isNaN(d.getTime())) return '';
+    return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+  }
+
+  function renderActivityStats(){
+    const rows=(activityDays||[]).filter(row=>row?.activity_date);
+    const byDate=new Map(rows.map(row=>[String(row.activity_date).slice(0,10),row]));
+    const today=new Date();
+    const todayKey=localDateKey(today);
+    const yesterday=new Date(today); yesterday.setDate(yesterday.getDate()-1);
+    const newestKey=[...byDate.keys()].sort().reverse()[0]||'';
+    let cursor=newestKey===todayKey?new Date(today):newestKey===localDateKey(yesterday)?yesterday:null;
+    let streak=0;
+    while(cursor&&byDate.has(localDateKey(cursor))){
+      streak++;
+      cursor=new Date(cursor);
+      cursor.setDate(cursor.getDate()-1);
+    }
+
+    const streakBox=document.querySelector('#progress .stats-streak');
+    if(streakBox){
+      const value=streakBox.querySelector(':scope > b');
+      const label=streakBox.querySelector(':scope > div > strong');
+      const message=streakBox.querySelector(':scope > div > p');
+      if(value) value.textContent=String(streak);
+      if(label) label.textContent=streak===1?'jour actif':'jours actifs';
+      if(message) message.textContent=byDate.has(todayKey)?'Activité enregistrée aujourd’hui !':streak?'Revenez aujourd’hui pour continuer.':'Commencez votre série aujourd’hui.';
+
+      const monday=new Date(today);
+      const day=(monday.getDay()+6)%7;
+      monday.setDate(monday.getDate()-day);
+      [...streakBox.querySelectorAll('.stats-days span')].slice(0,7).forEach((span,index)=>{
+        const date=new Date(monday); date.setDate(monday.getDate()+index);
+        const active=byDate.has(localDateKey(date));
+        span.classList.toggle('off',!active);
+        span.classList.toggle('op-active-day',active);
+        span.title=(active?'Actif · ':'Aucune activité · ')+date.toLocaleDateString('fr-FR');
+      });
+    }
+
+    const latest=rows.slice().sort((a,b)=>String(b.last_activity_at||b.activity_date).localeCompare(String(a.last_activity_at||a.activity_date)))[0];
+    const dateEl=$('statsLastActivityDate');
+    const titleEl=$('statsLastActivityTitle');
+    const activityCard=dateEl?.closest('.stats-mini-card');
+    const button=activityCard?.querySelector('button');
+    if(!latest){
+      if(dateEl) dateEl.textContent='Aucune activité récente';
+      if(titleEl) titleEl.textContent='Lancez une vidéo, une carte ou un quiz';
+      if(button){button.setAttribute('onclick',"go('home')");button.innerHTML='Commencer <span>›</span>';}
+      return;
+    }
+    const activityDate=new Date(latest.last_activity_at||latest.activity_date);
+    if(dateEl) dateEl.textContent=Number.isNaN(activityDate.getTime())?'Activité enregistrée':activityDate.toLocaleString('fr-FR',{day:'2-digit',month:'long',hour:'2-digit',minute:'2-digit'});
+    if(titleEl) titleEl.textContent=latest.last_activity_title||({quiz:'Quiz terminé',card:'Carte consultée',video:'Vidéo terminée'}[latest.last_activity_type]||'Activité Ostéo Pratik');
+    if(button){
+      const quiz=latest.last_activity_type==='quiz';
+      button.setAttribute('onclick',quiz?"go('quizMenu')":"go('catalogue')");
+      button.innerHTML=(quiz?'Ouvrir les quiz':'Ouvrir le catalogue')+' <span>›</span>';
+    }
+  }
+
+  async function recordActivity(type,title){
+    const s=await ensureSession();
+    if(!s?.user?.id) return false;
+    const dateKey=localDateKey(new Date());
+    const savedAt=new Date().toISOString();
+    const previous=activityDays.find(row=>String(row.activity_date).slice(0,10)===dateKey);
+    const optimistic={...(previous||{}),user_id:userId,activity_date:dateKey,activity_count:(Number(previous?.activity_count)||0)+1,last_activity_type:String(type||'activity'),last_activity_title:String(title||''),last_activity_at:savedAt};
+    activityDays=activityDays.filter(row=>String(row.activity_date).slice(0,10)!==dateKey);
+    activityDays.unshift(optimistic);
+    saveCache(); renderActivityStats();
+    try{
+      const {data,error}=await client.rpc('osteo_record_user_activity',{p_activity_type:String(type||'activity'),p_activity_title:String(title||''),p_activity_date:dateKey});
+      if(error) throw error;
+      const saved=Array.isArray(data)?data[0]:data;
+      if(saved&&typeof saved==='object') Object.assign(optimistic,saved);
+      saveCache(); renderActivityStats();
+      return true;
+    }catch(error){
+      console.warn('[Ostéo Pratik V19.20] Activité non synchronisée.',error);
+      return false;
+    }
+  }
+
   function renderLastQuizCard(history){
     const card=document.querySelector('#progress .stats-last-practice');
     if(!card) return;
@@ -1260,6 +1355,7 @@
       if(saved && typeof saved==='object') Object.assign(row,saved);
       saveCache();
       renderCoreStats();
+      recordActivity('card',techniqueById(id)?.title||row.title||'Carte technique');
       return true;
     }catch(error){
       row.card_open_count=previousCount;
@@ -1299,6 +1395,7 @@
       if(existing){Object.assign(existing,{status:'vue',percent:100,completed_at:existing.completed_at||now,updated_at:now});}
       else progressRows.push({user_id:userId,technique_id:String(t.id),title:t.title||'',zone:t.zone||'',subzone:t.sub||'',level:t.level||'',status:'vue',percent:100,opened_count:1,first_opened_at:now,last_opened_at:now,completed_at:now,updated_at:now});
       applyAll();
+      recordActivity('video',t.title||'Vidéo technique');
     }catch(error){console.warn('[Ostéo Pratik V19.8] Technique terminée',error);}
   }
 
@@ -1343,6 +1440,7 @@
       quizResults.unshift({quiz_title:q.title,score:q.score,total:q.total,percent:q.percent,created_at:savedAt});
       applyStateToCompatibilityStorage(); saveCache();
       renderLearningStats();
+      recordActivity('quiz',q.title);
     }catch(error){
       lastQuizSaveSignature='';
       console.warn('[Ostéo Pratik V19.12] Résultat quiz',error);
@@ -1407,8 +1505,11 @@
         if($('progress')?.classList.contains('active')){
           renderCoreStats();
           renderLearningStats();
+          renderActivityStats();
           setTimeout(renderCoreStats,80);
           setTimeout(renderCoreStats,320);
+          setTimeout(renderActivityStats,80);
+          setTimeout(renderActivityStats,320);
         }
       },40);
     });
@@ -1450,7 +1551,7 @@
     });
 
     await loadUserData();
-    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();renderSeenHub();renderCoreStats();renderLearningStats();},ms));
+    [300,900,1800].forEach(ms=>setTimeout(()=>{installHooks();updateHearts();updateStatusBars();renderFavorites();renderSeenHub();renderCoreStats();renderLearningStats();renderActivityStats();},ms));
   }
 
   window.OSTEO_USER_DATA_V19={
@@ -1468,7 +1569,9 @@
     recordCardOpen,
     recordQuiz,
     recordQuizSummary,
-    renderLearningStats
+    recordActivity,
+    renderLearningStats,
+    renderActivityStats
   };
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true});
