@@ -2479,13 +2479,24 @@
 
 
 /* ==============================================================
-   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP24
+   OSTÉO PRATIK — PLEIN ÉCRAN VIDÉO MOBILE APP25
    ============================================================== */
 (function(){
   'use strict';
 
-  if(window.__osteoVideoFullscreenApp24) return;
-  window.__osteoVideoFullscreenApp24=true;
+  if(window.__osteoVideoFullscreenApp25) return;
+  window.__osteoVideoFullscreenApp25=true;
+
+  function isIOS(){
+    return /iPad|iPhone|iPod/i.test(navigator.userAgent||'') ||
+      (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  }
+
+  function isPortrait(){
+    const width=window.visualViewport?.width || window.innerWidth || 0;
+    const height=window.visualViewport?.height || window.innerHeight || 0;
+    return height>width;
+  }
 
   function elements(){
     return {
@@ -2515,9 +2526,16 @@
     document.documentElement.classList.add('op-video-fullscreen-open');
   }
 
+  function enterIOSLandscapeFullscreen(){
+    const {box}=elements();
+    enterVisualFullscreen();
+    box?.classList.toggle('op-force-landscape',isPortrait());
+  }
+
   function leaveVisualFullscreen(){
     const {box}=elements();
     box?.classList.remove('app-fullscreen-video','op-mobile-video-fullscreen');
+    box?.classList.remove('op-force-landscape');
     document.body.classList.remove('video-fullscreen-open');
     document.documentElement.classList.remove('op-video-fullscreen-open');
     document.documentElement.style.removeProperty('--op-video-fullscreen-height');
@@ -2557,6 +2575,12 @@
     }
 
     // Vimeo : un seul appui sur le bouton Ostéo déclenche son vrai plein écran.
+    // Sur iPhone en portrait, Vimeo ne pivote pas toujours : rotation contrôlée.
+    if(visible(iframe) && isIOS() && isPortrait()){
+      enterIOSLandscapeFullscreen();
+      return;
+    }
+
     const vimeoRequest=requestVimeoFullscreen(iframe);
     if(vimeoRequest){
       if(typeof vimeoRequest.catch==='function'){
@@ -2646,6 +2670,24 @@
         right:calc(10px + env(safe-area-inset-right,0px)) !important;
         z-index:2147483647 !important;
       }
+      #videoBox.op-mobile-video-fullscreen.op-force-landscape{
+        inset:auto !important;
+        left:50% !important;
+        top:50% !important;
+        width:var(--op-video-fullscreen-height,100dvh) !important;
+        height:100vw !important;
+        transform:translate(-50%,-50%) rotate(90deg) !important;
+        transform-origin:center center !important;
+      }
+      #videoBox.op-mobile-video-fullscreen.op-force-landscape video,
+      #videoBox.op-mobile-video-fullscreen.op-force-landscape iframe{
+        width:100% !important;
+        height:100% !important;
+        max-width:100% !important;
+        max-height:100% !important;
+        aspect-ratio:auto !important;
+        object-fit:contain !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -2662,7 +2704,10 @@
     if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
   });
   window.addEventListener('orientationchange',()=>setTimeout(()=>{
-    if(document.documentElement.classList.contains('op-video-fullscreen-open')) setViewportHeight();
+    if(document.documentElement.classList.contains('op-video-fullscreen-open')){
+      setViewportHeight();
+      elements().box?.classList.toggle('op-force-landscape',isIOS()&&isPortrait());
+    }
   },120));
   document.addEventListener('fullscreenchange',()=>{
     if(!document.fullscreenElement) leaveVisualFullscreen();
@@ -2675,5 +2720,5 @@
   document.addEventListener('DOMContentLoaded',install,{once:true});
   [100,500,1200].forEach(ms=>setTimeout(install,ms));
 
-  window.OSTEO_VIDEO_FULLSCREEN_APP24={version:'24.0',open,close,refresh:install};
+  window.OSTEO_VIDEO_FULLSCREEN_APP25={version:'25.0',open,close,refresh:install};
 })();
