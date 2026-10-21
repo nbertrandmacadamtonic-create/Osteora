@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-  Version 22.2-app-39
+  Version 22.2-app-40
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-39';
+  const VERSION = '22.2-app-40';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1506,16 +1506,17 @@
         position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;
         overflow:hidden !important;border-radius:24px !important;
         backface-visibility:hidden !important;-webkit-backface-visibility:hidden !important;
+        transform-style:flat !important;-webkit-transform-style:flat !important;
       }
       #op22AppCardOverlay .op22-front{
-        transform:rotateY(0deg) translateZ(1px) !important;
-        -webkit-transform:rotateY(0deg) translateZ(1px) !important;
+        transform:rotateY(0deg) !important;
+        -webkit-transform:rotateY(0deg) !important;
         border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.85) !important;
         box-shadow:inset 0 0 22px rgba(var(--op-card-electric-rgb,57,231,255),.10) !important;
       }
       #op22AppCardOverlay .op22-back{
-        transform:rotateY(180deg) translateZ(1px) !important;
-        -webkit-transform:rotateY(180deg) translateZ(1px) !important;
+        transform:rotateY(180deg) !important;
+        -webkit-transform:rotateY(180deg) !important;
         overflow-y:auto !important;
         padding:14px 12px 12px !important;
         background:radial-gradient(circle at 100% 0%,rgba(126,72,255,.20),transparent 34%),

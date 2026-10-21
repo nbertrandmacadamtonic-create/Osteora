@@ -1,26 +1,27 @@
-/* === APP38 · CHARGEUR ANTI-CACHE DE L'INTÉGRATION CARTES ===
-   index.html référence encore ?v=22.2-app-1. Ce chargeur, placé dans le
-   bridge qui le précède, exécute APP37 en premier sans modifier index.html. */
+/* === APP41 · CHARGEUR PERMANENT ANTI-CACHE ===
+   Le bridge reste le point d'entrée stable. L'intégration est toujours
+   rechargée avec une adresse unique : index.html n'est plus à modifier. */
 (function(){
   'use strict';
   if(window.__osteoRevisionCardsLoaderApp38) return;
   window.__osteoRevisionCardsLoaderApp38=true;
 
   const FILE='revision-cards-v22_2-integration.js';
-  const SRC=FILE+'?v=22.2-app-39';
+  const BUILD='22.2-app-40';
+  const SRC=FILE+'?v='+BUILD+'&cb='+Date.now();
 
-  function isApp37AlreadyRequested(){
+  function isCurrentIntegrationAlreadyRequested(){
     return Array.from(document.scripts || []).some(function(script){
       const src=script.getAttribute('src') || '';
-      return src.indexOf(FILE)!==-1 && src.indexOf('22.2-app-39')!==-1;
+      return src.indexOf(FILE)!==-1 && script.dataset.osteoRevisionLoader==='app41';
     });
   }
 
-  if(isApp37AlreadyRequested()) return;
+  if(isCurrentIntegrationAlreadyRequested()) return;
 
   if(document.readyState==='loading'){
-    /* Chargement synchrone : APP37 passe avant l'ancienne balise APP1. */
-    document.write('<script data-osteo-revision-loader="app38" src="'+SRC+'"><'+'/script>');
+    /* Chargement synchrone : la version courante passe avant l'ancienne balise. */
+    document.write('<script data-osteo-revision-loader="app41" src="'+SRC+'"><'+'/script>');
     return;
   }
 
@@ -28,7 +29,7 @@
   const script=document.createElement('script');
   script.src=SRC;
   script.async=false;
-  script.dataset.osteoRevisionLoader='app38';
+  script.dataset.osteoRevisionLoader='app41';
   (document.head || document.documentElement).appendChild(script);
 })();
 
