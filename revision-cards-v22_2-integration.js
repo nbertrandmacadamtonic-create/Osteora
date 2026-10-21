@@ -2311,23 +2311,28 @@
       #opWheelAudioOverlay.is-open{display:flex}
       #opWheelAudioOverlay .op-audio-shell{
         width:min(460px,94vw);
-        border:1px solid rgba(0,229,255,.30);
+        border:1px solid rgba(91,222,255,.42);
         border-radius:26px;
         padding:20px;
         background:
-          radial-gradient(circle at 50% 5%,rgba(0,229,255,.11),transparent 34%),
-          linear-gradient(145deg,rgba(8,27,50,.98),rgba(3,12,27,.98));
-        box-shadow:0 28px 90px rgba(0,0,0,.45);
+          radial-gradient(circle at 12% 0%,rgba(0,221,255,.22),transparent 38%),
+          radial-gradient(circle at 100% 32%,rgba(139,78,255,.20),transparent 42%),
+          linear-gradient(155deg,#0b3554 0%,#101d48 48%,#180f35 100%);
+        box-shadow:0 28px 90px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.08);
       }
       #opWheelAudioOverlay .op-audio-head{
-        display:flex;justify-content:space-between;gap:12px;align-items:flex-start;
+        display:flex;justify-content:space-between;gap:12px;align-items:center;
+        min-height:66px;padding:11px 12px 11px 15px;border-radius:18px;
+        border:1px solid rgba(114,231,255,.20);
+        background:linear-gradient(120deg,rgba(0,190,225,.16),rgba(117,62,210,.18));
       }
       #opWheelAudioOverlay .op-audio-head small{
         display:block;color:#5feaff;font-size:11px;font-weight:900;
         text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px;
       }
       #opWheelAudioOverlay .op-audio-head strong{
-        display:block;color:#fff;font-size:19px;line-height:1.15;
+        display:block;color:#fff;font-size:19px;line-height:1.2;
+        text-shadow:0 2px 8px rgba(0,0,0,.55);
       }
       #opWheelAudioOverlay .op-audio-close{
         flex:0 0 auto;width:40px;height:40px;border-radius:50%;
@@ -2337,10 +2342,11 @@
       #opWheelAudioOverlay .op-audio-visual{
         height:150px;margin:18px 0;border-radius:22px;
         display:grid;place-items:center;
-        border:1px solid rgba(0,229,255,.18);
+        border:1px solid rgba(95,229,255,.28);
         background:
-          radial-gradient(circle,rgba(0,229,255,.12),transparent 44%),
-          rgba(0,229,255,.025);
+          radial-gradient(circle at center,rgba(43,226,255,.22),transparent 38%),
+          linear-gradient(145deg,rgba(5,43,67,.82),rgba(47,23,83,.72));
+        box-shadow:inset 0 0 36px rgba(0,0,0,.26);
       }
       #opWheelAudioOverlay .op-audio-picker{
         display:grid;gap:8px;margin:16px 0 12px;
@@ -2458,7 +2464,6 @@
       <div class="op-audio-shell" role="dialog" aria-modal="true" aria-label="Révision audio">
         <div class="op-audio-head">
           <div>
-            <small>Révision audio</small>
             <strong id="opWheelAudioTitle">Technique</strong>
           </div>
           <button class="op-audio-close" type="button" aria-label="Fermer">×</button>
