@@ -709,6 +709,44 @@
     setTimeout(apply,320);
   }
 
+  function decorateModernCardBack(stage){
+    if(!stage) return;
+    const apply=()=>{
+      const back=stage.querySelector(
+        '.op22-card-back,.op22-back,[class*="card-back"],[class*="face-back"],[class*="verso"]'
+      );
+      if(!back) return;
+      back.classList.add('op-app-modern-back');
+
+      const labels=['position','position des mains','barrière motrice','barriere motrice','normalisation'];
+      [...back.querySelectorAll('*')].forEach(node=>{
+        if(node.children.length) return;
+        const text=String(node.textContent||'').replace(/\s+/g,' ').trim().toLocaleLowerCase('fr');
+        if(!labels.includes(text)) return;
+        node.classList.add('op-app-back-section-title');
+        let panel=node.parentElement;
+        let best=panel;
+        for(let depth=0;panel&&panel!==back&&depth<5;depth++,panel=panel.parentElement){
+          const bg=getComputedStyle(panel).backgroundColor.match(/[\d.]+/g)?.slice(0,3).map(Number)||[];
+          const isLight=bg.length===3&&bg.every(value=>value>150);
+          if(panel.querySelector('img')||isLight) best=panel;
+          if(isLight) break;
+        }
+        if(best&&best!==back) best.classList.add('op-app-back-section');
+      });
+
+      if(!back.querySelector(':scope > .op-app-electric-layer-back')){
+        const layer=document.createElement('span');
+        layer.className='op-app-electric-layer op-app-electric-layer-back';
+        layer.setAttribute('aria-hidden','true');
+        back.appendChild(layer);
+      }
+    };
+    apply();
+    setTimeout(apply,80);
+    setTimeout(apply,320);
+  }
+
   function enableWholeCardFlip(stage){
     const card=stage?.querySelector('.op22-card');
     if(!card||card.dataset.wholeFlip==='app35') return;
@@ -867,6 +905,7 @@
       fitMainCardPhoto(stage);
       decorateElectricCard(stage,t);
       cleanCardBackMetadata(stage);
+      decorateModernCardBack(stage);
       enableWholeCardFlip(stage);
     }catch(err){
       console.warn('[Ostéo Pratik] Rendu carte V22.2 impossible',err);
@@ -1332,6 +1371,77 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   window.OSTEO_WHOLE_CARD_CLICKABLE_APP35={version:'35.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP36 · CALQUE MODERNE RECTO ET VERSO
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoModernCardFacesApp36) return;
+  window.__osteoModernCardFacesApp36=true;
+  function install(){
+    if(document.getElementById('opModernCardFacesApp36')) return;
+    const style=document.createElement('style');
+    style.id='opModernCardFacesApp36';
+    style.textContent=`
+      #op22AppCardOverlay .op-app-electric-front > .op-app-electric-layer{
+        background:linear-gradient(180deg,transparent 48%,rgba(2,12,27,.12) 62%,rgba(2,12,27,.48) 100%);
+      }
+      #op22AppCardOverlay .op-app-modern-back{
+        color:#f7fbff !important;
+        background:
+          radial-gradient(circle at 100% 0%,rgba(130,68,255,.16),transparent 36%),
+          radial-gradient(circle at 0% 100%,rgba(var(--op-card-electric-rgb,57,231,255),.12),transparent 42%),
+          linear-gradient(155deg,#071d32 0%,#071526 48%,#100d27 100%) !important;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.78) !important;
+        box-shadow:
+          0 0 0 1px rgba(var(--op-card-electric-rgb,57,231,255),.14),
+          0 0 20px rgba(var(--op-card-electric-rgb,57,231,255),.18),
+          inset 0 0 18px rgba(var(--op-card-electric-rgb,57,231,255),.06) !important;
+      }
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section{
+        color:#f5fbff !important;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.46) !important;
+        border-radius:14px !important;
+        background:linear-gradient(135deg,rgba(5,29,47,.94),rgba(10,19,43,.90)) !important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 7px 18px rgba(0,0,0,.14) !important;
+      }
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section-title{
+        color:var(--op-card-electric,#39e7ff) !important;
+        font-weight:950 !important;letter-spacing:.07em !important;
+        text-transform:uppercase !important;text-shadow:none !important;
+      }
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section p,
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section span:not(.op-app-electric-layer){
+        color:#edf7ff !important;
+      }
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section img{
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.52) !important;
+        border-radius:10px !important;background:#071827 !important;
+        box-shadow:0 0 12px rgba(var(--op-card-electric-rgb,57,231,255),.10) !important;
+      }
+      #op22AppCardOverlay .op-app-electric-layer-back{
+        background:none !important;
+      }
+      @media(max-width:560px){
+        #op22AppCardOverlay .op-app-modern-back .op-app-back-section{
+          margin-bottom:7px !important;padding:8px !important;
+        }
+        #op22AppCardOverlay .op-app-modern-back .op-app-back-section-title{
+          font-size:9px !important;
+        }
+        #op22AppCardOverlay .op-app-modern-back .op-app-back-section p,
+        #op22AppCardOverlay .op-app-modern-back .op-app-back-section span{
+          font-size:8px !important;line-height:1.28 !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_MODERN_CARD_FACES_APP36={version:'36.0',refresh:install};
 })();
 
 
