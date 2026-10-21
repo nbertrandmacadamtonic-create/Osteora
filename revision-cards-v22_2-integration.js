@@ -2414,6 +2414,18 @@
       #opWheelAudioOverlay .op-audio-status{
         color:#b9c8db;text-align:center;font-size:12px;margin:-6px 0 15px;
       }
+      #opWheelAudioOverlay .op-audio-now{
+        display:block;margin:-5px 0 13px;text-align:center;
+      }
+      #opWheelAudioOverlay .op-audio-now small{
+        display:block;margin-bottom:4px;color:#71eaff;font-size:9px;
+        font-weight:950;letter-spacing:.12em;text-transform:uppercase;
+      }
+      #opWheelAudioOverlay .op-audio-now strong{
+        display:block;color:#f7fbff;font-size:13px;line-height:1.3;font-weight:850;
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+        text-shadow:0 1px 4px rgba(0,0,0,.45);
+      }
       #opWheelAudioOverlay .op-audio-actions{
         display:grid;grid-template-columns:1fr 1fr;gap:9px;
       }
@@ -2464,7 +2476,7 @@
       <div class="op-audio-shell" role="dialog" aria-modal="true" aria-label="Révision audio">
         <div class="op-audio-head">
           <div>
-            <strong id="opWheelAudioTitle">Technique</strong>
+            <strong>Réviser en écoutant</strong>
           </div>
           <button class="op-audio-close" type="button" aria-label="Fermer">×</button>
         </div>
@@ -2485,6 +2497,11 @@
 
         <div class="op-audio-visual">
           <div class="op-audio-disc">♫</div>
+        </div>
+
+        <div class="op-audio-now">
+          <small>Technique en cours</small>
+          <strong id="opWheelAudioTitle">Technique</strong>
         </div>
 
         <div class="op-audio-status" id="opWheelAudioStatus">Prêt à écouter</div>
