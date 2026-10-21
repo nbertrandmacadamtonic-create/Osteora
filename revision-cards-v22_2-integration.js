@@ -2374,6 +2374,20 @@
         border:1px solid rgba(104,233,255,.30);color:#f4fbff;
         background:#07192b;font:inherit;font-size:13px;outline:none;
       }
+      #opWheelAudioOverlay .op-audio-search-wrap{position:relative}
+      #opWheelAudioOverlay .op-audio-search-wrap::before{
+        content:"";position:absolute;left:13px;top:50%;width:13px;height:13px;
+        border:2px solid #78eaff;border-radius:50%;transform:translateY(-58%);
+        opacity:.9;pointer-events:none;box-sizing:border-box;
+      }
+      #opWheelAudioOverlay .op-audio-search-wrap::after{
+        content:"";position:absolute;left:24px;top:27px;width:6px;height:2px;
+        border-radius:2px;background:#78eaff;transform:rotate(45deg);
+        opacity:.9;pointer-events:none;
+      }
+      #opWheelAudioOverlay .op-audio-search-wrap input{
+        padding-left:38px !important;
+      }
       #opWheelAudioOverlay .op-audio-picker input:focus,
       #opWheelAudioOverlay .op-audio-picker select:focus{
         border-color:#54e8ff;box-shadow:0 0 0 3px rgba(84,232,255,.10);
@@ -2458,7 +2472,9 @@
 
         <div class="op-audio-picker">
           <label for="opWheelAudioSearch">Choisir une technique déjà vue</label>
-          <input id="opWheelAudioSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher une technique…">
+          <div class="op-audio-search-wrap">
+            <input id="opWheelAudioSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher une technique…">
+          </div>
           <select id="opWheelAudioSelect" aria-label="Techniques disponibles par ordre alphabétique"></select>
         </div>
 
