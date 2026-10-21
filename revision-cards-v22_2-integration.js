@@ -735,6 +735,18 @@
         if(best&&best!==back) best.classList.add('op-app-back-section');
       });
 
+      [...back.querySelectorAll('img')].forEach(img=>{
+        const src=String(img.currentSrc||img.src||'').toLocaleLowerCase('fr');
+        const holder=String(img.parentElement?.className||'').toLocaleLowerCase('fr');
+        const isBrand=src.includes('logo-osteo-pratik')||/brand|app-logo|card-logo/.test(holder);
+        const isStepLogo=/step-logo|fiche-logo|detail-step-logo|step-icon|pictogram|picto/.test(holder);
+        const ratio=(img.naturalWidth&&img.naturalHeight)?img.naturalWidth/img.naturalHeight:0;
+        const looksLikeIcon=ratio>.82&&ratio<1.18&&(img.naturalWidth||0)<=256;
+        img.classList.toggle('op-app-native-brand-logo',isBrand);
+        img.classList.toggle('op-app-native-step-logo',!isBrand&&(isStepLogo||looksLikeIcon));
+        img.classList.toggle('op-app-step-photo',!isBrand&&!isStepLogo&&!looksLikeIcon);
+      });
+
       if(!back.querySelector(':scope > .op-app-electric-layer-back')){
         const layer=document.createElement('span');
         layer.className='op-app-electric-layer op-app-electric-layer-back';
@@ -1416,10 +1428,16 @@
       #op22AppCardOverlay .op-app-modern-back .op-app-back-section span:not(.op-app-electric-layer){
         color:#edf7ff !important;
       }
-      #op22AppCardOverlay .op-app-modern-back .op-app-back-section img{
+      #op22AppCardOverlay .op-app-modern-back .op-app-back-section img.op-app-step-photo{
         border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.52) !important;
         border-radius:10px !important;background:#071827 !important;
         box-shadow:0 0 12px rgba(var(--op-card-electric-rgb,57,231,255),.10) !important;
+      }
+      #op22AppCardOverlay .op-app-modern-back img.op-app-native-step-logo,
+      #op22AppCardOverlay .op-app-modern-back img.op-app-native-brand-logo{
+        object-fit:contain !important;
+        border:0 !important;background:transparent !important;
+        box-shadow:none !important;filter:none !important;
       }
       #op22AppCardOverlay .op-app-electric-layer-back{
         background:none !important;
@@ -1442,6 +1460,17 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   window.OSTEO_MODERN_CARD_FACES_APP36={version:'36.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP37 · LOGOS NATIFS PRÉSERVÉS
+   Les logos existants restent la seule source graphique.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoNativeCardLogosApp37) return;
+  window.__osteoNativeCardLogosApp37=true;
+  window.OSTEO_NATIVE_CARD_LOGOS_APP37={version:'37.0'};
 })();
 
 
