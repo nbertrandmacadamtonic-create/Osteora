@@ -632,6 +632,59 @@
     return common / Math.max(sa.size,sb.size,1);
   }
 
+  function fitMainCardPhoto(stage){
+    if(!stage) return;
+    const apply=()=>{
+      const card=stage.querySelector('.op22-card');
+      if(!card) return;
+      const images=[...card.querySelectorAll('img')].filter(img=>
+        !img.closest('.op22-card-back,[class*="back"],[class*="verso"]')
+      );
+      images.forEach(img=>img.classList.remove('op-app-main-card-photo'));
+      let main=null;
+      let bestArea=0;
+      images.forEach(img=>{
+        const rect=img.getBoundingClientRect();
+        const displayed=Math.max(0,rect.width*rect.height);
+        const natural=Math.max(0,(img.naturalWidth||0)*(img.naturalHeight||0));
+        const area=displayed||natural;
+        if(area>bestArea){bestArea=area;main=img;}
+      });
+      if(main) main.classList.add('op-app-main-card-photo');
+    };
+    apply();
+    setTimeout(apply,80);
+    setTimeout(apply,320);
+    stage.querySelectorAll('img').forEach(img=>{
+      if(!img.complete) img.addEventListener('load',apply,{once:true});
+    });
+  }
+
+  function decorateElectricCard(stage,technique){
+    const card=stage?.querySelector('.op22-card');
+    if(!card) return;
+    const zone=String(technique?.zone||'').toLocaleLowerCase('fr');
+    let color='#39e7ff';
+    let rgb='57,231,255';
+    if(zone.includes('supérieur')){color='#b46cff';rgb='180,108,255';}
+    else if(zone.includes('inférieur')){color='#ff9f43';rgb='255,159,67';}
+    else if(zone.includes('bassin')){color='#39e6ad';rgb='57,230,173';}
+    card.style.setProperty('--op-card-electric',color);
+    card.style.setProperty('--op-card-electric-rgb',rgb);
+    card.classList.add('op-app-electric-card');
+
+    const front=card.querySelector(
+      '.op22-card-front,.op22-front,[class*="card-front"],[class*="face-front"],.op22-card-face:not(.op22-card-back):not([class*="back"])'
+    )||card.firstElementChild||card;
+    front.classList.add('op-app-electric-front');
+    if(!front.querySelector(':scope > .op-app-electric-layer')){
+      const layer=document.createElement('span');
+      layer.className='op-app-electric-layer';
+      layer.setAttribute('aria-hidden','true');
+      front.appendChild(layer);
+    }
+  }
+
   function resolveRef(t,premiumApi){
     if(!t) return null;
 
@@ -760,6 +813,8 @@
 
     try{
       await api.render(ref,stage);
+      fitMainCardPhoto(stage);
+      decorateElectricCard(stage,t);
     }catch(err){
       console.warn('[Ostéo Pratik] Rendu carte V22.2 impossible',err);
       toastSafe('Impossible d’afficher la carte V22.2');
@@ -944,6 +999,123 @@
     syncAccount:syncAccountViewed,
     refresh
   };
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP30 · RECTO DE CARTE COMPACT ET RECADRÉ
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoCardFrontFitApp30) return;
+  window.__osteoCardFrontFitApp30=true;
+  function install(){
+    if(document.getElementById('opCardFrontFitApp30')) return;
+    const style=document.createElement('style');
+    style.id='opCardFrontFitApp30';
+    style.textContent=`
+      #op22AppCardOverlay .op22-app-shell{
+        max-height:calc(100dvh - 16px) !important;
+      }
+      #op22AppCardOverlay #op22AppCardStage{
+        display:flex !important;justify-content:center !important;
+        overflow:auto !important;min-height:0 !important;
+      }
+      #op22AppCardOverlay .op22-card{
+        width:min(370px,86vw) !important;
+        max-width:370px !important;
+        height:auto !important;
+        aspect-ratio:2 / 3 !important;
+        flex:0 0 auto !important;
+      }
+      #op22AppCardOverlay .op-app-main-card-photo{
+        object-fit:contain !important;
+        object-position:center center !important;
+        background:linear-gradient(145deg,#edf3f6,#dce7ed) !important;
+      }
+      @media(max-width:560px){
+        #op22AppCardOverlay .op22-card{
+          width:min(320px,82vw,calc(58dvh * 2 / 3)) !important;
+        }
+        #op22AppCardOverlay .op22-app-head,
+        #op22AppCardOverlay .op22-app-actions{
+          width:min(360px,92vw) !important;
+        }
+        #op22AppCardOverlay .op22-app-actions button{
+          min-height:40px !important;padding:8px 12px !important;
+        }
+      }
+      @media(max-height:720px) and (max-width:560px){
+        #op22AppCardOverlay .op22-card{
+          width:min(280px,76vw,calc(52dvh * 2 / 3)) !important;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_CARD_FRONT_FIT_APP30={version:'30.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP31 · CALQUE ÉLECTRIQUE DU RECTO
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoCardElectricLayerApp31) return;
+  window.__osteoCardElectricLayerApp31=true;
+  function install(){
+    if(document.getElementById('opCardElectricLayerApp31')) return;
+    const style=document.createElement('style');
+    style.id='opCardElectricLayerApp31';
+    style.textContent=`
+      #op22AppCardOverlay .op-app-electric-card{
+        filter:drop-shadow(0 0 9px rgba(var(--op-card-electric-rgb,57,231,255),.23));
+      }
+      #op22AppCardOverlay .op-app-electric-front{
+        position:relative !important;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.78) !important;
+        box-shadow:
+          0 0 0 1px rgba(var(--op-card-electric-rgb,57,231,255),.16),
+          0 0 20px rgba(var(--op-card-electric-rgb,57,231,255),.22),
+          inset 0 0 18px rgba(var(--op-card-electric-rgb,57,231,255),.08) !important;
+      }
+      #op22AppCardOverlay .op-app-electric-layer{
+        position:absolute;inset:5px;z-index:50;display:block;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.24);
+        border-radius:calc(1em - 3px);pointer-events:none;
+        box-shadow:inset 0 0 12px rgba(var(--op-card-electric-rgb,57,231,255),.06);
+      }
+      #op22AppCardOverlay .op-app-electric-layer::before,
+      #op22AppCardOverlay .op-app-electric-layer::after{
+        content:"";position:absolute;width:38px;height:38px;pointer-events:none;
+      }
+      #op22AppCardOverlay .op-app-electric-layer::before{
+        left:-2px;top:-2px;border-left:3px solid var(--op-card-electric,#39e7ff);
+        border-top:3px solid var(--op-card-electric,#39e7ff);border-radius:12px 0 0 0;
+        filter:drop-shadow(0 0 5px var(--op-card-electric,#39e7ff));
+      }
+      #op22AppCardOverlay .op-app-electric-layer::after{
+        right:-2px;bottom:-2px;border-right:3px solid var(--op-card-electric,#39e7ff);
+        border-bottom:3px solid var(--op-card-electric,#39e7ff);border-radius:0 0 12px 0;
+        filter:drop-shadow(0 0 5px var(--op-card-electric,#39e7ff));
+      }
+      #op22AppCardOverlay.is-open .op-app-electric-layer{
+        animation:opCardElectricPulse 3.2s ease-in-out infinite;
+      }
+      @keyframes opCardElectricPulse{
+        0%,100%{opacity:.72}
+        50%{opacity:1}
+      }
+      @media(prefers-reduced-motion:reduce){
+        #op22AppCardOverlay.is-open .op-app-electric-layer{animation:none}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_CARD_ELECTRIC_LAYER_APP31={version:'31.0',refresh:install};
 })();
 
 
