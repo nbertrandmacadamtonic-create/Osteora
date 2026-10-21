@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-   Version 22.2-app-20
+  Version 22.2-app-37
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-20';
+  const VERSION = '22.2-app-37';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';

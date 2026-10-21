@@ -1,3 +1,37 @@
+/* === APP38 · CHARGEUR ANTI-CACHE DE L'INTÉGRATION CARTES ===
+   index.html référence encore ?v=22.2-app-1. Ce chargeur, placé dans le
+   bridge qui le précède, exécute APP37 en premier sans modifier index.html. */
+(function(){
+  'use strict';
+  if(window.__osteoRevisionCardsLoaderApp38) return;
+  window.__osteoRevisionCardsLoaderApp38=true;
+
+  const FILE='revision-cards-v22_2-integration.js';
+  const SRC=FILE+'?v=22.2-app-37';
+
+  function isApp37AlreadyRequested(){
+    return Array.from(document.scripts || []).some(function(script){
+      const src=script.getAttribute('src') || '';
+      return src.indexOf(FILE)!==-1 && src.indexOf('22.2-app-37')!==-1;
+    });
+  }
+
+  if(isApp37AlreadyRequested()) return;
+
+  if(document.readyState==='loading'){
+    /* Chargement synchrone : APP37 passe avant l'ancienne balise APP1. */
+    document.write('<script data-osteo-revision-loader="app38" src="'+SRC+'"><'+'/script>');
+    return;
+  }
+
+  /* Secours si le bridge est chargé après la construction de la page. */
+  const script=document.createElement('script');
+  script.src=SRC;
+  script.async=false;
+  script.dataset.osteoRevisionLoader='app38';
+  (document.head || document.documentElement).appendChild(script);
+})();
+
 /* === V15.6 · INTRO VIDÉO AVEC SON + BOUTON REVOIR === */
 (function(){
   'use strict';
