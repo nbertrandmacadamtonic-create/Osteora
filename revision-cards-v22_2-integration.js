@@ -675,7 +675,8 @@
 
     const front=card.querySelector(
       '.op22-card-front,.op22-front,[class*="card-front"],[class*="face-front"],.op22-card-face:not(.op22-card-back):not([class*="back"])'
-    )||card.firstElementChild||card;
+    );
+    if(!front) return;
     front.classList.add('op-app-electric-front');
     if(!front.querySelector(':scope > .op-app-electric-layer')){
       const layer=document.createElement('span');
@@ -1073,7 +1074,6 @@
         filter:drop-shadow(0 0 9px rgba(var(--op-card-electric-rgb,57,231,255),.23));
       }
       #op22AppCardOverlay .op-app-electric-front{
-        position:relative !important;
         border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.78) !important;
         box-shadow:
           0 0 0 1px rgba(var(--op-card-electric-rgb,57,231,255),.16),
@@ -1116,6 +1116,48 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   window.OSTEO_CARD_ELECTRIC_LAYER_APP31={version:'31.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP32 · SÉPARATION RECTO / VERSO
+   Le calque ne modifie plus le positionnement 3D des faces.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoCardFacesSeparatedApp32) return;
+  window.__osteoCardFacesSeparatedApp32=true;
+  function install(){
+    if(document.getElementById('opCardFacesSeparatedApp32')) return;
+    const style=document.createElement('style');
+    style.id='opCardFacesSeparatedApp32';
+    style.textContent=`
+      #op22AppCardOverlay .op22-card-front,
+      #op22AppCardOverlay .op22-front,
+      #op22AppCardOverlay [class*="card-front"],
+      #op22AppCardOverlay [class*="face-front"]{
+        overflow:hidden !important;
+      }
+      #op22AppCardOverlay .op22-card-back,
+      #op22AppCardOverlay .op22-back,
+      #op22AppCardOverlay [class*="card-back"],
+      #op22AppCardOverlay [class*="face-back"],
+      #op22AppCardOverlay [class*="verso"]{
+        overflow-y:auto !important;
+        overflow-x:hidden !important;
+        overscroll-behavior:contain !important;
+        -webkit-overflow-scrolling:touch !important;
+      }
+      #op22AppCardOverlay .op-app-electric-layer{
+        transform:none !important;
+        backface-visibility:hidden !important;
+        -webkit-backface-visibility:hidden !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_CARD_FACES_APP32={version:'32.0',refresh:install};
 })();
 
 
