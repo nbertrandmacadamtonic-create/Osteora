@@ -2195,10 +2195,57 @@
   function audioTechniques(){
     try{
       if(typeof getViewedTechniquesForWheel==='function'){
-        return (getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+        return (getViewedTechniquesForWheel()||[])
+          .filter(t=>t&&(t.videoUrl||t.vimeoId))
+          .sort((a,b)=>String(a.title||'').localeCompare(String(b.title||''),'fr',{sensitivity:'base'}));
       }
     }catch(_){ }
     return [];
+  }
+
+  function populateAudioPicker(query,currentId){
+    const select=document.getElementById('opWheelAudioSelect');
+    if(!select) return;
+    const needle=String(query||'').trim().toLocaleLowerCase('fr');
+    const list=audioTechniques().filter(t=>
+      !needle || String(t.title||'').toLocaleLowerCase('fr').includes(needle)
+    );
+    select.innerHTML='';
+    if(!list.length){
+      const option=document.createElement('option');
+      option.value=''; option.textContent='Aucune technique trouvée';
+      select.appendChild(option);
+      select.disabled=true;
+      return;
+    }
+    select.disabled=false;
+    list.forEach(t=>{
+      const option=document.createElement('option');
+      option.value=String(t.id);
+      option.textContent=String(t.title||'Technique');
+      select.appendChild(option);
+    });
+    const wanted=String(currentId||audioTechniqueId||'');
+    if(list.some(t=>String(t.id)===wanted)) select.value=wanted;
+  }
+
+  function refreshLastViewedAudioCard(){
+    const card=document.getElementById('opWheelAudioLast');
+    const title=document.getElementById('opWheelAudioLastTitle');
+    if(!card||!title) return;
+    let saved=null;
+    try{saved=JSON.parse(localStorage.getItem('osteoPratikLastPractice')||'null');}catch(_){ }
+    const technique=saved?.id
+      ? audioTechniques().find(t=>String(t.id)===String(saved.id))
+      : null;
+    if(!technique){
+      card.hidden=true;
+      card.dataset.techniqueId='';
+      return;
+    }
+    card.hidden=false;
+    card.dataset.techniqueId=String(technique.id);
+    title.textContent=String(technique.title||'Technique');
   }
 
   function adjacentAudioTechnique(direction){
@@ -2295,6 +2342,42 @@
           radial-gradient(circle,rgba(0,229,255,.12),transparent 44%),
           rgba(0,229,255,.025);
       }
+      #opWheelAudioOverlay .op-audio-picker{
+        display:grid;gap:8px;margin:16px 0 12px;
+      }
+      #opWheelAudioOverlay .op-audio-last{
+        width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;
+        align-items:center;gap:5px 12px;margin:16px 0 12px;padding:13px 14px;
+        border-radius:16px;border:1px solid rgba(174,114,255,.45);
+        color:#fff;text-align:left;cursor:pointer;
+        background:linear-gradient(135deg,rgba(110,52,173,.42),rgba(18,48,91,.82));
+        box-shadow:0 10px 28px rgba(81,42,150,.16);
+      }
+      #opWheelAudioOverlay .op-audio-last[hidden]{display:none !important}
+      #opWheelAudioOverlay .op-audio-last small{
+        grid-column:1;color:#cfadff;font-size:9px;font-weight:950;
+        letter-spacing:.13em;text-transform:uppercase;
+      }
+      #opWheelAudioOverlay .op-audio-last strong{
+        grid-column:1;display:block;min-width:0;color:#fff;font-size:13px;
+        line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+      }
+      #opWheelAudioOverlay .op-audio-last span{
+        grid-column:2;grid-row:1 / 3;color:#75ecff;font-size:12px;font-weight:950;
+      }
+      #opWheelAudioOverlay .op-audio-picker label{
+        color:#79eaff;font-size:10px;font-weight:950;letter-spacing:.12em;text-transform:uppercase;
+      }
+      #opWheelAudioOverlay .op-audio-picker input,
+      #opWheelAudioOverlay .op-audio-picker select{
+        width:100%;min-height:44px;padding:0 12px;border-radius:13px;
+        border:1px solid rgba(104,233,255,.30);color:#f4fbff;
+        background:#07192b;font:inherit;font-size:13px;outline:none;
+      }
+      #opWheelAudioOverlay .op-audio-picker input:focus,
+      #opWheelAudioOverlay .op-audio-picker select:focus{
+        border-color:#54e8ff;box-shadow:0 0 0 3px rgba(84,232,255,.10);
+      }
       #opWheelAudioOverlay .op-audio-disc{
         width:84px;height:84px;border-radius:50%;
         border:1px solid rgba(0,229,255,.55);
@@ -2367,6 +2450,18 @@
           <button class="op-audio-close" type="button" aria-label="Fermer">×</button>
         </div>
 
+        <button class="op-audio-last" type="button" id="opWheelAudioLast" hidden>
+          <small>Dernière technique vue</small>
+          <strong id="opWheelAudioLastTitle">Technique</strong>
+          <span>Écouter ›</span>
+        </button>
+
+        <div class="op-audio-picker">
+          <label for="opWheelAudioSearch">Choisir une technique déjà vue</label>
+          <input id="opWheelAudioSearch" type="search" inputmode="search" autocomplete="off" placeholder="Rechercher une technique…">
+          <select id="opWheelAudioSelect" aria-label="Techniques disponibles par ordre alphabétique"></select>
+        </div>
+
         <div class="op-audio-visual">
           <div class="op-audio-disc">♫</div>
         </div>
@@ -2418,6 +2513,22 @@
         await audioPlayer.setCurrentTime(0);
         await audioPlayer.play();
       }catch(_){}
+    });
+
+    overlay.querySelector('#opWheelAudioSearch').addEventListener('input',event=>{
+      populateAudioPicker(event.currentTarget.value,audioTechniqueId);
+    });
+
+    overlay.querySelector('#opWheelAudioLast').addEventListener('click',event=>{
+      const id=event.currentTarget.dataset.techniqueId;
+      const t=audioTechniques().find(item=>String(item.id)===String(id));
+      if(t) openWheelAudio(t,false);
+    });
+
+    overlay.querySelector('#opWheelAudioSelect').addEventListener('change',event=>{
+      const id=event.currentTarget.value;
+      const t=audioTechniques().find(item=>String(item.id)===String(id));
+      if(t) openWheelAudio(t,false);
     });
 
     overlay.querySelector('#opWheelAudioPrevious').addEventListener('click',()=>{
@@ -2493,6 +2604,8 @@
 
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden','false');
+    refreshLastViewedAudioCard();
+    populateAudioPicker(document.getElementById('opWheelAudioSearch')?.value||'',t.id);
 
     try{
       if(audioPlayer){
@@ -3169,13 +3282,28 @@
   function availableAudioTechniques(){
     try{
       if(typeof window.getViewedTechniquesForWheel==='function'){
-        return (window.getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+        return (window.getViewedTechniquesForWheel()||[])
+          .filter(t=>t&&(t.videoUrl||t.vimeoId))
+          .sort((a,b)=>String(a.title||'').localeCompare(String(b.title||''),'fr',{sensitivity:'base'}));
       }
       if(typeof getViewedTechniquesForWheel==='function'){
-        return (getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+        return (getViewedTechniquesForWheel()||[])
+          .filter(t=>t&&(t.videoUrl||t.vimeoId))
+          .sort((a,b)=>String(a.title||'').localeCompare(String(b.title||''),'fr',{sensitivity:'base'}));
       }
     }catch(_){ }
     return [];
+  }
+
+  function lastViewedAudioTechnique(list){
+    try{
+      const saved=JSON.parse(localStorage.getItem('osteoPratikLastPractice')||'null');
+      if(saved?.id){
+        const match=(list||[]).find(t=>String(t.id)===String(saved.id));
+        if(match) return match;
+      }
+    }catch(_){ }
+    return (list||[])[0]||null;
   }
 
   function openRevisionAudioMode(){
@@ -3184,7 +3312,7 @@
       toastAudio('Visionnez d’abord une technique complète pour la réviser en audio');
       return;
     }
-    const first=list[Math.floor(Math.random()*list.length)];
+    const first=lastViewedAudioTechnique(list);
     if(window.OSTEO_WHEEL_V2?.audio){
       window.OSTEO_WHEEL_V2.audio(first,false);
       return;
