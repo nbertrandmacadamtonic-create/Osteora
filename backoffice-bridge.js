@@ -7,12 +7,12 @@
   window.__osteoRevisionCardsLoaderApp38=true;
 
   const FILE='revision-cards-v22_2-integration.js';
-  const SRC=FILE+'?v=22.2-app-37';
+  const SRC=FILE+'?v=22.2-app-39';
 
   function isApp37AlreadyRequested(){
     return Array.from(document.scripts || []).some(function(script){
       const src=script.getAttribute('src') || '';
-      return src.indexOf(FILE)!==-1 && src.indexOf('22.2-app-37')!==-1;
+      return src.indexOf(FILE)!==-1 && src.indexOf('22.2-app-39')!==-1;
     });
   }
 

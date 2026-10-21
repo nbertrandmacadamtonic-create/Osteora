@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-  Version 22.2-app-37
+  Version 22.2-app-39
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-37';
+  const VERSION = '22.2-app-39';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1281,13 +1281,15 @@
         filter:none !important;
         isolation:isolate !important;
       }
-      #op22AppCardOverlay .op22-card-inner{
+      #op22AppCardOverlay .op22-card-inner,
+      #op22AppCardOverlay .op22-inner{
         position:relative !important;
         width:100% !important;height:100% !important;
         transform-style:preserve-3d !important;
         -webkit-transform-style:preserve-3d !important;
       }
       #op22AppCardOverlay .op22-card-face,
+      #op22AppCardOverlay .op22-face,
       #op22AppCardOverlay .op22-card-front,
       #op22AppCardOverlay .op22-card-back{
         position:absolute !important;inset:0 !important;
@@ -1297,15 +1299,18 @@
         transform-style:preserve-3d !important;
         -webkit-transform-style:preserve-3d !important;
       }
-      #op22AppCardOverlay .op22-card-front{
+      #op22AppCardOverlay .op22-card-front,
+      #op22AppCardOverlay .op22-front{
         transform:rotateY(0deg) translateZ(1px) !important;
         -webkit-transform:rotateY(0deg) translateZ(1px) !important;
       }
-      #op22AppCardOverlay .op22-card-back{
+      #op22AppCardOverlay .op22-card-back,
+      #op22AppCardOverlay .op22-back{
         transform:rotateY(180deg) translateZ(1px) !important;
         -webkit-transform:rotateY(180deg) translateZ(1px) !important;
       }
-      #op22AppCardOverlay .op22-card.is-flipped .op22-card-inner{
+      #op22AppCardOverlay .op22-card.is-flipped .op22-card-inner,
+      #op22AppCardOverlay .op22-card.is-flipped .op22-inner{
         transform:rotateY(180deg) !important;
         -webkit-transform:rotateY(180deg) !important;
       }
@@ -1471,6 +1476,124 @@
   if(window.__osteoNativeCardLogosApp37) return;
   window.__osteoNativeCardLogosApp37=true;
   window.OSTEO_NATIVE_CARD_LOGOS_APP37={version:'37.0'};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP39 · CALQUE MODERNE SUR LA STRUCTURE RÉELLE
+   playing-cards-v22 utilise op22-inner/front/back/face.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoRealCardLayerApp39) return;
+  window.__osteoRealCardLayerApp39=true;
+
+  function installStyles(){
+    if(document.getElementById('opRealCardLayerApp39')) return;
+    const style=document.createElement('style');
+    style.id='opRealCardLayerApp39';
+    style.textContent=`
+      #op22AppCardOverlay .op22-card{
+        border-radius:24px !important;
+        background:#061321 !important;
+        box-shadow:0 0 0 1px rgba(var(--op-card-electric-rgb,57,231,255),.20),
+          0 0 30px rgba(var(--op-card-electric-rgb,57,231,255),.30) !important;
+      }
+      #op22AppCardOverlay .op22-inner{
+        position:relative !important;width:100% !important;height:100% !important;
+        transform-style:preserve-3d !important;-webkit-transform-style:preserve-3d !important;
+      }
+      #op22AppCardOverlay .op22-face{
+        position:absolute !important;inset:0 !important;width:100% !important;height:100% !important;
+        overflow:hidden !important;border-radius:24px !important;
+        backface-visibility:hidden !important;-webkit-backface-visibility:hidden !important;
+      }
+      #op22AppCardOverlay .op22-front{
+        transform:rotateY(0deg) translateZ(1px) !important;
+        -webkit-transform:rotateY(0deg) translateZ(1px) !important;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.85) !important;
+        box-shadow:inset 0 0 22px rgba(var(--op-card-electric-rgb,57,231,255),.10) !important;
+      }
+      #op22AppCardOverlay .op22-back{
+        transform:rotateY(180deg) translateZ(1px) !important;
+        -webkit-transform:rotateY(180deg) translateZ(1px) !important;
+        overflow-y:auto !important;
+        padding:14px 12px 12px !important;
+        background:radial-gradient(circle at 100% 0%,rgba(126,72,255,.20),transparent 34%),
+          linear-gradient(155deg,#071e33,#071426 55%,#100d28) !important;
+      }
+      #op22AppCardOverlay .op22-card.is-flipped .op22-inner{
+        transform:rotateY(180deg) !important;-webkit-transform:rotateY(180deg) !important;
+      }
+      #op22AppCardOverlay .op22-logo{
+        display:block !important;object-fit:contain !important;filter:none !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-logo-back{
+        width:auto !important;max-width:88px !important;height:28px !important;margin:0 auto 6px !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-code,
+      #op22AppCardOverlay .op22-back .op22-back-footer{
+        display:none !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-back-header{
+        margin:0 0 9px !important;padding:0 8px 8px !important;
+        border-bottom:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.34) !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-back-header h2{
+        margin:0 !important;color:#fff !important;font-size:15px !important;line-height:1.08 !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-step{
+        margin:0 0 8px !important;padding:8px !important;border-radius:13px !important;
+        border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.34) !important;
+        background:linear-gradient(135deg,rgba(7,35,55,.96),rgba(12,20,43,.94)) !important;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.04) !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-step-icon img{
+        display:block !important;width:100% !important;height:100% !important;
+        object-fit:contain !important;border:0 !important;background:transparent !important;
+        box-shadow:none !important;filter:none !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-step h3{
+        color:var(--op-card-electric,#39e7ff) !important;text-transform:uppercase !important;
+        letter-spacing:.055em !important;
+      }
+      #op22AppCardOverlay .op22-back .op22-step p{color:#edf8ff !important;}
+      #op22AppCardOverlay .op-app-electric-layer{
+        border-radius:19px !important;
+      }
+      @media(max-width:560px){
+        #op22AppCardOverlay .op22-back{padding:11px 9px 9px !important;}
+        #op22AppCardOverlay .op22-back .op22-logo-back{height:23px !important;margin-bottom:4px !important;}
+        #op22AppCardOverlay .op22-back .op22-back-header h2{font-size:12px !important;}
+        #op22AppCardOverlay .op22-back .op22-step{padding:6px !important;margin-bottom:6px !important;}
+        #op22AppCardOverlay .op22-back .op22-step h3{font-size:8px !important;}
+        #op22AppCardOverlay .op22-back .op22-step p{font-size:7.5px !important;line-height:1.22 !important;}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  function decorate(root){
+    const scope=root&&root.querySelectorAll?root:document;
+    scope.querySelectorAll('#op22AppCardOverlay .op22-card').forEach(card=>{
+      card.dataset.realLayer='app39';
+      card.querySelectorAll('.op22-logo').forEach(img=>img.classList.add('op-app-native-brand-logo'));
+      card.querySelectorAll('.op22-step-icon img').forEach(img=>img.classList.add('op-app-native-step-logo'));
+      card.querySelectorAll('.op22-step').forEach(step=>step.classList.add('op-app-back-section'));
+      const front=card.querySelector('.op22-front');
+      if(front&&!front.querySelector(':scope > .op-app-electric-layer')){
+        const layer=document.createElement('span');
+        layer.className='op-app-electric-layer';layer.setAttribute('aria-hidden','true');front.appendChild(layer);
+      }
+    });
+  }
+
+  installStyles();
+  decorate(document);
+  const observer=new MutationObserver(records=>records.forEach(record=>
+    record.addedNodes.forEach(node=>{if(node.nodeType===1) decorate(node);})
+  ));
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  window.OSTEO_REAL_CARD_LAYER_APP39={version:'39.0',refresh:()=>{installStyles();decorate(document);}};
 })();
 
 
