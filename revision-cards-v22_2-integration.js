@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-  Version 22.2-app-42
+  Version 22.2-app-43
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-42';
+  const VERSION = '22.2-app-43';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1618,6 +1618,165 @@
   ));
   observer.observe(document.documentElement,{childList:true,subtree:true});
   window.OSTEO_REAL_CARD_LAYER_APP39={version:'39.0',refresh:()=>{installStyles();decorate(document);}};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP43 · ESPACE MÉDAILLES
+   Sous-page distincte, accessible depuis Mes statistiques.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoRewardsApp43) return;
+  window.__osteoRewardsApp43=true;
+
+  const $=id=>document.getElementById(id);
+  const numberFrom=value=>Number(String(value||'0').replace(/[^0-9.-]/g,''))||0;
+  const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,char=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[char]));
+
+  function statNumber(id){return numberFrom($(id)?.textContent);}
+
+  function collectStats(){
+    let viewed=statNumber('statsVideos');
+    try{
+      const ids=window.OSTEO_REVISION_CARDS_V22_2?.viewed?.();
+      if(Array.isArray(ids)) viewed=ids.length;
+    }catch(_){ }
+    const cards=statNumber('statsSheets');
+    const streak=numberFrom(document.querySelector('#progress .stats-streak > b')?.textContent);
+    const learning=[...document.querySelectorAll('#osteoLearningStatsV1912 .op-learning-kpi b')];
+    const mastered=numberFrom(learning[0]?.textContent);
+    const review=numberFrom(learning[1]?.textContent);
+    const quizSummary=[...document.querySelectorAll('#opQuizStatsSummaryV1919 .op-learning-kpi b')];
+    const quizzes=numberFrom(quizSummary[0]?.textContent);
+    const quizAverage=numberFrom(quizSummary[1]?.textContent);
+    const perfect=[...document.querySelectorAll('#opQuizHistoryV1919 .op-history-row b')]
+      .some(node=>numberFrom(node.textContent)>=100);
+    const completedZones=[...document.querySelectorAll('#osteoLearningStatsV1912 .op-zone-row em')]
+      .filter(node=>{
+        const match=String(node.textContent||'').match(/(\d+)\s*\/\s*(\d+)/);
+        return match&&Number(match[2])>0&&Number(match[1])>=Number(match[2]);
+      }).length;
+    return {viewed,cards,streak,mastered,review,quizzes,quizAverage,perfect:perfect?1:0,completedZones};
+  }
+
+  const MEDALS=[
+    {id:'first-view',tier:'bronze',icon:'▶',title:'Premier pas',text:'Voir une première technique',key:'viewed',target:1},
+    {id:'explorer-10',tier:'silver',icon:'✦',title:'Explorateur',text:'Voir 10 techniques',key:'viewed',target:10},
+    {id:'explorer-25',tier:'gold',icon:'✧',title:'Grand explorateur',text:'Voir 25 techniques',key:'viewed',target:25},
+    {id:'first-card',tier:'bronze',icon:'▤',title:'Première révision',text:'Consulter une première carte',key:'cards',target:1},
+    {id:'cards-10',tier:'silver',icon:'▥',title:'Cartographe',text:'Consulter 10 cartes',key:'cards',target:10},
+    {id:'first-mastered',tier:'gold',icon:'◆',title:'Technique maîtrisée',text:'Maîtriser une technique',key:'mastered',target:1},
+    {id:'mastered-10',tier:'platinum',icon:'◇',title:'Expertise',text:'Maîtriser 10 techniques',key:'mastered',target:10},
+    {id:'first-quiz',tier:'bronze',icon:'✓',title:'Mise à l’épreuve',text:'Terminer un premier quiz',key:'quizzes',target:1},
+    {id:'quiz-80',tier:'silver',icon:'◎',title:'Précision',text:'Atteindre 80 % de moyenne',key:'quizAverage',target:80,suffix:'%'},
+    {id:'perfect',tier:'gold',icon:'★',title:'Sans faute',text:'Obtenir 100 % à un quiz',key:'perfect',target:1},
+    {id:'streak-3',tier:'bronze',icon:'◔',title:'Régularité',text:'Être actif 3 jours de suite',key:'streak',target:3},
+    {id:'streak-7',tier:'gold',icon:'♢',title:'Semaine complète',text:'Être actif 7 jours de suite',key:'streak',target:7},
+    {id:'zone-complete',tier:'platinum',icon:'⌖',title:'Anatomie accomplie',text:'Maîtriser entièrement une zone',key:'completedZones',target:1}
+  ];
+
+  function medalState(medal,stats){
+    const value=Math.max(0,Number(stats[medal.key])||0);
+    return {...medal,value,done:value>=medal.target,ratio:Math.min(1,value/medal.target)};
+  }
+
+  function ensureStyles(){
+    if($('opRewardsStylesApp43')) return;
+    const style=document.createElement('style');
+    style.id='opRewardsStylesApp43';
+    style.textContent=`
+      #progress .op-rewards-entry{position:relative;width:100%;margin:12px 0 18px;padding:17px 58px 17px 18px;border:1px solid rgba(255,190,72,.48);border-radius:23px;text-align:left;color:#fff;background:radial-gradient(circle at 92% 15%,rgba(255,193,71,.18),transparent 30%),linear-gradient(135deg,rgba(28,25,52,.96),rgba(7,25,43,.96));box-shadow:0 16px 38px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);cursor:pointer}
+      #progress .op-rewards-entry small{display:block;color:#ffc866;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}
+      #progress .op-rewards-entry strong{display:block;margin-top:5px;font-size:19px;line-height:1.1}
+      #progress .op-rewards-entry span{display:block;margin-top:6px;color:#9fb2c9;font-size:11px}
+      #progress .op-rewards-entry b{position:absolute;right:14px;top:50%;width:38px;height:38px;display:grid;place-items:center;transform:translateY(-50%);border:1px solid rgba(255,199,91,.68);border-radius:50%;color:#ffd57e;background:rgba(255,190,72,.08);font-size:23px;box-shadow:0 0 18px rgba(255,190,72,.18)}
+      #rewards{padding-bottom:110px;background:radial-gradient(circle at 50% 8%,rgba(255,184,62,.08),transparent 28%),#020914}
+      #rewards .op-rewards-title{margin:13px 0 15px;padding:20px;border:1px solid rgba(255,194,76,.30);border-radius:25px;background:linear-gradient(145deg,rgba(24,28,54,.94),rgba(5,18,33,.96));text-align:center}
+      #rewards .op-rewards-title small{color:#ffca68;font-size:9px;font-weight:950;letter-spacing:.16em;text-transform:uppercase}
+      #rewards .op-rewards-title h1{margin:7px 0 5px;color:#fff;font-size:29px;line-height:1}
+      #rewards .op-rewards-title p{margin:0;color:#9eb0c8;font-size:12px}
+      #rewards .op-next-medal{display:grid;grid-template-columns:82px minmax(0,1fr);gap:15px;align-items:center;margin-bottom:17px;padding:17px;border:1px solid rgba(0,229,255,.25);border-radius:23px;background:linear-gradient(145deg,rgba(9,31,52,.92),rgba(9,17,38,.96))}
+      #rewards .op-next-copy small{color:#76eaff;font-size:9px;font-weight:950;letter-spacing:.12em;text-transform:uppercase}
+      #rewards .op-next-copy strong{display:block;margin:5px 0;color:#fff;font-size:17px}
+      #rewards .op-next-copy span{color:#9eb0c8;font-size:11px}
+      #rewards .op-next-bar{height:7px;margin-top:10px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.08)}
+      #rewards .op-next-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#00e5ff,#8d6cff);box-shadow:0 0 12px rgba(0,229,255,.45)}
+      #rewards .op-medal-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+      #rewards .op-medal-card{position:relative;min-width:0;padding:15px 10px 13px;border:1px solid rgba(255,255,255,.09);border-radius:21px;text-align:center;background:linear-gradient(155deg,rgba(10,28,48,.92),rgba(7,13,29,.97));overflow:hidden}
+      #rewards .op-medal-card.is-done{border-color:rgba(var(--medal-rgb),.52);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 22px rgba(var(--medal-rgb),.10)}
+      #rewards .op-medal{position:relative;width:70px;height:70px;margin:4px auto 13px;display:grid;place-items:center;border-radius:50%;color:var(--medal);font-size:29px;font-weight:950;border:3px solid var(--medal);background:radial-gradient(circle at 36% 28%,rgba(255,255,255,.24),transparent 23%),linear-gradient(145deg,rgba(var(--medal-rgb),.28),rgba(3,12,24,.98));box-shadow:0 0 0 5px rgba(var(--medal-rgb),.08),0 0 20px rgba(var(--medal-rgb),.22),inset 0 0 16px rgba(var(--medal-rgb),.18)}
+      #rewards .op-medal::before,#rewards .op-medal::after{content:'';position:absolute;z-index:-1;bottom:-17px;width:21px;height:31px;background:linear-gradient(180deg,var(--medal),rgba(var(--medal-rgb),.30));clip-path:polygon(0 0,100% 0,82% 100%,50% 76%,18% 100%)}
+      #rewards .op-medal::before{left:9px;transform:rotate(8deg)} #rewards .op-medal::after{right:9px;transform:rotate(-8deg)}
+      #rewards .op-medal-card:not(.is-done){filter:saturate(.25);opacity:.64}
+      #rewards .op-medal-card:not(.is-done) .op-medal{color:#718095;border-color:#718095;--medal-rgb:113,128,149!important}
+      #rewards .op-medal-card h3{margin:0;color:#fff;font-size:13px;line-height:1.12}
+      #rewards .op-medal-card p{min-height:28px;margin:6px 0;color:#91a4bd;font-size:9.5px;line-height:1.3}
+      #rewards .op-medal-progress{height:5px;margin:9px 2px 5px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.08)}
+      #rewards .op-medal-progress i{display:block;height:100%;border-radius:inherit;background:var(--medal)}
+      #rewards .op-medal-card em{color:#a8b7ca;font-size:9px;font-style:normal;font-weight:850}
+      #rewards .bronze{--medal:#d99057;--medal-rgb:217,144,87} #rewards .silver{--medal:#bcd5e7;--medal-rgb:188,213,231} #rewards .gold{--medal:#ffc44f;--medal-rgb:255,196,79} #rewards .platinum{--medal:#72ecff;--medal-rgb:114,236,255}
+      @media(max-width:380px){#rewards .op-medal-grid{gap:8px}#rewards .op-medal-card{padding-left:7px;padding-right:7px}#rewards .op-medal{width:62px;height:62px}}
+    `;
+    document.head.appendChild(style);
+  }
+
+  function ensureEntry(){
+    const progress=$('progress');
+    if(!progress||$('opRewardsEntryApp43')) return;
+    const button=document.createElement('button');
+    button.id='opRewardsEntryApp43';button.type='button';button.className='op-rewards-entry';
+    button.innerHTML='<small>Collection personnelle</small><strong>Mes médailles</strong><span id="opRewardsEntryCount">Découvrez vos récompenses</span><b>›</b>';
+    button.addEventListener('click',openRewards);
+    const anchor=progress.querySelector('.stats-page-title');
+    if(anchor) anchor.insertAdjacentElement('afterend',button); else progress.prepend(button);
+  }
+
+  function ensureScreen(){
+    let screen=$('rewards');
+    if(screen) return screen;
+    screen=document.createElement('section');screen.id='rewards';screen.className='screen';
+    screen.innerHTML=`<header class="top"><button class="icon round" type="button" data-rewards-back>‹</button><div class="brand"><h1 class="logo">Médailles</h1><p class="subtitle">Mes récompenses</p></div><button class="icon" type="button" aria-label="Récompenses">✦</button></header><div class="op-rewards-title"><small>Progression personnelle</small><h1>Collection de médailles</h1><p>Chaque médaille récompense une étape réelle de votre apprentissage.</p></div><div id="opRewardsContent"></div>`;
+    document.body.appendChild(screen);
+    screen.querySelector('[data-rewards-back]').addEventListener('click',()=>{
+      try{if(typeof window.go==='function') window.go('progress');else if(typeof go==='function') go('progress');}catch(_){ }
+    });
+    return screen;
+  }
+
+  function medalHTML(medal){
+    const current=Math.min(medal.value,medal.target);
+    const display=(medal.suffix==='%'?current+'%':current)+' / '+medal.target+(medal.suffix||'');
+    return `<article class="op-medal-card ${medal.tier} ${medal.done?'is-done':''}"><div class="op-medal">${esc(medal.icon)}</div><h3>${esc(medal.title)}</h3><p>${esc(medal.text)}</p><div class="op-medal-progress"><i style="width:${Math.round(medal.ratio*100)}%"></i></div><em>${medal.done?'Médaille obtenue':display}</em></article>`;
+  }
+
+  function renderRewards(){
+    ensureStyles();ensureEntry();ensureScreen();
+    const states=MEDALS.map(medal=>medalState(medal,collectStats()));
+    const obtained=states.filter(medal=>medal.done).length;
+    const next=states.filter(medal=>!medal.done).sort((a,b)=>b.ratio-a.ratio||a.target-b.target)[0]||states[states.length-1];
+    const entryCount=$('opRewardsEntryCount');
+    if(entryCount) entryCount.textContent=obtained+' / '+states.length+' médailles obtenues';
+    const content=$('opRewardsContent');if(!content) return;
+    content.innerHTML=`<article class="op-next-medal ${next.tier}"><div class="op-medal">${esc(next.icon)}</div><div class="op-next-copy"><small>${obtained===states.length?'Collection complète':'Prochaine médaille'}</small><strong>${esc(next.title)}</strong><span>${esc(next.text)} · ${Math.min(next.value,next.target)} / ${next.target}${next.suffix||''}</span><div class="op-next-bar"><i style="width:${Math.round(next.ratio*100)}%"></i></div></div></article><div class="op-medal-grid">${states.map(medalHTML).join('')}</div>`;
+  }
+
+  function openRewards(){
+    renderRewards();
+    try{if(typeof window.go==='function') window.go('rewards');else if(typeof go==='function') go('rewards');}catch(_){
+      document.querySelectorAll('.screen').forEach(screen=>screen.classList.toggle('active',screen.id==='rewards'));
+    }
+    $('rewards')?.scrollTo?.({top:0,behavior:'smooth'});
+  }
+
+  function install(){ensureStyles();ensureEntry();ensureScreen();renderRewards();}
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true}); else install();
+  const observer=new MutationObserver(()=>{
+    if($('progress')?.classList.contains('active')) setTimeout(()=>{ensureEntry();renderRewards();},80);
+  });
+  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});
+  window.OSTEO_REWARDS_APP43={version:'43.0',open:openRewards,refresh:renderRewards};
 })();
 
 
