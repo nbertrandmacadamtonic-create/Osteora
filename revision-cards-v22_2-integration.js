@@ -686,6 +686,56 @@
     }
   }
 
+  function cleanCardBackMetadata(stage){
+    if(!stage) return;
+    const apply=()=>{
+      const back=stage.querySelector(
+        '.op22-card-back,.op22-back,[class*="card-back"],[class*="face-back"],[class*="verso"]'
+      );
+      if(!back) return;
+      [...back.querySelectorAll('*')].forEach(node=>{
+        if(node.children.length) return;
+        const text=String(node.textContent||'').replace(/\s+/g,' ').trim();
+        const isCode=/^[A-ZÀ-Ü]{1,4}\s*[-–]?\s*\d{1,3}$/i.test(text);
+        const isMethod=/^(thrust|snap|énergie musculaire|energie musculaire)$/i.test(text);
+        if(isCode||isMethod){
+          node.classList.add('op-app-back-meta-hidden');
+          node.setAttribute('aria-hidden','true');
+        }
+      });
+    };
+    apply();
+    setTimeout(apply,80);
+    setTimeout(apply,320);
+  }
+
+  function enableWholeCardFlip(stage){
+    const card=stage?.querySelector('.op22-card');
+    if(!card||card.dataset.wholeFlip==='app35') return;
+    card.dataset.wholeFlip='app35';
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    card.setAttribute('aria-label','Retourner la carte');
+    let startX=0,startY=0,moved=false;
+    card.addEventListener('pointerdown',event=>{
+      startX=event.clientX;startY=event.clientY;moved=false;
+    });
+    card.addEventListener('pointermove',event=>{
+      if(Math.abs(event.clientX-startX)>8||Math.abs(event.clientY-startY)>8) moved=true;
+    });
+    card.addEventListener('click',event=>{
+      if(moved||event.target.closest('button,a,input,select,textarea')) return;
+      card.classList.toggle('is-flipped');
+      card.setAttribute('aria-label',card.classList.contains('is-flipped')?'Afficher le recto':'Afficher le verso');
+    });
+    card.addEventListener('keydown',event=>{
+      if(event.key!=='Enter'&&event.key!==' ') return;
+      event.preventDefault();
+      card.classList.toggle('is-flipped');
+      card.setAttribute('aria-label',card.classList.contains('is-flipped')?'Afficher le recto':'Afficher le verso');
+    });
+  }
+
   function resolveRef(t,premiumApi){
     if(!t) return null;
 
@@ -816,6 +866,8 @@
       await api.render(ref,stage);
       fitMainCardPhoto(stage);
       decorateElectricCard(stage,t);
+      cleanCardBackMetadata(stage);
+      enableWholeCardFlip(stage);
     }catch(err){
       console.warn('[Ostéo Pratik] Rendu carte V22.2 impossible',err);
       toastSafe('Impossible d’afficher la carte V22.2');
@@ -1212,6 +1264,74 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   window.OSTEO_CARD_IOS_FACES_APP33={version:'33.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP34 · VERSO ALLÉGÉ
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoCardBackCompactApp34) return;
+  window.__osteoCardBackCompactApp34=true;
+  function install(){
+    if(document.getElementById('opCardBackCompactApp34')) return;
+    const style=document.createElement('style');
+    style.id='opCardBackCompactApp34';
+    style.textContent=`
+      #op22AppCardOverlay .op-app-back-meta-hidden{
+        display:none !important;
+      }
+      @media(max-width:560px){
+        #op22AppCardOverlay .op22-card.is-flipped{
+          width:min(290px,76vw,calc(54dvh * 2 / 3)) !important;
+        }
+        #op22AppCardOverlay .op22-card-back,
+        #op22AppCardOverlay .op22-back,
+        #op22AppCardOverlay [class*="card-back"],
+        #op22AppCardOverlay [class*="face-back"],
+        #op22AppCardOverlay [class*="verso"]{
+          scrollbar-width:thin;
+          scrollbar-color:rgba(87,230,255,.58) rgba(3,20,34,.24);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_CARD_BACK_COMPACT_APP34={version:'34.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP35 · CARTE ENTIÈREMENT CLIQUABLE
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoWholeCardClickableApp35) return;
+  window.__osteoWholeCardClickableApp35=true;
+  function install(){
+    if(document.getElementById('opWholeCardClickableApp35')) return;
+    const style=document.createElement('style');
+    style.id='opWholeCardClickableApp35';
+    style.textContent=`
+      #op22AppCardOverlay .op22-card[data-whole-flip="app35"]{
+        cursor:pointer !important;
+        -webkit-tap-highlight-color:transparent;
+        touch-action:pan-y;
+      }
+      #op22AppCardOverlay .op22-card[data-whole-flip="app35"]:focus-visible{
+        outline:2px solid var(--op-card-electric,#39e7ff) !important;
+        outline-offset:4px !important;
+      }
+      #op22AppCardOverlay .op22-card[data-whole-flip="app35"]:active{
+        opacity:.97;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_WHOLE_CARD_CLICKABLE_APP35={version:'35.0',refresh:install};
 })();
 
 
