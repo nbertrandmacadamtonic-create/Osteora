@@ -1071,7 +1071,7 @@
     style.id='opCardElectricLayerApp31';
     style.textContent=`
       #op22AppCardOverlay .op-app-electric-card{
-        filter:drop-shadow(0 0 9px rgba(var(--op-card-electric-rgb,57,231,255),.23));
+        filter:none !important;
       }
       #op22AppCardOverlay .op-app-electric-front{
         border:1px solid rgba(var(--op-card-electric-rgb,57,231,255),.78) !important;
@@ -1158,6 +1158,60 @@
   install();
   document.addEventListener('DOMContentLoaded',install,{once:true});
   window.OSTEO_CARD_FACES_APP32={version:'32.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP33 · CORRECTION SUPERPOSITION IOS
+   Aucun filtre n'est appliqué au conteneur de rotation 3D.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoCardIosFacesApp33) return;
+  window.__osteoCardIosFacesApp33=true;
+  function install(){
+    if(document.getElementById('opCardIosFacesApp33')) return;
+    const style=document.createElement('style');
+    style.id='opCardIosFacesApp33';
+    style.textContent=`
+      #op22AppCardOverlay .op22-card{
+        perspective:1200px !important;
+        filter:none !important;
+        isolation:isolate !important;
+      }
+      #op22AppCardOverlay .op22-card-inner{
+        position:relative !important;
+        width:100% !important;height:100% !important;
+        transform-style:preserve-3d !important;
+        -webkit-transform-style:preserve-3d !important;
+      }
+      #op22AppCardOverlay .op22-card-face,
+      #op22AppCardOverlay .op22-card-front,
+      #op22AppCardOverlay .op22-card-back{
+        position:absolute !important;inset:0 !important;
+        width:100% !important;height:100% !important;
+        backface-visibility:hidden !important;
+        -webkit-backface-visibility:hidden !important;
+        transform-style:preserve-3d !important;
+        -webkit-transform-style:preserve-3d !important;
+      }
+      #op22AppCardOverlay .op22-card-front{
+        transform:rotateY(0deg) translateZ(1px) !important;
+        -webkit-transform:rotateY(0deg) translateZ(1px) !important;
+      }
+      #op22AppCardOverlay .op22-card-back{
+        transform:rotateY(180deg) translateZ(1px) !important;
+        -webkit-transform:rotateY(180deg) translateZ(1px) !important;
+      }
+      #op22AppCardOverlay .op22-card.is-flipped .op22-card-inner{
+        transform:rotateY(180deg) !important;
+        -webkit-transform:rotateY(180deg) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  install();
+  document.addEventListener('DOMContentLoaded',install,{once:true});
+  window.OSTEO_CARD_IOS_FACES_APP33={version:'33.0',refresh:install};
 })();
 
 
