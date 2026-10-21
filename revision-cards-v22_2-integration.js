@@ -1,6 +1,6 @@
 /* ==============================================================
    OSTÉO PRATIK — RÉVISION PROPRE + CARTES V22.2
-  Version 22.2-app-40
+  Version 22.2-app-42
    --------------------------------------------------------------
    - supprime les anciens déblocages de démonstration 12 / 401
    - source unique : techniques réellement visionnées
@@ -14,7 +14,7 @@
 (function(){
   'use strict';
 
-  const VERSION = '22.2-app-40';
+  const VERSION = '22.2-app-42';
 
   const CLEAN_KEY  = 'osteoPratikViewedTechniqueIdsCleanV1';
   const STRICT_KEY = 'osteoPratikStrictViewedTechniqueIdsV2';
@@ -1568,6 +1568,29 @@
         #op22AppCardOverlay .op22-back .op22-step{padding:6px !important;margin-bottom:6px !important;}
         #op22AppCardOverlay .op22-back .op22-step h3{font-size:8px !important;}
         #op22AppCardOverlay .op22-back .op22-step p{font-size:7.5px !important;line-height:1.22 !important;}
+      }
+      @media(max-width:760px){
+        #op22AppCardOverlay .op22-card.is-flipped{
+          width:min(255px,70vw,calc(48dvh * 2 / 3)) !important;
+          max-width:255px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-back{
+          padding:9px 7px 7px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-logo-back{
+          height:21px !important;max-width:76px !important;margin-bottom:3px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-back-header{
+          margin-bottom:5px !important;padding-bottom:5px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-back-header h2{
+          font-size:10.5px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-step{
+          margin-bottom:4px !important;padding:5px !important;border-radius:10px !important;
+        }
+        #op22AppCardOverlay .op22-card.is-flipped .op22-step h3{font-size:7.5px !important;}
+        #op22AppCardOverlay .op22-card.is-flipped .op22-step p{font-size:6.8px !important;line-height:1.16 !important;}
       }
     `;
     document.head.appendChild(style);
