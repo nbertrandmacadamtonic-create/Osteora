@@ -2519,11 +2519,16 @@
       audioPlayer=new window.Vimeo.Player(iframe);
       audioTechniqueId=Number(t.id)||0;
       audioTechnique=t;
+      let activityRecorded=false;
 
       audioPlayer.on('play',()=>{
         overlay.classList.add('is-playing');
         if(status) status.textContent='Lecture en cours';
         if(playBtn) playBtn.textContent='❚❚ Pause';
+        if(!activityRecorded){
+          activityRecorded=true;
+          try{window.OSTEO_USER_DATA_V19?.recordActivity?.('audio',t.title||'Révision audio');}catch(_){ }
+        }
       });
 
       audioPlayer.on('pause',()=>{
@@ -3142,4 +3147,68 @@
   document.addEventListener('DOMContentLoaded',install,{once:true});
   setTimeout(install,500);
   window.OSTEO_WHEEL_ACTIONS_GRADIENT_APP21={version:'21.0',refresh:install};
+})();
+
+/* =========================================================
+   OSTÉO PRATIK — APP23 · ENTRÉE « RÉVISER EN ÉCOUTANT »
+   Le menu Réviser utilise le même lecteur que la roue et la même
+   source Supabase de techniques réellement vues.
+   ========================================================= */
+(function(){
+  'use strict';
+  if(window.__osteoRevisionAudioEntryApp23) return;
+  window.__osteoRevisionAudioEntryApp23=true;
+
+  function toastAudio(message){
+    try{
+      if(typeof window.toast==='function') return window.toast(message);
+      if(typeof toast==='function') return toast(message);
+    }catch(_){ }
+  }
+
+  function availableAudioTechniques(){
+    try{
+      if(typeof window.getViewedTechniquesForWheel==='function'){
+        return (window.getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+      }
+      if(typeof getViewedTechniquesForWheel==='function'){
+        return (getViewedTechniquesForWheel()||[]).filter(t=>t&&(t.videoUrl||t.vimeoId));
+      }
+    }catch(_){ }
+    return [];
+  }
+
+  function openRevisionAudioMode(){
+    const list=availableAudioTechniques();
+    if(!list.length){
+      toastAudio('Visionnez d’abord une technique complète pour la réviser en audio');
+      return;
+    }
+    const first=list[Math.floor(Math.random()*list.length)];
+    if(window.OSTEO_WHEEL_V2?.audio){
+      window.OSTEO_WHEEL_V2.audio(first,false);
+      return;
+    }
+    toastAudio('Le lecteur audio est en cours de chargement');
+  }
+
+  function connectEntry(){
+    const candidates=[...document.querySelectorAll('#revision .revision-orbit-card')];
+    const button=candidates.find(node=>
+      node.classList.contains('revision-review') ||
+      /réviser en écoutant/i.test(node.textContent||'')
+    );
+    if(!button) return false;
+    button.setAttribute('onclick','openRevisionAudioMode()');
+    button.setAttribute('aria-label','Réviser en écoutant les techniques déjà vues');
+    button.dataset.audioConnected='app23';
+    return true;
+  }
+
+  window.openRevisionAudioMode=openRevisionAudioMode;
+  try{openRevisionAudioMode=window.openRevisionAudioMode;}catch(_){ }
+  connectEntry();
+  document.addEventListener('DOMContentLoaded',connectEntry,{once:true});
+  [100,500,1200,2500].forEach(ms=>setTimeout(connectEntry,ms));
+  window.OSTEO_REVISION_AUDIO_APP23={version:'23.0',open:openRevisionAudioMode,refresh:connectEntry};
 })();
