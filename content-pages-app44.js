@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'44.0'};
+  window.OSTEO_CONTENT_APP44={version:'45.0'};
   const defaults={
     about:{slug:'about',title:'Qui sommes-nous',body:'Ostéo Pratik est une application pédagogique consacrée à l’apprentissage et à la révision des techniques ostéopathiques.\n\nConçue par Nicolas Bertrand, masseur-kinésithérapeute et ostéopathe, elle associe vidéos, cartes de révision, audio et quiz pour accompagner un apprentissage régulier.\n\nNotre démarche\nTransmettre des repères clairs, faciliter la mémorisation et permettre à chacun de suivre sa progression.\n\nLes contenus sont des supports pédagogiques. Ils s’adressent aux étudiants et aux professionnels formés et ne remplacent ni une formation pratique encadrée, ni l’évaluation clinique d’un patient.'},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
@@ -11,8 +11,8 @@
   function node(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
   function bodyInto(el,text){el.replaceChildren();String(text||'').split(/\n\s*\n/).forEach(p=>el.appendChild(node('p',p)));}
   function style(){if($('opContentStyle44'))return;const s=node('style');s.id='opContentStyle44';s.textContent=`
-    .op-content-links{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:18px 12px}.op-content-links button{color:#b9ddec;background:transparent;border:1px solid #31516a;border-radius:14px;padding:12px;font:inherit;cursor:pointer}
-    #opContentDialog44{color:#edf6ff;background:#081528;border:1px solid #286078;border-radius:22px;padding:0;width:min(680px,calc(100% - 24px));max-height:88dvh;overflow:auto;box-sizing:border-box}#opContentDialog44::backdrop{background:#020815de}
+    .op-content-links{display:grid;gap:12px;padding:8px 0 12px}.op-content-links button{text-align:left;min-height:48px}#opSettingsDialog45{width:min(440px,calc(100% - 24px))}.op-content-links button{color:#b9ddec;background:transparent;border:1px solid #31516a;border-radius:14px;padding:12px;font:inherit;cursor:pointer}
+    #opContentDialog44,#opSettingsDialog45{color:#edf6ff;background:#081528;border:1px solid #286078;border-radius:22px;padding:0;width:min(680px,calc(100% - 24px));max-height:88dvh;overflow:auto;box-sizing:border-box}#opContentDialog44::backdrop,#opSettingsDialog45::backdrop{background:#020815de}
     .op-content-page{padding:22px;overflow-wrap:anywhere}.op-content-page h1{font-size:26px;line-height:1.2;margin:20px 0}.op-content-page p{white-space:pre-line;line-height:1.7;margin:0 0 20px}.op-content-page small{color:#9bb1ca}.op-content-close{color:#001b27;background:#57d9ef;border:0;border-radius:12px;padding:12px 18px;font:inherit;cursor:pointer;min-height:44px}
     #contentWorkspace44{grid-column:1/-1;min-width:0;padding:22px}#contentWorkspace44[hidden]{display:none!important}#contentWorkspace44 input,#contentWorkspace44 textarea{box-sizing:border-box;width:100%;color:#edf6ff;background:#091729;border:1px solid #31516a;border-radius:10px;padding:12px;font:inherit}#contentWorkspace44 textarea{min-height:360px;resize:vertical}#contentWorkspace44 label{display:block;margin:16px 0}#contentWorkspace44 .op-content-actions{display:flex;gap:10px;flex-wrap:wrap}#contentWorkspace44 .op-content-preview{margin-top:20px;padding:18px;border:1px solid #31516a;border-radius:14px;overflow-wrap:anywhere}#contentWorkspace44 .op-content-preview p{white-space:pre-line;line-height:1.6}#contentWorkspace44 input[type=checkbox]{width:auto}#contentStatus44{white-space:pre-line;line-height:1.6}#contentWorkspace44 button{min-height:44px} .workspace-tabs{flex-wrap:wrap}
     @media(max-width:480px){.op-content-page{padding:18px}.op-content-page h1{font-size:24px}#contentWorkspace44{padding:14px}}
@@ -25,19 +25,39 @@
     return (await response.json())[0]||null;
   }
   let openSequence=0;
-  async function openPage(slug){
+  async function openPage(slug,fromSettings=false){
     const seq=++openSequence;let dialog=$('opContentDialog44');
     if(!dialog){dialog=node('dialog');dialog.id='opContentDialog44';dialog.setAttribute('aria-labelledby','opContentTitle44');document.body.appendChild(dialog);}
-    const wrap=node('article',null,'op-content-page'),close=node('button','← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
-    title.id='opContentTitle44';close.type='button';close.onclick=()=>dialog.close();wrap.append(close,title,meta,body);dialog.replaceChildren(wrap);if(!dialog.open)dialog.showModal();close.focus();
+    const wrap=node('article',null,'op-content-page'),close=node('button',fromSettings?'← Paramètres':'← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
+    title.id='opContentTitle44';close.type='button';close.onclick=()=>{dialog.close();if(fromSettings)openSettings();};wrap.append(close,title,meta,body);dialog.replaceChildren(wrap);if(!dialog.open)dialog.showModal();close.focus();
     try{
       const page=await publicPage(slug);if(seq!==openSequence)return;
       if(page){title.textContent=page.title;meta.textContent='Mis à jour le '+new Date(page.updated_at).toLocaleDateString('fr-FR');bodyInto(body,page.body);}
       else {meta.textContent='';bodyInto(body,'Cette page n’est pas encore publiée.');}
     }catch(e){if(seq!==openSequence)return;meta.textContent='';bodyInto(body,'Impossible de charger cette page. Vérifiez votre connexion et réessayez.');}
   }
+  function openSettings(){
+    let dialog=$('opSettingsDialog45');
+    if(!dialog){
+      dialog=node('dialog');dialog.id='opSettingsDialog45';dialog.setAttribute('aria-labelledby','opSettingsTitle45');
+      const wrap=node('article',null,'op-content-page'),close=node('button','Fermer','op-content-close'),title=node('h1','Paramètres'),links=node('nav',null,'op-content-links');
+      title.id='opSettingsTitle45';close.type='button';close.onclick=()=>dialog.close();links.setAttribute('aria-label','Informations');
+      for(const slug of ['about','cgu']){const button=node('button',defaults[slug].title);button.type='button';button.onclick=()=>{dialog.close();openPage(slug,true);};links.appendChild(button);}
+      wrap.append(close,title,links);dialog.appendChild(wrap);document.body.appendChild(dialog);
+    }
+    if(!dialog.open)dialog.showModal();
+  }
   function app(){
-    function install(){for(const id of ['home','profile']){const target=$(id);if(!target||target.querySelector('.op-content-links'))continue;const links=node('nav',null,'op-content-links');links.setAttribute('aria-label','Informations Ostéo Pratik');for(const slug of ['about','cgu']){const b=node('button',slug==='about'?'Qui sommes-nous':'CGU');b.type='button';b.onclick=()=>openPage(slug);links.appendChild(b);}target.appendChild(links);}}
+    function install(){
+      document.querySelectorAll('#home > .op-content-links,#profile > .op-content-links').forEach(n=>n.remove());
+      const launchers=[document.querySelector('#home .home-settings'),document.querySelector('#profile > header > button.icon:last-child')].filter(Boolean);
+      for(const button of launchers){
+        if(button.dataset.opSettings45)continue;
+        button.dataset.opSettings45='1';button.removeAttribute('onclick');button.onclick=openSettings;button.type='button';
+        button.setAttribute('aria-label','Paramètres');button.setAttribute('aria-haspopup','dialog');button.setAttribute('title','Paramètres');
+        button.textContent='⚙';
+      }
+    }
     install();document.addEventListener('DOMContentLoaded',install,{once:true});[300,1200,3000].forEach(t=>setTimeout(install,t));
   }
   async function admin(){
