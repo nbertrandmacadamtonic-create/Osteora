@@ -4211,3 +4211,12 @@
   [100,500,1200,2500].forEach(ms=>setTimeout(connectEntry,ms));
   window.OSTEO_REVISION_AUDIO_APP23={version:'23.0',open:openRevisionAudioMode,refresh:connectEntry};
 })();
+
+/* APP44 — extension éditoriale indépendante. Bridge permanent APP41 conservé. */
+(function(){
+  if(document.querySelector('script[data-op-content-app44]'))return;
+  const s=document.createElement('script');
+  const current=document.currentScript;
+  s.src=new URL('content-pages-app44.js?cb='+Date.now(),current?.src||location.href).href;
+  s.dataset.opContentApp44='1';document.head.appendChild(s);
+})();
