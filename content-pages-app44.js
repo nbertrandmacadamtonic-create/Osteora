@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'48.0'};
+  window.OSTEO_CONTENT_APP44={version:'49.0'};
   const defaults={
     about:{slug:'about',title:'Qui sommes-nous',body:'Ostéo Pratik est une application pédagogique consacrée à l’apprentissage et à la révision des techniques ostéopathiques.\n\nConçue par Nicolas Bertrand, masseur-kinésithérapeute et ostéopathe, elle associe vidéos, cartes de révision, audio et quiz pour accompagner un apprentissage régulier.\n\nNotre démarche\nTransmettre des repères clairs, faciliter la mémorisation et permettre à chacun de suivre sa progression.\n\nLes contenus sont des supports pédagogiques. Ils s’adressent aux étudiants et aux professionnels formés et ne remplacent ni une formation pratique encadrée, ni l’évaluation clinique d’un patient.'},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
@@ -53,7 +53,7 @@
   async function openPage(slug,fromSettings=false){
     const seq=++openSequence;let dialog=$('opContentDialog44');
     if(!dialog){dialog=node('dialog');dialog.id='opContentDialog44';dialog.setAttribute('aria-labelledby','opContentTitle44');document.body.appendChild(dialog);}
-    const wrap=node('article',null,'op-content-page'),close=node('button',fromSettings?'← Paramètres':'← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
+    const wrap=node('article',null,'op-content-page'),close=node('button',fromSettings?'← Réglages':'← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
     title.id='opContentTitle44';close.type='button';close.onclick=()=>{dialog.close();if(fromSettings)openSettings();};wrap.append(close,title,meta,body);dialog.replaceChildren(wrap);if(!dialog.open)dialog.showModal();close.focus();
     try{
       const page=await publicPage(slug);if(seq!==openSequence)return;
@@ -65,12 +65,20 @@
   function preferences46(){try{return JSON.parse(localStorage.getItem('osteo.preferences.app46')||'{}')||{};}catch(_){return {};}}
   function applyPreferences46(){const p=preferences46();document.documentElement.classList.toggle('op-reduce-motion46',p.reduceMotion===true);document.documentElement.style.setProperty('--op-reading46',p.largeText?'18px':'16px');}
   function navigateLogin46(){const d=$('opSettingsDialog45');if(d?.open)d.close();if(typeof window.go==='function')window.go('login');}
+  let menuMode49='settings';
+  function openCurrentMenu49(){if(menuMode49==='profile')openProfile49();else openSettings();}
   function settingsShell46(title){
     let dialog=$('opSettingsDialog45');
-    if(!dialog){dialog=node('dialog');dialog.id='opSettingsDialog45';document.body.appendChild(dialog);dialog.addEventListener('close',()=>{++settingsRun46;dialog.replaceChildren();document.documentElement.classList.remove('op-settings-open47');document.querySelectorAll('[data-op-settings45]').forEach(b=>b.setAttribute('aria-expanded','false'));});dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();});}
-    dialog.setAttribute('aria-labelledby','opSettingsTitle45');
-    const wrap=node('article',null,'op-content-page'),head=node('div',null,'op46-head'),back=node('button',title==='Paramètres et compte'?'Fermer':'← Paramètres','op-content-close'),h=node('h1',title);
-    back.type='button';back.onclick=()=>{if(title==='Paramètres et compte')dialog.close();else openSettings();};h.id='opSettingsTitle45';if(title==='Paramètres et compte'){wrap.classList.add('op46-menu47');h.textContent='Paramètres';back.textContent='×';back.setAttribute('aria-label','Fermer les paramètres');}head.append(back,h);wrap.appendChild(head);dialog.replaceChildren(wrap);dialog.scrollTop=0;if(!dialog.open)dialog.showModal();document.documentElement.classList.add('op-settings-open47');document.querySelectorAll('[data-op-settings45]').forEach(b=>b.setAttribute('aria-expanded','true'));back.focus();return wrap;
+    if(!dialog){dialog=node('dialog');dialog.id='opSettingsDialog45';document.body.appendChild(dialog);dialog.addEventListener('close',()=>{++settingsRun46;dialog.replaceChildren();document.documentElement.classList.remove('op-settings-open47');document.querySelectorAll('[data-op-settings45],[data-op-profile49]').forEach(b=>b.setAttribute('aria-expanded','false'));});dialog.addEventListener('click',e=>{if(e.target!==dialog)return;const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();});}
+    const root=title==='Réglages'||title==='Mon profil';
+    dialog.setAttribute('aria-labelledby','opSettingsTitle45');dialog.dataset.menuMode49=menuMode49;
+    const wrap=node('article',null,'op-content-page'),head=node('div',null,'op46-head'),back=node('button',root?'×':menuMode49==='profile'?'← Profil':'← Réglages','op-content-close'),h=node('h1',title);
+    back.type='button';back.onclick=()=>{if(root)dialog.close();else openCurrentMenu49();};h.id='opSettingsTitle45';
+    if(root){wrap.classList.add('op46-menu47');back.setAttribute('aria-label','Fermer '+(menuMode49==='profile'?'le profil':'les réglages'));}
+    head.append(back,h);wrap.appendChild(head);dialog.replaceChildren(wrap);dialog.scrollTop=0;
+    if(!dialog.open)dialog.showModal();document.documentElement.classList.add('op-settings-open47');
+    document.querySelectorAll('[data-op-settings45],[data-op-profile49]').forEach(b=>b.setAttribute('aria-expanded',String(menuMode49==='profile'?b.hasAttribute('data-op-profile49'):b.hasAttribute('data-op-settings45'))));
+    back.focus();return wrap;
   }
   function settingButton46(parent,label,detail,action){
     const icons={'Mon compte':'♙','Mon abonnement':'◇','Préférences':'⚙','Qui sommes-nous':'ⓘ','Conditions générales d’utilisation':'≡','Confidentialité':'♧','Suppression du compte':'−','Se déconnecter':'↪','Se connecter':'→','Modifier mon mot de passe':'⌁'};
@@ -123,12 +131,16 @@
   }
   async function logout46(button){button.disabled=true;try{const {c}=await session46();const {error}=await c.auth.signOut();if(error)throw error;$('opSettingsDialog45')?.close();if(typeof window.go==='function')window.go('welcome');}catch(e){button.disabled=false;const s=$('op46MenuStatus');if(s)s.textContent='Déconnexion impossible. Vérifiez votre connexion et réessayez.';}}
   function openSettings(){
-    ++settingsRun46;const wrap=settingsShell46('Paramètres et compte');
-    settingButton46(wrap,'Mon compte','Profil et mot de passe',account46);
-    settingButton46(wrap,'Mon abonnement','Formule, statut et échéance',subscription46);
+    menuMode49='settings';++settingsRun46;const wrap=settingsShell46('Réglages');
     settingButton46(wrap,'Préférences','Affichage et animations sur cet appareil',prefs46);
     wrap.append(node('h2','Informations'));
     for(const slug of ['about','cgu','privacy'])settingButton46(wrap,defaults[slug].title,'Consulter',()=>{$('opSettingsDialog45').close();openPage(slug,true);});
+  }
+  function openProfile49(){
+    menuMode49='profile';++settingsRun46;const wrap=settingsShell46('Mon profil');
+    settingButton46(wrap,'Mon compte','Mes informations personnelles',account46);
+    settingButton46(wrap,'Modifier mon mot de passe','Sécuriser mon compte',password46);
+    settingButton46(wrap,'Mon abonnement','Formule, statut et échéance',subscription46);
     wrap.append(node('h2','Compte'));
     settingButton46(wrap,'Suppression du compte','Enregistrer une demande de suppression',deletion46);
     const logout=settingButton46(wrap,'Se déconnecter','Fermer votre session',()=>logout46(logout));
@@ -139,13 +151,22 @@
     if(/backoffice\.html$/i.test(location.pathname))return;
     let bound=false;
     function attach(){const c=window.OSTEO_APP_AUTH_CLIENT;if(bound||!c)return;bound=true;let previous=window.OSTEO_AUTH?.getSession?.()?.user?.id||null;
-      c.auth.onAuthStateChange((_event,session)=>{const id=session?.user?.id||null;if(id!==previous){previous=id;++settingsRun46;setTimeout(()=>{const d=$('opSettingsDialog45');if(d?.open)openSettings();else d?.replaceChildren();},0);}});
+      c.auth.onAuthStateChange((_event,session)=>{const id=session?.user?.id||null;if(id!==previous){previous=id;++settingsRun46;setTimeout(()=>{const d=$('opSettingsDialog45');if(d?.open)openCurrentMenu49();else d?.replaceChildren();},0);}});
     }
     attach();const timer=setInterval(()=>{attach();if(bound)clearInterval(timer);},500);setTimeout(()=>clearInterval(timer),30000);
   }
   function app(){
     function install(){
       document.querySelectorAll('#home > .op-content-links,#profile > .op-content-links').forEach(n=>n.remove());
+      const profileLaunchers=[...document.querySelectorAll('[data-target="profile"]')];
+      const profileScreen=$('profile');
+      if(profileScreen && !$('opProfileEntry49')){
+        const entry=node('button','Gérer mon profil','op46-row');entry.id='opProfileEntry49';entry.type='button';profileScreen.appendChild(entry);profileLaunchers.push(entry);
+      }else if($('opProfileEntry49'))profileLaunchers.push($('opProfileEntry49'));
+      for(const button of profileLaunchers){
+        if(button.dataset.opProfile49)continue;button.dataset.opProfile49='1';button.removeAttribute('onclick');button.type='button';
+        button.onclick=()=>openProfile49();button.setAttribute('aria-label','Mon profil');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls','opSettingsDialog45');button.setAttribute('aria-expanded','false');
+      }
       const backoffice=document.querySelector('#home .home-top .home-notifications');
       if(backoffice && backoffice.dataset.opBackoffice48!=='1'){
         backoffice.dataset.opBackoffice48='1';backoffice.type='button';
@@ -157,7 +178,7 @@
       for(const button of launchers){
         if(button.dataset.opSettings45)continue;
         button.dataset.opSettings45='1';button.removeAttribute('onclick');button.onclick=openSettings;button.type='button';
-        button.setAttribute('aria-label','Paramètres');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls','opSettingsDialog45');button.setAttribute('aria-expanded','false');button.setAttribute('title','Paramètres');
+        button.setAttribute('aria-label','Réglages');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls','opSettingsDialog45');button.setAttribute('aria-expanded','false');button.setAttribute('title','Réglages');
         button.textContent='⚙';
       }
     }
