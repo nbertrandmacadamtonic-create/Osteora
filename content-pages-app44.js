@@ -2,7 +2,7 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'47.0'};
+  window.OSTEO_CONTENT_APP44={version:'48.0'};
   const defaults={
     about:{slug:'about',title:'Qui sommes-nous',body:'Ostéo Pratik est une application pédagogique consacrée à l’apprentissage et à la révision des techniques ostéopathiques.\n\nConçue par Nicolas Bertrand, masseur-kinésithérapeute et ostéopathe, elle associe vidéos, cartes de révision, audio et quiz pour accompagner un apprentissage régulier.\n\nNotre démarche\nTransmettre des repères clairs, faciliter la mémorisation et permettre à chacun de suivre sa progression.\n\nLes contenus sont des supports pédagogiques. Ils s’adressent aux étudiants et aux professionnels formés et ne remplacent ni une formation pratique encadrée, ni l’évaluation clinique d’un patient.'},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
@@ -146,6 +146,13 @@
   function app(){
     function install(){
       document.querySelectorAll('#home > .op-content-links,#profile > .op-content-links').forEach(n=>n.remove());
+      const backoffice=document.querySelector('#home .home-top .home-notifications');
+      if(backoffice && backoffice.dataset.opBackoffice48!=='1'){
+        backoffice.dataset.opBackoffice48='1';backoffice.type='button';
+        backoffice.removeAttribute('onclick');backoffice.textContent='▦';
+        backoffice.setAttribute('aria-label','Ouvrir le back-office');backoffice.title='Back-office';
+        backoffice.onclick=()=>{window.location.href=new URL('backoffice.html',window.location.href).href;};
+      }
       const launchers=[document.querySelector('#home .home-settings'),document.querySelector('#profile > header > button.icon:last-child')].filter(Boolean);
       for(const button of launchers){
         if(button.dataset.opSettings45)continue;
