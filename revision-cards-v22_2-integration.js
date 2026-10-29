@@ -3008,6 +3008,28 @@
   let audioTechnique=null;
   let audioRate=1;
   let audioShuffle=false;
+  let audioLoad63=0,audioReturnFocus63=null,audioSpeech63=null,audioSpeechRun63=0;
+  function stopSpeech63(){++audioSpeechRun63;if(window.speechSynthesis)try{window.speechSynthesis.cancel();}catch(_){}audioSpeech63=null;const overlay=document.getElementById('opWheelAudioOverlay');overlay?.classList.remove('is-playing');const b=document.getElementById('opWheelAudioSpeak63');if(b)b.textContent='Lire la fiche à voix haute';}
+  function speechText63(t){const steps=Array.isArray(t?.detail?.steps)?t.detail.steps:[];const parts=[t?.title||'Technique'];if(steps.some(x=>x.body)){for(const step of steps)if(step.body)parts.push((step.label||step.key||'')+'. '+step.body);}else if(t?.text)parts.push(t.text);else if(t?.detail?.intro)parts.push(t.detail.intro);return parts.length>1?parts.join('. ').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim():'';}
+  function startSpeech63(){
+    const synth=window.speechSynthesis,Utterance=window.SpeechSynthesisUtterance,overlay=document.getElementById('opWheelAudioOverlay'),status=document.getElementById('opWheelAudioStatus'),button=document.getElementById('opWheelAudioSpeak63');
+    if(!synth||!Utterance){if(status)status.textContent='Lecture vocale indisponible dans ce navigateur.';return;}
+    if(audioSpeech63){if(synth.paused){synth.resume();if(button)button.textContent='Pause de la lecture vocale';}else{synth.pause();overlay?.classList.remove('is-playing');if(button)button.textContent='Reprendre la lecture vocale';}return;}
+    const text=speechText63(audioTechnique);if(!text){if(status)status.textContent='Le texte de cette fiche n’est pas disponible.';return;}
+    stopSpeech63();const run=audioSpeechRun63,utterance=new Utterance(text);audioSpeech63=utterance;
+    try{audioPlayer?.pause()?.catch?.(()=>{});}catch(_){}
+    const language=window.OSTEO_LANG50?.getLanguage?.()||'fr';utterance.lang=language==='fr'?'fr-FR':language==='en'?'en-GB':language==='zh-CN'?'zh-CN':language;utterance.rate=audioRate;utterance.volume=1;
+    const voice=(synth.getVoices?.()||[]).find(v=>v.lang.toLowerCase().startsWith(language.toLowerCase().split('-')[0]));if(voice)utterance.voice=voice;
+    const current=()=>run===audioSpeechRun63&&overlay?.classList.contains('is-open');
+    utterance.onstart=()=>{if(!current())return;overlay.classList.add('is-playing');if(status)status.textContent='Lecture vocale de la fiche';if(button)button.textContent='Pause de la lecture vocale';try{window.OSTEO_USER_DATA_V19?.recordActivity?.('audio',audioTechnique?.title||'Révision audio');}catch(_){}};
+    utterance.onpause=()=>{if(!current())return;overlay.classList.remove('is-playing');if(button)button.textContent='Reprendre la lecture vocale';};
+    utterance.onresume=()=>{if(!current())return;overlay.classList.add('is-playing');if(button)button.textContent='Pause de la lecture vocale';};
+    utterance.onend=()=>{if(!current())return;audioSpeech63=null;overlay.classList.remove('is-playing');if(status)status.textContent='Lecture vocale terminée';if(button)button.textContent='Relire la fiche à voix haute';};
+    utterance.onerror=event=>{if(!current()||['canceled','interrupted'].includes(event.error))return;audioSpeech63=null;overlay.classList.remove('is-playing');if(status)status.textContent='La lecture vocale n’a pas démarré. Appuyez à nouveau sur Lire la fiche.';if(button)button.textContent='Lire la fiche à voix haute';};
+    if(status)status.textContent='Démarrage de la lecture vocale…';synth.speak(utterance);
+  }
+  async function soundOn63(player){if(typeof player.setMuted==='function')try{await player.setMuted(false);}catch(_){}if(typeof player.setVolume==='function')try{await player.setVolume(1);}catch(_){} }
+
 
   function toastSafe(message){
     try{
@@ -3332,6 +3354,12 @@
       @keyframes op-audio-bar62{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
       @media(prefers-reduced-motion:reduce){#opWheelAudioOverlay .op-audio-frame62,#opWheelAudioOverlay .op-audio-equalizer62 span{animation:none!important}}
       .op-reduce-motion46 #opWheelAudioOverlay .op-audio-frame62,.op-reduce-motion46 #opWheelAudioOverlay .op-audio-equalizer62 span{animation:none!important}
+      /* APP63 : retour à gauche et deux sources d’écoute explicites. */
+      #opWheelAudioOverlay .op-audio-close{grid-column:1;grid-row:1;justify-self:start;border-radius:14px}
+      #opWheelAudioOverlay .op-audio-speak63{width:100%;min-height:46px;padding:10px 14px;border-radius:14px;margin:0 0 9px;font-weight:800;cursor:pointer}
+      #opWheelAudioOverlay .op-audio-speak63:disabled{opacity:.5;cursor:default}
+      #opWheelAudioOverlay .op-audio-shell{position:relative}
+      #opWheelAudioOverlay #opWheelAudioIframeWrap{left:0!important;top:0!important}
     `;
     document.head.appendChild(style);
 
@@ -3345,7 +3373,7 @@
           <div>
             <strong>Réviser en écoutant</strong>
           </div>
-          <button class="op-audio-close" type="button" aria-label="Fermer">×</button>
+          <button class="op-audio-close" type="button" aria-label="Retour à la page précédente">←</button>
         </div>
 
         <button class="op-audio-last" type="button" id="opWheelAudioLast" hidden>
@@ -3375,10 +3403,11 @@
 
         <div class="op-audio-transport">
           <button class="op-audio-secondary" type="button" id="opWheelAudioPrevious" aria-label="Technique précédente">◀</button>
-          <button class="op-audio-play" type="button" id="opWheelAudioPlay">▶ Lecture</button>
+          <button class="op-audio-play" type="button" id="opWheelAudioPlay">▶ Son de la vidéo</button>
           <button class="op-audio-secondary" type="button" id="opWheelAudioNext" aria-label="Technique suivante">▶</button>
         </div>
 
+        <button class="op-audio-secondary op-audio-speak63" type="button" id="opWheelAudioSpeak63">Lire la fiche à voix haute</button>
         <div class="op-audio-options">
           <button class="op-audio-secondary" type="button" id="opWheelAudioRestart">↺ Début</button>
           <button class="op-audio-secondary" type="button" id="opWheelAudioSpeed">×1</button>
@@ -3396,23 +3425,26 @@
     document.body.appendChild(overlay);
 
     overlay.querySelector('.op-audio-close').addEventListener('click',closeAudio);
+    overlay.querySelector('#opWheelAudioSpeak63').addEventListener('click',startSpeech63);
     overlay.addEventListener('click',e=>{
       if(e.target===overlay) closeAudio();
     });
 
     overlay.querySelector('#opWheelAudioPlay').addEventListener('click',async()=>{
-      if(!audioPlayer) return;
+      stopSpeech63();
+      if(!audioPlayer){const status=document.getElementById('opWheelAudioStatus');if(status)status.textContent='Son vidéo indisponible. Vous pouvez écouter la fiche avec le bouton de lecture vocale.';return;}
       try{
         const paused=await audioPlayer.getPaused();
         if(paused){
-          await audioPlayer.play();
+          const player=audioPlayer;await soundOn63(player);if(player===audioPlayer)await player.play();
         }else{
           await audioPlayer.pause();
         }
-      }catch(_){}
+      }catch(_){const status=document.getElementById('opWheelAudioStatus');if(status)status.textContent='Lecture vidéo bloquée. Essayez Lire la fiche à voix haute.';}
     });
 
     overlay.querySelector('#opWheelAudioRestart').addEventListener('click',async()=>{
+      if(audioSpeech63){stopSpeech63();startSpeech63();return;}
       if(!audioPlayer) return;
       try{
         await audioPlayer.setCurrentTime(0);
@@ -3475,14 +3507,10 @@
   }
 
   async function closeAudio(){
-    const overlay=document.getElementById('opWheelAudioOverlay');
-    try{
-      if(audioPlayer) await audioPlayer.pause();
-    }catch(_){}
-    if(overlay){
-      overlay.classList.remove('is-open','is-playing');
-      overlay.setAttribute('aria-hidden','true');
-    }
+    ++audioLoad63;stopSpeech63();const overlay=document.getElementById('opWheelAudioOverlay');
+    if(overlay){overlay.classList.remove('is-open','is-playing');overlay.setAttribute('aria-hidden','true');}
+    if(audioReturnFocus63?.isConnected)try{audioReturnFocus63.focus({preventScroll:true});}catch(_){}
+    try{if(audioPlayer)await audioPlayer.pause();}catch(_){}
   }
 
   function updateAudioPhoto61(overlay,t){
@@ -3516,6 +3544,8 @@
     }
 
     const overlay=ensureAudioOverlay();
+    if(!overlay.classList.contains('is-open'))audioReturnFocus63=document.activeElement;
+    const load=++audioLoad63;stopSpeech63();audioTechnique=t;
     const title=overlay.querySelector('#opWheelAudioTitle');
     const status=overlay.querySelector('#opWheelAudioStatus');
     const playBtn=overlay.querySelector('#opWheelAudioPlay');
@@ -3524,7 +3554,8 @@
     updateAudioPhoto61(overlay,t);
     if(title) title.textContent=t.title||'Technique';
     if(status) status.textContent='Chargement de la piste audio…';
-    if(playBtn) playBtn.textContent='▶ Lecture';
+    if(playBtn) playBtn.textContent='▶ Son de la vidéo';
+    const speakButton=overlay.querySelector('#opWheelAudioSpeak63');if(speakButton){speakButton.disabled=!speechText63(t)||!window.speechSynthesis||!window.SpeechSynthesisUtterance;speakButton.title=speakButton.disabled?'Lecture vocale indisponible pour cette fiche ou ce navigateur':'Lit le texte de la fiche';}
 
     overlay.classList.add('is-open');
     overlay.setAttribute('aria-hidden','false');
@@ -3533,66 +3564,70 @@
 
     try{
       if(audioPlayer){
-        try{ await audioPlayer.unload(); }catch(_){}
-        audioPlayer=null;
+        const previousPlayer=audioPlayer;try{await previousPlayer.unload();}catch(_){}
+        if(audioPlayer===previousPlayer)audioPlayer=null;
       }
 
-      await ensureVimeoApi();
+      if(load!==audioLoad63)return;
+      await ensureVimeoApi();if(load!==audioLoad63)return;
 
       const src = t.videoUrl
         ? String(t.videoUrl)
         : 'https://player.vimeo.com/video/'+encodeURIComponent(String(t.vimeoId));
 
-      const joiner=src.includes('?')?'&':'?';
+      const videoUrl=new URL(src,location.href);for(const [k,v]of Object.entries({controls:'0',title:'0',byline:'0',portrait:'0',autoplay:'0',dnt:'1',muted:'0',background:'0',playsinline:'1'}))videoUrl.searchParams.set(k,v);
       const iframe=document.createElement('iframe');
       iframe.id='opWheelAudioIframe';
-      iframe.src=src+joiner+'controls=0&title=0&byline=0&portrait=0&autoplay=0&dnt=1';
+      iframe.src=videoUrl.href;
       iframe.allow='autoplay; fullscreen; picture-in-picture';
       iframe.setAttribute('title','Lecture audio Ostéo Pratik');
 
       wrap.innerHTML='';
       wrap.appendChild(iframe);
 
-      audioPlayer=new window.Vimeo.Player(iframe);
+      const player=new window.Vimeo.Player(iframe);audioPlayer=player;
       audioTechniqueId=Number(t.id)||0;
       audioTechnique=t;
       let activityRecorded=false;
 
-      audioPlayer.on('play',()=>{
+      player.on('play',()=>{
+        if(load!==audioLoad63||player!==audioPlayer)return;if(audioSpeech63)stopSpeech63();
         overlay.classList.add('is-playing');
         if(status) status.textContent='Lecture en cours';
-        if(playBtn) playBtn.textContent='❚❚ Pause';
+        if(playBtn) playBtn.textContent='❚❚ Pause vidéo';
         if(!activityRecorded){
           activityRecorded=true;
           try{window.OSTEO_USER_DATA_V19?.recordActivity?.('audio',t.title||'Révision audio');}catch(_){ }
         }
       });
 
-      audioPlayer.on('pause',()=>{
+      player.on('pause',()=>{
+        if(load!==audioLoad63||player!==audioPlayer)return;if(audioSpeech63)return;
         overlay.classList.remove('is-playing');
         if(status) status.textContent='En pause';
-        if(playBtn) playBtn.textContent='▶ Lecture';
+        if(playBtn) playBtn.textContent='▶ Son de la vidéo';
       });
 
-      audioPlayer.on('ended',()=>{
+      player.on('ended',()=>{
+        if(load!==audioLoad63||player!==audioPlayer)return;
         overlay.classList.remove('is-playing');
         if(status) status.textContent='Lecture terminée';
         if(playBtn) playBtn.textContent='▶ Réécouter';
         const next=adjacentAudioTechnique(1);
-        if(next) setTimeout(()=>openWheelAudio(next,true),350);
+        if(next)setTimeout(()=>{if(load===audioLoad63&&overlay.classList.contains('is-open'))openWheelAudio(next,true);},350);
       });
 
-      audioPlayer.ready().then(async()=>{
-        try{await audioPlayer.setPlaybackRate(audioRate);}catch(_){ }
-        if(status) status.textContent='Prêt à écouter';
-        if(autoplay){
-          try{await audioPlayer.play();}catch(_){ }
-        }
-      }).catch(()=>{});
+      player.ready().then(async()=>{
+        if(load!==audioLoad63||player!==audioPlayer)return;
+        await soundOn63(player);try{await player.setPlaybackRate(audioRate);}catch(_){}
+        if(load!==audioLoad63||player!==audioPlayer)return;
+        if(status&&!audioSpeech63)status.textContent='Son vidéo prêt · ou écoutez la fiche à voix haute';
+        if(autoplay&&!audioSpeech63)try{await player.play();}catch(_){if(status)status.textContent='Appuyez sur Son de la vidéo pour démarrer, ou écoutez la fiche à voix haute.';}
+      }).catch(()=>{if(load===audioLoad63&&!audioSpeech63&&status)status.textContent='Son vidéo indisponible · la lecture vocale de la fiche reste disponible.';});
 
     }catch(err){
       console.warn('[Ostéo Pratik] Audio roue',err);
-      if(status) status.textContent='Audio indisponible';
+      if(load===audioLoad63&&!audioSpeech63&&status)status.textContent='Son vidéo indisponible · utilisez Lire la fiche à voix haute.';
       toastSafe('Impossible de charger l’audio de cette technique');
     }
   }
