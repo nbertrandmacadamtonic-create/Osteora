@@ -3300,6 +3300,20 @@
         #opWheelAudioOverlay .op-audio-options{grid-template-columns:1fr 1fr 1fr}
       }
     `;
+    style.textContent+=`
+      #opWheelAudioOverlay .op-audio-shell{box-sizing:border-box;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px);overflow-y:auto;overscroll-behavior:contain}
+      #opWheelAudioOverlay .op-audio-brand61{display:flex;justify-content:center;align-items:center;margin:0 0 12px;min-height:44px}
+      #opWheelAudioOverlay .op-audio-brand61 img{display:block;width:144px;height:46px;object-fit:contain}
+      #opWheelAudioOverlay .op-audio-head{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;column-gap:8px;align-items:center;padding:10px;box-sizing:border-box}
+      #opWheelAudioOverlay .op-audio-head>div{grid-column:2;grid-row:1;min-width:0;text-align:center}
+      #opWheelAudioOverlay .op-audio-head strong{text-align:center;white-space:normal;overflow-wrap:anywhere;font-size:19px;line-height:1.3}
+      #opWheelAudioOverlay .op-audio-close{grid-column:3;grid-row:1;justify-self:end;width:44px;height:44px}
+      #opWheelAudioOverlay .op-audio-visual{height:clamp(150px,24dvh,220px);padding:10px;overflow:hidden;background:rgba(4,17,30,.75)}
+      #opWheelAudioOverlay .op-audio-photo61{display:block;width:100%;height:100%;min-height:0;object-fit:contain;border-radius:12px}
+      #opWheelAudioOverlay .op-audio-photo61[hidden],#opWheelAudioOverlay .op-audio-photo-fallback61[hidden]{display:none!important}
+      #opWheelAudioOverlay .op-audio-photo-fallback61{margin:0;padding:12px;color:#c3e6ef;text-align:center;font-size:14px;line-height:1.5}
+      #opWheelAudioOverlay .op-audio-now strong{display:block;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.4;text-align:center}
+    `;
     document.head.appendChild(style);
 
     overlay=document.createElement('div');
@@ -3307,6 +3321,7 @@
     overlay.setAttribute('aria-hidden','true');
     overlay.innerHTML=`
       <div class="op-audio-shell" role="dialog" aria-modal="true" aria-label="Révision audio">
+        <div class="op-audio-brand61"><img src="assets/images/logo-osteo-pratik-title-transparent.webp" alt="Ostéo Pratik"></div>
         <div class="op-audio-head">
           <div>
             <strong>Réviser en écoutant</strong>
@@ -3329,7 +3344,7 @@
         </div>
 
         <div class="op-audio-visual">
-          <div class="op-audio-disc">♫</div>
+          <p class="op-audio-photo-fallback61">Chargement de la photo…</p>
         </div>
 
         <div class="op-audio-now">
@@ -3451,6 +3466,21 @@
     }
   }
 
+  function updateAudioPhoto61(overlay,t){
+    const visual=overlay.querySelector('.op-audio-visual');if(!visual)return;
+    const d=t.detail||{},position=(d.steps||[]).find(step=>step.key==='position');
+    const candidates=[t.mainPhoto,t.frontPhoto,d.mainPhoto,d.frontPhoto,position?.photo,t.image,...(Array.isArray(d.images)?d.images:[])];
+    const source=candidates.find(value=>typeof value==='string'&&value.trim());
+    const note=document.createElement('p');note.className='op-audio-photo-fallback61';note.textContent='Photo indisponible pour cette technique';
+    visual.dataset.techniqueId=String(t.id||'');visual.replaceChildren(note);
+    if(!source)return;
+    let url;try{url=new URL(source,location.href);if(!['http:','https:'].includes(url.protocol))return;}catch(_){return;}
+    const img=document.createElement('img');img.className='op-audio-photo61';img.alt='Photo principale : '+String(t.title||'Technique');img.decoding='async';img.hidden=true;visual.append(img);
+    img.onload=()=>{if(!img.isConnected)return;note.hidden=true;img.hidden=false;};
+    img.onerror=()=>{if(!img.isConnected)return;img.hidden=true;note.hidden=false;};
+    img.src=url.href;
+  }
+
   async function openWheelAudio(technique,autoplay){
     const t=technique&&typeof technique==='object'?technique:selectedTechnique();
     if(!t){
@@ -3469,6 +3499,7 @@
     const playBtn=overlay.querySelector('#opWheelAudioPlay');
     const wrap=overlay.querySelector('#opWheelAudioIframeWrap');
 
+    updateAudioPhoto61(overlay,t);
     if(title) title.textContent=t.title||'Technique';
     if(status) status.textContent='Chargement de la piste audio…';
     if(playBtn) playBtn.textContent='▶ Lecture';
