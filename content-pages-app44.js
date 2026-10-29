@@ -230,3 +230,6 @@
 
 /* APP50 : chargement indépendant, index et bridge permanents conservés. */
 (function(){if(document.querySelector('script[data-op-languages50]'))return;const script=document.createElement('script');script.src=new URL('languages-app50.js?cb='+Date.now(),document.currentScript?.src||location.href).href;script.dataset.opLanguages50='1';document.head.appendChild(script);})();
+
+/* APP56 : composants et navigation, sans changement du document principal. */
+(function(){if(/backoffice\.html$/i.test(location.pathname)||document.querySelector('script[data-op-navigation56]'))return;const script=document.createElement('script');script.src=new URL('navigation-app56.js?cb='+Date.now(),document.currentScript?.src||location.href).href;script.dataset.opNavigation56='1';document.head.appendChild(script);})();
