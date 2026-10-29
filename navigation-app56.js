@@ -22,6 +22,11 @@ function initialise(){if(!window.OSTEO_AUTH)return;identity=userKey();entries.cl
 function storeTransition(before,id){if(!started)return;if(userKey()!==identity){initialise();return;}if(popping)return;const old=entries.get(position);if(old&&before&&old.screen===before.screen)entries.set(position,before);if(old?.screen===id)return;
  const next=capture(id);for(const key of entries.keys())if(key>position)entries.delete(key);const n=position+1;try{history.pushState(state(n),'');entries.set(n,next);position=n;}catch(_){}
 }
+function installHelp57(){
+ const pages=window.OSTEO_CONTENT_APP44?.helpPages||{};
+ for(const screen of Object.keys(pages)){const header=$(screen)?.querySelector(':scope > header.top');if(!header)continue;const buttons=[...header.children].filter(n=>n.matches('button.icon:not(.round)'));const b=buttons[buttons.length-1];if(!b)continue;
+ if(!header.classList.contains('op-help-header57'))header.classList.add('op-help-header57');b.dataset.opHelp57=screen;b.type='button';icon(b,'info',tr('Informations')+' · '+pages[screen][0]);attr(b,'aria-haspopup','dialog');attr(b,'aria-controls','opContentDialog44');}
+}
 function sync(){const screen=active();if(!screen)return;const id=screen.id;
  if(!started&&window.OSTEO_AUTH)initialise();
  if(started&&userKey()!==identity)initialise();
@@ -37,6 +42,7 @@ function sync(){const screen=active();if(!screen)return;const id=screen.id;
  for(const b of document.querySelectorAll('button.auth-v18-eye, .auth-v18-password-wrap button'))labelPassword(b);
  // Auth module uses a plain wrapper; avoid assumptions about its class name.
  for(const b of document.querySelectorAll('#signup button,#login button,#reset-password button'))if(b.textContent.trim()==='◉'||b.dataset.opPassword56)labelPassword(b);
+ installHelp57();
  const start=document.querySelector('#welcome .welcome-start');if(start){const base=signed()?'Commencer':'Créer mon compte';if(start.dataset.opStart56!==base){start.dataset.opStart56=base;start.innerHTML='';const text=document.createElement('span');text.className='op-start-label56';text.textContent=tr(base);start.append(text);const arrow=document.createElement('span');arrow.textContent='→';arrow.setAttribute('aria-hidden','true');start.append(arrow);}attr(start,'aria-label',tr(base));}
 }
 function labelPassword(b){const input=b.parentElement?.querySelector('input');if(!input||!['password','text'].includes(input.type))return;b.dataset.opPassword56='1';attr(b,'aria-label',tr(input.type==='password'?'Afficher le mot de passe':'Masquer le mot de passe'));attr(b,'title',tr(input.type==='password'?'Afficher le mot de passe':'Masquer le mot de passe'));attr(b,'aria-pressed',input.type==='text');}
@@ -55,6 +61,7 @@ window.addEventListener('popstate',event=>{if(!started)return;const key=event.st
  if(userKey()!==identity||!entry||!restore(entry)){entries.clear();identity=userKey();window.go(signed()?'home':'welcome');lastId=active()?.id||'welcome';entries.set(position,capture());}
  popping=false;schedule();});
 document.addEventListener('click',event=>{const b=event.target.closest('button');if(!b)return;
+ if(b.dataset.opHelp57){event.preventDefault();event.stopImmediatePropagation();window.OSTEO_CONTENT_APP44?.openHelp?.(b.dataset.opHelp57);return;}
  if(!popping)departing=capture();
  const screen=b.closest('.screen');const isBack=b.matches('.icon.round')&&b.parentElement?.matches('header.top');
  let withinList=false;try{withinList=screen?.id==='techniques'&&typeof currentBack!=='undefined'&&currentBack==='techniques';}catch(_){}
@@ -63,6 +70,10 @@ document.addEventListener('click',event=>{const b=event.target.closest('button')
  schedule();},true);
 document.addEventListener('scroll',event=>{const el=event.target;if(started&&el===active()){const entry=entries.get(position);if(entry?.screen===el.id)entry.scroll=el.scrollTop;}},true);
 const css=document.createElement('style');css.id='opNavigationStyles56';css.textContent=`
+ .screen > header.top.op-help-header57{display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;align-items:center!important;gap:12px!important;width:100%!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}
+ .screen > header.top.op-help-header57 > .brand{grid-column:2!important;min-width:0!important;width:auto!important;text-align:center!important}
+ .screen > header.top.op-help-header57 > button.icon.round{grid-column:1!important;justify-self:start!important;margin:0!important}
+ .screen > header.top.op-help-header57 > button[data-op-help57]{grid-column:3!important;justify-self:end!important;margin:0!important;cursor:pointer}
  .bottom button > svg[data-op-icon56]{display:block;width:23px;height:23px;flex:0 0 23px;pointer-events:none}
  .screen > header.top > button.icon{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;border-radius:14px!important;display:grid!important;place-items:center!important;flex-shrink:0}
  .screen > header.top > button.op-unavailable56{display:none!important}
@@ -74,7 +85,7 @@ const css=document.createElement('style');css.id='opNavigationStyles56';css.text
  #welcome .welcome-start .op-start-label56{float:none!important;font:inherit!important}
  .bottom button[aria-expanded=true]{color:var(--cyan,#00e5ff)}
  `;document.head.append(css);
-window.OSTEO_NAV56={version:'56.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
+window.OSTEO_NAV56={version:'57.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
 installGo();sync();
 const observer=new MutationObserver(records=>{if(records.some(r=>r.type==='childList'||r.target.matches?.('.screen,dialog,input,[data-op-profile49]')))schedule();});observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','open','type','aria-expanded']});
 // Existing auth and integration modules install their wrappers asynchronously.
