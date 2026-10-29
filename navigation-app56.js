@@ -27,8 +27,28 @@ function installHelp57(){
  for(const screen of Object.keys(pages)){const header=$(screen)?.querySelector(':scope > header.top');if(!header)continue;const buttons=[...header.children].filter(n=>n.matches('button.icon:not(.round)'));const b=buttons[buttons.length-1];if(!b)continue;
  if(!header.classList.contains('op-help-header57'))header.classList.add('op-help-header57');b.dataset.opHelp57=screen;b.type='button';icon(b,'info',tr('Informations')+' · '+pages[screen][0]);attr(b,'aria-haspopup','dialog');attr(b,'aria-controls','opContentDialog44');}
 }
-const titleSelectors58='.video-page-title,.rachis-menu-title,.module-menu-title,.revision-page-title,.seen-album-title,.stats-page-title,.catalogue-hero-title,.quiz-general-title,.revision-title,.page-title,.zone-page-title,.library-page-title,.detail-page-title,.op-tester-summary,.op-rewards-title';
+const titleSelectors58='.video-page-title,.rachis-menu-title,.module-menu-title,.revision-page-title,.seen-album-title,.stats-page-title,.catalogue-hero-title,.quiz-general-title,.revision-title,.page-title,.zone-page-title,.library-page-title,.detail-page-title,.op-tester-summary,.op-rewards-title,.op-page-title60';
+const titleIcons60={videoMap:'icon-videos.webp',techniqueDetail:'icon-fiches.webp',revision:'icon-revision.webp',revisionWheel:'icon-revision.webp',revisionVoice:'icon-revision.webp',revisionCard:'icon-revision.webp',seenCollections:'icon-mes-acquis.webp',seenCards:'icon-mes-acquis.webp',quiz:'icon-mes-acquis.webp',quizMenu:'icon-mes-acquis.webp',progress:'icon-statistiques.webp',rewards:'icon-statistiques.webp',zones:'icon-fiches.webp',rachis:'icon-rachis.webp',rachisMenu:'icon-rachis.webp',bassinMenu:'icon-bassin.webp',msupMenu:'icon-membres-superieurs.webp',minfMenu:'icon-membres-inferieurs.webp',player:'icon-videos.webp',favorites:'icon-favoris.webp',profile:'icon-profil.webp',techniques:'icon-fiches.webp'};
+function fallbackIcon60(img,kind){img.onerror=null;img.parentElement?.classList.remove('logo-missing');if(img.dataset.opFallback60)return;img.dataset.opFallback60='1';img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg(kind).replace('stroke="currentColor"','stroke="#54eaff"').replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" '));}
+function completeTitles60(){
+ for(const screen of document.querySelectorAll('.screen')){
+  const header=screen.querySelector(':scope > header.top'),brand=header?.querySelector(':scope > .brand');if(!header||!brand||pub.has(screen.id)||screen.id==='home')continue;
+  const oldTitle=brand.querySelector('h1,h2'),oldSub=brand.querySelector('p.subtitle');let banner=screen.querySelector(titleSelectors58);
+  if(!banner&&oldTitle){banner=document.createElement('div');banner.className='op-page-title60';banner.dataset.opGenerated60='1';banner.append(document.createElement('h1'),document.createElement('p'));header.insertAdjacentElement('afterend',banner);}
+  if(!banner)continue;
+  if(banner.dataset.opGenerated60){const h=banner.querySelector('h1'),p=banner.querySelector('p');if(h.textContent!==oldTitle.textContent)h.textContent=oldTitle.textContent;const subtitle=oldSub?.textContent||'';if(p.textContent!==subtitle)p.textContent=subtitle;p.hidden=!subtitle;}
+  if(!brand.classList.contains('op-app-brand60'))brand.classList.add('op-app-brand60');let image=brand.querySelector('img.op-app-logo60')||brand.querySelector('img.brand-title-webp,img.brand-logo-full');
+  if(!image){image=document.createElement('img');image.src=new URL('assets/images/logo-osteo-pratik-title-transparent.webp',location.href).href;image.alt='Ostéo Pratik';brand.prepend(image);image.addEventListener('error',()=>{if(!brand.querySelector('.op-brand-fallback60')){const name=document.createElement('span');name.className='op-brand-fallback60';name.textContent='Ostéo Pratik';brand.append(name);}brand.classList.add('op-brand-error60');},{once:true});}
+  if(!image.classList.contains('op-app-logo60'))image.classList.add('op-app-logo60');
+ }
+ for(const block of document.querySelectorAll(titleSelectors58)){
+  const screen=block.closest('.screen');if(!screen||!block.querySelector('h1,h2'))continue;
+  let badge=block.querySelector(':scope > .page-title-logo');if(!badge){badge=document.createElement('span');badge.className='page-title-logo';badge.setAttribute('aria-hidden','true');const img=document.createElement('img');img.alt='';img.src=new URL('assets/icons/'+(titleIcons60[screen.id]||'icon-fiches.webp'),location.href).href;badge.append(img);block.append(badge);}
+  const badgeImage=badge.querySelector('img');if(badgeImage&&!badgeImage.dataset.opFallbackBound60){badgeImage.dataset.opFallbackBound60='1';const kind=screen.id==='quizMenu'?'books':screen.id.startsWith('revision')?'revision':'info';badgeImage.addEventListener('error',()=>fallbackIcon60(badgeImage,kind));if(badgeImage.complete&&!badgeImage.naturalWidth)fallbackIcon60(badgeImage,kind);}
+ }
+}
 function centreTitles58(){
+ completeTitles60();
  for(const header of document.querySelectorAll('.screen > header.top'))if(header.querySelector(':scope > .brand')&&header.querySelector(':scope > button.icon.round')){if(!header.classList.contains('op-balanced-header58'))header.classList.add('op-balanced-header58');}
  for(const block of document.querySelectorAll(titleSelectors58)){
   if(!block.closest('.screen'))continue;
@@ -116,12 +136,23 @@ const css=document.createElement('style');css.id='opNavigationStyles56';css.text
  button[data-op-password56]{min-width:44px!important}
  #welcome .welcome-start .op-start-label56{float:none!important;font:inherit!important}
  .bottom button[aria-expanded=true]{color:var(--cyan,#00e5ff)}
- /* APP59 : pages créées par les modules Tester et Médailles. */
- .app :is(#quizMenu,#rewards,.screen) .op-centered-title58.op-title-no-logo59{grid-template-columns:minmax(0,1fr)!important}
- .app :is(#quizMenu,#rewards,.screen) .op-centered-title58.op-title-no-logo59 > .op-title-content58{grid-column:1!important}
- .app :is(#quizMenu,#rewards,.screen) .op-centered-title58 > .op-tester-seen-count{grid-column:1/-1!important;justify-self:center!important;max-width:100%!important;box-sizing:border-box!important;text-align:center!important;white-space:normal!important;line-height:1.4!important;margin-top:12px!important;padding:7px 11px!important}
+ /* APP60 : normalisation des en-têtes ; annulation explicite des anciennes positions absolues. */
+ .app :is(#revision,#quizMenu,#revisionWheel,.screen) > header.top.op-balanced-header58{position:relative!important;inset:auto!important;transform:none!important;display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;align-items:center!important;gap:12px!important;min-height:72px!important;width:100%!important;max-width:100%!important;margin:0 0 12px!important;padding:0!important;overflow:visible!important}
+ .app :is(#revision,#quizMenu,#revisionWheel,.screen) > header.top.op-balanced-header58 > .brand{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;transform:none!important;grid-column:2!important;grid-row:1!important;justify-self:stretch!important;width:100%!important;max-width:100%!important;min-width:0!important;margin:0!important;padding:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important}
+ .app :is(#revision,#quizMenu,#revisionWheel,.screen) > header.top.op-balanced-header58 > button.icon{position:relative!important;inset:auto!important;transform:none!important;grid-row:1!important;margin:0!important}
+ .app :is(#revision,#quizMenu,#revisionWheel,.screen) > header.top .brand.op-app-brand60 > :not(.op-app-logo60):not(.op-brand-fallback60){display:none!important}
+ .app :is(#revision,#quizMenu,#revisionWheel,.screen) > header.top .brand.op-app-brand60 > img.op-app-logo60{display:block!important;width:min(152px,100%)!important;height:52px!important;max-height:52px!important;max-width:100%!important;object-fit:contain!important;object-position:center!important;margin:0 auto!important;transform:none!important}
+ .app .brand .op-brand-fallback60{display:none;color:#65e8ff;font-size:20px;font-weight:800}
+ .app .brand.op-brand-error60 .op-brand-fallback60{display:block!important}
+ .app .brand.op-brand-error60 img.op-app-logo60{visibility:hidden!important;position:absolute!important}
+ .app .op-page-title60{margin:12px 0 14px;border:1px solid rgba(0,229,255,.24);border-radius:26px;background:linear-gradient(145deg,rgba(10,29,55,.78),rgba(5,15,31,.92));color:#fff}
+ .app .op-page-title60 h1{font-weight:950;letter-spacing:-.035em}
+ .app .op-page-title60 p{font-size:15px;color:#c3d4e5}
+ .app :is(#quizMenu,#rewards,.screen) .op-centered-title58 > .op-tester-seen-count{grid-column:1/-1!important;grid-row:2!important;justify-self:center!important;max-width:100%!important;box-sizing:border-box!important;text-align:center!important;white-space:normal!important;line-height:1.4!important;margin-top:12px!important;padding:7px 11px!important}
+ .app .op-centered-title58 > .page-title-logo{display:grid!important;place-items:center!important;overflow:hidden!important;border:1px solid rgba(0,229,255,.42)!important;border-radius:50%!important;background:rgba(0,229,255,.07)!important}
+ .app .op-centered-title58 > .page-title-logo > img{display:block!important;width:100%!important;height:100%!important;object-fit:contain!important}
  `;document.body.append(css);
-window.OSTEO_NAV56={version:'59.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
+window.OSTEO_NAV56={version:'60.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
 installGo();sync();
 const observer=new MutationObserver(records=>{if(records.some(r=>r.type==='childList'||r.target.matches?.('.screen,dialog,input,[data-op-profile49]')))schedule();});observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','open','type','aria-expanded']});
 // Existing auth and integration modules install their wrappers asynchronously.
