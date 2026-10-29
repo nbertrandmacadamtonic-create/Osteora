@@ -3323,7 +3323,8 @@
       }
     `;
     style.textContent+=`
-      #opWheelAudioOverlay .op-audio-shell{box-sizing:border-box;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px);overflow-y:auto;overscroll-behavior:contain}
+      #opWheelAudioOverlay .op-audio-shell{box-sizing:border-box;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;-ms-overflow-style:none}
+      #opWheelAudioOverlay .op-audio-shell::-webkit-scrollbar{display:none;width:0;height:0}
       #opWheelAudioOverlay .op-audio-brand61{display:flex;justify-content:center;align-items:center;margin:0 0 12px;min-height:44px}
       #opWheelAudioOverlay .op-audio-brand61 img{display:block;width:144px;height:46px;object-fit:contain}
       #opWheelAudioOverlay .op-audio-head{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;column-gap:8px;align-items:center;padding:10px;box-sizing:border-box}
@@ -3337,12 +3338,12 @@
       #opWheelAudioOverlay .op-audio-now strong{display:block;white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.4;text-align:center}
       /* APP62 : cadre et animation discrète liés à Lecture / Pause. */
       #opWheelAudioOverlay .op-audio-visual{position:relative;height:clamp(180px,28dvh,250px);display:grid;grid-template-rows:minmax(0,1fr) 20px;gap:10px;padding:12px;border:1px solid rgba(94,224,255,.28);border-radius:24px;background:linear-gradient(145deg,rgba(8,42,62,.96),rgba(28,20,62,.95));box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 8px 24px rgba(0,0,0,.18)}
-      #opWheelAudioOverlay .op-audio-frame62{position:relative;display:grid;place-items:center;min-width:0;min-height:0;height:100%;padding:6px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(123,233,255,.40);border-radius:17px;background:linear-gradient(145deg,#0c2639,#131d35);box-shadow:0 0 10px rgba(39,205,236,.08),inset 0 1px 0 rgba(255,255,255,.12)}
-      #opWheelAudioOverlay .op-audio-frame62::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(88,225,255,.05),transparent 40%,transparent 65%,rgba(157,116,255,.05));box-shadow:inset 0 0 14px rgba(3,15,30,.22)}
+      #opWheelAudioOverlay .op-audio-frame62{position:relative;display:grid;place-items:center;min-width:0;min-height:0;height:100%;padding:6px;box-sizing:border-box;overflow:hidden;border:1px solid rgba(229,247,255,.55);border-radius:17px;background:linear-gradient(135deg,#64efff 0%,#28cbe7 38%,#9875ff 65%,#c49aff 100%);box-shadow:0 0 12px rgba(40,203,231,.25),0 0 20px rgba(152,117,255,.20),inset 0 1px 0 rgba(255,255,255,.45)}
+      #opWheelAudioOverlay .op-audio-frame62::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
       #opWheelAudioOverlay .op-audio-frame62 .op-audio-photo61{grid-area:1/1;min-width:0;min-height:0;border-radius:11px;object-fit:contain}
       #opWheelAudioOverlay .op-audio-frame62 .op-audio-photo-fallback61{grid-area:1/1}
       #opWheelAudioOverlay .op-audio-equalizer62{display:flex;align-items:center;justify-content:center;gap:5px;height:20px;pointer-events:none;opacity:.45}
-      #opWheelAudioOverlay .op-audio-equalizer62 span{display:block;width:3px;height:18px;border-radius:4px;background:linear-gradient(#8cf2ff,#20bcf1);transform:scaleY(.28);transform-origin:center}
+      #opWheelAudioOverlay .op-audio-equalizer62 span{display:block;width:3px;height:18px;border-radius:4px;background:linear-gradient(#64efff,#b38aff);transform:scaleY(.28);transform-origin:center}
       #opWheelAudioOverlay.is-playing .op-audio-frame62{animation:op-audio-halo62 2.6s ease-in-out infinite}
       #opWheelAudioOverlay.is-playing .op-audio-equalizer62{opacity:.95}
       #opWheelAudioOverlay.is-playing .op-audio-equalizer62 span{animation:op-audio-bar62 .9s ease-in-out infinite alternate}
@@ -3350,7 +3351,7 @@
       #opWheelAudioOverlay.is-playing .op-audio-equalizer62 span:nth-child(3){animation-delay:-.6s;animation-duration:1.1s}
       #opWheelAudioOverlay.is-playing .op-audio-equalizer62 span:nth-child(4){animation-delay:-.2s;animation-duration:.8s}
       #opWheelAudioOverlay.is-playing .op-audio-equalizer62 span:nth-child(5){animation-delay:-.45s;animation-duration:1s}
-      @keyframes op-audio-halo62{0%,100%{box-shadow:0 0 8px rgba(39,205,236,.12),inset 0 1px 0 rgba(255,255,255,.12)}50%{box-shadow:0 0 18px rgba(39,205,236,.28),inset 0 1px 0 rgba(255,255,255,.15)}}
+      @keyframes op-audio-halo62{0%,100%{box-shadow:0 0 12px rgba(40,203,231,.25),0 0 20px rgba(152,117,255,.20),inset 0 1px 0 rgba(255,255,255,.45)}50%{box-shadow:0 0 20px rgba(40,203,231,.45),0 0 28px rgba(152,117,255,.38),inset 0 1px 0 rgba(255,255,255,.55)}}
       @keyframes op-audio-bar62{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
       @media(prefers-reduced-motion:reduce){#opWheelAudioOverlay .op-audio-frame62,#opWheelAudioOverlay .op-audio-equalizer62 span{animation:none!important}}
       .op-reduce-motion46 #opWheelAudioOverlay .op-audio-frame62,.op-reduce-motion46 #opWheelAudioOverlay .op-audio-equalizer62 span{animation:none!important}
