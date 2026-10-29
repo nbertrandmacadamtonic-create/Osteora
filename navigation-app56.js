@@ -27,6 +27,22 @@ function installHelp57(){
  for(const screen of Object.keys(pages)){const header=$(screen)?.querySelector(':scope > header.top');if(!header)continue;const buttons=[...header.children].filter(n=>n.matches('button.icon:not(.round)'));const b=buttons[buttons.length-1];if(!b)continue;
  if(!header.classList.contains('op-help-header57'))header.classList.add('op-help-header57');b.dataset.opHelp57=screen;b.type='button';icon(b,'info',tr('Informations')+' · '+pages[screen][0]);attr(b,'aria-haspopup','dialog');attr(b,'aria-controls','opContentDialog44');}
 }
+const titleSelectors58='.video-page-title,.rachis-menu-title,.module-menu-title,.revision-page-title,.seen-album-title,.stats-page-title,.catalogue-hero-title,.quiz-general-title,.revision-title,.page-title,.zone-page-title,.library-page-title,.detail-page-title,.op-tester-summary,.op-rewards-title';
+function centreTitles58(){
+ for(const header of document.querySelectorAll('.screen > header.top'))if(header.querySelector(':scope > .brand')&&header.querySelector(':scope > button.icon.round')){if(!header.classList.contains('op-balanced-header58'))header.classList.add('op-balanced-header58');}
+ for(const block of document.querySelectorAll(titleSelectors58)){
+  if(!block.closest('.screen'))continue;
+  let text=[...block.children].find(el=>el.tagName==='DIV'&&el.querySelector('h1,h2'));
+  const direct=block.querySelector(':scope > h1,:scope > h2');
+  if(!text&&direct){text=document.createElement('div');for(const child of [...block.children])if(child.matches('h1,h2,p,small'))text.appendChild(child);block.insertBefore(text,block.firstChild);}
+  if(!text)continue;
+  // Tester et les médailles ne possèdent pas l’illustration des anciens bandeaux.
+  const noLogo=!block.querySelector(':scope > .page-title-logo');if(block.classList.contains('op-title-no-logo59')!==noLogo)block.classList.toggle('op-title-no-logo59',noLogo);
+
+  if(!text.classList.contains('op-title-content58'))text.classList.add('op-title-content58');
+  if(!block.classList.contains('op-centered-title58'))block.classList.add('op-centered-title58');
+ }
+}
 function sync(){const screen=active();if(!screen)return;const id=screen.id;
  if(!started&&window.OSTEO_AUTH)initialise();
  if(started&&userKey()!==identity)initialise();
@@ -42,7 +58,7 @@ function sync(){const screen=active();if(!screen)return;const id=screen.id;
  for(const b of document.querySelectorAll('button.auth-v18-eye, .auth-v18-password-wrap button'))labelPassword(b);
  // Auth module uses a plain wrapper; avoid assumptions about its class name.
  for(const b of document.querySelectorAll('#signup button,#login button,#reset-password button'))if(b.textContent.trim()==='◉'||b.dataset.opPassword56)labelPassword(b);
- installHelp57();
+ installHelp57();centreTitles58();
  const start=document.querySelector('#welcome .welcome-start');if(start){const base=signed()?'Commencer':'Créer mon compte';if(start.dataset.opStart56!==base){start.dataset.opStart56=base;start.innerHTML='';const text=document.createElement('span');text.className='op-start-label56';text.textContent=tr(base);start.append(text);const arrow=document.createElement('span');arrow.textContent='→';arrow.setAttribute('aria-hidden','true');start.append(arrow);}attr(start,'aria-label',tr(base));}
 }
 function labelPassword(b){const input=b.parentElement?.querySelector('input');if(!input||!['password','text'].includes(input.type))return;b.dataset.opPassword56='1';attr(b,'aria-label',tr(input.type==='password'?'Afficher le mot de passe':'Masquer le mot de passe'));attr(b,'title',tr(input.type==='password'?'Afficher le mot de passe':'Masquer le mot de passe'));attr(b,'aria-pressed',input.type==='text');}
@@ -70,6 +86,22 @@ document.addEventListener('click',event=>{const b=event.target.closest('button')
  schedule();},true);
 document.addEventListener('scroll',event=>{const el=event.target;if(started&&el===active()){const entry=entries.get(position);if(entry?.screen===el.id)entry.scroll=el.scrollTop;}},true);
 const css=document.createElement('style');css.id='opNavigationStyles56';css.textContent=`
+ /* APP58 : même espace de chaque côté, centre du texte = centre du bandeau. */
+ .app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58{--op-title-side58:52px;display:grid!important;grid-template-columns:var(--op-title-side58) minmax(0,1fr) var(--op-title-side58)!important;align-items:center!important;column-gap:10px!important;row-gap:0!important;padding:16px!important;text-align:center!important;box-sizing:border-box!important}
+ .app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 > .op-title-content58{grid-column:2!important;grid-row:1!important;min-width:0!important;width:100%!important;max-width:none!important;text-align:center!important;margin:0!important;padding:0!important}
+ .app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 > .page-title-logo{grid-column:3!important;grid-row:1!important;position:relative!important;inset:auto!important;justify-self:end!important;align-self:center!important;width:var(--op-title-side58)!important;height:var(--op-title-side58)!important;margin:0!important;transform:none!important}
+ .app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 h1,.app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 h2{width:100%!important;max-width:none!important;text-align:center!important;margin:0!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.12!important;font-size:clamp(23px,6.6vw,30px)!important}
+ .app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 p,.app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 small{display:block;max-width:none!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important;line-height:1.35!important;margin:7px 0 0!important}
+ .screen > header.top.op-balanced-header58{display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;align-items:center!important;column-gap:12px!important;width:100%!important;max-width:100%!important;margin-inline:auto!important;box-sizing:border-box!important}
+ .screen > header.top.op-balanced-header58 > .brand{grid-column:2!important;min-width:0!important;width:100%!important;text-align:center!important;justify-self:center!important}
+ .screen > header.top.op-balanced-header58 > .brand h1,.screen > header.top.op-balanced-header58 > .brand p{text-align:center!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+ .screen > header.top.op-balanced-header58 > .brand img{max-width:100%!important;margin-left:auto!important;margin-right:auto!important}
+ .screen > header.top.op-balanced-header58 > button.icon.round{grid-column:1!important;justify-self:start!important;margin:0!important}
+ .screen > header.top.op-balanced-header58 > button.icon:not(.round){grid-column:3!important;justify-self:end!important;margin:0!important}
+ #opContentDialog44.op-help-dialog57 .op-content-page{grid-template-columns:44px minmax(0,1fr) 44px;column-gap:10px}
+ #opContentDialog44.op-help-dialog57 h1{grid-column:2;text-align:center}
+ #opContentDialog44.op-help-dialog57 .op-content-close{grid-column:3}
+ @media(max-width:380px){.app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58{--op-title-side58:40px;column-gap:8px!important;padding:14px!important}.app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 h1,.app :is(#revision,#videoMap,#zones,#progress,#rachisMenu,#bassinMenu,#msupMenu,#minfMenu,#quiz,.screen) .op-centered-title58 .op-title-content58 h2{font-size:25px!important}}
  .screen > header.top.op-help-header57{display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;align-items:center!important;gap:12px!important;width:100%!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box!important}
  .screen > header.top.op-help-header57 > .brand{grid-column:2!important;min-width:0!important;width:auto!important;text-align:center!important}
  .screen > header.top.op-help-header57 > button.icon.round{grid-column:1!important;justify-self:start!important;margin:0!important}
@@ -84,8 +116,12 @@ const css=document.createElement('style');css.id='opNavigationStyles56';css.text
  button[data-op-password56]{min-width:44px!important}
  #welcome .welcome-start .op-start-label56{float:none!important;font:inherit!important}
  .bottom button[aria-expanded=true]{color:var(--cyan,#00e5ff)}
- `;document.head.append(css);
-window.OSTEO_NAV56={version:'57.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
+ /* APP59 : pages créées par les modules Tester et Médailles. */
+ .app :is(#quizMenu,#rewards,.screen) .op-centered-title58.op-title-no-logo59{grid-template-columns:minmax(0,1fr)!important}
+ .app :is(#quizMenu,#rewards,.screen) .op-centered-title58.op-title-no-logo59 > .op-title-content58{grid-column:1!important}
+ .app :is(#quizMenu,#rewards,.screen) .op-centered-title58 > .op-tester-seen-count{grid-column:1/-1!important;justify-self:center!important;max-width:100%!important;box-sizing:border-box!important;text-align:center!important;white-space:normal!important;line-height:1.4!important;margin-top:12px!important;padding:7px 11px!important}
+ `;document.body.append(css);
+window.OSTEO_NAV56={version:'59.0',refresh:()=>{installGo();sync();},getState:()=>({screen:active()?.id,section:transient.has(active()?.id)?origin:fixed[active()?.id],historyReady:started})};
 installGo();sync();
 const observer=new MutationObserver(records=>{if(records.some(r=>r.type==='childList'||r.target.matches?.('.screen,dialog,input,[data-op-profile49]')))schedule();});observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','open','type','aria-expanded']});
 // Existing auth and integration modules install their wrappers asynchronously.
