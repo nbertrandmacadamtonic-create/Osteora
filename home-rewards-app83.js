@@ -1,8 +1,8 @@
-/* Ostéo Pratik APP97 — centrage direct sur le cercle de l'application. */
+/* Ostéo Pratik APP98 — médaille visible uniquement sur l'accueil principal. */
 (function(){
   'use strict';
   if(window.OSTEO_HOME_REWARDS83)return;
-  window.OSTEO_HOME_REWARDS83={version:'97.0'};
+  window.OSTEO_HOME_REWARDS83={version:'98.0'};
   const $=id=>document.getElementById(id);
 
   function addStyle(){
@@ -44,7 +44,8 @@
 
   function install(){
     addStyle();const home=$('home');if(!home)return;
-    const homeBox=home.getBoundingClientRect(),visible=homeBox.width>0&&homeBox.height>0&&getComputedStyle(home).display!=='none';
+    const activeScreens=[...document.querySelectorAll('.app > .screen.active')],activeScreen=activeScreens[activeScreens.length-1]||document.querySelector('.screen.active');
+    const homeBox=home.getBoundingClientRect(),visible=activeScreen===home&&home.classList.contains('active')&&homeBox.width>0&&homeBox.height>0&&getComputedStyle(home).display!=='none'&&getComputedStyle(home).visibility!=='hidden';
     let wrap=$('opHomeRewards83');
     if(!wrap){wrap=document.createElement('div');wrap.id='opHomeRewards83';wrap.className='op-home-rewards83';const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Ouvrir mes trophées');button.innerHTML='<span class="op-home-medal83" aria-hidden="true">★</span>';button.onclick=openRewards;wrap.appendChild(button);}
     if(wrap.parentElement!==document.body)document.body.appendChild(wrap);
