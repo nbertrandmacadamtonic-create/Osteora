@@ -1,8 +1,8 @@
-/* Ostéo Pratik APP98 — médaille visible uniquement sur l'accueil principal. */
+/* Ostéo Pratik APP99 — coupe trophée visible uniquement sur l'accueil principal. */
 (function(){
   'use strict';
   if(window.OSTEO_HOME_REWARDS83)return;
-  window.OSTEO_HOME_REWARDS83={version:'98.0'};
+  window.OSTEO_HOME_REWARDS83={version:'99.0'};
   const $=id=>document.getElementById(id);
 
   function addStyle(){
@@ -11,9 +11,10 @@
       body>.op-home-rewards83{position:fixed;z-index:10050!important;width:112px;height:112px;margin:0;padding:0;transform:translate(-50%,-50%);isolation:isolate}
       body>.op-home-rewards83[hidden]{display:none!important}
       body>.op-home-rewards83 button{display:grid;place-items:center;width:100%;height:100%;padding:0;border:0;border-radius:50%;color:#fff;background:transparent;font:inherit;cursor:pointer}
-      body>.op-home-rewards83 .op-home-medal83{position:relative;z-index:2;display:grid;place-items:center;width:62px;height:62px;border:2px solid rgba(255,211,109,.84);border-radius:50%;color:#ffd36d;background:radial-gradient(circle at 35% 27%,#5c452b 0,#36251e 30%,#151124 72%);box-shadow:0 0 0 4px #07101f,0 0 21px rgba(255,199,78,.34);font-size:34px;line-height:1}
+      body>.op-home-rewards83 .op-home-medal83{position:relative;z-index:2;display:grid;place-items:center;width:62px;height:62px;border:2px solid rgba(255,211,109,.84);border-radius:50%;color:#ffd36d;background:radial-gradient(circle at 35% 27%,#5c452b 0,#36251e 30%,#151124 72%);box-shadow:0 0 0 4px #07101f,0 0 21px rgba(255,199,78,.34);line-height:1}
+      body>.op-home-rewards83 .op-home-medal83 svg{display:block;width:35px;height:35px;fill:currentColor;filter:drop-shadow(0 0 5px rgba(255,199,78,.35))}
       body>.op-home-rewards83 button:hover .op-home-medal83,body>.op-home-rewards83 button:focus-visible .op-home-medal83{border-color:#5feaff;box-shadow:0 0 0 5px rgba(3,14,28,.70),0 0 30px rgba(95,234,255,.45)}
-      @media(max-width:420px){body>.op-home-rewards83 .op-home-medal83{width:58px;height:58px;font-size:32px}}
+      @media(max-width:420px){body>.op-home-rewards83 .op-home-medal83{width:58px;height:58px}body>.op-home-rewards83 .op-home-medal83 svg{width:32px;height:32px}}
     `;document.head.appendChild(style);
   }
 
@@ -47,7 +48,7 @@
     const activeScreens=[...document.querySelectorAll('.app > .screen.active')],activeScreen=activeScreens[activeScreens.length-1]||document.querySelector('.screen.active');
     const homeBox=home.getBoundingClientRect(),visible=activeScreen===home&&home.classList.contains('active')&&homeBox.width>0&&homeBox.height>0&&getComputedStyle(home).display!=='none'&&getComputedStyle(home).visibility!=='hidden';
     let wrap=$('opHomeRewards83');
-    if(!wrap){wrap=document.createElement('div');wrap.id='opHomeRewards83';wrap.className='op-home-rewards83';const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Ouvrir mes trophées');button.innerHTML='<span class="op-home-medal83" aria-hidden="true">★</span>';button.onclick=openRewards;wrap.appendChild(button);}
+    if(!wrap){wrap=document.createElement('div');wrap.id='opHomeRewards83';wrap.className='op-home-rewards83';const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Ouvrir mes trophées');button.innerHTML='<span class="op-home-medal83" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M19 8h26v8h8v8c0 10-6 17-15 19v5h9v8H17v-8h9v-5C17 41 11 34 11 24v-8h8V8Zm0 16h-2c0 5 2 9 6 11-2-3-4-7-4-11Zm28 0c0 4-2 8-4 11 4-2 6-6 6-11h-2ZM25 14v10c0 8 3 13 7 13s7-5 7-13V14H25Z"/></svg></span>';button.onclick=openRewards;wrap.appendChild(button);}
     if(wrap.parentElement!==document.body)document.body.appendChild(wrap);
     wrap.hidden=!visible;if(!visible)return;
     const location=locate(home);if(!location){wrap.hidden=true;return;}
