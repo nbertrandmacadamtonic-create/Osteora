@@ -1,8 +1,8 @@
-/* Ostéo Pratik APP83 — accès central aux récompenses depuis l'accueil. */
+/* Ostéo Pratik APP85 — accès central aux récompenses sans boucle de chargement. */
 (function(){
   'use strict';
   if(window.OSTEO_HOME_REWARDS83)return;
-  window.OSTEO_HOME_REWARDS83={version:'83.0'};
+  window.OSTEO_HOME_REWARDS83={version:'85.0'};
   const $=id=>document.getElementById(id);
   function style(){
     if($('opHomeRewardsStyle83'))return;
@@ -18,7 +18,8 @@
   function updateCount(){
     const count=$('opHomeRewardCount83');if(!count)return;
     const cards=[...document.querySelectorAll('#opRewardsFun75 .op75-card')],done=cards.filter(card=>card.classList.contains('is-done')).length;
-    count.textContent=cards.length?done+' / '+cards.length+' trophées obtenus':'Voir ma collection';
+    const label=cards.length?done+' / '+cards.length+' trophées obtenus':'Voir ma collection';
+    if(count.textContent!==label)count.textContent=label;
   }
   function openRewards(){
     const existing=$('opRewardsEntryApp43');
@@ -33,7 +34,12 @@
     updateCount();
   }
   install();
-  const observer=new MutationObserver(()=>{install();updateCount();});
-  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+  let refreshQueued=false;
+  const observer=new MutationObserver(()=>{
+    if(refreshQueued)return;
+    refreshQueued=true;
+    requestAnimationFrame(()=>{refreshQueued=false;install();updateCount();});
+  });
+  observer.observe(document.body,{childList:true,subtree:true});
   [300,900,1800].forEach(ms=>setTimeout(()=>{install();updateCount();},ms));
 })();
