@@ -2,9 +2,9 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'57.0'};
+  window.OSTEO_CONTENT_APP44={version:'67.0'};
   const defaults={
-    about:{slug:'about',title:'Qui sommes-nous',body:'Ostéo Pratik est une application pédagogique consacrée à l’apprentissage et à la révision des techniques ostéopathiques.\n\nConçue par Nicolas Bertrand, masseur-kinésithérapeute et ostéopathe, elle associe vidéos, cartes de révision, audio et quiz pour accompagner un apprentissage régulier.\n\nNotre démarche\nTransmettre des repères clairs, faciliter la mémorisation et permettre à chacun de suivre sa progression.\n\nLes contenus sont des supports pédagogiques. Ils s’adressent aux étudiants et aux professionnels formés et ne remplacent ni une formation pratique encadrée, ni l’évaluation clinique d’un patient.'},
+    about:{"slug": "about", "title": "Qui sommes-nous", "body": "Ostéo Pratik est un projet pédagogique porté par Nicolas Bertrand, Frédéric Zenouda et Valentin Cohas. Vidéos, fiches, cartes, audio et quiz accompagnent l’apprentissage et la révision des techniques ostéopathiques.\n\nNicolas Bertrand\nNicolas Bertrand exerce la kinésithérapie et l’ostéopathie à Paris, et l’ostéopathie à Nice. Auteur de plusieurs ouvrages et entrepreneur, il souhaite rendre les techniques ostéopathiques plus accessibles à travers des supports pédagogiques clairs et complémentaires.\n\nValentin Cohas\nOstéopathe D.O. MROF, Valentin Cohas exerce l’ostéopathie depuis plus de 22 ans et enseigne depuis 20 ans. Il pratique en cabinet dans le 13e arrondissement de Paris.\n\nFrédéric Zenouda"},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
   };
   defaults.privacy={slug:'privacy',title:'Confidentialité',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n[Identité et contact du responsable de traitement]\n\n[Données collectées, finalités et bases légales]\n\n[Prestataires, hébergement, destinataires et transferts éventuels]\n\n[Durées de conservation et modalités de suppression]\n\n[Droits des personnes et modalités de contact]\n\n[Traceurs et stockage local utilisés par l’application]'};
@@ -14,7 +14,16 @@
   const $=id=>document.getElementById(id);
   function node(tag,text,cls){const n=document.createElement(tag);if(text!=null)n.textContent=text;if(cls)n.className=cls;return n;}
   function bodyInto(el,text){el.replaceChildren();String(text||'').split(/\n\s*\n/).forEach(p=>el.appendChild(node('p',p)));}
+  const team67=[{"key": "nicolas-bertrand", "name": "Nicolas Bertrand", "bio": "Nicolas Bertrand exerce la kinésithérapie et l’ostéopathie à Paris, et l’ostéopathie à Nice. Auteur de plusieurs ouvrages et entrepreneur, il souhaite rendre les techniques ostéopathiques plus accessibles à travers des supports pédagogiques clairs et complémentaires."}, {"key": "valentin-cohas", "name": "Valentin Cohas", "bio": "Ostéopathe D.O. MROF, Valentin Cohas exerce l’ostéopathie depuis plus de 22 ans et enseigne depuis 20 ans. Il pratique en cabinet dans le 13e arrondissement de Paris."}, {"key": "frederic-zenouda", "name": "Frédéric Zenouda", "bio": ""}];
+  function aboutInto67(el,text){
+    const parts=String(text||'').split(/\n\s*\n/), bios=new Map(), intro=[];let current=null;
+    for(const part of parts){const lines=part.split('\n');const person=team67.find(p=>p.name===lines[0].trim());if(person){current=person.name;bios.set(current,lines.slice(1).join('\n'));}else if(current){bios.set(current,(bios.get(current)+'\n\n'+part).trim());}else intro.push(part);}
+    bodyInto(el,intro.join('\n\n'));const list=node('div',null,'op-team67');
+    for(const person of team67){const card=node('section',null,'op-person67'),img=node('img'),copy=node('div');img.src=new URL('assets/images/equipe/'+person.key+'.webp',document.baseURI).href;img.alt='Portrait de '+person.name;img.width=400;img.height=500;img.loading='lazy';img.decoding='async';img.onerror=()=>{img.hidden=true;};copy.append(node('h2',person.name));const bio=bios.has(person.name)?bios.get(person.name):person.bio;if(bio)bodyInto(copy.appendChild(node('div')),bio);card.append(img,copy);list.append(card);}el.append(list);
+  }
   function style(){if($('opContentStyle44'))return;const s=node('style');s.id='opContentStyle44';s.textContent=`
+    .op-team67{display:grid;gap:20px;margin-top:24px}.op-person67{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;padding:18px;border:1px solid #31516a;border-radius:18px;background:#0c2038}.op-person67 img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:center 25%;border-radius:12px}.op-person67 h2{margin:0 0 10px;font-size:20px;line-height:1.3}.op-person67 p:last-child{margin-bottom:0}@media(max-width:480px){.op-person67{grid-template-columns:minmax(0,1fr);padding:16px}.op-person67 img{width:min(220px,100%);justify-self:center}.op-person67 h2{text-align:center}}
+
     #opContentDialog44.op-help-dialog57{width:min(560px,calc(100% - 28px));max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 40px)}
     #opContentDialog44.op-help-dialog57 .op-content-page{display:grid;grid-template-columns:minmax(0,1fr) 44px;column-gap:12px;padding:20px}
     #opContentDialog44.op-help-dialog57 .op-content-close{grid-column:2;grid-row:1;align-self:start;padding:0;width:44px;height:44px;font-size:25px}
@@ -66,10 +75,10 @@
     const wrap=node('article',null,'op-content-page'),close=node('button',isHelp?'×':fromSettings?'← Réglages':'← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
     title.id='opContentTitle44';close.type='button';if(isHelp){close.setAttribute('aria-label','Fermer l’explication');dialog.addEventListener('close',()=>{if(opener?.isConnected)opener.focus();},{once:true});}close.onclick=()=>{dialog.close();if(fromSettings)openSettings();};wrap.append(close,title,meta,body);dialog.replaceChildren(wrap);if(!dialog.open)dialog.showModal();close.focus();
     try{
-      let page=await publicPage(slug);if(!page&&isHelp)page=defaults[slug];if(window.OSTEO_LANG50?.translatePage)page=await window.OSTEO_LANG50.translatePage(slug,page);if(seq!==openSequence||!dialog.open)return;
-      if(page){title.textContent=page.title;meta.textContent=page.updated_at?'Mis à jour le '+new Date(page.updated_at).toLocaleDateString('fr-FR'):'';bodyInto(body,page.body);}
+      let page=await publicPage(slug);if(!page&&(isHelp||slug==='about'))page=defaults[slug];if(window.OSTEO_LANG50?.translatePage)page=await window.OSTEO_LANG50.translatePage(slug,page);if(seq!==openSequence||!dialog.open)return;
+      if(page){title.textContent=page.title;meta.textContent=page.updated_at?'Mis à jour le '+new Date(page.updated_at).toLocaleDateString('fr-FR'):'';if(slug==='about')aboutInto67(body,page.body);else bodyInto(body,page.body);}
       else {meta.textContent='';bodyInto(body,'Cette page n’est pas encore publiée.');}
-    }catch(e){if(seq!==openSequence||!dialog.open)return;meta.textContent='';bodyInto(body,isHelp?defaults[slug].body:'Impossible de charger cette page. Vérifiez votre connexion et réessayez.');}
+    }catch(e){if(seq!==openSequence||!dialog.open)return;meta.textContent='';if(slug==='about')aboutInto67(body,defaults.about.body);else bodyInto(body,isHelp?defaults[slug].body:'Impossible de charger cette page. Vérifiez votre connexion et réessayez.');}
   }
   let settingsRun46=0;
   function preferences46(){try{return JSON.parse(localStorage.getItem('osteo.preferences.app46')||'{}')||{};}catch(_){return {};}}
@@ -206,7 +215,7 @@
     tabs.appendChild(tab);
     let client=null,slug='about',version=null,liveVersion=null,busy=false,dirty=false,loadToken=0,authorized=false;
     const status=t=>$('contentStatus44').textContent=t;
-    function preview(){const p=$('contentPreview44');p.replaceChildren(node('h2',$('contentTitle44').value));const b=node('div');bodyInto(b,$('contentBody44').value);p.appendChild(b);}
+    function preview(){const p=$('contentPreview44');p.replaceChildren(node('h2',$('contentTitle44').value));const b=node('div');if(slug==='about')aboutInto67(b,$('contentBody44').value);else bodyInto(b,$('contentBody44').value);p.appendChild(b);}
     function valid(){if(!$('contentTitle44').value.trim()||!$('contentBody44').value.trim())throw Error('Renseignez le titre et le texte.');}
     async function ready(){client=window.OSTEO_BACKOFFICE_CLIENT;if(!client)throw Error('Connectez-vous au back-office puis rechargez cette rubrique.');const {data,error}=await client.rpc('osteo_get_my_role');if(error||data!=='admin')throw Error('La modification est réservée aux administrateurs.');}
     async function load(next){
