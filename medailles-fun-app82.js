@@ -1,8 +1,8 @@
-/* Ostéo Pratik APP101 — hauteur normale et colonne ordinateur étroite. */
+/* Ostéo Pratik APP102 — trophées et informations en colonne ordinateur étroite. */
 (function(){
   'use strict';
   if(window.OSTEO_MEDALS82)return;
-  window.OSTEO_MEDALS82={version:'101.0'};
+  window.OSTEO_MEDALS82={version:'102.0'};
   const $=id=>document.getElementById(id);
   const number=value=>Number(String(value||'0').replace(/[^0-9.-]/g,''))||0;
   const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -121,6 +121,7 @@
       /* APP101 : hauteur normale, seule la largeur ordinateur est réduite. */
       @media(min-width:800px){
         #opRewardsFun75{width:min(430px,calc(100% - 36px));padding:20px 16px 150px}
+        #opXpRules81{width:min(430px,calc(100% - 36px))}
         #opRewardsFun75 .op75-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
         #opRewardsFun75 .op75-card{min-height:142px}
         #opRewardsFun75 .op75-zone-list{grid-template-columns:1fr}
