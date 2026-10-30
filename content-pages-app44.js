@@ -1,8 +1,50 @@
+/* Ostéo Pratik APP73 — stabilisation visuelle avant affichage de l'application. */
+(function(){
+  'use strict';
+  if(/backoffice\.html$/i.test(location.pathname)||window.OSTEO_BOOT_APP73)return;
+  window.OSTEO_BOOT_APP73={startedAt:Date.now()};
+  const style=document.createElement('style');
+  style.id='opBootStyle73';
+  style.textContent=`
+    html.op-booting73{overflow:hidden!important}
+    #opBoot73{position:fixed;inset:0;z-index:2147483647;display:grid;place-items:center;background:#061426;color:#eaf8ff;opacity:1;transition:opacity .18s ease}
+    #opBoot73.op-ready73{opacity:0;pointer-events:none}
+    #opBoot73 .op-boot-box73{display:grid;justify-items:center;gap:14px;padding:24px;text-align:center}
+    #opBoot73 .op-boot-mark73{width:48px;height:48px;border-radius:50%;border:3px solid #31516a;border-top-color:#57d9ef;animation:op-spin73 .8s linear infinite}
+    #opBoot73 p{margin:0;font:600 15px/1.4 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;letter-spacing:.02em}
+    @keyframes op-spin73{to{transform:rotate(360deg)}}
+    @media(prefers-reduced-motion:reduce){#opBoot73 .op-boot-mark73{animation:none;border-color:#57d9ef}#opBoot73{transition:none}}
+  `;
+  (document.head||document.documentElement).appendChild(style);
+  const overlay=document.createElement('div');overlay.id='opBoot73';overlay.setAttribute('role','status');overlay.setAttribute('aria-live','polite');overlay.innerHTML='<div class="op-boot-box73"><span class="op-boot-mark73" aria-hidden="true"></span><p>Chargement d’Ostéo Pratik…</p></div>';
+  document.documentElement.classList.add('op-booting73');
+  const mount=()=>{if(!overlay.isConnected)(document.body||document.documentElement).appendChild(overlay);};
+  mount();if(!document.body)document.addEventListener('DOMContentLoaded',mount,{once:true});
+  let finished=false;
+  function finish(){
+    if(finished)return;finished=true;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      overlay.classList.add('op-ready73');document.documentElement.classList.remove('op-booting73');
+      setTimeout(()=>{overlay.remove();style.remove();},220);
+    }));
+  }
+  function ready(){
+    const app=document.querySelector('.app');
+    const screen=app?.querySelector(':scope > .screen.active');
+    return !!(app&&screen&&window.OSTEO_LANG50&&window.OSTEO_NAV56);
+  }
+  const started=Date.now(),timer=setInterval(()=>{
+    if(ready()&&Date.now()-started>350){clearInterval(timer);finish();}
+    else if(Date.now()-started>4500){clearInterval(timer);finish();}
+  },80);
+  window.addEventListener('load',()=>setTimeout(()=>{if(ready())finish();},120),{once:true});
+})();
+
 /* Ostéo Pratik APP44 — pages éditoriales. Texte brut uniquement ; droits contrôlés par RLS. */
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'72.0'};
+  window.OSTEO_CONTENT_APP44={version:'73.0'};
   const defaults={
     about:{"slug": "about", "title": "Qui sommes-nous", "body": "Ostéo Pratik est un projet pédagogique porté par Nicolas Bertrand, Frédéric Zenouda et Valentin Cohas. Vidéos, fiches, cartes, audio et quiz accompagnent l’apprentissage et la révision des techniques ostéopathiques.\n\nNicolas Bertrand\nOstéopathe depuis 2005 et masseur-kinésithérapeute depuis 1992, Nicolas Bertrand exerce la kinésithérapie et l’ostéopathie à Paris, et l’ostéopathie à Nice. Son parcours l’a notamment conduit à accompagner des sportifs dans le milieu du tennis, à Roland-Garros et au sein du Lagardère Paris Racing.\n\nAuteur de plusieurs ouvrages, dont L’Encyclopédie du massage, Leçons pour votre dos et Ostéo Pratique, coécrit avec Frédéric Zenouda, il développe une approche pédagogique nourrie par son expérience en cabinet.\n\nÉgalement entrepreneur et cofondateur de Macadam Tonic, il associe pratique, écriture et création d’outils pour transmettre ses connaissances.\n\nValentin Cohas\nOstéopathe D.O. MROF, Valentin Cohas exerce l’ostéopathie depuis plus de 22 ans et enseigne depuis 20 ans. Il pratique en cabinet dans le 13e arrondissement de Paris.\n\nFrédéric Zenouda"},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
