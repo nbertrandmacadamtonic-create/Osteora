@@ -1,19 +1,19 @@
-/* Ostéo Pratik APP90 — grande médaille exactement centrée sur les quatre menus. */
+/* Ostéo Pratik APP93 — médaille centrée masquant entièrement l'ancien logo. */
 (function(){
   'use strict';
   if(window.OSTEO_HOME_REWARDS83)return;
-  window.OSTEO_HOME_REWARDS83={version:'90.0'};
+  window.OSTEO_HOME_REWARDS83={version:'93.0'};
   const $=id=>document.getElementById(id);
 
   function addStyle(){
     if($('opHomeRewardsStyle83'))return;
     const style=document.createElement('style');style.id='opHomeRewardsStyle83';style.textContent=`
       #home .op-home-menu-anchor90{position:relative!important;overflow:visible!important}
-      #home .op-home-rewards83{position:absolute;z-index:40;width:112px;height:112px;margin:0;padding:0;transform:translate(-50%,-50%)}
+      #home .op-home-rewards83{position:absolute;z-index:10050!important;width:112px;height:112px;margin:0;padding:0;transform:translate(-50%,-50%);isolation:isolate}
       #home .op-home-rewards83 button{display:grid;place-items:center;width:100%;height:100%;padding:0;border:0;border-radius:50%;color:#fff;background:transparent;font:inherit;cursor:pointer}
-      #home .op-home-medal83{display:grid;place-items:center;width:72px;height:72px;border:2px solid rgba(255,211,109,.78);border-radius:50%;color:#ffd36d;background:radial-gradient(circle at 35% 27%,rgba(255,255,255,.31),transparent 22%),linear-gradient(145deg,rgba(255,198,76,.38),rgba(22,15,37,.98));box-shadow:0 0 0 5px rgba(3,14,28,.66),0 0 25px rgba(255,199,78,.34);font-size:39px;line-height:1}
+      #home .op-home-medal83{position:relative;z-index:2;display:grid;place-items:center;width:80px;height:80px;border:2px solid rgba(255,211,109,.84);border-radius:50%;color:#ffd36d;background:radial-gradient(circle at 35% 27%,#5c452b 0,#36251e 30%,#151124 72%);box-shadow:0 0 0 6px #07101f,0 0 27px rgba(255,199,78,.38);font-size:44px;line-height:1}
       #home .op-home-rewards83 button:hover .op-home-medal83,#home .op-home-rewards83 button:focus-visible .op-home-medal83{border-color:#5feaff;box-shadow:0 0 0 5px rgba(3,14,28,.70),0 0 30px rgba(95,234,255,.45)}
-      @media(max-width:420px){#home .op-home-medal83{width:68px;height:68px;font-size:37px}}
+      @media(max-width:420px){#home .op-home-medal83{width:76px;height:76px;font-size:42px}}
     `;document.head.appendChild(style);
   }
 
