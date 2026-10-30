@@ -44,7 +44,7 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'89.0'};
+  window.OSTEO_CONTENT_APP44={version:'83.0'};
   const defaults={
     about:{"slug": "about", "title": "Qui sommes-nous", "body": "Ostéo Pratik est un projet pédagogique porté par Nicolas Bertrand, Frédéric Zenouda et Valentin Cohas. Vidéos, fiches, cartes, audio et quiz accompagnent l’apprentissage et la révision des techniques ostéopathiques.\n\nNicolas Bertrand\nOstéopathe depuis 2005 et masseur-kinésithérapeute depuis 1992, Nicolas Bertrand exerce la kinésithérapie et l’ostéopathie à Paris, et l’ostéopathie à Nice. Son parcours l’a notamment conduit à accompagner des sportifs dans le milieu du tennis, à Roland-Garros et au sein du Lagardère Paris Racing.\n\nAuteur de plusieurs ouvrages, dont L’Encyclopédie du massage, Leçons pour votre dos et Ostéo Pratique, coécrit avec Frédéric Zenouda, il développe une approche pédagogique nourrie par son expérience en cabinet.\n\nÉgalement entrepreneur et cofondateur de Macadam Tonic, il associe pratique, écriture et création d’outils pour transmettre ses connaissances.\n\nValentin Cohas\nOstéopathe D.O. MROF, Valentin Cohas exerce l’ostéopathie depuis plus de 22 ans et enseigne depuis 20 ans. Il pratique en cabinet dans le 13e arrondissement de Paris.\n\nFrédéric Zenouda"},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
@@ -144,7 +144,7 @@
     back.focus();return wrap;
   }
   function settingButton46(parent,label,detail,action){
-    const icons={'Mon compte':'♙','Mon abonnement':'◇','Préférences':'⚙','Langues':'文','Qui sommes-nous':'ⓘ','Conditions générales d’utilisation':'≡','Confidentialité':'♧','Suppression du compte':'−','Se déconnecter':'↪','Se connecter':'→','Modifier mon mot de passe':'⌁'};
+    const icons={'Mon compte':'♙','Mon abonnement':'◇','Préférences':'⚙','Qui sommes-nous':'ⓘ','Conditions générales d’utilisation':'≡','Confidentialité':'♧','Suppression du compte':'−','Se déconnecter':'↪','Se connecter':'→','Modifier mon mot de passe':'⌁'};
     const b=node('button',null,'op46-row'),icon=node('span',icons[label]||'›','op47-icon'),arrow=node('span','›','op47-chevron');
     icon.setAttribute('aria-hidden','true');arrow.setAttribute('aria-hidden','true');b.type='button';b.append(icon,node('strong',label),node('small',detail),arrow);b.onclick=action;
     if(label==='Se déconnecter'||label==='Suppression du compte')b.dataset.accountExit='1';parent.appendChild(b);return b;
@@ -183,13 +183,6 @@
     for(const [key,label] of [['reduceMotion','Réduire les animations'],['largeText','Agrandir le texte des pages d’information']]){const l=node('label',null,'op46-check'),i=node('input');i.type='checkbox';i.checked=p[key]===true;l.append(i,node('span',label));wrap.append(l);i.onchange=()=>{const old=preferences46();try{localStorage.setItem('osteo.preferences.app46',JSON.stringify({...old,[key]:i.checked}));applyPreferences46();status.textContent='Préférence enregistrée sur cet appareil.';}catch(e){i.checked=old[key]===true;status.textContent='Ce navigateur ne permet pas d’enregistrer ce réglage.';}};}
     wrap.append(node('p','Ces réglages sont propres à ce navigateur.'));
   }
-  function languages89(){
-    ++settingsRun46;const wrap=settingsShell46('Langues'),status=status46(wrap);
-    const api=window.OSTEO_LANG50,current=api?.getLanguage?.()||localStorage.getItem('osteo.language.app50')||'fr';
-    const languages=[['fr','🇫🇷','Français','Langue complète'],['en','🇬🇧','English','Traduction en préparation'],['es','🇪🇸','Español','Traduction en préparation'],['it','🇮🇹','Italiano','Traduzione in preparazione'],['de','🇩🇪','Deutsch','Übersetzung in Vorbereitung'],['pt','🇵🇹','Português','Tradução em preparação']];
-    languages.forEach(([code,flag,label,detail])=>{const button=settingButton46(wrap,label,detail,async()=>{try{if(api?.setLanguage)await api.setLanguage(code);else{localStorage.setItem('osteo.language.app50',code);document.documentElement.lang=code;}wrap.querySelectorAll('[data-language89]').forEach(item=>item.querySelector('.op47-chevron').textContent=item.dataset.language89===code?'✓':'›');status.textContent=code==='fr'?'Français activé.':'Choix enregistré. Cette traduction sera activée progressivement.';}catch(_){status.textContent='Impossible d’enregistrer la langue sur cet appareil.';}});button.dataset.language89=code;button.querySelector('.op47-icon').textContent=flag;button.querySelector('.op47-chevron').textContent=current===code?'✓':'›';});
-    wrap.append(node('p','Le français est actuellement la langue complète de référence. Les autres traductions seront ajoutées progressivement.'));
-  }
   async function deletion46(){
     const run=++settingsRun46,wrap=settingsShell46('Suppression du compte'),status=status46(wrap);status.textContent='Chargement…';
     try{const {c,user}=await session46();if(run!==settingsRun46)return;const {data,error}=await c.from('osteo_account_requests').select('status,created_at').eq('user_id',user.id).eq('kind','delete_account').maybeSingle();if(error)throw Error('Cette fonction nécessite l’installation SQL APP46.');if(run!==settingsRun46)return;status.textContent='';
@@ -202,8 +195,6 @@
   async function logout46(button){button.disabled=true;try{const {c}=await session46();const {error}=await c.auth.signOut();if(error)throw error;$('opSettingsDialog45')?.close();if(typeof window.go==='function')window.go('welcome');}catch(e){button.disabled=false;const s=$('op46MenuStatus');if(s)s.textContent='Déconnexion impossible. Vérifiez votre connexion et réessayez.';}}
   function openSettings(){
     menuMode49='settings';++settingsRun46;const wrap=settingsShell46('Réglages');
-    const currentLanguage=window.OSTEO_LANG50?.getLanguage?.()||localStorage.getItem('osteo.language.app50')||'fr',languageNames={fr:'Français',en:'English',es:'Español',it:'Italiano',de:'Deutsch',pt:'Português'};
-    settingButton46(wrap,'Langues',languageNames[currentLanguage]||'Français',languages89);
     settingButton46(wrap,'Préférences','Affichage et animations sur cet appareil',prefs46);
     wrap.append(node('h2','Informations'));
     for(const slug of ['about','cgu','privacy'])settingButton46(wrap,defaults[slug].title,'Consulter',()=>{$('opSettingsDialog45').close();openPage(slug,true);});
