@@ -1,8 +1,8 @@
-/* Ostéo Pratik APP82 — trophées alignés sur le format général de l'application. */
+/* Ostéo Pratik APP100 — page Mes trophées très compacte sur ordinateur. */
 (function(){
   'use strict';
   if(window.OSTEO_MEDALS82)return;
-  window.OSTEO_MEDALS82={version:'82.0'};
+  window.OSTEO_MEDALS82={version:'100.0'};
   const $=id=>document.getElementById(id);
   const number=value=>Number(String(value||'0').replace(/[^0-9.-]/g,''))||0;
   const esc=value=>String(value==null?'':value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -128,6 +128,37 @@
       @media(min-width:1180px){
         #opRewardsFun75{width:680px}
       }
+      /* APP100 : affichage ordinateur plus petit, adapté à la fenêtre. */
+      @media(min-width:800px){
+        #opRewardsFun75{width:min(560px,calc(100% - 36px));padding:7px 11px 92px;border-radius:18px 18px 0 0}
+        #opRewardsFun75 .op75-head{grid-template-columns:32px 1fr 32px;margin-bottom:5px}
+        #opRewardsFun75 .op75-head h1{margin-top:0;font-size:18px}
+        #opRewardsFun75 .op75-head small{font-size:7px}
+        #opRewardsFun75 .op75-back,#opRewardsFun75 .op75-info{width:32px;height:32px}
+        #opRewardsFun75 .op75-back svg{width:19px;height:19px}
+        #opRewardsFun75 .op75-tabs{margin-bottom:6px;padding:3px;border-radius:11px}
+        #opRewardsFun75 .op75-tab{min-height:30px;font-size:11px}
+        #opRewardsFun75 .op75-level{grid-template-columns:52px 1fr;gap:8px;padding:7px 9px;border-radius:13px}
+        #opRewardsFun75 .op75-level-ring{width:46px;height:46px}
+        #opRewardsFun75 .op75-level-ring strong{font-size:17px}
+        #opRewardsFun75 .op75-level-copy strong{margin:1px 0 4px;font-size:12px}
+        #opRewardsFun75 .op75-level-copy span{margin-top:4px;font-size:8px}
+        #opRewardsFun75 .op75-next{grid-template-columns:41px 1fr;gap:7px;margin:5px 0;padding:6px 8px;border-radius:12px}
+        #opRewardsFun75 .op75-next strong{margin:1px 0;font-size:11px}
+        #opRewardsFun75 .op75-next span{margin-bottom:4px;font-size:8px}
+        #opRewardsFun75 .op75-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+        #opRewardsFun75 .op75-card{min-height:82px;padding:6px 3px 5px;border-radius:11px}
+        #opRewardsFun75 .op75-card strong{min-height:21px;margin-top:4px;font-size:8px}
+        #opRewardsFun75 .op75-card small{font-size:7px}
+        #opRewardsFun75 .op75-medal{width:34px;height:34px;font-size:16px}
+        #opRewardsFun75 .op75-detail{margin-top:5px;padding:6px 9px;border-radius:10px}
+        #opRewardsFun75 .op75-detail strong{margin:2px 0;font-size:11px}
+        #opRewardsFun75 .op75-detail span{font-size:8px}
+        #opRewardsFun75 .op75-zone-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-top:5px}
+        #opRewardsFun75 .op75-zone{min-height:58px;grid-template-columns:30px 1fr auto;gap:6px;padding:6px;border-radius:11px}
+        #opRewardsFun75 .op75-zone-icon{width:28px;height:28px}
+      }
+      @media(min-width:1180px){#opRewardsFun75{width:560px}}
       @media(max-width:370px){#opRewardsFun75{padding-left:10px;padding-right:10px}#opRewardsFun75 .op75-grid{gap:5px}#opRewardsFun75 .op75-card{padding-left:3px;padding-right:3px}}
     `;document.head.appendChild(style);
   }
