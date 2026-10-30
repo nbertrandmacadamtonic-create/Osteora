@@ -1,53 +1,56 @@
-/* Ostéo Pratik APP86 — récompenses au centre des quatre menus. */
+/* Ostéo Pratik APP88 — récompenses dans le cercle central des quatre menus. */
 (function(){
   'use strict';
   if(window.OSTEO_HOME_REWARDS83)return;
-  window.OSTEO_HOME_REWARDS83={version:'86.0'};
+  window.OSTEO_HOME_REWARDS83={version:'88.0'};
   const $=id=>document.getElementById(id);
-  function style(){
+  function addStyle(){
     if($('opHomeRewardsStyle83'))return;
-    const s=document.createElement('style');s.id='opHomeRewardsStyle83';s.textContent=`
-      #home .op-home-menu-anchor86{position:relative!important;overflow:visible!important}
-      #home .op-home-rewards83{position:absolute;left:50%;top:50%;z-index:12;width:auto;margin:0;padding:0;transform:translate(-50%,-50%);box-sizing:border-box}
-      #home .op-home-rewards83 button{display:grid;place-items:center;width:78px;height:78px;padding:6px;border:1px solid rgba(255,200,90,.62);border-radius:50%;color:#f5f8ff;background:linear-gradient(145deg,rgba(25,39,68,.98),rgba(34,18,55,.98));box-shadow:0 10px 28px rgba(0,0,0,.48),0 0 0 5px rgba(2,9,20,.82),0 0 24px rgba(255,200,90,.20);font:inherit;cursor:pointer}
-      #home .op-home-medal83{display:grid;place-items:center;width:37px;height:37px;margin:auto;border-radius:50%;color:#ffc85a;background:radial-gradient(circle at 36% 28%,rgba(255,255,255,.25),transparent 23%),linear-gradient(145deg,rgba(255,200,90,.34),rgba(20,14,34,.98));font-size:20px}
-      #home .op-home-reward-copy83{display:block;margin-top:2px;color:#fff;text-align:center;font-size:8px;font-weight:900;line-height:1.05}#home .op-home-reward-copy83 small{display:none}
-      #home .op-home-rewards83 button:hover,#home .op-home-rewards83 button:focus-visible{border-color:#5feaff;box-shadow:0 0 0 5px rgba(2,9,20,.82),0 0 0 7px rgba(95,234,255,.24),0 12px 32px rgba(0,0,0,.52)}
-      @media(max-width:420px){#home .op-home-rewards83 button{width:68px;height:68px}#home .op-home-medal83{width:32px;height:32px;font-size:18px}#home .op-home-reward-copy83{font-size:7px}}
-    `;document.head.appendChild(s);
-  }
-  function findMenu(home){
-    const named=['.home-grid','.home-menu','.menu-grid','.main-menu','.home-actions','.home-cards'];
-    for(const selector of named){const found=home.querySelector(selector);if(found)return found;}
-    const nodes=[...home.querySelectorAll('div,section,main')];
-    return nodes.find(node=>{
-      const items=[...node.children].filter(child=>child.matches('button,a')||child.querySelector(':scope > button,:scope > a'));
-      return items.length===4;
-    })||null;
+    const style=document.createElement('style');style.id='opHomeRewardsStyle83';style.textContent=`
+      #home .op-home-menu-anchor88{position:relative!important;overflow:visible!important}
+      #home .op-home-rewards83{position:absolute;z-index:30;width:112px;height:112px;margin:0;padding:0;transform:translate(-50%,-50%)}
+      #home .op-home-rewards83 button{display:grid;place-items:center;width:100%;height:100%;padding:10px;border:2px solid rgba(231,246,255,.88);border-radius:50%;color:#fff;background:radial-gradient(circle at 50% 35%,rgba(31,73,103,.96),rgba(5,17,34,.98) 67%);box-shadow:0 0 0 4px rgba(95,234,255,.12),0 0 26px rgba(95,234,255,.27),0 12px 30px rgba(0,0,0,.48);font:inherit;cursor:pointer}
+      #home .op-home-medal83{display:grid;place-items:center;width:47px;height:47px;border-radius:50%;color:#ffc85a;background:radial-gradient(circle at 35% 27%,rgba(255,255,255,.30),transparent 22%),linear-gradient(145deg,rgba(255,200,90,.35),rgba(27,16,31,.98));box-shadow:0 0 0 3px rgba(255,200,90,.10),0 0 17px rgba(255,200,90,.24);font-size:25px}
+      #home .op-home-reward-copy83{display:block;margin-top:5px;color:#fff;font-size:9px;font-weight:950;line-height:1;letter-spacing:.02em;text-align:center}
+      #home .op-home-rewards83 button:hover,#home .op-home-rewards83 button:focus-visible{border-color:#ffc85a;box-shadow:0 0 0 4px rgba(255,200,90,.16),0 0 32px rgba(255,200,90,.33),0 12px 30px rgba(0,0,0,.5)}
+      @media(max-width:420px){#home .op-home-rewards83{width:104px;height:104px}#home .op-home-medal83{width:43px;height:43px;font-size:23px}#home .op-home-reward-copy83{font-size:8px}}
+    `;document.head.appendChild(style);
   }
   function openRewards(){
-    const existing=$('opRewardsEntryApp43');
-    if(existing){existing.click();return;}
+    const existing=$('opRewardsEntryApp43');if(existing){existing.click();return;}
     try{if(typeof window.go==='function')window.go('rewards');else if(typeof go==='function')go('rewards');}catch(_){}
   }
+  function action(home,pattern){
+    return [...home.querySelectorAll('button,a,[role="button"]')].find(element=>pattern.test((element.innerText||element.textContent||'').trim()))||null;
+  }
+  function commonAncestor(elements,home){
+    let current=elements[0]?.parentElement;
+    while(current&&current!==home){if(elements.every(element=>current.contains(element)))return current;current=current.parentElement;}
+    return home;
+  }
+  function locate(home){
+    const actions=[action(home,/vid[eé]os/i),action(home,/r[eé]viser/i),action(home,/tester/i),action(home,/stats|statistiques/i)];
+    if(actions.some(element=>!element))return null;
+    const boxes=actions.map(element=>element.getBoundingClientRect()).filter(box=>box.width&&box.height);if(boxes.length!==4)return null;
+    const left=Math.min(...boxes.map(box=>box.left)),right=Math.max(...boxes.map(box=>box.right));
+    const top=Math.min(...boxes.map(box=>box.top)),bottom=Math.max(...boxes.map(box=>box.bottom));
+    return {anchor:commonAncestor(actions,home),x:(left+right)/2,y:(top+bottom)/2};
+  }
   function install(){
-    style();const home=$('home');if(!home)return;
-    const menu=findMenu(home);if(!menu)return;
-    menu.classList.add('op-home-menu-anchor86');
+    addStyle();const home=$('home');if(!home)return;
+    const location=locate(home);if(!location)return;
+    const anchor=location.anchor;anchor.classList.add('op-home-menu-anchor88');
     let wrap=$('opHomeRewards83');
     if(!wrap){
       wrap=document.createElement('div');wrap.id='opHomeRewards83';wrap.className='op-home-rewards83';
-      const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Ouvrir mes trophées et récompenses');button.innerHTML='<span class="op-home-medal83" aria-hidden="true">★</span><span class="op-home-reward-copy83">Récompenses</span>';button.onclick=openRewards;wrap.appendChild(button);
+      const button=document.createElement('button');button.type='button';button.setAttribute('aria-label','Ouvrir mes trophées et récompenses');
+      button.innerHTML='<span class="op-home-medal83" aria-hidden="true">★</span><span class="op-home-reward-copy83">Récompenses</span>';button.onclick=openRewards;wrap.appendChild(button);
     }
-    if(wrap.parentElement!==menu)menu.appendChild(wrap);
+    if(wrap.parentElement!==anchor)anchor.appendChild(wrap);
+    const anchorBox=anchor.getBoundingClientRect();
+    wrap.style.left=(location.x-anchorBox.left+anchor.scrollLeft)+'px';wrap.style.top=(location.y-anchorBox.top+anchor.scrollTop)+'px';
   }
-  install();
-  let refreshQueued=false;
-  const observer=new MutationObserver(()=>{
-    if(refreshQueued)return;
-    refreshQueued=true;
-    requestAnimationFrame(()=>{refreshQueued=false;install();});
-  });
-  observer.observe(document.body,{childList:true,subtree:true});
-  [300,900,1800].forEach(ms=>setTimeout(install,ms));
+  let queued=false;function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;install();});}
+  install();const observer=new MutationObserver(schedule);observer.observe(document.body,{childList:true,subtree:true});
+  window.addEventListener('resize',schedule,{passive:true});[250,700,1400,2500].forEach(delay=>setTimeout(schedule,delay));
 })();
