@@ -44,7 +44,7 @@
 (function(){
   'use strict';
   if(window.OSTEO_CONTENT_APP44) return;
-  window.OSTEO_CONTENT_APP44={version:'78.0'};
+  window.OSTEO_CONTENT_APP44={version:'79.0'};
   const defaults={
     about:{"slug": "about", "title": "Qui sommes-nous", "body": "Ostéo Pratik est un projet pédagogique porté par Nicolas Bertrand, Frédéric Zenouda et Valentin Cohas. Vidéos, fiches, cartes, audio et quiz accompagnent l’apprentissage et la révision des techniques ostéopathiques.\n\nNicolas Bertrand\nOstéopathe depuis 2005 et masseur-kinésithérapeute depuis 1992, Nicolas Bertrand exerce la kinésithérapie et l’ostéopathie à Paris, et l’ostéopathie à Nice. Son parcours l’a notamment conduit à accompagner des sportifs dans le milieu du tennis, à Roland-Garros et au sein du Lagardère Paris Racing.\n\nAuteur de plusieurs ouvrages, dont L’Encyclopédie du massage, Leçons pour votre dos et Ostéo Pratique, coécrit avec Frédéric Zenouda, il développe une approche pédagogique nourrie par son expérience en cabinet.\n\nÉgalement entrepreneur et cofondateur de Macadam Tonic, il associe pratique, écriture et création d’outils pour transmettre ses connaissances.\n\nValentin Cohas\nOstéopathe D.O. MROF, Valentin Cohas exerce l’ostéopathie depuis plus de 22 ans et enseigne depuis 20 ans. Il pratique en cabinet dans le 13e arrondissement de Paris.\n\nFrédéric Zenouda"},
     cgu:{slug:'cgu',title:'Conditions générales d’utilisation',body:'BROUILLON À COMPLÉTER AVANT PUBLICATION\n\n1. Éditeur et contact\n[Identité ou raison sociale, statut, adresse, identifiants professionnels et contact de l’éditeur]\n\n2. Objet et public concerné\nOstéo Pratik propose des contenus pédagogiques pour apprendre et réviser des techniques ostéopathiques. Ces supports ne remplacent pas une formation pratique encadrée ni une évaluation clinique.\n[Préciser les conditions d’âge et de qualification]\n\n3. Accès et compte\n[Préciser les modalités de création du compte, les accès gratuits et payants, la sécurité du compte et sa suppression]\n\n4. Utilisation des contenus\n[Préciser les autorisations de consultation, les droits sur les vidéos et fiches, les usages interdits et les règles de partage]\n\n5. Disponibilité et responsabilités\n[Décrire les limites du service et les responsabilités sans exclure les garanties légales applicables]\n\n6. Données personnelles\n[Indiquer le contact et le lien vers une politique de confidentialité distincte précisant les finalités, bases légales, destinataires, durées de conservation et droits]\n\n7. Offres payantes\n[Confirmer l’absence d’offre payante ou renvoyer aux CGV adaptées aux prix, abonnements, paiements et rétractation]\n\n8. Évolution des conditions et réclamations\n[Préciser les modalités d’information, la date d’effet, le contact de réclamation et les dispositions applicables]'}
@@ -119,10 +119,10 @@
     const wrap=node('article',null,'op-content-page'),close=node('button',isHelp?'×':fromSettings?'← Réglages':'← Retour','op-content-close'),title=node('h1',defaults[slug].title),meta=node('small','Chargement…'),body=node('div');
     title.id='opContentTitle44';close.type='button';if(isHelp){close.setAttribute('aria-label','Fermer l’explication');dialog.addEventListener('close',()=>{if(opener?.isConnected)opener.focus();},{once:true});}close.onclick=()=>{dialog.close();if(fromSettings)openSettings();};wrap.append(close,title,meta,body);dialog.replaceChildren(wrap);if(!dialog.open)dialog.showModal();close.focus();
     try{
-      let page=await publicPage(slug);if(!page&&(isHelp||slug==='about'))page=defaults[slug];if(window.OSTEO_LANG50?.translatePage)page=await window.OSTEO_LANG50.translatePage(slug,page);if(seq!==openSequence||!dialog.open)return;
+      let page=await publicPage(slug);if(slug==='cgu'&&window.OSTEO_CGU_APP69?.text&&(!page||/BROUILLON À COMPLÉTER|\[[^\]]+\]/i.test(page.body||'')))page={title:window.OSTEO_CGU_APP69.title||defaults.cgu.title,body:window.OSTEO_CGU_APP69.text,updated_at:null};if(!page&&(isHelp||slug==='about'))page=defaults[slug];if(window.OSTEO_LANG50?.translatePage)page=await window.OSTEO_LANG50.translatePage(slug,page);if(seq!==openSequence||!dialog.open)return;
       if(page){title.textContent=page.title;meta.textContent=page.updated_at?'Mis à jour le '+new Date(page.updated_at).toLocaleDateString('fr-FR'):'';if(slug==='about')aboutInto67(body,page.body);else bodyInto(body,page.body);}
       else {meta.textContent='';bodyInto(body,'Cette page n’est pas encore publiée.');}
-    }catch(e){if(seq!==openSequence||!dialog.open)return;meta.textContent='';if(slug==='about')aboutInto67(body,defaults.about.body);else bodyInto(body,isHelp?defaults[slug].body:'Impossible de charger cette page. Vérifiez votre connexion et réessayez.');}
+    }catch(e){if(seq!==openSequence||!dialog.open)return;meta.textContent='';if(slug==='about')aboutInto67(body,defaults.about.body);else if(slug==='cgu'&&window.OSTEO_CGU_APP69?.text)bodyInto(body,window.OSTEO_CGU_APP69.text);else bodyInto(body,isHelp?defaults[slug].body:'Impossible de charger cette page. Vérifiez votre connexion et réessayez.');}
   }
   let settingsRun46=0;
   function preferences46(){try{return JSON.parse(localStorage.getItem('osteo.preferences.app46')||'{}')||{};}catch(_){return {};}}
@@ -204,6 +204,8 @@
     settingButton46(wrap,'Mon compte','Mes informations personnelles',account46);
     settingButton46(wrap,'Modifier mon mot de passe','Sécuriser mon compte',password46);
     settingButton46(wrap,'Mon abonnement','Formule, statut et échéance',subscription46);
+    wrap.append(node('h2','Informations'));
+    settingButton46(wrap,'Conditions générales d’utilisation','Consulter la version bêta acceptée',()=>{$('opSettingsDialog45')?.close();openPage('cgu');});
     wrap.append(node('h2','Compte'));
     settingButton46(wrap,'Suppression du compte','Enregistrer une demande de suppression',deletion46);
     const logout=settingButton46(wrap,'Se déconnecter','Fermer votre session',()=>logout46(logout));
@@ -304,5 +306,5 @@
 /* APP74 : même flèche de retour dans le lecteur audio et la navigation. */
 (function(){if(/backoffice\.html$/i.test(location.pathname)||document.querySelector('script[data-op-audio-back74]'))return;const script=document.createElement('script');script.src=new URL('audio-back-app74.js?cb='+Date.now(),document.currentScript?.src||location.href).href;script.dataset.opAudioBack74='1';document.head.appendChild(script);})();
 
-/* APP78 : médailles adaptées, sans second titre injecté par la navigation. */
-(function(){if(/backoffice\.html$/i.test(location.pathname)||document.querySelector('script[data-op-medals78]'))return;const script=document.createElement('script');script.src=new URL('medailles-fun-app78.js?cb='+Date.now(),document.currentScript?.src||location.href).href;script.dataset.opMedals78='1';document.head.appendChild(script);})();
+/* APP79 : notifications limitées aux statistiques et titres nettoyés. */
+(function(){if(/backoffice\.html$/i.test(location.pathname)||document.querySelector('script[data-op-medals79]'))return;const script=document.createElement('script');script.src=new URL('medailles-fun-app79.js?cb='+Date.now(),document.currentScript?.src||location.href).href;script.dataset.opMedals79='1';document.head.appendChild(script);})();
